@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{63E6F49A-4BD0-4C11-91BF-9E738642414E}</ProjectGuid>
+    <RootNamespace>Abducted</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)build.bat</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)rebuild.bat</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)clean.bat</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\..\Bin\win-msvc8-debug\Abducted.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)..\..\Radiance\Extern\boost\1.49.0;$(ProjectDir)..\..\Radiance\Extern\Win\Qt\4.8.1\include;$(ProjectDir)..\..\Radiance\Extern\Lua\5.1.4;$(ProjectDir)..\..\Radiance\Extern\SDL\1.2.15;$(ProjectDir)..\..\Radiance\Source;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)build.bat --developer --sym</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)rebuild.bat --developer --sym</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)clean.bat --developer --sym</NMakeCleanCommandLine>
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\..\Bin\win-msvc8-developer-sym\Abducted.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)..\..\Radiance\Extern\boost\1.49.0;$(ProjectDir)..\..\Radiance\Extern\Win\Qt\4.8.1\include;$(ProjectDir)..\..\Radiance\Extern\Lua\5.1.4;$(ProjectDir)..\..\Radiance\Extern\SDL\1.2.15;$(ProjectDir)..\..\Radiance\Source;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Game\AbductedApp.cpp" />
+    <ClCompile Include="..\Game\AbductedGame.cpp" />
+    <ClCompile Include="..\Game\Entities\G_Exports.cpp" />
+    <ClCompile Include="..\Game\Entities\G_OmenEnergy.cpp" />
+    <ClCompile Include="..\Game\Entities\G_ScreenPawn.cpp" />
+    <ClCompile Include="..\Game\Entities\G_ScreenProjectile.cpp" />
+    <ClCompile Include="..\Game\Entities\G_ScreenView.cpp" />
+    <ClCompile Include="..\Game\Entities\G_Thwap.cpp" />
+    <ClCompile Include="..\Game\Entities\G_ViewController.cpp" />
+    <ClCompile Include="..\Game\Lua\G_SkModel.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Game\AbductedApp.h" />
+    <ClInclude Include="..\Game\AbductedGame.h" />
+    <ClInclude Include="..\Game\Entities\G_Exports.h" />
+    <ClInclude Include="..\Game\Entities\G_OmenEnergy.h" />
+    <ClInclude Include="..\Game\Entities\G_ScreenPawn.h" />
+    <ClInclude Include="..\Game\Entities\G_ScreenProjectile.h" />
+    <ClInclude Include="..\Game\Entities\G_ScreenView.h" />
+    <ClInclude Include="..\Game\Entities\G_Thwap.h" />
+    <ClInclude Include="..\Game\Entities\G_ViewController.h" />
+    <ClInclude Include="..\Game\Lua\G_SkModel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Game\SConstruct" />
+    <None Include="..\..\Base\Shaders\F_1T.sh" />
+    <None Include="..\..\Base\Shaders\F_1T_A.sh" />
+    <None Include="..\..\Base\Shaders\F_1T_BLOOM.sh" />
+    <None Include="..\..\Base\Shaders\F_1T_COLORIZE_BLEND.sh" />
+    <None Include="..\..\Base\Shaders\F_1T_INVERT_BLEND.sh" />
+    <None Include="..\..\Base\Shaders\F_2T_ADD.sh" />
+    <None Include="..\..\Base\Shaders\F_2T_BC_POSTFX.sh" />
+    <None Include="..\..\Base\Shaders\F_2T_BLEND.sh" />
+    <None Include="..\..\Base\Shaders\F_2T_MUL.sh" />
+    <None Include="..\..\Base\Shaders\F_3T_ADD.sh" />
+    <None Include="..\..\Base\Shaders\F_3T_BC_POSTFX.sh" />
+    <None Include="..\..\Base\Shaders\F_3T_BLEND.sh" />
+    <None Include="..\..\Base\Shaders\F_3T_DETAIL.sh" />
+    <None Include="..\..\Base\Shaders\F_3T_MUL.sh" />
+    <None Include="..\..\Base\Shaders\F_4T_ADD.sh" />
+    <None Include="..\..\Base\Shaders\F_4T_BCA_POSTFX.sh" />
+    <None Include="..\..\Base\Shaders\F_4T_BLEND.sh" />
+    <None Include="..\..\Base\Shaders\F_4T_DETAIL.sh" />
+    <None Include="..\..\Base\Shaders\F_4T_MUL.sh" />
+    <None Include="..\..\Base\Shaders\F_4TA_DETAIL.sh" />
+    <None Include="..\..\Base\Shaders\F_5T_BCA_POSTFX.sh" />
+    <None Include="..\..\Base\Shaders\F_5TA_DETAIL.sh" />
+    <None Include="..\..\Base\Shaders\F_6T_BCA_POSTFX.sh" />
+    <None Include="..\..\Base\Shaders\F_COLOR.sh" />
+    <None Include="..\..\Base\Shaders\Nodes\Add.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Add.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Add3.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Add3.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Add4.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Add4.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Add5.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Add5.n" />
+    <None Include="..\..\Base\Shaders\Nodes\BloomSample.f" />
+    <None Include="..\..\Base\Shaders\Nodes\BloomSample.n" />
+    <None Include="..\..\Base\Shaders\Nodes\CG.cg" />
+    <None Include="..\..\Base\Shaders\Nodes\Common.cg" />
+    <None Include="..\..\Base\Shaders\Nodes\GLSL.cg" />
+    <None Include="..\..\Base\Shaders\Nodes\Lerp.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Lerp.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul3.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul3.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul4.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul4.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul5.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Mul5.n" />
+    <None Include="..\..\Base\Shaders\Nodes\OneMinus.f" />
+    <None Include="..\..\Base\Shaders\Nodes\OneMinus.n" />
+    <None Include="..\..\Base\Shaders\Nodes\SampleTexture2D.f" />
+    <None Include="..\..\Base\Shaders\Nodes\SampleTexture2D.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Shader.cg" />
+    <None Include="..\..\Base\Shaders\Nodes\SplitRGBA.f" />
+    <None Include="..\..\Base\Shaders\Nodes\SplitRGBA.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_w.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_w.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_ww.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_ww.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_www.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_www.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_wwww.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_wwww.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x511.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x511.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xx.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xx.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxx.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxx.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxxx.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxxx.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xyz.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xyz.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_y.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_y.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yy.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yy.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyy.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyy.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyyy.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyyy.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_z.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_z.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zz.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zz.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzz.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzz.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzzz.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzzz.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyz1.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyz1.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw.n" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw_w.f" />
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw_w.n" />
+    <None Include="..\..\Base\Scripts\Actor.lua" />
+    <None Include="..\..\Base\Scripts\Banshee.lua" />
+    <None Include="..\..\Base\Scripts\CinematicLevel.lua" />
+    <None Include="..\..\Base\Scripts\Class.lua" />
+    <None Include="..\..\Base\Scripts\CrowPawn.lua" />
+    <None Include="..\..\Base\Scripts\Crystal.lua" />
+    <None Include="..\..\Base\Scripts\EnemyPawn.lua" />
+    <None Include="..\..\Base\Scripts\Entity.lua" />
+    <None Include="..\..\Base\Scripts\Game.lua" />
+    <None Include="..\..\Base\Scripts\Imports.lua" />
+    <None Include="..\..\Base\Scripts\InfoNull.lua" />
+    <None Include="..\..\Base\Scripts\Input.lua" />
+    <None Include="..\..\Base\Scripts\Math.lua" />
+    <None Include="..\..\Base\Scripts\OmenBossTrigger.lua" />
+    <None Include="..\..\Base\Scripts\OmenEnergy.lua" />
+    <None Include="..\..\Base\Scripts\OmenLevel.lua" />
+    <None Include="..\..\Base\Scripts\OmenTrigger.lua" />
+    <None Include="..\..\Base\Scripts\OpeningCinematic.lua" />
+    <None Include="..\..\Base\Scripts\Overworld.lua" />
+    <None Include="..\..\Base\Scripts\Owl.lua" />
+    <None Include="..\..\Base\Scripts\Persistence.lua" />
+    <None Include="..\..\Base\Scripts\PostFX.lua" />
+    <None Include="..\..\Base\Scripts\Projectile.lua" />
+    <None Include="..\..\Base\Scripts\Rider.lua" />
+    <None Include="..\..\Base\Scripts\Score.lua" />
+    <None Include="..\..\Base\Scripts\ScoreScreen.lua" />
+    <None Include="..\..\Base\Scripts\Shiny.lua" />
+    <None Include="..\..\Base\Scripts\SoundEmitter.lua" />
+    <None Include="..\..\Base\Scripts\System.lua" />
+    <None Include="..\..\Base\Scripts\Thwap.lua" />
+    <None Include="..\..\Base\Scripts\TreeOfLife.lua" />
+    <None Include="..\..\Base\Scripts\UI.lua" />
+    <None Include="..\..\Base\Scripts\ViewController.lua" />
+    <None Include="..\..\Base\Scripts\Worldspawn.lua" />
+    <None Include="..\..\SConstruct" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,1 @@
+.\Bin\win-msvc10-golden\Abducted.exe

@@ -1,0 +1,5 @@
+QT_PATH=~/Projects/Abducted/Radiance/Extern/Linux/Qt/4.5.2/lib
+CG_PATH=~/Projects/Abducted/Radiance/Extern/Linux/Cg/2.2/lib
+export LD_LIBRARY_PATH=$QT_PATH:$CG_PATH
+#echo $LD_LIBRARY_PATH
+./Bin/$1/Balance

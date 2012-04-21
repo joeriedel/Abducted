@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\Game\Entities\G_Exports.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_OmenEnergy.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_ScreenPawn.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_ScreenProjectile.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_ScreenView.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_Thwap.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Entities\G_ViewController.cpp">
+      <Filter>Source\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\Lua\G_SkModel.cpp">
+      <Filter>Source\Game\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\AbductedApp.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Game\AbductedGame.cpp">
+      <Filter>Source\Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Game\Entities\G_ViewController.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_Exports.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_OmenEnergy.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_ScreenPawn.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_ScreenProjectile.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_ScreenView.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Entities\G_Thwap.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\Lua\G_SkModel.h">
+      <Filter>Source\Game\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\AbductedApp.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Game\AbductedGame.h">
+      <Filter>Source\Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Base\Scripts\Actor.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Class.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Banshee.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\CinematicLevel.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\CrowPawn.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Entity.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Crystal.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\EnemyPawn.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_1T.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_COLOR.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_1T_A.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_1T_BLOOM.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_1T_COLORIZE_BLEND.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_1T_INVERT_BLEND.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_2T_ADD.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_2T_BC_POSTFX.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_2T_BLEND.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_2T_MUL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_3T_ADD.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_3T_BC_POSTFX.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_3T_BLEND.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_3T_DETAIL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_3T_MUL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4T_ADD.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4T_BCA_POSTFX.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4T_BLEND.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4T_DETAIL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4T_MUL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_4TA_DETAIL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_5T_BCA_POSTFX.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_5TA_DETAIL.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\F_6T_BCA_POSTFX.sh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Common.cg">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add3.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add3.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add4.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add4.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add5.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Add5.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\BloomSample.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\BloomSample.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\CG.cg">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\Game\SConstruct">
+      <Filter>Source\Game</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Game.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Imports.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Input.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\InfoNull.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Math.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\OmenBossTrigger.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\OmenTrigger.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\OmenEnergy.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\OmenLevel.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\OpeningCinematic.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Rider.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Overworld.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Owl.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Persistence.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\PostFX.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Projectile.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Score.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\ScoreScreen.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\SoundEmitter.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Shiny.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\System.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Worldspawn.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\Thwap.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\TreeOfLife.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\UI.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Scripts\ViewController.lua">
+      <Filter>Script</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\GLSL.cg">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw_w.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Lerp.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Lerp.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul3.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul3.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul4.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul4.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul5.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Mul5.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\OneMinus.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\OneMinus.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\SampleTexture2D.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\SampleTexture2D.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Shader.cg">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\SplitRGBA.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\SplitRGBA.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_w.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_w.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_ww.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_ww.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_www.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_www.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_wwww.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_wwww.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x511.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_x511.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xx.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xx.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxx.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxx.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxxx.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xxxx.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xyz.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_xyz.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_y.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_y.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yy.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yy.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyy.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyy.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyyy.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_yyyy.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_z.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_z.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zz.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zz.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzz.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzz.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzzz.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Sw_zzzz.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyz1.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyz1.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw.n">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\Base\Shaders\Nodes\Swp_xyzw_w.f">
+      <Filter>Shaders\Nodes</Filter>
+    </None>
+    <None Include="..\..\SConstruct" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Script">
+      <UniqueIdentifier>{755f8e3f-0037-4fc2-9f15-49239c7715ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{0a2088c8-ed24-4a7c-9968-65095502f5c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Nodes">
+      <UniqueIdentifier>{1d89e584-27c3-45e6-98ae-e4eff7b3115b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{bf35311c-958c-416d-a347-4b877351c559}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Game">
+      <UniqueIdentifier>{9ef4edd2-6351-4f13-af60-362e47ac53b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Game\Entities">
+      <UniqueIdentifier>{a9974b63-a424-446c-8e94-2d25ebd94528}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Game\Lua">
+      <UniqueIdentifier>{747897a3-a901-4b59-a9c4-845f52c4c175}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

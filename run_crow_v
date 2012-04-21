@@ -1,0 +1,5 @@
+QT_PATH=~/Projects/Abducted/Radiance/Extern/Linux/Qt/lib
+CG_PATH=~/Projects/Abducted/Radiance/Extern/Linux/Cg/lib
+export LD_LIBRARY_PATH=$QT_PATH:$CG_PATH
+#echo $LD_LIBRARY_PATH
+valgrind ./Bin/$1/Balance

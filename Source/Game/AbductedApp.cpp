@@ -37,7 +37,7 @@ AbductedApp::~AbductedApp()
 
 bool AbductedApp::PreInit()
 {
-	COut(C_Info) << string::Shorten(title).c_str() << " built on " << __DATE__ << " @ " << __TIME__ << std::endl;
+	COut(C_Info) << title.get() << " built on " << __DATE__ << " @ " << __TIME__ << std::endl;
 	COut(C_Info) << "PreInit..." << std::endl;
 	if (!App::PreInit()) 
 		return false;
@@ -55,7 +55,7 @@ bool AbductedApp::Initialize()
 
 	int media = file::AllMedia;
 	int r = engine->sys->files->OpenFile(
-		L"pak0.pak",
+		"pak0.pak",
 		media,
 		file,
 		file::HIONotify()
@@ -67,7 +67,7 @@ bool AbductedApp::Initialize()
 		return false;
 	}
 
-	file::HPakFile pak = engine->sys->paks->MountPakFile(file, L"pak0.pak");
+	file::HPakFile pak = engine->sys->paks->MountPakFile(file, "pak0.pak");
 	if (!pak)
 	{
 		COut(C_Error) << "Unable to mount pak0.pak!" << std::endl;
@@ -96,8 +96,8 @@ bool AbductedApp::Initialize()
 bool AbductedApp::RunAutoExec()
 {
 	wchar_t nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath(L"9:/autoexec.txt", nativePath, file::MaxFilePathLen+1);
-	FILE *fp = file::wfopen(nativePath, L"rb");
+	file::ExpandToNativePath("9:/autoexec.txt", nativePath, file::MaxFilePathLen+1);
+	FILE *fp = fopen(nativePath, "rb");
 	if (!fp)
 		return false;
 	fseek(fp, 0, SEEK_END);
@@ -169,19 +169,19 @@ void AbductedApp::PostInputEvent(const InputEvent &e)
 #endif
 }
 
-const wchar_t *AbductedApp::RAD_IMPLEMENT_GET(title)
+const char *AbductedApp::RAD_IMPLEMENT_GET(title)
 {
-	return L"Abducted";
+	return "Abducted";
 }
 
-const wchar_t *AbductedApp::RAD_IMPLEMENT_GET(company)
+const char *AbductedApp::RAD_IMPLEMENT_GET(company)
 {
-	return L"Sunside";
+	return "Sunside";
 }
 
-const wchar_t *AbductedApp::RAD_IMPLEMENT_GET(website)
+const char *AbductedApp::RAD_IMPLEMENT_GET(website)
 {
-	return L"www.sunsidegames.com";
+	return "www.sunsidegames.com";
 }
 
 void AbductedApp::Finalize()

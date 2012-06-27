@@ -34,9 +34,9 @@ protected:
 
 private:
 
-	virtual RAD_DECLARE_GET(title, const wchar_t*);
-	virtual RAD_DECLARE_GET(company, const wchar_t*);
-	virtual RAD_DECLARE_GET(website, const wchar_t*);
+	virtual RAD_DECLARE_GET(title, const char*);
+	virtual RAD_DECLARE_GET(company, const char*);
+	virtual RAD_DECLARE_GET(website, const char*);
 	virtual RAD_DECLARE_GET(allowMultipleInstances, bool);
 	virtual RAD_DECLARE_GET(flurryAPIKey, const char*);
 

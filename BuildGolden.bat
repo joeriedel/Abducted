@@ -1,3 +1,4 @@
-call python scons.py --nocom --nounittests --golden -j 4
-call StageWinDLLs.bat
+call "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x86
+devenv Source/VSProjects/VS10/Abducted.sln /clean "Golden - Release|Win32"
+devenv Source/VSProjects/VS10/Abducted.sln /build "Golden - Release|Win32" /project Abducted
 pause

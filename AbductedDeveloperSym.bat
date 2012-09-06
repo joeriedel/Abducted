@@ -1,1 +1,0 @@
-.\Bin\win-msvc10-developer-sym\Abducted.exe

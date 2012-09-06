@@ -1,1 +1,1 @@
-.\Bin\win-msvc10-debug\Abducted.exe
+".\Bin\Dev - Debug - Win32\Abducted.exe"

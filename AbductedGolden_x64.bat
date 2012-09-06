@@ -1,0 +1,1 @@
+".\Bin\Golden - Release - x64\Abducted.exe"

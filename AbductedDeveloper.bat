@@ -1,1 +1,1 @@
-.\Bin\win-msvc10-developer\Abducted.exe
+".\Bin\Dev - Release - Win32\Abducted.exe"

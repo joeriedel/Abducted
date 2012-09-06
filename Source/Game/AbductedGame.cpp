@@ -1,7 +1,7 @@
 // AbductedGame.cpp
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
-// See Abducted/LICENSE for licensing terms.
+// See Crow/LICENSE for licensing terms.
 
 #include "AbductedGame.h"
 #include <Engine/App.h>
@@ -28,10 +28,10 @@ enum
 	OverlayDiv = 8
 };
 
-class GSAbductedLoadMap : public GSLoadMap
+class GSCrowLoadMap : public GSLoadMap
 {
 public:
-	GSAbductedLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
+	GSCrowLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
 	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true)
 	{
 	}
@@ -48,10 +48,9 @@ public:
 #if defined(RAD_OPT_PC_TOOLS)
 			if (game.toolsCallback)
 				game.toolsCallback->SwapBuffers();
-			else
+#else
+			App::Get()->engine->sys->r->SwapBuffers();
 #endif
-				App::Get()->engine->sys->r->SwapBuffers();
-
 			mapAsset->world->draw->rb->ClearBackBuffer();
 
 		}
@@ -109,8 +108,11 @@ private:
 		gl.MatrixMode(GL_MODELVIEW);
 		gl.LoadIdentity();
 		const float size = 128.f;
-		gl.Translatef(vpw-size-8.f, vph-(size*yaspect)-8.f, 0.f);
-		gl.Scalef(size/BaseRectSize, (size*yaspect)/BaseRectSize, 1.f);
+		const float scale = vpw/1024.f;
+		const float sizeX = size*scale;
+		const float sizeY = size*scale * yaspect;
+		gl.Translatef(vpw-sizeX-8.f, vph-sizeY-8.f, 0.f);
+		gl.Scalef(sizeX/BaseRectSize, sizeY/BaseRectSize, 1.f);
 
 		Material *m = m_parser->material;
 
@@ -241,7 +243,7 @@ private:
 
 Game::Tickable::Ref GSLoadMap::New(int mapId, int slot, bool play, bool loadScreen)
 {
-	return Game::Tickable::Ref(new (ZWorld) GSAbductedLoadMap(mapId, slot, play, loadScreen));
+	return Game::Tickable::Ref(new (ZWorld) GSCrowLoadMap(mapId, slot, play, loadScreen));
 }
 
 Game::Tickable::Ref GSPlay::New()
@@ -260,5 +262,7 @@ AbductedGame::AbductedGame()
 
 bool AbductedGame::LoadEntry()
 {
+	if (!Game::LoadEntry())
+		return false;
 	return LoadMapSeq("Cinematic/ToL", 1, world::UD_Slot, false);
 }

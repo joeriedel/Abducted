@@ -11,22 +11,19 @@
 #include <Engine/Game/Game.h>
 #endif
 
-class AbductedApp : public App
-{
+class AbductedApp : public App {
 public:
-	AbductedApp();
+	AbductedApp(int argc, const char **argv);
 	virtual ~AbductedApp();
 
 	virtual bool PreInit();
+	virtual int DoLauncher();
+	virtual bool InitWindow();
 	virtual bool Initialize();
 	virtual void Finalize();
+	virtual bool Run();
 	virtual void NotifyBackground(bool background);
 	virtual void PostInputEvent(const InputEvent &e);
-
-#if defined(RAD_OPT_PC)
-	virtual void CloseWindow();
-	virtual void FocusChange(bool focus);
-#endif
 
 protected:
 
@@ -37,14 +34,7 @@ private:
 	virtual RAD_DECLARE_GET(title, const char*);
 	virtual RAD_DECLARE_GET(company, const char*);
 	virtual RAD_DECLARE_GET(website, const char*);
-	virtual RAD_DECLARE_GET(allowMultipleInstances, bool);
 	virtual RAD_DECLARE_GET(flurryAPIKey, const char*);
-
-#if defined(RAD_OPT_PC_TOOLS)
-	virtual RAD_DECLARE_GET(wantEditor, bool);
-	virtual void SwitchEditorMode(bool editor);
-	virtual void EditorStart();
-#endif
 
 #if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
 	virtual RAD_DECLARE_GET(game, Game*) { return m_game.get(); }

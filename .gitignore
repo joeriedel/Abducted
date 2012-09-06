@@ -4,8 +4,10 @@
 *.suo
 *.ncb
 *.vcproj.*.user
+*.opensdf
 *.vcxproj.user
 *.sdf
+*.cache
 *~
 BuildLog.htm
 *.idb
@@ -13,6 +15,7 @@ BuildLog.htm
 *.exe
 *.manifest
 *.pch
+*.ipch
 *.lib
 *.pdb
 *.dep
@@ -24,6 +27,9 @@ BuildLog.htm
 *.pbxuser
 *.a
 *.mode1v3
+*.tlog
+*.log
+*.lastbuildstate
 pbxindex.header
 *.pbxsymbols
 *.hmap
@@ -45,6 +51,7 @@ Cooked/*
 globals.data
 *.sav
 *.deuser
+Extern/*
 TODO.txt
 autoexec.txt
 editor.user.ini

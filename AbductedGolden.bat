@@ -1,1 +1,1 @@
-.\Bin\win-msvc10-golden\Abducted.exe
+".\Bin\Golden - Release - Win32\Abducted.exe"

@@ -5,7 +5,7 @@
 
 #include "AbductedApp.h"
 #include <Engine/Engine.h>
-#include <Engine/Utils/Tokenizer.h>
+#include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
 #include "Game/Entities/G_Exports.h"
 #if defined(RAD_OPT_GL) && defined(RAD_TARGET_GOLDEN) && defined(RAD_OPT_PC)

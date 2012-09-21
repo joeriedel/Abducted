@@ -26,14 +26,11 @@ namespace
 	{
 		Id = RAD_FOURCC('R', 'S', 'C', 'N'),
 		Version2 = 2,
-		Version = 3,
+		Version3 = 3,
+		Version = 4,
 		MaxUVChannels = 1,
 
 		HasMaterialFlag = 0x80000000,
-		ContentsDetailFlag = 0x40000000,
-		ContentsAreaportalFlag = 0x20000000,
-		ContentsNoClipFlag = 0x00800000,
-		ContentsNoDrawFlag = 0x00400000,
 		HasMeshFlag = 0x00100000,
 		HasAnimsFlag = 0x00200000
 	};
@@ -140,6 +137,7 @@ namespace
 		vec3 mins, maxs;
 		int contents;
 		int id;
+		std::string name;
 	};
 
 	void ReadTriModel(FILE *fp, int version, TriModel &mdl, int flags, int numSkelBones)
@@ -714,6 +712,8 @@ bool MaxScene::Load(const char *filename)
 			S32 skel;
 
 			fread(&mdl.id, sizeof(int), 1, fp);
+			if (version > 3)
+				mdl.name = ReadString(fp);
 			fread(&flags, sizeof(U32), 1, fp);
 			fread(&skel, sizeof(S32), 1, fp);
 
@@ -723,29 +723,6 @@ bool MaxScene::Load(const char *filename)
 				fread(&idx, sizeof(U32), 1, fp);
 				m = &mats[idx];
 			}
-
-			/*if (flags & 0x40000000)
-			{
-				mdl.contents = Map::ContentsDetail;
-			}
-			else if (flags & 0x20000000)
-			{
-				mdl.contents = Map::ContentsAreaportal;
-			}
-			else
-			{
-				mdl.contents = Map::ContentsSolid;
-			}
-
-			if (!(flags & 0x00800000))
-			{
-				mdl.contents |= Map::ContentsNoClip;
-			}
-
-			if (!(flags & 0x00400000))
-			{
-				mdl.contents |= Map::ContentsNoDraw;
-			}*/
 
 			if (flags&(HasMeshFlag|HasAnimsFlag))
 				ReadTriModel(fp, version, mdl, flags, skel >= 0 ? skelBoneCounts[skel] : 0);

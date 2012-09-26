@@ -2052,17 +2052,6 @@ bool CTreadDoc::IsEditingVerts()
 	return m_bEditVerts;
 }
 
-bool CTreadDoc::IsEditingWaypoints() {
-	return m_bEditWaypoints;
-}
-
-void CTreadDoc::SetEditingWaypoints( bool editing )
-{
-	m_bEditFaces = false;
-	m_bEditVerts = false;
-	m_bEditWaypoints = editing;
-}
-
 void CTreadDoc::SetEditingFaces( bool editing )
 {
 	m_bEditFaces = editing;
@@ -2563,11 +2552,6 @@ void CTreadDoc::UpdateSelectionInterface()
 		if( m_bEditVerts )
 			UpdateVertMode();
 
-		return;
-	}
-
-	if (m_bEditWaypoints) {
-		m_gamePlugin->UpdateWaypointMode(this);
 		return;
 	}
 

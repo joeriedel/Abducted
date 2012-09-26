@@ -4080,7 +4080,8 @@ OS_FNEXP bool Sys_DragSel( CMapView* pView, int mx, int my, int buttons )
 		vec3 trans = vec3::zero;
 
 		int count = pDoc->GetSelectedObjectCount();
-		if( (count == pDoc->GetSelectedObjectCount(MAPOBJ_CLASS_ENTITY, MAPOBJ_SUBCLASS_NONE)) )
+		if( (count == pDoc->GetSelectedObjectCount(MAPOBJ_CLASS_ENTITY, MAPOBJ_SUBCLASS_NONE)) ||
+			(count == pDoc->GetSelectedObjectCount(MAPOBJ_CLASS_WAYPOINT, MAPOBJ_SUBCLASS_NONE)) )
 		{
 			//
 			// we only have entities, so snap them each to the grid.

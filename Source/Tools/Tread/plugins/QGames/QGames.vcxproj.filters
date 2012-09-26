@@ -179,7 +179,7 @@
     <ClCompile Include="Abducted.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WaypointMesh.cpp">
+    <ClCompile Include="WaypointGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -283,7 +283,7 @@
     <ClInclude Include="Abducted.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="WaypointMesh.h">
+    <ClInclude Include="WaypointGrid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

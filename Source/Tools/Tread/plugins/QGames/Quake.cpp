@@ -762,48 +762,6 @@ void CQuakeGame::UpdateVertexMode(CTreadDoc *doc)
 	doc->AddManipulatorToMap( m );
 }
 
-void CQuakeGame::UpdateWaypointMode(CTreadDoc *doc)
-{
-	CWaypointDrag3DGizmo* m;
-	float size = 64.0f;
-	unsigned hlcolor = 0xFF4DE6F2;
-
-	CQuakeUserData *ud = static_cast<CQuakeUserData*>(doc->UserData());
-	
-	doc->m_manips.push_back(m = new CWaypointDrag3DGizmo());
-	m->color = 0xFF0000FF;
-	m->hlcolor = hlcolor;
-	m->size = size;
-	m->vec = sysAxisX;
-	m->x_in = &ud->vertmanpos;
-	m->y_in = &ud->vertmanpos;
-	m->z_in = &ud->vertmanpos;
-	m->string = "waypoint drag x";
-	doc->AddManipulatorToMap( m );
-
-	doc->m_manips.push_back(m = new CWaypointDrag3DGizmo());
-	m->color = 0xFF00FF00;
-	m->hlcolor = hlcolor;
-	m->size = size;
-	m->vec = sysAxisY;
-	m->x_in = &ud->vertmanpos;
-	m->y_in = &ud->vertmanpos;
-	m->z_in = &ud->vertmanpos;
-	m->string = "waypoint drag y";
-	doc->AddManipulatorToMap( m );
-
-	doc->m_manips.push_back(m = new CWaypointDrag3DGizmo());
-	m->color = 0xFFFF0000;
-	m->hlcolor = hlcolor;
-	m->size = size;
-	m->vec = sysAxisZ;
-	m->x_in = &ud->vertmanpos;
-	m->y_in = &ud->vertmanpos;
-	m->z_in = &ud->vertmanpos;
-	m->string = "waypoint drag z";
-	doc->AddManipulatorToMap( m );
-}
-
 void CQuakeGame::UpdateSelectionBounds(CTreadDoc *doc)
 {
 	CQuakeUserData *ud = static_cast<CQuakeUserData*>(doc->UserData());
@@ -819,12 +777,6 @@ void CQuakeGame::UpdateSelectionBounds(CTreadDoc *doc)
 		{
 			ud->vertmanpos += *(bm->pos);
 			num += 1.0f;
-		} else {
-			CWaypointMesh::WaypointGizmo *waypoint = dynamic_cast<CWaypointMesh::WaypointGizmo*>(pM);
-			if (waypoint) {
-				ud->vertmanpos += waypoint->waypoint->pos;
-				num += 1.0f;
-			}
 		}
 	}
 
@@ -853,18 +805,6 @@ void CQuakeGame::EnterFaceMode(CTreadDoc *doc, bool enter)
 	else
 	{
 		doc->GetSelectedObjectList()->WalkList( CQBrush::ExitBrushFaceMode );
-	}
-}
-
-void CQuakeGame::EnterWaypointMode(CTreadDoc *doc, bool enter)
-{
-	if (enter)
-	{
-		doc->GetSelectedObjectList()->WalkList( CWaypointMesh::EnterEditMode );
-	}
-	else
-	{
-		doc->GetSelectedObjectList()->WalkList( CWaypointMesh::ExitEditMode );
 	}
 }
 

@@ -349,7 +349,7 @@ copy "$(TargetPath)" "$(ProjectDir)..\..\..\..\..\Base\TreadBase\Plugins"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Dev - Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WaypointMesh.cpp" />
+    <ClCompile Include="WaypointGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brush.h" />
@@ -385,7 +385,7 @@ copy "$(TargetPath)" "$(ProjectDir)..\..\..\..\..\Base\TreadBase\Plugins"
     <ClInclude Include="jpeg\jpegint.h" />
     <ClInclude Include="jpeg\jpeglib.h" />
     <ClInclude Include="jpeg\jversion.h" />
-    <ClInclude Include="WaypointMesh.h" />
+    <ClInclude Include="WaypointGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\checkbuttons2.bmp" />

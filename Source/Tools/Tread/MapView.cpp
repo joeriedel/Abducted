@@ -1374,18 +1374,7 @@ void CMapView::OnLButtonDown(UINT nFlags, CPoint point)
 		if( !m_lpick )
 			m_lpick = R_PickObject( this, point.x, point.y, picksize, picksize );
 		
-		if (GetDocument()->IsEditingWaypoints() && !GetDocument()->IsInTrackAnimationMode() )
-		{
-			if( m_lpick )
-			{ // when editing waypoints, restrict us to selecting waypoint gizmos, or splines.
-				CMapObject* m = dynamic_cast<CMapObject*>(m_lpick);
-				if (!m) {
-					m_lpick->MouseDown( this, point.x, point.y, nFlags|MS_LBUTTON );
-					redraw = true;
-				}
-			}
-		}
-		else if( GetDocument()->IsEditingVerts() && !GetDocument()->IsInTrackAnimationMode() )
+		if( GetDocument()->IsEditingVerts() && !GetDocument()->IsInTrackAnimationMode() )
 		{
 			bool box = m_lpick == 0;
 
@@ -1807,12 +1796,6 @@ void CMapView::OnRButtonDown(UINT nFlags, CPoint point)
 		{
 			CPickObject* parent = pick->GetParent();
 			if( !parent || (dynamic_cast<CSplineTrack*>(parent) == 0) )
-				return;
-		}
-		else if( GetDocument()->IsEditingWaypoints() )
-		{
-			CMapObject* m = dynamic_cast<CMapObject*>(pick->GetParent());
-			if( m && (m->GetClass() != MAPOBJ_CLASS_WAYPOINTMESH))
 				return;
 		}
 		

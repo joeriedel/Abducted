@@ -211,9 +211,6 @@ public:
 	void SetEditingFaces( bool editing = true );
 	void SetEditingVerts( bool editing = true );
 
-	bool IsEditingWaypoints();
-	void SetEditingWaypoints(bool editing = true);
-
 	void Prop_UpdateSelection();
 	void Prop_PropChange( const char* prop );
 	void Prop_SelectProp( const char* name );

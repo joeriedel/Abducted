@@ -38,7 +38,7 @@
 #include "resource.h"
 #include "Brush.h"
 #include "VertDrag3D_Manipulator.h"
-#include "WaypointMesh.h"
+#include "WaypointGrid.h"
 #include "TextureFactory.h"
 #include "QuakePak.h"
 #include "QuakeMap.h"
@@ -233,8 +233,6 @@ public:
 	virtual void EnterVertexMode(CTreadDoc *doc, bool enter);
 	virtual void EnterFaceMode(CTreadDoc *doc, bool enter);
 	virtual void ProcessVertexBoxSelection(CTreadDoc *doc, int count, CPickObject **list, bool select);
-	virtual void UpdateWaypointMode(CTreadDoc *doc);
-	virtual void EnterWaypointMode(CTreadDoc *doc, bool enter);
 	virtual void UpdateSelectionInterface(CTreadDoc *doc);
 	virtual void BindUserData(CTreadDoc *doc);
 	virtual void ReleaseUserData(CTreadDoc *doc);

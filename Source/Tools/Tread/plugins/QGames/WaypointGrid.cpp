@@ -52,8 +52,21 @@ CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
 	m_pos = m.m_pos;
 	m_boxPos = vec3::zero;
 	m_drag = false;
-	m_connections = m.m_connections;
 	m_tails = m.m_tails;
+
+	for (Connection::Map::const_iterator it = m.m_connections.begin(); it != m.m_connections.end(); ++it) {
+		const Connection::Ref &c = it->second;
+		Connection::Ref clone(new Connection());
+		clone->ctrls[0] = c->ctrls[0];
+		clone->ctrls[1] = c->ctrls[1];
+		clone->head = 0;
+		clone->tail = 0;
+		clone->headId = c->headId;
+		clone->tailId = c->tailId;
+		clone->InitMesh();
+		m_connections[it->first] = clone;
+	}
+
 	UpdateBoxMesh();
 }
 
@@ -90,11 +103,17 @@ void CWaypoint::Nudge(const vec3 &amt, CTreadDoc *doc) {
 }
 
 bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
-	return CMapObject::WriteToFile(pFile, pDoc, nVersion);
+	if (!CMapObject::WriteToFile(pFile, pDoc, nVersion))
+		return false;
+
+	return true;
 }
 
 bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
-	return CMapObject::ReadFromFile(pFile, pDoc, nVersion);
+	if (!CMapObject::ReadFromFile(pFile, pDoc, nVersion))
+		return false;
+
+	return true;
 }
 
 CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* pDoc ) {
@@ -479,7 +498,7 @@ bool CWaypoint::ControlPointGizmo3D::OnDrag( CMapView* pView, int nButtons, cons
 		moved = true;
 	}
 
-	src->waypoint->m_pos += t;
+	*(src->pos) += t;
 	src->connection->UpdateMesh();
 
 	pView->GetDocument()->BuildSelectionBounds();

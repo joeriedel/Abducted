@@ -145,6 +145,69 @@ public:
 class OS_CLEXP CSplineTrack : public CMapObject
 {
 friend class CSplineControlPoint_Manipulator;
+public:
+
+	CSplineTrack();
+	CSplineTrack( const CSplineTrack& t );
+	virtual ~CSplineTrack();
+
+	CLinkedList<CSplineKeyFrame>* GetKeyFrames( int type );
+	void AddKeyFrame( int ticks, vec3 v, const char* event, int type );
+	void RemoveKeyFrame( int ticks, int type );
+	void SetKeyFrameInfo( int ticks, int new_ticks, vec3 v, const char* event, int type, int flags = KEYFRAME_MASK_ALL );
+	void EvaluateSpline( int ticks, vec3* pos, vec3* rot, float* fov );
+	bool KeyFrameExists( int ticks, int type );
+	bool HasMotion();
+	void SetMotion( bool motion = true );
+
+	//
+	// returns total milliseconds that this spline runs for.
+	//
+	int GetTotalTicks();
+	
+	//
+	// this will cause the spline to dynamically resize all keyframes and splines.
+	//
+	void ScaleTimes( float scale );
+
+	//
+	// computes spline start/end times based on spline lengths.
+	void CalcSplineTimes();
+
+	void GetWorldMinsMaxs( vec3* pMins, vec3* pMaxs );
+	void GetObjectMinsMaxs( vec3* pMins, vec3* pMaxs );
+	vec3 GetObjectWorldPos();
+	void SetObjectWorldPos( const vec3& pos, CTreadDoc* pDoc );
+
+	void OnMouseDown( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+	void OnMouseUp( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+	void OnMouseMove( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+	bool OnPopupMenu( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+
+	void OnAddToMap( CTreadDoc* pDoc );
+	void OnRemoveFromMap( CTreadDoc* pDoc );
+	void OnAddToSelection( CTreadDoc* pDoc );
+
+	bool WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion );
+	bool ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion );
+
+	CLinkedList<CObjProp>* GetPropList( CTreadDoc* pDoc );
+	void SetProp(  CTreadDoc* pDoc, CObjProp* prop );
+
+	int GetNumRenderMeshes( CMapView* pView );
+	CRenderMesh* GetRenderMesh( int num, CMapView* pView );
+
+	int GetClass();
+	const char* GetRootName();
+
+	CMapObject* Clone();
+	void CopyState( CMapObject* src, CTreadDoc* pDoc );
+
+	void WriteToMapFile( std::fstream& file, CTreadDoc* doc );
+
+	static CMapObject* MakeSplineTrack( CTreadDoc* doc );
+	static CObjectCreator *Creator();
+
 private:
 
 	CSplineKeyFrame* FindKeyFrame( CLinkedList<CSplineKeyFrame>* list, int ticks );
@@ -228,69 +291,6 @@ private:
 
 	bool WriteKeyframeList( CLinkedList<CSplineKeyFrame>* list, CFile* file, CTreadDoc* doc, int nVersion );
 	bool ReadKeyframeList( CLinkedList<CSplineKeyFrame>* list, CFile* file, CTreadDoc* doc, int nVersion );
-
-public:
-
-	CSplineTrack();
-	CSplineTrack( const CSplineTrack& t );
-	virtual ~CSplineTrack();
-
-	CLinkedList<CSplineKeyFrame>* GetKeyFrames( int type );
-	void AddKeyFrame( int ticks, vec3 v, const char* event, int type );
-	void RemoveKeyFrame( int ticks, int type );
-	void SetKeyFrameInfo( int ticks, int new_ticks, vec3 v, const char* event, int type, int flags = KEYFRAME_MASK_ALL );
-	void EvaluateSpline( int ticks, vec3* pos, vec3* rot, float* fov );
-	bool KeyFrameExists( int ticks, int type );
-	bool HasMotion();
-	void SetMotion( bool motion = true );
-
-	//
-	// returns total milliseconds that this spline runs for.
-	//
-	int GetTotalTicks();
-	
-	//
-	// this will cause the spline to dynamically resize all keyframes and splines.
-	//
-	void ScaleTimes( float scale );
-
-	//
-	// computes spline start/end times based on spline lengths.
-	void CalcSplineTimes();
-
-	void GetWorldMinsMaxs( vec3* pMins, vec3* pMaxs );
-	void GetObjectMinsMaxs( vec3* pMins, vec3* pMaxs );
-	vec3 GetObjectWorldPos();
-	void SetObjectWorldPos( const vec3& pos, CTreadDoc* pDoc );
-
-	void OnMouseDown( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
-	void OnMouseUp( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
-	void OnMouseMove( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
-	bool OnPopupMenu( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
-
-	void OnAddToMap( CTreadDoc* pDoc );
-	void OnRemoveFromMap( CTreadDoc* pDoc );
-	void OnAddToSelection( CTreadDoc* pDoc );
-
-	bool WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion );
-	bool ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion );
-
-	CLinkedList<CObjProp>* GetPropList( CTreadDoc* pDoc );
-	void SetProp(  CTreadDoc* pDoc, CObjProp* prop );
-
-	int GetNumRenderMeshes( CMapView* pView );
-	CRenderMesh* GetRenderMesh( int num, CMapView* pView );
-
-	int GetClass();
-	const char* GetRootName();
-
-	CMapObject* Clone();
-	void CopyState( CMapObject* src, CTreadDoc* pDoc );
-
-	void WriteToMapFile( std::fstream& file, CTreadDoc* doc );
-
-	static CMapObject* MakeSplineTrack( CTreadDoc* doc );
-	static CObjectCreator *Creator();
 };
 
 #endif

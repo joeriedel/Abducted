@@ -9,8 +9,8 @@
 
 #include "System.h"
 #include "vec3d_manipulator.h"
-#include <list>
 #include <map>
+#include <set>
 
 ///////////////////////////////////////////////////////////////////////////////
 class CWaypointDrag3DGizmo;
@@ -65,6 +65,86 @@ public:
 	virtual bool OnPopupMenu( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc);
 
 private:
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	class Connection;
+	class ControlPointGizmo;
+	class ControlPointGizmo3D : public CVec3D_Manipulator {
+	public:
+
+		ControlPointGizmo3D();
+		virtual ~ControlPointGizmo3D();
+
+		ControlPointGizmo *src;
+		bool moved;
+
+		virtual void OnMouseDown( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual bool OnDrag( CMapView* pView, int nButtons, const vec3& move );
+	};
+
+	friend class ControlPointGizmo3D;
+
+	class ControlPointGizmo : public CManipulator {
+	public:
+
+		ControlPointGizmo();
+		virtual ~ControlPointGizmo();
+
+		virtual void OnMouseDown( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual void OnMouseUp( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual void OnMouseMove( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual void OnMouseEnter( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual void OnMouseLeave( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc );
+		virtual void OnDraw( CMapView* pView );
+
+		bool hover;
+		bool moved;
+		bool drag;
+		bool snap;
+		float size;
+		int lastx, lasty;
+		unsigned int color;
+		unsigned int hlcolor;
+		vec3 *pos;
+		CWaypoint *waypoint;
+		Connection *connection;
+	};
+
+	friend class ControlPointGizmo;
+
+	///////////////////////////////////////////////////////////////////////////////
+
+	class Connection : public CPickObject {
+	public:
+		typedef boost::shared_ptr<Connection> Ref;
+		typedef std::map<int, Ref> Map;
+		
+		enum {
+			kNumPoints = 100
+		};
+
+		Connection();
+		virtual ~Connection();
+
+		void InitMesh();
+		void UpdateMesh();
+		void Select(bool select);
+		void Bind(CTreadDoc *doc);
+		void CreateGizmos(CTreadDoc *doc);
+		void DeleteGizmos(CTreadDoc *doc);
+
+		CRenderMesh mesh;
+		vec3 ctrls[2];
+		CWaypoint *head;
+		CWaypoint *tail;
+		ControlPointGizmo *gizmos[2];
+		ControlPointGizmo3D *gizmos3D[2][3];
+		int headId;
+		int tailId;
+	};
+
+	friend class Connection;
 	
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -72,8 +152,8 @@ private:
 	public:
 
 		enum {
-			kConnectWaypoints,
-			kDisconnectWaypoints
+			kConnect,
+			kDisconnect
 		};
 
 		ContextMenu();
@@ -91,13 +171,31 @@ private:
 	friend class AbductedUserData;
 	friend class CQuakeGame;
 
+	typedef std::set<int> IntSet;
+
 	void CalcBounds();
 	void UpdateBoxMesh();
+	void NotifyAttach(CTreadDoc *doc);
+	void NotifyDetach(CTreadDoc *doc);
+	void NotifyAttach(CTreadDoc *doc, CWaypoint &src);
+	void NotifyDetach(CTreadDoc *doc, CWaypoint &src);
+	void NotifyMoved(CTreadDoc *doc);
+	void NotifyMoved(CTreadDoc *doc, CWaypoint &src);
+	void CreateGizmos(CTreadDoc *doc);
+	void DeleteGizmos(CTreadDoc *doc);
+	void CreateGizmos(CTreadDoc *doc, CWaypoint &src);
+	void DeleteGizmos(CTreadDoc *doc, CWaypoint &src);
 
 	void PopupMenu_OnConnectWaypoints(CMapView *view);
 	void PopupMenu_OnDisconnectWaypoints(CMapView *view);
+
+	static void Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst);
+	static void Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool flip);
 	
 	CRenderMesh m_boxMesh;
+	Connection::Map m_connections;
+	Connection::Map::iterator m_meshIt;
+	IntSet m_tails;
 	vec3 m_world[2];
 	vec3 m_local[2];
 	vec3 m_pos;

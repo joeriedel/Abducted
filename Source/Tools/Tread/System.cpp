@@ -1635,6 +1635,7 @@ void CUndoRedoManager::DuplicateListIntoDocument( CLinkedList<CMapObject>* pSrc,
 	for( obj = pSrc->ResetPos(); obj; obj = pSrc->GetNextItem() )
 	{
 		copy = obj->Clone();
+		copy->SetUID(obj->GetUID());
 		pDoc->AddObjectToMap( copy );
 		pDoc->AddObjectToSelection( copy );
 		copy->CopyState( obj, pDoc );

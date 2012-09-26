@@ -205,8 +205,8 @@ void AbductedUserData::MakeWaypointMenu(CTreadDoc *doc)
 	if( m_WaypointMenuCreated )
 		return;
 
-	m_WaypointMenu.AddMenuItem(CWaypoint::ContextMenu::kConnectWaypoints, "Connect");
-	m_WaypointMenu.AddMenuItem(CWaypoint::ContextMenu::kDisconnectWaypoints, "Disconnect");
+	m_WaypointMenu.AddMenuItem(CWaypoint::ContextMenu::kConnect, "Connect");
+	m_WaypointMenu.AddMenuItem(CWaypoint::ContextMenu::kDisconnect, "Disconnect");
 	
 	m_WaypointMenuCreated = true;
 }

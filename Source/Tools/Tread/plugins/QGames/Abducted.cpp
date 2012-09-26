@@ -81,6 +81,8 @@ CObjectCreator *AbductedGame::ObjectCreator(int i)
 	case 3:
 		return CSplineTrack::Creator();
 		break;
+	case 4:
+		return new CMakeWaypointMesh();
 	}
 
 	return 0;
@@ -196,4 +198,21 @@ void AbductedUserData::MakeBrushMenu(CTreadDoc *doc)
 	m_BrushMenu.AddMenuItem( ID_TOOLS_ROTATE180, "Rotate 180º", true );
 
 	m_BrushMenuCreated = true;
+}
+
+void AbductedUserData::MakeWaypointMenu(CTreadDoc *doc)
+{
+	if( m_WaypointMenuCreated )
+		return;
+
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kEditWaypoints, "Edit Waypoints");
+	m_WaypointMenu.AddMenuItem( 0, "@SEP@" );
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kAddWaypoint, "Add Waypoint");
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kConnectWaypoints, "Connect Waypoints");
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kDisconnectWaypoints, "Disconnect Waypoints");
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kEditWaypoint, "Edit Waypoint...");
+	m_WaypointMenu.AddMenuItem( 0, "@SEP@" );
+	m_WaypointMenu.AddMenuItem(CWaypointMesh::ContextMenu::kDeleteSelected, "Delete Selected Waypoints...");
+
+	m_WaypointMenuCreated = true;
 }

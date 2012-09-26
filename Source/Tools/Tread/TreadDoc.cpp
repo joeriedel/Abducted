@@ -250,6 +250,7 @@ CTreadDoc::CTreadDoc()
 	m_pChildFrame = 0;
 	m_bEditFaces = false;
 	m_bEditVerts = false;
+	m_bEditWaypoints = false;
 	m_nNextUID = 0;
 
 	m_nNumTextureFilters = 0;
@@ -2051,16 +2052,29 @@ bool CTreadDoc::IsEditingVerts()
 	return m_bEditVerts;
 }
 
+bool CTreadDoc::IsEditingWaypoints() {
+	return m_bEditWaypoints;
+}
+
+void CTreadDoc::SetEditingWaypoints( bool editing )
+{
+	m_bEditFaces = false;
+	m_bEditVerts = false;
+	m_bEditWaypoints = editing;
+}
+
 void CTreadDoc::SetEditingFaces( bool editing )
 {
 	m_bEditFaces = editing;
 	m_bEditVerts = false;
+	m_bEditWaypoints = false;
 }
 
 void CTreadDoc::SetEditingVerts( bool editing )
 {
 	m_bEditVerts = editing;
 	m_bEditFaces = false;
+	m_bEditWaypoints = false;
 }
 
 void CTreadDoc::DetachObject( CMapObject* pObject )
@@ -2549,6 +2563,11 @@ void CTreadDoc::UpdateSelectionInterface()
 		if( m_bEditVerts )
 			UpdateVertMode();
 
+		return;
+	}
+
+	if (m_bEditWaypoints) {
+		m_gamePlugin->UpdateWaypointMode(this);
 		return;
 	}
 

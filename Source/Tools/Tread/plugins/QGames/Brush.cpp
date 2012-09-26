@@ -280,7 +280,7 @@ void CQBrushVertex_Manipulator::OnMouseDown( CMapView* pView, int nMX, int nMY, 
 {
 	if( pView->GetViewType() == VIEW_TYPE_3D )
 	{
-		if( !m_bSelected )
+		if( !IsSelected() )
 		{
 			if( !(nButtons&MS_CONTROL) )
 			{
@@ -308,7 +308,7 @@ void CQBrushVertex_Manipulator::OnMouseDown( CMapView* pView, int nMX, int nMY, 
 		//
 		// get all hit records from the click.
 		//
-		if( !m_bSelected )
+		if( !IsSelected() )
 		{
 			if( !(nButtons&MS_CONTROL) )
 			{
@@ -489,7 +489,7 @@ void CQBrushVertex_Manipulator::OnMouseEnter( CMapView* pView, int nMX, int nMY,
 {
 	m_bHover = true;
 
-	if( m_bSelected )
+	if( IsSelected() )
 		pView->GetDocument()->AddManipulatorToSelection( this ); // this little trick pushes it forward to be visible in all views.
 	else
 		pView->GetDocument()->AddManipulatorToMap( this ); // this little trick pushes it forward to be visible in all views.
@@ -517,7 +517,7 @@ void CQBrushVertex_Manipulator::OnDraw( CMapView* pView )
 		s = size;
 	}
 
-	if( m_bSelected )
+	if( IsSelected() )
 	{
 		glColor4ub( 0xFF, 0, 0, 0xFF );
 	}

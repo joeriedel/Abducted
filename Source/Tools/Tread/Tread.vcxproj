@@ -584,6 +584,7 @@
     <ClInclude Include="texcache.h" />
     <ClInclude Include="TrackAnimDialog.h" />
     <ClInclude Include="Tread.h" />
+    <ClInclude Include="TreadDoc.h" />
     <ClInclude Include="TreadView.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="sdk\burger.h" />

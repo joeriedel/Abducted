@@ -46,8 +46,18 @@ protected:
 class AbductedUserData : public CQuakeUserData
 {
 public:
-	AbductedUserData(CTreadDoc *doc, AbductedGame *game) : CQuakeUserData(doc, game) {}
+	AbductedUserData(CTreadDoc *doc, AbductedGame *game) : CQuakeUserData(doc, game), m_WaypointMenuCreated(false) {}
+	
+	CWaypointMesh::ContextMenu m_WaypointMenu;
+	
 	void MakeBrushMenu(CTreadDoc *doc);
+	void MakeWaypointMenu(CTreadDoc *doc);
+
+
+
+protected:
+
+	bool m_WaypointMenuCreated;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

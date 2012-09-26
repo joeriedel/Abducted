@@ -336,7 +336,7 @@ void CSplineControlPoint_Manipulator::OnDraw( CMapView* pView )
 		s = size;
 	}
 
-	if( m_bSelected )
+	if( IsSelected() )
 	{
 		glColor4f( 1, 0, 0, 1 );
 	}
@@ -790,7 +790,7 @@ void CSplineTrack::FreeManipulators( CTreadDoc* doc )
 		int i;
 		for(i = 0; i < m_num_manips; i++)
 		{
-			if( m_manips[i]->m_bSelected )
+			if( m_manips[i]->IsSelected() )
 			{
 				Clear3DManipulators( doc );
 			}

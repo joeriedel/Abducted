@@ -179,6 +179,9 @@
     <ClCompile Include="Abducted.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WaypointMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brush.h">
@@ -278,6 +281,9 @@
       <Filter>jpeg</Filter>
     </ClInclude>
     <ClInclude Include="Abducted.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaypointMesh.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

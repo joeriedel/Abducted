@@ -67,6 +67,7 @@
 #include "r_sys.h"
 #include "c_tokenizer.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #define TREAD_API_VERSION 1
 
@@ -201,6 +202,7 @@ OS_FNEXP extern const vec3 sysAxisZ;
 #define MAPOBJ_CLASS_ENTITY			0x00000002
 #define MAPOBJ_CLASS_GROUP			0x00000004
 #define MAPOBJ_CLASS_SPLINETRACK    0x00000008
+#define MAPOBJ_CLASS_WAYPOINTMESH   0x00000010
 #define MAPOBJ_CLASS_FIRST_USER_BIT 0x00004000
 #define MAPOBJ_CLASS_ALL			0xFFFFFFFF
 
@@ -463,7 +465,12 @@ public:
 	
 	DECLARE_TREAD_NEW();
 
-	bool m_bSelected;
+	bool IsSelected() {
+		return m_bSelected;
+	}
+
+	// Default returns true
+	virtual bool PickEnabled(CMapView* pView);
 
 	CManipulator();
 	virtual ~CManipulator();
@@ -473,6 +480,7 @@ public:
 friend class CTreadDoc;
 private:
 
+	bool m_bSelected;
 	void* m_pMapList;
 };
 
@@ -1727,6 +1735,9 @@ public:
 	virtual void UpdateSelectionBounds(CTreadDoc *doc) = 0;
 	virtual void EnterVertexMode(CTreadDoc *doc, bool enter) = 0;
 	virtual void EnterFaceMode(CTreadDoc *doc, bool enter) = 0;
+	virtual void UpdateWaypointMode(CTreadDoc *doc) = 0;
+	virtual void EnterWaypointMode(CTreadDoc *doc, bool enter) = 0;
+	virtual void UpdateSelectionInterface(CTreadDoc *doc) = 0;
 	virtual void ProcessVertexBoxSelection(CTreadDoc *doc, int count, CPickObject **list, bool select) = 0;
 	virtual void BindUserData(CTreadDoc *doc) = 0;
 	virtual void ReleaseUserData(CTreadDoc *doc) = 0;

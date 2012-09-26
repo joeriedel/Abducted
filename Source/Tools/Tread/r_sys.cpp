@@ -799,6 +799,8 @@ static void R_RenderManipulatorList( CMapView* pView, CLinkedList<CManipulator>*
 	{
 		if( (m->GetViewFlags()&pView->GetViewType()) == 0 )
 			continue;
+		if (pick && !m->PickEnabled(pView))
+			continue;
 
 		if( pick )
 		{

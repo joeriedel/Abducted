@@ -339,6 +339,9 @@
     <ClInclude Include="sdk\Vec3d_Manipulator.h">
       <Filter>SDK</Filter>
     </ClInclude>
+    <ClInclude Include="TreadDoc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\AbductED.ico">

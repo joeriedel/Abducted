@@ -122,6 +122,12 @@ public:
 
 	virtual CMapObject *ObjectForClass(int classbits, int subclassbits)
 	{
+		switch (classbits) {
+		case MAPOBJ_CLASS_WAYPOINT:
+			return new CWaypoint();
+		default:
+			break;
+		}
 		return 0;
 	}
 };

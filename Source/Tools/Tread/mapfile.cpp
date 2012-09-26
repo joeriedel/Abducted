@@ -573,7 +573,14 @@ static CMapObject* ObjectForClass( CPluginGame *game, int classbits, int subclas
 {
 	{
 		CMapObject *obj = game->ObjectForClass(classbits, subclassbits);
-		if (obj) return obj;
+		if (obj) 
+			return obj;
+		for (CPlugin *plugin = Sys_Plugins()->ResetPos(); plugin; plugin = Sys_Plugins()->GetNextItem())
+		{
+			obj = plugin->ObjectForClass(classbits, subclassbits);
+			if (obj)
+				return obj;
+		}
 	}
 
 	switch( classbits )

@@ -13,6 +13,10 @@
 #include "Abducted.h"
 #include "r_gl.h"
 
+enum {
+	kWaypointSaveVersion = 1
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 
 CWaypoint *CWaypoint::Create(CTreadDoc *doc) {
@@ -59,8 +63,6 @@ CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
 		Connection::Ref clone(new Connection());
 		clone->ctrls[0] = c->ctrls[0];
 		clone->ctrls[1] = c->ctrls[1];
-		clone->head = 0;
-		clone->tail = 0;
 		clone->headId = c->headId;
 		clone->tailId = c->tailId;
 		clone->InitMesh();
@@ -106,6 +108,27 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 	if (!CMapObject::WriteToFile(pFile, pDoc, nVersion))
 		return false;
 
+	MAP_WriteInt(pFile, kWaypointSaveVersion);
+	MAP_WriteVec3(pFile, &m_world[0]);
+	MAP_WriteVec3(pFile, &m_world[1]);
+	MAP_WriteVec3(pFile, &m_local[0]);
+	MAP_WriteVec3(pFile, &m_local[1]);
+	MAP_WriteVec3(pFile, &m_pos);
+		
+	MAP_WriteInt(pFile, (int)m_connections.size());
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
+		const Connection::Ref &c = it->second;
+		MAP_WriteInt(pFile, c->headId);
+		MAP_WriteInt(pFile, c->tailId);
+		MAP_WriteVec3(pFile, &c->ctrls[0]);
+		MAP_WriteVec3(pFile, &c->ctrls[1]);
+	}
+
+	MAP_WriteInt(pFile, (int)m_tails.size());
+	for (IntSet::const_iterator it = m_tails.begin(); it != m_tails.end(); ++it) {
+		MAP_WriteInt(pFile, *it);
+	}
+
 	return true;
 }
 
@@ -113,15 +136,42 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 	if (!CMapObject::ReadFromFile(pFile, pDoc, nVersion))
 		return false;
 
+	int version = MAP_ReadInt(pFile);
+	MAP_ReadVec3(pFile, &m_world[0]);
+	MAP_ReadVec3(pFile, &m_world[1]);
+	MAP_ReadVec3(pFile, &m_local[0]);
+	MAP_ReadVec3(pFile, &m_local[1]);
+	MAP_ReadVec3(pFile, &m_pos);
+
+	int num = MAP_ReadInt(pFile);
+	for (int i = 0; i < num; ++i) {
+		Connection::Ref c(new Connection());
+		c->headId = MAP_ReadInt(pFile);
+		c->head = this;
+		c->tailId = MAP_ReadInt(pFile);
+		c->InitMesh();
+		MAP_ReadVec3(pFile, &c->ctrls[0]);
+		MAP_ReadVec3(pFile, &c->ctrls[1]);
+		m_connections[c->tailId] = c;
+	}
+
+	num = MAP_ReadInt(pFile);
+	for (int i = 0; i < num; ++i) {
+		m_tails.insert(MAP_ReadInt(pFile));
+	}
+
+	UpdateBoxMesh();
+
 	return true;
 }
 
 CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* pDoc ) {
-	return 0;
+	m_propList.ReleaseList();
+	return &m_propList;
 }
 
 void CWaypoint::SetProp( CTreadDoc* pDoc, CObjProp* prop ) {
-	CMapObject::SetProp(pDoc, prop);
+	
 }
 
 void CWaypoint::OnAddToMap( CTreadDoc* pDoc ) {
@@ -377,6 +427,8 @@ void CWaypoint::DeleteGizmos(CTreadDoc *doc, CWaypoint &src) {
 void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 	CLinkedList<CMapObject> *selection = view->GetDocument()->GetSelectedObjectList();
 
+	bool undo = false;
+
 	CMapObject *xNext;
 	for (CMapObject *x = selection->ResetPos(); x; x = xNext) {
 		selection->SetPosition(x);
@@ -390,6 +442,13 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 			CWaypoint *dst = dynamic_cast<CWaypoint*>(y);
 			if (!dst)
 				continue;
+
+			if (!undo) {
+				undo = true;
+				view->GetDocument()->GenericUndoRedoFromSelection()->SetTitle("Connect Waypoints");
+				selection->SetPosition(y);
+			}
+
 			Connect(view->GetDocument(), *src, *dst);
 		}
 	}
@@ -401,6 +460,8 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 void CWaypoint::PopupMenu_OnDisconnectWaypoints(CMapView *view) {
 	CLinkedList<CMapObject> *selection = view->GetDocument()->GetSelectedObjectList();
 
+	bool undo = false;
+
 	CMapObject *xNext;
 	for (CMapObject *x = selection->ResetPos(); x; x = xNext) {
 		selection->SetPosition(x);
@@ -414,6 +475,13 @@ void CWaypoint::PopupMenu_OnDisconnectWaypoints(CMapView *view) {
 			CWaypoint *dst = dynamic_cast<CWaypoint*>(y);
 			if (!dst)
 				continue;
+
+			if (!undo) {
+				undo = true;
+				view->GetDocument()->GenericUndoRedoFromSelection()->SetTitle("Disconnect Waypoints");
+				selection->SetPosition(y);
+			}
+
 			Disconnect(view->GetDocument(), *src, *dst, false);
 		}
 	}
@@ -427,8 +495,6 @@ void CWaypoint::Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst) {
 	Connection::Map::iterator it = src.m_connections.find(dst.GetUID());
 	if (it != src.m_connections.end())
 		return;
-
-	doc->GenericUndoRedoFromSelection()->SetTitle("Connect Waypoints");
 
 	Connection::Ref c(new Connection());
 	c->head = &src;
@@ -456,7 +522,6 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 			Disconnect(doc, dst, src, true); // maybe connected this way
 		return;
 	}
-	doc->GenericUndoRedoFromSelection()->SetTitle("Disconnect Waypoints");
 	it->second->DeleteGizmos(doc);
 	src.m_connections.erase(it);
 	dst.m_tails.erase(src.GetUID());
@@ -660,6 +725,11 @@ void CWaypoint::ControlPointGizmo::OnDraw( CMapView* pView ) {
 ///////////////////////////////////////////////////////////////////////////////
 
 CWaypoint::Connection::Connection() {
+	head = 0;
+	tail = 0;
+	headId = -1;
+	tailId = -1;
+
 	for (int i = 0; i < 2; ++i) {
 		gizmos[i] = 0;
 		gizmos3D[i][0] = 0;

@@ -194,6 +194,7 @@ private:
 	
 	CRenderMesh m_boxMesh;
 	Connection::Map m_connections;
+	CLinkedList<CObjProp> m_propList;
 	Connection::Map::iterator m_meshIt;
 	IntSet m_tails;
 	vec3 m_world[2];

@@ -64,6 +64,8 @@ public:
 
 	virtual bool OnPopupMenu( CMapView* pView, int nMX, int nMY, int nButtons, CPickObject* pSrc);
 
+	void WriteToMapFile(std::fstream &fs, CTreadDoc *doc);
+
 private:
 
 	///////////////////////////////////////////////////////////////////////////////

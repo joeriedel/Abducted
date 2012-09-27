@@ -36,6 +36,7 @@
 #include "QuakeMap.h"
 #include "Quake.h"
 #include "splinetrack.h"
+#include "WaypointGrid.h"
 #include <vector>
 
 static bool ParseEntity( C_Tokenizer* script, CTreadDoc* pDoc );
@@ -63,6 +64,14 @@ int CQuakeMap::WriteEntities( CMapObject* obj, void* p, void* p2 )
 		if (track)
 		{
 			track->WriteToMapFile(*qm->m_file, doc);
+			Sys_StepStatusBar();
+		}
+	}
+	else if (obj->GetClass() == MAPOBJ_CLASS_WAYPOINT)
+	{
+		CWaypoint *waypoint = dynamic_cast<CWaypoint*>(obj);
+		if (waypoint) {
+			waypoint->WriteToMapFile(*qm->m_file, doc);
 			Sys_StepStatusBar();
 		}
 	}

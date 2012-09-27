@@ -527,6 +527,22 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 	dst.m_tails.erase(src.GetUID());
 }
 
+void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
+	fs << "{\n\"classname\" \"waypoint\"\n";
+	fs << "\"uid\" \"" << GetUID() << "\"\n";
+	fs << "\"pos\" \"( " << m_pos.x << " " << m_pos.y << " " << m_pos.z << " )\"\n";
+
+	int i = 0;
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it, ++i) {
+		const Connection::Ref &c = it->second;
+		fs << "\"connection " << i << "\" \"" << it->second->tailId << 
+			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
+			") (" << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << ")\"\n";
+	}
+
+	fs << "}\n";
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 CWaypoint::ControlPointGizmo3D::ControlPointGizmo3D() {

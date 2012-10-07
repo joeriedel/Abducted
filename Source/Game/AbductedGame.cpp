@@ -264,5 +264,5 @@ bool AbductedGame::LoadEntry()
 {
 	if (!Game::LoadEntry())
 		return false;
-	return LoadMapSeq("Cinematic/ToL", 1, world::UD_Slot, false);
+	return LoadMapSeq("Cinematic/ToL", 1, world::kUD_Slot, false);
 }

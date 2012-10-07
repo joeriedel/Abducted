@@ -376,11 +376,7 @@
     <QtMOC Include="..\..\AbductedLauncher.h" />
     <ClInclude Include="..\..\Game\AbductedGame.h" />
     <ClInclude Include="..\..\Game\Entities\G_Exports.h" />
-    <ClInclude Include="..\..\Game\Entities\G_OmenEnergy.h" />
-    <ClInclude Include="..\..\Game\Entities\G_ScreenPawn.h" />
-    <ClInclude Include="..\..\Game\Entities\G_ScreenProjectile.h" />
-    <ClInclude Include="..\..\Game\Entities\G_ScreenView.h" />
-    <ClInclude Include="..\..\Game\Entities\G_Thwap.h" />
+    <ClInclude Include="..\..\Game\Entities\G_PlayerPawn.h" />
     <ClInclude Include="..\..\Game\Entities\G_ViewController.h" />
     <ClInclude Include="..\..\Game\Lua\G_SkModel.h" />
     <ClInclude Include="Resource.h" />
@@ -394,11 +390,7 @@
     <ClCompile Include="..\..\AbductedLauncher.cpp" />
     <ClCompile Include="..\..\Game\AbductedGame.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_Exports.cpp" />
-    <ClCompile Include="..\..\Game\Entities\G_OmenEnergy.cpp" />
-    <ClCompile Include="..\..\Game\Entities\G_ScreenPawn.cpp" />
-    <ClCompile Include="..\..\Game\Entities\G_ScreenProjectile.cpp" />
-    <ClCompile Include="..\..\Game\Entities\G_ScreenView.cpp" />
-    <ClCompile Include="..\..\Game\Entities\G_Thwap.cpp" />
+    <ClCompile Include="..\..\Game\Entities\G_PlayerPawn.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_ViewController.cpp" />
     <ClCompile Include="..\..\Game\Lua\G_SkModel.cpp" />
   </ItemGroup>

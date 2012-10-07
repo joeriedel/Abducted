@@ -36,21 +36,6 @@
     <ClInclude Include="..\..\Game\Entities\G_Exports.h">
       <Filter>Source\Game\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Game\Entities\G_OmenEnergy.h">
-      <Filter>Source\Game\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Game\Entities\G_ScreenPawn.h">
-      <Filter>Source\Game\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Game\Entities\G_ScreenProjectile.h">
-      <Filter>Source\Game\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Game\Entities\G_ScreenView.h">
-      <Filter>Source\Game\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Game\Entities\G_Thwap.h">
-      <Filter>Source\Game\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Game\Entities\G_ViewController.h">
       <Filter>Source\Game\Entities</Filter>
     </ClInclude>
@@ -63,6 +48,9 @@
     <ClInclude Include="..\..\Game\AbductedGame.h">
       <Filter>Source\Game</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Game\Entities\G_PlayerPawn.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Abducted.rc">
@@ -71,21 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Game\Entities\G_Exports.cpp">
-      <Filter>Source\Game\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Game\Entities\G_OmenEnergy.cpp">
-      <Filter>Source\Game\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Game\Entities\G_ScreenPawn.cpp">
-      <Filter>Source\Game\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Game\Entities\G_ScreenProjectile.cpp">
-      <Filter>Source\Game\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Game\Entities\G_ScreenView.cpp">
-      <Filter>Source\Game\Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Game\Entities\G_Thwap.cpp">
       <Filter>Source\Game\Entities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Game\Entities\G_ViewController.cpp">
@@ -102,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Game\AbductedGame.cpp">
       <Filter>Source\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Game\Entities\G_PlayerPawn.cpp">
+      <Filter>Source\Game\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

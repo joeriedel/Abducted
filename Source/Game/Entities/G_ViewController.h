@@ -7,8 +7,7 @@
 
 namespace world {
 
-class G_ViewController : public E_ViewController
-{
+class G_ViewController : public E_ViewController {
 	E_DECL_BASE(E_ViewController);
 public:
 	G_ViewController();

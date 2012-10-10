@@ -4,6 +4,9 @@
     <filename>Base\Scripts\Class.lua</filename>
   </file>
   <file>
+    <filename>Base\Scripts\Engine.lua</filename>
+  </file>
+  <file>
     <filename>Base\Scripts\Entity.lua</filename>
   </file>
   <file>
@@ -13,7 +16,13 @@
     <filename>Base\Scripts\Imports.lua</filename>
   </file>
   <file>
+    <filename>Base\Scripts\Input.lua</filename>
+  </file>
+  <file>
     <filename>Base\Scripts\KeyCodes.lua</filename>
+  </file>
+  <file>
+    <filename>Base\Library.lua</filename>
   </file>
   <file>
     <filename>Base\Scripts\Math.lua</filename>
@@ -22,6 +31,15 @@
     <filename>Base\Scripts\Persistence.lua</filename>
   </file>
   <file>
+    <filename>Base\Scripts\SoundEmitter.lua</filename>
+  </file>
+  <file>
     <filename>Base\Scripts\System.lua</filename>
+  </file>
+  <file>
+    <filename>Base\Scripts\ViewController.lua</filename>
+  </file>
+  <file>
+    <filename>Base\Scripts\Worldspawn.lua</filename>
   </file>
 </project>

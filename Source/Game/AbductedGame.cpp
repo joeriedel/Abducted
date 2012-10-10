@@ -32,16 +32,13 @@ class GSCrowLoadMap : public GSLoadMap
 {
 public:
 	GSCrowLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
-	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true)
-	{
+	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true) {
 	}
 
-	virtual void Draw(Game &game, float dt)
-	{
+	virtual void Draw(Game &game, float dt) {
 		if (!loadScreen)
 			return;
-		if (m_first)
-		{
+		if (m_first) {
 			m_first = false;
 			Load();
 			mapAsset->world->draw->rb->ClearBackBuffer();
@@ -53,9 +50,7 @@ public:
 #endif
 			mapAsset->world->draw->rb->ClearBackBuffer();
 
-		}
-		else
-		{
+		} else {
 			m_elapsed += dt;
 		}
 
@@ -66,9 +61,8 @@ public:
 
 private:
 
-	void Load()
-	{
-		m_mat = App::Get()->engine->sys->packages->Resolve("UI/finger_shadow_M", pkg::Z_Engine);
+	void Load() {
+		m_mat = App::Get()->engine->sys->packages->Resolve("UI/loading_icon_M", pkg::Z_Engine);
 		if (!m_mat)
 			return;
 		int r = m_mat->Process(
@@ -90,8 +84,7 @@ private:
 		InitRectVerts(BaseRectSize, BaseRectSize);
 	}
 
-	void Draw(Game &game)
-	{
+	void Draw(Game &game) {
 		if (!m_mat)
 			return;
 		
@@ -156,8 +149,7 @@ private:
 		m->Sample(m_time, 0.1f);
 	}
 	
-	void InitRectVerts(int vpw, int vph)
-	{
+	void InitRectVerts(int vpw, int vph) {
 		m_rectVB.reset(
 		   new GLVertexBuffer(
 			  GL_ARRAY_BUFFER_ARB, 
@@ -178,10 +170,8 @@ private:
 		int x, y;
 		float xf, yf;
 		
-		for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc)
-		{
-			for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc)
-			{
+		for (y = 0, yf = 0.f; y < OverlayDiv; ++y, yf += yInc) {
+			for (x = 0, xf = 0.f; x < OverlayDiv; ++x, xf += xInc) {
 				OverlayVert &v = verts[y*OverlayDiv+x];
 				v.xy[0] = xf;
 				v.xy[1] = yf;
@@ -206,10 +196,8 @@ private:
 		RAD_ASSERT(vb);
 		U16 *indices = (U16*)vb->ptr.get();
 		
-		for (y = 0; y < OverlayDiv-1; ++y)
-		{
-			for (x = 0; x < OverlayDiv-1; ++x)
-			{
+		for (y = 0; y < OverlayDiv-1; ++y) {
+			for (x = 0; x < OverlayDiv-1; ++x) {
 				U16 *idx = &indices[y*(OverlayDiv-1)*6+x*6];
 				
 				// glOrtho() inverts the +Z axis (or -Z can't recall), inverting the 
@@ -241,28 +229,23 @@ private:
 	r::GLVertexBuffer::Ref m_rectIB;
 };
 
-Game::Tickable::Ref GSLoadMap::New(int mapId, int slot, bool play, bool loadScreen)
-{
+Game::Tickable::Ref GSLoadMap::New(int mapId, int slot, bool play, bool loadScreen) {
 	return Game::Tickable::Ref(new (ZWorld) GSCrowLoadMap(mapId, slot, play, loadScreen));
 }
 
-Game::Tickable::Ref GSPlay::New()
-{
+Game::Tickable::Ref GSPlay::New() {
 	return Game::Tickable::Ref(new (ZWorld) GSPlay());
 }
 
-Game::Ref Game::New()
-{
+Game::Ref Game::New() {
 	return Game::Ref(new AbductedGame());
 }
 
-AbductedGame::AbductedGame()
-{
+AbductedGame::AbductedGame() {
 }
 
-bool AbductedGame::LoadEntry()
-{
+bool AbductedGame::LoadEntry() {
 	if (!Game::LoadEntry())
 		return false;
-	return LoadMapSeq("Cinematic/ToL", 1, world::kUD_Slot, false);
+	return true;
 }

@@ -22,13 +22,16 @@
     <filename>Base\Scripts\KeyCodes.lua</filename>
   </file>
   <file>
-    <filename>Base\Library.lua</filename>
+    <filename>Base\Scripts\Library.lua</filename>
   </file>
   <file>
     <filename>Base\Scripts\Math.lua</filename>
   </file>
   <file>
     <filename>Base\Scripts\Persistence.lua</filename>
+  </file>
+  <file>
+    <filename>Base\Scripts\Player.lua</filename>
   </file>
   <file>
     <filename>Base\Scripts\SoundEmitter.lua</filename>

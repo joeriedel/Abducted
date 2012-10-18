@@ -28,10 +28,9 @@ enum
 	OverlayDiv = 8
 };
 
-class GSCrowLoadMap : public GSLoadMap
-{
+class GSAbductedLoadMap : public GSLoadMap {
 public:
-	GSCrowLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
+	GSAbductedLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
 	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true) {
 	}
 
@@ -230,7 +229,7 @@ private:
 };
 
 Game::Tickable::Ref GSLoadMap::New(int mapId, int slot, bool play, bool loadScreen) {
-	return Game::Tickable::Ref(new (ZWorld) GSCrowLoadMap(mapId, slot, play, loadScreen));
+	return Game::Tickable::Ref(new (ZWorld) GSAbductedLoadMap(mapId, slot, play, loadScreen));
 }
 
 Game::Tickable::Ref GSPlay::New() {

@@ -1,6 +1,2 @@
-// TESTING A COMMENT
 EN
-/*!
- * Testing A Block Comment
- */
 DEFAULT = EN

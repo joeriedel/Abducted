@@ -8,8 +8,9 @@
 #include <Runtime/Tokenizer.h>
 #include <Runtime/File.h>
 #include "Game/Entities/G_Exports.h"
-#if defined(RAD_OPT_GL) && defined(RAD_TARGET_GOLDEN) && defined(RAD_OPT_PC)
-#include <Engine/Renderer/PC/RGLBackend.h>
+#include <Main/GL/GLContext.h>
+#if defined(RAD_OPT_GL) && defined(RAD_TARGET_GOLDEN)
+#include <Engine/Renderer/GL/RGLBackend.h>
 #endif
 #if defined(RAD_TARGET_GOLDEN) && defined(RAD_OPT_PC)
 #include <Engine/Persistence.h>
@@ -32,37 +33,24 @@ bool AbductedApp::PreInit() {
 	if (!App::PreInit()) 
 		return false;
 #if defined(RAD_TARGET_GOLDEN)
-	file::HFile file;
 
-	int media = file::AllMedia;
-	int r = engine->sys->files->OpenFile(
-		"pak0.pak",
-		media,
-		file,
-		file::HIONotify()
-	);
-
-	if (r < file::Success) {
+	file::PakFileRef pakFile = engine->sys->files->OpenPakFile("pak0.pak");
+	
+	if (!pakFile) {
 		COut(C_Error) << "Unable to open pak0.pak!" << std::endl;
 		return false;
 	}
-
-	file::HPakFile pak = engine->sys->paks->MountPakFile(file, "pak0.pak");
-	if (!pak) {
-		COut(C_Error) << "Unable to mount pak0.pak!" << std::endl;
-		return false;
-	}
-
-	engine->sys->files->AddPakFile(pak);
-
-	// disable all file access except through the pak file.
-	engine->sys->files->enabledMedia = file::Paks;
+	
+	engine->sys->files->AddPakFile(pakFile);
+	engine->sys->files->globalMask = file::kFileMask_PakFiles;
+	
 #endif
 	return true;
 }
 
 bool AbductedApp::InitWindow() {
-#if defined(RAD_OPT_GL) && defined(RAD_TARGET_GOLDEN) && defined(RAD_OPT_PC)
+#if defined(RAD_OPT_GL) && defined(RAD_TARGET_GOLDEN)
+#if defined(RAD_OPT_PC)
 	Persistence::Ref settings = Persistence::Load("settings.prefs");
 	
 	r::VidMode mode;
@@ -91,6 +79,14 @@ bool AbductedApp::InitWindow() {
 		COut(C_Error) << "ERROR: Unable to find resolution " << mode.w << "x" << std::endl;
 		return false;
 	}
+
+#else
+
+	// Embedded device
+
+	r::VidMode mode = *primaryDisplay->curVidMode.get();
+
+#endif
 
 	if (!BindDisplayDevice(primaryDisplay, mode)) {
 		COut(C_Error) << "ERROR: failed to set video mode " << mode.w << "x" << mode.h << std::endl;
@@ -142,37 +138,20 @@ bool AbductedApp::Run() {
 
 #if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
 bool AbductedApp::RunAutoExec() {
-	char nativePath[file::MaxFilePathLen+1];
-	file::ExpandToNativePath("9:/autoexec.txt", nativePath, file::MaxFilePathLen+1);
-	FILE *fp = fopen(nativePath, "rb");
-	if (!fp) {
+	file::MMFileInputBufferRef fileBuf = engine->sys->files->OpenInputBuffer("@r:/autoexec.txt", ZEngine);
+	if (!fileBuf) {
 		COut(C_Error) << "ERROR: autoexec.txt is missing." << std::endl;
 		return false;
 	}
-	fseek(fp, 0, SEEK_END);
-	size_t size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	void *data = safe_zone_malloc(ZEngine, size);
-	if (fread(data, 1, size, fp) != size)
-	{
-		fclose(fp);
-		zone_free(data);
-		return false;
-	}
-	fclose(fp);
-
 	Tokenizer script;
-	script.InitParsing((const char *)data, (int)size);
-	zone_free(data);
-
+	script.Bind(fileBuf);
+	
 	String token;
-	if (script.GetToken(token))
-	{
+	if (script.GetToken(token, Tokenizer::kTokenMode_SameLine)) {
 		m_game = Game::New();
 		const r::VidMode *vidMode = activeDisplay->curVidMode;
 		m_game->SetViewport(0, 0, vidMode->w, vidMode->h);
-		if (!(m_game->LoadEntry() && m_game->LoadMapSeq(token.c_str, 0, world::UD_Slot, true)))
-		{
+		if (!(m_game->LoadEntry() && m_game->LoadMapSeq(token.c_str, 0, world::kUD_Slot, true))) {
 			m_game.reset();
 			return false;
 		}
@@ -184,8 +163,7 @@ bool AbductedApp::RunAutoExec() {
 
 void AbductedApp::OnTick(float dt) {
 #if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
-	if (m_game)
-	{
+	if (m_game) {
 		const r::VidMode *vidMode = activeDisplay->curVidMode;
 		m_game->SetViewport(0, 0, vidMode->w, vidMode->h);
 		m_game->Tick(dt);
@@ -244,10 +222,16 @@ void AbductedApp::Finalize() {
 
 const char *AbductedApp::RAD_IMPLEMENT_GET(flurryAPIKey) {
 #if defined(RAD_OPT_SHIP)
-	return "NSUEK83QJRBVXRFDND2T";
+	return "00000000000000000000";
 #else
-	return "69GLZJN9GT5XN5IYQYXC";
+	return "00000000000000000000";
 #endif
 }
+
+#if defined(RAD_OPT_IOS)
+int AbductedApp::DoLauncher() {
+	return 0;
+}
+#endif
 
 

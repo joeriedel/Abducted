@@ -33,10 +33,6 @@
 #include <Runtime/File.h>
 #endif
 
-#if defined(RAD_OPT_OSX)
-void __OSX_BundlePath(char *dst);
-#endif
-
 #undef qApp
 
 enum {

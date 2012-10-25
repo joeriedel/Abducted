@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; };
 		339BA572163656B40017FD79 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		339BA573163656B40017FD79 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		339BA574163656C40017FD79 /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
@@ -307,6 +308,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		33BF3E6B1633255E006DEAAE /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33DB15241627D97A00963A33 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
@@ -465,6 +467,7 @@
 				33EC06441626774A00F8C9FF /* OpenGL.framework in Frameworks */,
 				33DB15251627D97A00963A33 /* Cg.framework in Frameworks */,
 				33EC05661626653900F8C9FF /* Cocoa.framework in Frameworks */,
+				338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -525,6 +528,7 @@
 				33EC04F3162663FC00F8C9FF /* AppKit.framework */,
 				33EC04F4162663FC00F8C9FF /* CoreData.framework */,
 				33EC04F5162663FC00F8C9FF /* Foundation.framework */,
+				338BD5081638DD4200468A4D /* GameKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

@@ -1,8 +1,8 @@
 /*! \file WaypointGrid.h
-	\copyright Copyright (c) 2010 Sunside Inc., All Rights Reserved.
+	\copyright Copyright (c) 2012 Sunside Inc., All Rights Reserved.
 	\copyright See Abducted/LICENSE for licensing terms.
 	\author Joe Riedel
-	\ingroup packages
+	\ingroup tread
 */
 
 #pragma once
@@ -187,6 +187,7 @@ private:
 	void DeleteGizmos(CTreadDoc *doc);
 	void CreateGizmos(CTreadDoc *doc, CWaypoint &src);
 	void DeleteGizmos(CTreadDoc *doc, CWaypoint &src);
+	void InitProps();
 
 	void PopupMenu_OnConnectWaypoints(CMapView *view);
 	void PopupMenu_OnDisconnectWaypoints(CMapView *view);
@@ -198,6 +199,7 @@ private:
 	Connection::Map m_connections;
 	CLinkedList<CObjProp> m_propList;
 	Connection::Map::iterator m_meshIt;
+	CObjProp m_props[2];
 	IntSet m_tails;
 	vec3 m_world[2];
 	vec3 m_local[2];
@@ -208,8 +210,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class CMakeWaypoint : public CObjectCreator
-{
+class CMakeWaypoint : public CObjectCreator {
 public:
 	virtual void Release() { delete this; }
 	virtual const char *Name() { return "Waypoint Node"; }

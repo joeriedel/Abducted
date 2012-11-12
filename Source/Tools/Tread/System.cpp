@@ -1807,7 +1807,7 @@ void CObjProp::Inherit(const CObjProp &t)
 	}
 }
 
-void CObjProp::SetValue( CObjProp* prop )
+void CObjProp::SetValue( const CObjProp* prop )
 {
 	m_sVal = prop->m_sVal;
 }

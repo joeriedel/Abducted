@@ -14,7 +14,7 @@
 #include "r_gl.h"
 
 enum {
-	kWaypointSaveVersion = 1
+	kWaypointSaveVersion = 2
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,6 +35,7 @@ CWaypoint::CWaypoint() {
 	m_boxMesh.pick = this;
 	m_boxMesh.solid2d = true;
 	m_boxPos = vec3::zero;
+	InitProps();
 }
 
 CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
@@ -70,10 +71,15 @@ CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
 	}
 
 	UpdateBoxMesh();
+	InitProps();
+
+	m_props[0].SetValue(&m.m_props[0]);
+	m_props[1].SetValue(&m.m_props[1]);
 }
 
 CWaypoint::~CWaypoint() {
 	m_boxMesh.FreeMesh();
+	m_propList.ReleaseList();
 }
 
 void CWaypoint::SetObjectWorldPos( const vec3& pos, CTreadDoc* pDoc ) {
@@ -129,6 +135,9 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		MAP_WriteInt(pFile, *it);
 	}
 
+	MAP_WriteString(pFile, m_props[0].GetString());
+	MAP_WriteString(pFile, m_props[1].GetString());
+
 	return true;
 }
 
@@ -160,18 +169,43 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		m_tails.insert(MAP_ReadInt(pFile));
 	}
 
+	if (version >= 2) {
+		m_props[0].SetString(MAP_ReadString(pFile));
+		m_props[1].SetString(MAP_ReadString(pFile));
+	}
+
 	UpdateBoxMesh();
 
 	return true;
 }
 
 CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* pDoc ) {
-	m_propList.ReleaseList();
 	return &m_propList;
 }
 
 void CWaypoint::SetProp( CTreadDoc* pDoc, CObjProp* prop ) {
-	
+	const char *name = prop->GetName();
+
+	if (!stricmp(name, "floor_name")) {
+		m_props[0].SetValue(prop);
+	} else if (!stricmp(name, "transition_animation")) {
+		m_props[1].SetValue(prop);
+	}
+}
+
+void CWaypoint::InitProps() {
+	m_props[0].SetName("floor_name");
+	m_props[0].SetDisplayName("Floor Name");
+	m_props[0].SetType(CObjProp::string);
+	m_props[0].SetSubType(FALSE);
+
+	m_props[1].SetName("transition_animation");
+	m_props[1].SetDisplayName("Transition Animation");
+	m_props[1].SetType(CObjProp::string);
+	m_props[1].SetSubType(FALSE);
+
+	m_propList.AddItem(&m_props[0]);
+	m_propList.AddItem(&m_props[1]);
 }
 
 void CWaypoint::OnAddToMap( CTreadDoc* pDoc ) {
@@ -530,14 +564,16 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "{\n\"classname\" \"waypoint\"\n";
 	fs << "\"uid\" \"" << GetUID() << "\"\n";
-	fs << "\"pos\" \"( " << m_pos.x << " " << m_pos.y << " " << m_pos.z << " )\"\n";
+	fs << "\"origin\" \"" << m_pos.x << " " << m_pos.y << " " << m_pos.z << "\"\n";
+	fs << "\"floor\" \"" << m_props[0].GetString() << "\"\n";
+	fs << "\"transition_animation\" \"" << m_props[1].GetString() << "\"\n";
 
 	int i = 0;
 	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it, ++i) {
 		const Connection::Ref &c = it->second;
 		fs << "\"connection " << i << "\" \"" << it->second->tailId << 
 			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
-			") (" << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << ")\"\n";
+			" ) ( " << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << " )\"\n";
 	}
 
 	fs << "}\n";

@@ -319,7 +319,7 @@ public:
 	CLinkedList<CObjProp>* GetChoices();
 	void AddChoice( CObjProp* choice );
 
-	void SetValue( CObjProp* prop );
+	void SetValue( const CObjProp* prop );
 
 	void SetListItem( int item );
 	int GetListItem();

@@ -677,7 +677,8 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "{\n\"classname\" \"waypoint\"\n";
 	fs << "\"uid\" \"" << GetUID() << "\"\n";
 	fs << "\"origin\" \"" << m_pos.x << " " << m_pos.y << " " << m_pos.z << "\"\n";
-	fs << "\"name\" \"" << m_props[kProp_Name].GetString() << "\"\n";
+	fs << "\"targetname\" \"" << m_props[kProp_Name].GetString() << "\"\n";
+	fs << "\"userid\" \"" << m_props[kProp_Id].GetString() << "\"\n";
 	fs << "\"floor\" \"" << m_props[kProp_Floor].GetString() << "\"\n";
 	fs << "\"flags\" \"" << m_props[kProp_Flags].GetInt() << "\"\n";
 	

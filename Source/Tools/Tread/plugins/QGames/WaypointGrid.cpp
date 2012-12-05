@@ -145,6 +145,7 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 	}
 
 	MAP_WriteString(pFile, m_props[kProp_Name].GetString());
+	MAP_WriteString(pFile, m_props[kProp_Id].GetString());
 	MAP_WriteString(pFile, m_props[kProp_Floor].GetString());
 	MAP_WriteInt(pFile, m_props[kProp_Flags].GetInt());
 
@@ -190,6 +191,7 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 
 	if (version >= 3) {
 		m_props[kProp_Name].SetString(MAP_ReadString(pFile));
+		m_props[kProp_Id].SetString(MAP_ReadString(pFile));
 		m_props[kProp_Floor].SetString(MAP_ReadString(pFile));
 		m_props[kProp_Flags].SetInt(MAP_ReadInt(pFile));
 	} else if (version == 2) {
@@ -215,6 +217,7 @@ void CWaypoint::AddSelectedConnectionProps(CTreadDoc* doc) {
 
 	m_propList.ReleaseList();
 	m_propList.AddItem(&m_props[kProp_Name]);
+	m_propList.AddItem(&m_props[kProp_Id]);
 	m_propList.AddItem(&m_props[kProp_Floor]);
 	m_propList.AddItem(&m_props[kProp_Flags]);
 
@@ -274,9 +277,14 @@ void CWaypoint::SetConnectionProp(Connection &c, CObjProp *p) {
 void CWaypoint::InitProps() {
 
 	m_props[kProp_Name].SetName("name");
-	m_props[kProp_Name].SetDisplayName("Name");
+	m_props[kProp_Name].SetDisplayName("Targetname");
 	m_props[kProp_Name].SetType(CObjProp::string);
 	m_props[kProp_Name].SetSubType(FALSE);
+
+	m_props[kProp_Id].SetName("userId");
+	m_props[kProp_Id].SetDisplayName("UserID");
+	m_props[kProp_Id].SetType(CObjProp::string);
+	m_props[kProp_Id].SetSubType(FALSE);
 	
 	m_props[kProp_Floor].SetName("floor_name");
 	m_props[kProp_Floor].SetDisplayName("Floor (Optional)");

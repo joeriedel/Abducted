@@ -227,6 +227,7 @@ private:
 	enum Properties {
 		kProp_First,
 		kProp_Name = kProp_First,
+		kProp_Id,
 		kProp_Floor,
 		kProp_Flags,
 		kProp_Num

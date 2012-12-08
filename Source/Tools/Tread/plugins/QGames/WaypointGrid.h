@@ -126,17 +126,42 @@ private:
 			kNumPoints = 100
 		};
 
+		enum {
+			kProp_First,
+			kProp_FwdStart = kProp_First,
+			kProp_FwdEnd,
+			kProp_BackStart,
+			kProp_BackEnd,
+			kProp_Flags,
+			kProp_Num
+		};
+
+		enum {
+			kFlag_First,
+			kFlag_AtoB = kFlag_First,
+			kFlag_BtoA,
+			kFlag_BtoAUseAtoBScript,
+			kFlag_AutoFace,
+			kFlag_Num
+		};
+
 		Connection();
 		virtual ~Connection();
 
+		void InitProps();
 		void InitMesh();
 		void UpdateMesh();
+		void InitArrow();
+		void UpdateArrow();
 		void Select(bool select);
 		void Bind(CTreadDoc *doc);
 		void CreateGizmos(CTreadDoc *doc);
 		void DeleteGizmos(CTreadDoc *doc);
 
 		CRenderMesh mesh;
+		CRenderMesh arrow;
+		CObjProp props[kProp_Num];
+		CObjProp flags[kFlag_Num];
 		vec3 ctrls[2];
 		CWaypoint *head;
 		CWaypoint *tail;
@@ -187,7 +212,11 @@ private:
 	void DeleteGizmos(CTreadDoc *doc);
 	void CreateGizmos(CTreadDoc *doc, CWaypoint &src);
 	void DeleteGizmos(CTreadDoc *doc, CWaypoint &src);
+	void AddSelectedConnectionProps(CTreadDoc* pDoc);
 	void InitProps();
+	void AddConnectionProps(Connection &c);
+	void SetSelectedConnectionProp(CObjProp *p);
+	void SetConnectionProp(Connection &c, CObjProp *p);
 
 	void PopupMenu_OnConnectWaypoints(CMapView *view);
 	void PopupMenu_OnDisconnectWaypoints(CMapView *view);
@@ -195,17 +224,28 @@ private:
 	static void Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst);
 	static void Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool flip);
 	
+	enum Properties {
+		kProp_First,
+		kProp_Name = kProp_First,
+		kProp_Id,
+		kProp_Floor,
+		kProp_Flags,
+		kProp_Num
+	};
+
 	CRenderMesh m_boxMesh;
 	Connection::Map m_connections;
 	CLinkedList<CObjProp> m_propList;
 	Connection::Map::iterator m_meshIt;
-	CObjProp m_props[2];
+	CObjProp m_props[kProp_Num];
 	IntSet m_tails;
 	vec3 m_world[2];
 	vec3 m_local[2];
 	vec3 m_pos;
 	vec3 m_boxPos;
 	bool m_drag;
+	bool m_inAddSelection;
+	bool m_beingSelected;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

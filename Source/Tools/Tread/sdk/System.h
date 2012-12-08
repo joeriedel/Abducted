@@ -285,7 +285,7 @@ public:
 
 	CObjProp();
 	CObjProp( const CObjProp& c );
-	virtual ~CObjProp();
+	virtual ~CObjProp() {}
 	
 	CObjProp& operator = ( const CObjProp& p );
 
@@ -317,7 +317,19 @@ public:
 	bool GetSubType();
 
 	CLinkedList<CObjProp>* GetChoices();
-	void AddChoice( CObjProp* choice );
+	void AddChoice( CObjProp* choice )
+	{
+		// this choice will replace one that already exists.
+		for (CObjProp *p = m_Choices.ResetPos(); p; p = m_Choices.GetNextItem())
+		{
+			if (!strcmp(p->GetString(), choice->GetString()))
+			{
+				p = m_Choices.ReplaceNode(choice, true);
+				return;
+			}
+		}
+		m_Choices.AddItem( choice );
+	}
 
 	void SetValue( const CObjProp* prop );
 

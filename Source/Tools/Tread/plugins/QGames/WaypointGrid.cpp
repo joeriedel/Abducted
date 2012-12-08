@@ -14,7 +14,7 @@
 #include "r_gl.h"
 
 enum {
-	kWaypointSaveVersion = 2
+	kWaypointSaveVersion = 3
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,6 +35,8 @@ CWaypoint::CWaypoint() {
 	m_boxMesh.pick = this;
 	m_boxMesh.solid2d = true;
 	m_boxPos = vec3::zero;
+	m_inAddSelection = false;
+	m_beingSelected = false;
 	InitProps();
 }
 
@@ -72,6 +74,8 @@ CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
 
 	UpdateBoxMesh();
 	InitProps();
+	m_inAddSelection = false;
+	m_beingSelected = false;
 
 	m_props[0].SetValue(&m.m_props[0]);
 	m_props[1].SetValue(&m.m_props[1]);
@@ -128,6 +132,11 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		MAP_WriteInt(pFile, c->tailId);
 		MAP_WriteVec3(pFile, &c->ctrls[0]);
 		MAP_WriteVec3(pFile, &c->ctrls[1]);
+		MAP_WriteString(pFile, c->props[Connection::kProp_FwdStart].GetString());
+		MAP_WriteString(pFile, c->props[Connection::kProp_FwdEnd].GetString());
+		MAP_WriteString(pFile, c->props[Connection::kProp_BackStart].GetString());
+		MAP_WriteString(pFile, c->props[Connection::kProp_BackEnd].GetString());
+		MAP_WriteInt(pFile, c->props[Connection::kProp_Flags].GetInt());
 	}
 
 	MAP_WriteInt(pFile, (int)m_tails.size());
@@ -135,8 +144,10 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		MAP_WriteInt(pFile, *it);
 	}
 
-	MAP_WriteString(pFile, m_props[0].GetString());
-	MAP_WriteString(pFile, m_props[1].GetString());
+	MAP_WriteString(pFile, m_props[kProp_Name].GetString());
+	MAP_WriteString(pFile, m_props[kProp_Id].GetString());
+	MAP_WriteString(pFile, m_props[kProp_Floor].GetString());
+	MAP_WriteInt(pFile, m_props[kProp_Flags].GetInt());
 
 	return true;
 }
@@ -161,6 +172,15 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		c->InitMesh();
 		MAP_ReadVec3(pFile, &c->ctrls[0]);
 		MAP_ReadVec3(pFile, &c->ctrls[1]);
+
+		if (version >= 3) {
+			c->props[Connection::kProp_FwdStart].SetString(MAP_ReadString(pFile));
+			c->props[Connection::kProp_FwdEnd].SetString(MAP_ReadString(pFile));
+			c->props[Connection::kProp_BackStart].SetString(MAP_ReadString(pFile));
+			c->props[Connection::kProp_BackEnd].SetString(MAP_ReadString(pFile));
+			c->props[Connection::kProp_Flags].SetInt(MAP_ReadInt(pFile));
+		}
+
 		m_connections[c->tailId] = c;
 	}
 
@@ -169,9 +189,14 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		m_tails.insert(MAP_ReadInt(pFile));
 	}
 
-	if (version >= 2) {
-		m_props[0].SetString(MAP_ReadString(pFile));
-		m_props[1].SetString(MAP_ReadString(pFile));
+	if (version >= 3) {
+		m_props[kProp_Name].SetString(MAP_ReadString(pFile));
+		m_props[kProp_Id].SetString(MAP_ReadString(pFile));
+		m_props[kProp_Floor].SetString(MAP_ReadString(pFile));
+		m_props[kProp_Flags].SetInt(MAP_ReadInt(pFile));
+	} else if (version == 2) {
+		MAP_ReadString(pFile);
+		MAP_ReadString(pFile);
 	}
 
 	UpdateBoxMesh();
@@ -179,33 +204,103 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 	return true;
 }
 
-CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* pDoc ) {
+CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* doc ) {
 	return &m_propList;
+}
+
+void CWaypoint::AddSelectedConnectionProps(CTreadDoc* doc) {
+
+	if (m_inAddSelection)
+		return;
+
+	m_inAddSelection = true;
+
+	m_propList.ReleaseList();
+	m_propList.AddItem(&m_props[kProp_Name]);
+	m_propList.AddItem(&m_props[kProp_Id]);
+	m_propList.AddItem(&m_props[kProp_Floor]);
+	m_propList.AddItem(&m_props[kProp_Flags]);
+
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
+		const Connection::Ref &c = it->second;
+		if (c->tail && (c->tail->IsSelected() || c->tail->m_beingSelected)) {
+			AddConnectionProps(*c);
+			c->tail->AddSelectedConnectionProps(doc);
+		}
+	}
+
+	for (IntSet::const_iterator it = m_tails.begin(); it != m_tails.end(); ++it) {
+		CWaypoint *waypoint = static_cast<CWaypoint*>(doc->ObjectForUID(*it));
+		if (waypoint && (waypoint->IsSelected() || waypoint->m_beingSelected)) {
+			for (Connection::Map::const_iterator it = waypoint->m_connections.begin(); it != waypoint->m_connections.end(); ++it) {
+				const Connection::Ref &c = it->second;
+				if (c->tail == this) {
+					AddConnectionProps(*c);
+					waypoint->AddSelectedConnectionProps(doc);
+				}
+			}
+		}
+	}
+
+	m_inAddSelection = false;
 }
 
 void CWaypoint::SetProp( CTreadDoc* pDoc, CObjProp* prop ) {
 	const char *name = prop->GetName();
 
-	if (!stricmp(name, "floor_name")) {
-		m_props[0].SetValue(prop);
-	} else if (!stricmp(name, "transition_animation")) {
-		m_props[1].SetValue(prop);
+	for (int i = kProp_First; i < kProp_Num; ++i) {
+		if (!strcmp(name, m_props[i].GetName()))
+			m_props[i].SetValue(prop);
+	}
+	
+	SetSelectedConnectionProp(prop);
+}
+
+void CWaypoint::SetSelectedConnectionProp(CObjProp *prop) {
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
+		const Connection::Ref &c = it->second;
+		if (c->tail && c->tail->IsSelected()) {
+			SetConnectionProp(*c, prop);
+		}
+	}
+}
+
+void CWaypoint::SetConnectionProp(Connection &c, CObjProp *p) {
+	const char *name = p->GetName();
+
+	for (int i = Connection::kProp_First; i < Connection::kProp_Num; ++i) {
+		if (!strcmp(name, c.props[i].GetName()))
+			c.props[i].SetValue(p);
 	}
 }
 
 void CWaypoint::InitProps() {
-	m_props[0].SetName("floor_name");
-	m_props[0].SetDisplayName("Floor Name");
-	m_props[0].SetType(CObjProp::string);
-	m_props[0].SetSubType(FALSE);
 
-	m_props[1].SetName("transition_animation");
-	m_props[1].SetDisplayName("Transition Animation");
-	m_props[1].SetType(CObjProp::string);
-	m_props[1].SetSubType(FALSE);
+	m_props[kProp_Name].SetName("name");
+	m_props[kProp_Name].SetDisplayName("Targetname");
+	m_props[kProp_Name].SetType(CObjProp::string);
+	m_props[kProp_Name].SetSubType(FALSE);
 
-	m_propList.AddItem(&m_props[0]);
-	m_propList.AddItem(&m_props[1]);
+	m_props[kProp_Id].SetName("userId");
+	m_props[kProp_Id].SetDisplayName("UserID");
+	m_props[kProp_Id].SetType(CObjProp::string);
+	m_props[kProp_Id].SetSubType(FALSE);
+	
+	m_props[kProp_Floor].SetName("floor_name");
+	m_props[kProp_Floor].SetDisplayName("Floor (Optional)");
+	m_props[kProp_Floor].SetType(CObjProp::string);
+	m_props[kProp_Floor].SetSubType(FALSE);
+	
+	m_props[kProp_Flags].SetName("flags");
+	m_props[kProp_Flags].SetDisplayName("Flags");
+	m_props[kProp_Flags].SetType(CObjProp::integer);
+	m_props[kProp_Flags].SetSubType(FALSE);
+	m_props[kProp_Flags].SetInt(0);
+}
+
+void CWaypoint::AddConnectionProps(Connection &c) {
+	for (int i = Connection::kProp_First; i < Connection::kProp_Num; ++i)
+		m_propList.AddItem(&c.props[i]);
 }
 
 void CWaypoint::OnAddToMap( CTreadDoc* pDoc ) {
@@ -219,8 +314,11 @@ void CWaypoint::OnAddToMap( CTreadDoc* pDoc ) {
 }
 
 void CWaypoint::OnAddToSelection( CTreadDoc* pDoc ) {
+	m_beingSelected = true;
 	CreateGizmos(pDoc);
 	CMapObject::OnAddToSelection(pDoc);
+	AddSelectedConnectionProps(pDoc);
+	m_beingSelected = false;
 }
 
 void CWaypoint::OnRemoveFromMap( CTreadDoc* pDoc ) {
@@ -303,7 +401,7 @@ CMapObject* CWaypoint::Clone() {
 
 int CWaypoint::GetNumRenderMeshes( CMapView* pView ) {
 	m_meshIt = m_connections.begin();
-	return 1 + (int)m_connections.size();
+	return 1 + (int)(m_connections.size() * 2);
 }
 
 CRenderMesh* CWaypoint::GetRenderMesh( int num, CMapView* pView ) {
@@ -311,7 +409,10 @@ CRenderMesh* CWaypoint::GetRenderMesh( int num, CMapView* pView ) {
 		return &m_boxMesh;
 	if (m_meshIt != m_connections.end()) {
 		const Connection::Ref &c = m_meshIt->second;
-		++m_meshIt;
+		if ((num-1) & 1) {
+			++m_meshIt;
+			return &c->arrow;
+		}
 		return &c->mesh;
 	}
 	return 0;
@@ -413,10 +514,12 @@ bool CWaypoint::OnPopupMenu( CMapView* pView, int nMX, int nMY, int nButtons, CP
 }
 
 void CWaypoint::CreateGizmos(CTreadDoc *doc) {
+
 	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
 		const Connection::Ref &c = it->second;
-		if (c->tail && c->tail->IsSelected())
+		if (c->tail && c->tail->IsSelected()) {
 			c->CreateGizmos(doc);
+		}
 	}
 
 	for (IntSet::const_iterator it = m_tails.begin(); it != m_tails.end(); ++it) {
@@ -427,6 +530,7 @@ void CWaypoint::CreateGizmos(CTreadDoc *doc) {
 }
 
 void CWaypoint::DeleteGizmos(CTreadDoc *doc) {
+
 	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
 		const Connection::Ref &c = it->second;
 		c->DeleteGizmos(doc);
@@ -477,6 +581,12 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 			if (!dst)
 				continue;
 
+			// already connected?
+			if (src->m_connections.find(dst->GetUID()) != src->m_connections.end())
+				continue;
+			if (dst->m_connections.find(src->GetUID()) != dst->m_connections.end())
+				continue;
+
 			if (!undo) {
 				undo = true;
 				view->GetDocument()->GenericUndoRedoFromSelection()->SetTitle("Connect Waypoints");
@@ -485,6 +595,8 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 
 			Connect(view->GetDocument(), *src, *dst);
 		}
+
+		src->AddSelectedConnectionProps(view->GetDocument());
 	}
 	
 	view->GetDocument()->Prop_UpdateSelection();
@@ -565,15 +677,22 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "{\n\"classname\" \"waypoint\"\n";
 	fs << "\"uid\" \"" << GetUID() << "\"\n";
 	fs << "\"origin\" \"" << m_pos.x << " " << m_pos.y << " " << m_pos.z << "\"\n";
-	fs << "\"floor\" \"" << m_props[0].GetString() << "\"\n";
-	fs << "\"transition_animation\" \"" << m_props[1].GetString() << "\"\n";
-
+	fs << "\"targetname\" \"" << m_props[kProp_Name].GetString() << "\"\n";
+	fs << "\"userid\" \"" << m_props[kProp_Id].GetString() << "\"\n";
+	fs << "\"floor\" \"" << m_props[kProp_Floor].GetString() << "\"\n";
+	fs << "\"flags\" \"" << m_props[kProp_Flags].GetInt() << "\"\n";
+	
 	int i = 0;
 	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it, ++i) {
 		const Connection::Ref &c = it->second;
 		fs << "\"connection " << i << "\" \"" << it->second->tailId << 
+			" " << c->props[Connection::kProp_Flags].GetInt() <<
 			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
 			" ) ( " << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << " )\"\n";
+		fs << "\"connection_fwd_start " << i << "\"" << c->props[Connection::kProp_FwdStart].GetString() << "\"\n";
+		fs << "\"connection_fwd_end " << i << "\"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
+		fs << "\"connection_back_start " << i << "\"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
+		fs << "\"connection_back_end " << i << "\"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
 	}
 
 	fs << "}\n";
@@ -788,11 +907,73 @@ CWaypoint::Connection::Connection() {
 		gizmos3D[i][1] = 0;
 		gizmos3D[i][2] = 0;
 	}
+
+	InitProps();
 }
 
 CWaypoint::Connection::~Connection() {
 	delete [] mesh.xyz;
 	delete [] mesh.tris;
+	delete [] arrow.xyz;
+	delete [] arrow.tris;
+	props[kProp_Flags].GetChoices()->ReleaseList();
+}
+
+void CWaypoint::Connection::InitProps() {
+	props[kProp_FwdStart].SetName("fwdstart");
+	props[kProp_FwdStart].SetDisplayName("*A -> B");
+	props[kProp_FwdStart].SetType(CObjProp::script);
+	props[kProp_FwdStart].SetSubType(FALSE);
+
+	props[kProp_FwdEnd].SetName("fwdend");
+	props[kProp_FwdEnd].SetDisplayName("A -> *B");
+	props[kProp_FwdEnd].SetType(CObjProp::script);
+	props[kProp_FwdEnd].SetSubType(FALSE);
+
+	props[kProp_BackStart].SetName("backstart");
+	props[kProp_BackStart].SetDisplayName("*B -> A");
+	props[kProp_BackStart].SetType(CObjProp::script);
+	props[kProp_BackStart].SetSubType(FALSE);
+
+	props[kProp_BackEnd].SetName("backend");
+	props[kProp_BackEnd].SetDisplayName("B -> *A");
+	props[kProp_BackEnd].SetType(CObjProp::script);
+	props[kProp_BackEnd].SetSubType(FALSE);
+
+	props[kProp_Flags].SetName("c_flags");
+	props[kProp_Flags].SetDisplayName("Connection Flags");
+	props[kProp_Flags].SetType(CObjProp::integer);
+	props[kProp_Flags].SetSubType(FALSE);
+	
+
+	flags[kFlag_AtoB].SetName("AtoB");
+	flags[kFlag_AtoB].SetDisplayName("Enable A -> B");
+	flags[kFlag_AtoB].SetType(CObjProp::integer);
+	flags[kFlag_AtoB].SetInt(1 << kFlag_AtoB);
+
+	flags[kFlag_BtoA].SetName("BtoA");
+	flags[kFlag_BtoA].SetDisplayName("Enable B -> A");
+	flags[kFlag_BtoA].SetType(CObjProp::integer);
+	flags[kFlag_BtoA].SetInt(1 << kFlag_BtoA);
+
+	flags[kFlag_BtoAUseAtoBScript].SetName("BtoAUseAtoBScript");
+	flags[kFlag_BtoAUseAtoBScript].SetDisplayName("(B -> A) use (A -> B) Script");
+	flags[kFlag_BtoAUseAtoBScript].SetType(CObjProp::integer);
+	flags[kFlag_BtoAUseAtoBScript].SetInt(1 << kFlag_BtoAUseAtoBScript);
+
+	flags[kFlag_AutoFace].SetName("autoFace");
+	flags[kFlag_AutoFace].SetDisplayName("Auto Face");
+	flags[kFlag_AutoFace].SetType(CObjProp::integer);
+	flags[kFlag_AutoFace].SetInt(1 << kFlag_AutoFace);
+
+	props[kProp_Flags].AddChoice(&flags[kFlag_AtoB]);
+	props[kProp_Flags].AddChoice(&flags[kFlag_BtoA]);
+	props[kProp_Flags].AddChoice(&flags[kFlag_BtoAUseAtoBScript]);
+	props[kProp_Flags].AddChoice(&flags[kFlag_AutoFace]);
+
+	props[kProp_Flags].SetInt(
+		(1 << kFlag_AtoB) | (1 << kFlag_BtoA) | (1 << kFlag_AutoFace)
+	);
 }
 
 void CWaypoint::Connection::InitMesh() {
@@ -808,6 +989,7 @@ void CWaypoint::Connection::InitMesh() {
 	mesh.allow_wireframe = false;
 	mesh.solid2d = false;
 
+	InitArrow();
 	Select(false);
 }
 
@@ -835,6 +1017,88 @@ void CWaypoint::Connection::UpdateMesh() {
 
 		mesh.xyz[i] = a*u_cb + b*u_sq + c*u + d;
 	}
+
+	UpdateArrow();
+}
+
+void CWaypoint::Connection::InitArrow() {
+	arrow.cmds = GL_TRIANGLES;
+	arrow.num_pts = 5;
+	arrow.num_tris = 6;
+	arrow.xyz = new vec3[arrow.num_pts];
+	arrow.tris = new unsigned int[arrow.num_tris * 3];
+
+	//           (0)
+	//            +
+	//           / \
+	//          /   \
+	//  (1)(4) +-----+ (2)(3)
+
+	arrow.tris[0] = 0;
+	arrow.tris[1] = 2;
+	arrow.tris[2] = 1;
+
+	arrow.tris[3] = 0;
+	arrow.tris[4] = 3;
+	arrow.tris[5] = 2;
+
+	arrow.tris[6] = 0;
+	arrow.tris[7] = 1;
+	arrow.tris[8] = 4;
+
+	arrow.tris[9] = 0;
+	arrow.tris[10] = 4;
+	arrow.tris[11] = 3;
+
+	arrow.tris[12] = 1;
+	arrow.tris[13] = 2;
+	arrow.tris[14] = 4;
+
+	arrow.tris[15] = 4;
+	arrow.tris[16] = 2;
+	arrow.tris[17] = 3;
+
+	arrow.allow_selected = false;
+	arrow.allow_wireframe = false;
+	arrow.solid2d = false;
+}
+
+void CWaypoint::Connection::UpdateArrow() {
+
+	const vec3 &head = mesh.xyz[kNumPoints / 2];
+	const vec3 &tail = mesh.xyz[kNumPoints / 2 - 1];
+
+	vec3 fwd = head - tail;
+	fwd.normalize();
+
+	vec3 left, up;
+
+	//           (0)
+	//            +
+	//           / \
+	//          /   \
+	//  (1)(4) +-----+ (2)(3)
+
+	if (dot(fwd, sysAxisZ) > 0.999) {
+		left = cross(fwd, sysAxisX);
+		up = cross(left, fwd);
+	} else {
+		left = cross(fwd, sysAxisZ);
+		up = cross(left, fwd);
+	}
+
+	const float kSize = 48.f;
+
+	fwd *= kSize;
+	left *= kSize*0.5f;
+	up *= kSize*0.5f;
+
+	arrow.xyz[0] = head;
+	arrow.xyz[1] = head - fwd + left + up;
+	arrow.xyz[2] = head - fwd - left + up;
+	arrow.xyz[3] = head - fwd - left - up;
+	arrow.xyz[4] = head - fwd + left - up;
+
 }
 
 void CWaypoint::Connection::Select(bool select) {
@@ -853,6 +1117,12 @@ void CWaypoint::Connection::Select(bool select) {
 		mesh.fcolor3d[3] = 1.0f;
 		mesh.line_size = 1.f;
 	}
+
+	arrow.color2d = arrow.color3d = mesh.color2d;
+	arrow.fcolor3d[0] = mesh.fcolor3d[0];
+	arrow.fcolor3d[1] = mesh.fcolor3d[1];
+	arrow.fcolor3d[2] = mesh.fcolor3d[2];
+	arrow.fcolor3d[3] = mesh.fcolor3d[3];
 }
 
 void CWaypoint::Connection::Bind(CTreadDoc *doc) {

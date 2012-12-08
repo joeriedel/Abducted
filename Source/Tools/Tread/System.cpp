@@ -1724,10 +1724,6 @@ CObjProp& CObjProp::operator = ( const CObjProp& p )
 	return *this;
 }
 
-CObjProp::~CObjProp()
-{
-}
-
 CObjProp* CObjProp::FindProp( CLinkedList<CObjProp>* list, const char* name )
 {
 	CObjProp* p;
@@ -1815,20 +1811,6 @@ void CObjProp::SetValue( const CObjProp* prop )
 CLinkedList<CObjProp>* CObjProp::GetChoices()
 {
 	return &m_Choices;
-}
-
-void CObjProp::AddChoice( CObjProp* choice )
-{
-	// this choice will replace one that already exists.
-	for (CObjProp *p = m_Choices.ResetPos(); p; p = m_Choices.GetNextItem())
-	{
-		if (!strcmp(p->GetString(), choice->GetString()))
-		{
-			p = m_Choices.ReplaceNode(choice, true);
-			return;
-		}
-	}
-	m_Choices.AddItem( choice );
 }
 
 const char* CObjProp::GetName()

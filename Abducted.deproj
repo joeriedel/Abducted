@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
-    <filename>Base\Scripts\Class.lua</filename>
+    <filename>Source\Scripts\Class.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Engine.lua</filename>
+    <filename>Source\Scripts\Engine.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Entity.lua</filename>
+    <filename>Source\Scripts\Entity.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\GameNetwork.lua</filename>
+    <filename>Source\Scripts\GameNetwork.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Imports.lua</filename>
+    <filename>Source\Scripts\Imports.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Input.lua</filename>
+    <filename>Source\Scripts\Input.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\KeyCodes.lua</filename>
+    <filename>Source\Scripts\KeyCodes.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Library.lua</filename>
+    <filename>Source\Scripts\Library.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Math.lua</filename>
+    <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Persistence.lua</filename>
+    <filename>Source\Scripts\Persistence.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Player.lua</filename>
+    <filename>Source\Scripts\Player.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\SoundEmitter.lua</filename>
+    <filename>Source\Scripts\SoundEmitter.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\System.lua</filename>
+    <filename>Source\Scripts\System.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\ViewController.lua</filename>
+    <filename>Source\Scripts\ViewController.lua</filename>
   </file>
   <file>
-    <filename>Base\Scripts\Worldspawn.lua</filename>
+    <filename>Source\Scripts\Worldspawn.lua</filename>
   </file>
 </project>

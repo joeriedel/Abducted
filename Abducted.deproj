@@ -10,6 +10,9 @@
     <filename>Source\Scripts\Entity.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Game.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\GameNetwork.lua</filename>
   </file>
   <file>
@@ -25,6 +28,9 @@
     <filename>Source\Scripts\Library.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\LuaCrashCourse.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>
@@ -38,6 +44,12 @@
   </file>
   <file>
     <filename>Source\Scripts\System.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\TerminalPuzzles.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\UI.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\ViewController.lua</filename>

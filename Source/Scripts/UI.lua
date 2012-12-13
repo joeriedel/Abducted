@@ -102,8 +102,8 @@ function UI.CenterWidget(self, widget, xp, yp)
 	xp = xp * 2
 	yp = yp * 2
 	
-	local x = (xp-r[1])/2
-	local y = (yp-r[2])/2
+	local x = (xp-r[3])/2
+	local y = (yp-r[4])/2
 	
 	r[1] = x
 	r[2] = y

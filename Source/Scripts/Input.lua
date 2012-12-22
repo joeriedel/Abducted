@@ -9,13 +9,9 @@ function MapInputEvent(e)
 		return e
 	end
 
-	local vp = World.Viewport()
-	local sw = 1024/vp[1]
-	local sh = 768/vp[2]
-	
 	e.orig = { data={e.data[1], e.data[2], e.data[3]} }
-	e.data[1] = e.data[1]*sw
-	e.data[2] = e.data[2]*sh
+	e.data[1] = e.data[1]
+	e.data[2] = e.data[2]
 	
 	return e
 
@@ -24,18 +20,16 @@ end
 function MapInputGesture(g)
 
 	local vp = World.Viewport()
-	local sw = 1024/vp[1]
-	local sh = 768/vp[2]
-	
+		
 	g.orig = { mins={g.mins[1],g.mins[2]}, maxs={g.maxs[1],g.maxs[2]}, origin={g.origin[1], g.origin[2]} }
 	
-	g.mins[1] = g.mins[1]*sw
-	g.maxs[1] = g.maxs[1]*sw
-	g.origin[1] = g.origin[1]*sw
+	g.mins[1] = g.mins[1]
+	g.maxs[1] = g.maxs[1]
+	g.origin[1] = g.origin[1]
 	
-	g.mins[2] = g.mins[2]*sh
-	g.maxs[2] = g.maxs[2]*sh
-	g.origin[2] = g.origin[2]*sh
+	g.mins[2] = g.mins[2]
+	g.maxs[2] = g.maxs[2]
+	g.origin[2] = g.origin[2]
 
 	return g
 

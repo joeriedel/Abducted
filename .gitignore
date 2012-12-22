@@ -58,3 +58,5 @@ TODO.txt
 autoexec.txt
 editor.user.ini
 Source/XCode/build/*
+Source/XCode/Abducted.xcworkspace/xcshareddata
+AbductedDeveloper.app/*

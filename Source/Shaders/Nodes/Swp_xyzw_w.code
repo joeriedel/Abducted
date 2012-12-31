@@ -1,0 +1,4 @@
+FIXED4 Swp_xyzw_w(FIXED4 xyzw, FIXED w GLOBALS)
+{
+	return FIXED4(xyzw.xyz, w);
+}

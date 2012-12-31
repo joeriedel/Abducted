@@ -1,0 +1,4 @@
+FIXED4 Swp_xyz1(FIXED x, FIXED y, FIXED z GLOBALS)
+{
+	return FIXED4(x, y, z, 1);
+}

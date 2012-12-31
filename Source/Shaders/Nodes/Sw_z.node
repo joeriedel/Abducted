@@ -1,0 +1,13 @@
+Node({
+
+	Outputs = 
+	{
+		z = {t=FIXED, r=-1, s="color" }
+	},
+	
+	Inputs =
+	{
+		x={t=FIXED4, s="color", r=0}
+	}
+
+})

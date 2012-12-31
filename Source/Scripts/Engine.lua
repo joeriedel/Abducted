@@ -126,15 +126,15 @@ kLangId_CH = 7
 -- Input Helpers
 
 function I_IsMouse(event)
-	return event.type == I_MouseDown or event.type == I_MouseUp or event.type == I_MouseMove
+	return event.type == kI_MouseDown or event.type == kI_MouseUp or event.type == kI_MouseMove
 end
 
 function I_IsMouseButton(event)
-	return event.type == I_MouseDown or event.type == I_MouseUp
+	return event.type == kI_MouseDown or event.type == kI_MouseUp
 end
 
 function I_IsTouch(event)
-	return event.type >= I_TouchBegin and event.type <= I_TouchCancelled
+	return event.type >= kI_TouchBegin and event.type <= kI_TouchCancelled
 end
 
 --[[

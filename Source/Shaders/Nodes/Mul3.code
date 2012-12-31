@@ -1,0 +1,4 @@
+FIXED4 Mul3(FIXED4 a, FIXED4 b, FIXED4 c GLOBALS)
+{
+	return mul(a, mul(b, c));
+}

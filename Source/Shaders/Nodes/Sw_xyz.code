@@ -1,0 +1,4 @@
+FIXED3 Sw_xyz(FIXED4 rgba GLOBALS)
+{
+	return rgba.xyz;
+}

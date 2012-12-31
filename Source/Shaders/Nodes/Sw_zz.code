@@ -1,0 +1,4 @@
+FIXED2 Sw_zz(FIXED4 rgba GLOBALS)
+{
+	return rgba.zz;
+}

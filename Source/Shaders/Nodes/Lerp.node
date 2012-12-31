@@ -1,0 +1,15 @@
+Node({
+
+	Outputs = 
+	{
+		rgba = {t=FIXED4, r=-1, s="color" }
+	},
+	
+	Inputs =
+	{
+		a={t=FIXED4, s="color", r=0},
+		b={t=FIXED4, s="color", r=1},
+		t={t=FIXED4, s="time", r=2}
+	}
+
+})

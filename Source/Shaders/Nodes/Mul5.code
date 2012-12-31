@@ -1,0 +1,4 @@
+FIXED4 Mul5(FIXED4 a, FIXED4 b, FIXED4 c, FIXED4 d, FIXED4 e GLOBALS)
+{
+	return mul(a, mul(b, mul(c, mul(d, e))));
+}

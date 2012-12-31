@@ -1,0 +1,4 @@
+FIXED2 Sw_yy(FIXED4 rgba GLOBALS)
+{
+	return rgba.yy;
+}

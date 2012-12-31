@@ -234,16 +234,14 @@ bool AbductedApp::RunAutoExec() {
 			src += 4;
 			cmp += 4;
 
-			for (int k = 0; k < m->numChannels; ++k) {
-				for (int j = 0; j < 4; ++j) {
-					d[j] = math::Abs(src[j]-cmp[j]);
-				}
-
-				RAD_VERIFY_MSG((d[0] < 0.1f && d[1] < 0.1f && d[2] < 0.1f && d[3] == 0.f), "Bad SIMD tangent");
-
-				src += 4;
-				cmp += 4;
+			for (int j = 0; j < 4; ++j) {
+				d[j] = math::Abs(src[j]-cmp[j]);
 			}
+
+			RAD_VERIFY_MSG((d[0] < 0.1f && d[1] < 0.1f && d[2] < 0.1f && d[3] == 0.f), "Bad SIMD tangent");
+
+			src += 4;
+			cmp += 4;
 		}
 		
 		zone_free(refFloats);

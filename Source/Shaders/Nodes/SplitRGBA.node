@@ -1,0 +1,47 @@
+-- Splits an RGBA value into
+-- an RGB and an A value
+
+-- This is the LUA code for a shader node.
+-- The shader code for all nodes lives in the
+-- associated .f files (see SplitRGBA.f).
+
+Node({
+
+	-- All nodes list their outputs:
+	
+	Outputs = 
+	{
+		-- Output called RGB (i.e. nodeName.rgb)
+		-- t is the type of the value:
+		-- (FLOAT, FLOAT2, FLOAT3, FLOAT4)
+		-- (HALF, HALF2, HALF3, HALF4)
+		-- (FIXED, FIXED2, FIXED3, FIXED4)
+		-- NOTE: FIXED is fastest on mobile hardware.
+		
+		-- r is the "register" number.
+		-- -1 means it is returned by the function
+		-- 0 through N means the value is an out parameter numbered 0 through N
+		
+		-- s is the semantic and has no use right now
+		
+		rgb = {t=FIXED3, r=-1, s="color"},
+		
+		-- Ditto for ALPHA (i.e. nodeName.alpha)
+		-- R = 0 means that the alpha value is returned as an out value
+		-- and is the first parameter to the function in the .f file.
+		
+		alpha = {t=FIXED, r=0, s="alpha" }
+	},
+
+	-- Node inputs
+	-- Not required
+	-- Unless your node take inputs
+	
+	Inputs = 
+	{
+		-- nodeName.rgba input
+		-- r = 1 means it's the second parameter to the function
+		rgba = { t=FIXED4, s="color", r=1}
+	}
+	
+})

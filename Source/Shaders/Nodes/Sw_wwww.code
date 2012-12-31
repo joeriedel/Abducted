@@ -1,0 +1,4 @@
+FIXED4 Sw_wwww(FIXED4 rgba GLOBALS)
+{
+	return rgba.wwww;
+}

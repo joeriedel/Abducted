@@ -1,0 +1,4 @@
+FIXED4 Add(FIXED4 a, FIXED4 b GLOBALS)
+{
+	return a + b;
+}

@@ -61,4 +61,3 @@ Source/XCode/build/*
 Source/XCode/Abducted.xcworkspace/xcshareddata
 AbductedDeveloper.app/*
 *.glsl
-Source/Shaders/Logs/*

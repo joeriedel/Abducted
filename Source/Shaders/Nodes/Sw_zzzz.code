@@ -1,0 +1,4 @@
+FIXED4 Sw_zzzz(FIXED4 rgba GLOBALS)
+{
+	return rgba.zzzz;
+}

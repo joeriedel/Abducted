@@ -1,0 +1,18 @@
+
+Node({
+
+	Outputs = 
+	{
+		r = {t=FIXED4, r=-1}
+	},
+
+	Inputs = 
+	{
+		x = {t=FIXED4, r=0},
+		y = {t=FIXED4, r=1},
+		z = {t=FIXED4, r=2},
+		w = {t=FIXED4, r=3},
+		q = {t=FIXED4, r=4}
+	}
+	
+})

@@ -16,6 +16,17 @@
 #include <Engine/Persistence.h>
 #endif
 
+#if defined(RAD_OPT_IOS_DEVICE) && defined(RAD_TARGET_GOLDEN)
+#define VALIDATE_NEON_SKIN
+#endif
+
+#if defined(VALIDATE_NEON_SKIN)
+#include <Runtime/Base/SIMD.h>
+#include <Engine/Renderer/SkMesh.h>
+#include <Engine/Packages/Packages.h>
+const SIMDDriver *SIMD_ref_bind();
+#endif
+
 App *App::New(int argc, const char **argv) { 
 	return new AbductedApp(argc, argv); 
 }
@@ -156,6 +167,93 @@ bool AbductedApp::RunAutoExec() {
 			return false;
 		}
 	}
+	
+// big hack for NEON skin testing
+// NOTE: none of our test data has 2 UV (tangent) channels in it, those are still done blind with no
+// verification as to correctness.
+
+#if defined(VALIDATE_NEON_SKIN)
+	pkg::Asset::Ref asset = engine->sys->packages->Resolve("Characters/HumanFemale", pkg::Z_Engine);
+	RAD_VERIFY_MSG(asset, "Unable to load NEON skin test data!");
+	RAD_VERIFY(asset->type == asset::AT_SkModel);
+	
+	int r = asset->Process(xtime::TimeSlice::Infinite, pkg::P_Load|pkg::P_FastPath);
+	RAD_VERIFY_MSG(r == pkg::SR_Success, "Unable to load NEON skin test data!");
+	
+	r::SkMesh::Ref skModel(r::SkMesh::New(asset));
+	
+	ska::AnimState::Map::const_iterator it = skModel->states->find(CStr("walk"));
+	RAD_VERIFY(it != skModel->states->end());
+	
+	ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
+		it->second.variants,
+		*skModel->ska.get(),
+		ska::Notify::Ref()
+	);
+
+	ska::Controller::Ref target = boost::static_pointer_cast<ska::Controller>(animSource);
+	
+	ska::BlendToController::Ref blendTo = ska::BlendToController::New(*skModel->ska.get(), ska::Notify::Ref());
+	skModel->ska->root = boost::static_pointer_cast<ska::Controller>(blendTo);
+	blendTo->Activate();
+
+	boost::static_pointer_cast<ska::BlendToController>(skModel->ska->root.get())->BlendTo(target);
+	
+	ska::BoneTM unused;
+	skModel->ska->Tick(1.f, true, true, Mat4::Identity, ska::Ska::MT_None, unused);
+	
+	for (int i = 0; i < skModel->numMeshes; ++i) {
+		const ska::DMesh *m = skModel->DMesh(i);
+		float *refFloats = (float*)safe_zone_malloc(ZEngine, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+		float *simdFloats = (float*)safe_zone_malloc(ZEngine, m->NumVertexFloats() * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+		
+		skModel->SkinToBuffer(SIMD, i, simdFloats);
+
+		// Compare the reference implementation with optimized path:
+		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
+		
+		skModel->SkinToBuffer(SIMD_ref, i, refFloats);
+		const float *src = refFloats;
+		const float *cmp = simdFloats;
+		for (int z = 0; z < (int)m->totalVerts; ++z) {
+			float d[4];
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			RAD_VERIFY_MSG((d[0] < 0.1f && d[1] < 0.1f && d[2] < 0.1f), "Bad SIMD vertex");
+			
+			src += 4;
+			cmp += 4;
+
+			for (int j = 0; j < 3; ++j)
+				d[j] = math::Abs(src[j]-cmp[j]);
+
+			RAD_VERIFY_MSG((d[0] < 0.1f && d[1] < 0.1f && d[2] < 0.1f), "Bad SIMD normal");
+
+			src += 4;
+			cmp += 4;
+
+			for (int j = 0; j < 4; ++j) {
+				d[j] = math::Abs(src[j]-cmp[j]);
+			}
+
+			RAD_VERIFY_MSG((d[0] < 0.1f && d[1] < 0.1f && d[2] < 0.1f && d[3] == 0.f), "Bad SIMD tangent");
+
+			src += 4;
+			cmp += 4;
+		}
+		
+		zone_free(refFloats);
+		zone_free(simdFloats);
+	}
+	
+#endif
+
+// time-test for SIMD
+#if defined(RAD_OPT_TOOLS) || (defined(RAD_OPT_IOS_DEVICE) && !defined(RAD_OPT_SHIP))
+//	SIMDSkinTest(COut(C_Info));
+#endif
 
 	return true;
 }

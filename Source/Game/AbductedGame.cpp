@@ -110,11 +110,11 @@ private:
 
 		m->BindStates();
 		m->BindTextures(m_loader);
-		m->shader->Begin(r::Shader::P_Default, *m);
+		m->shader->Begin(Shader::kPass_Default, *m);
 
 		gls.DisableAllMGSources();
 		gls.SetMGSource(
-			r::MGS_Vertices,
+			kMaterialGeometrySource_Vertices,
 			0,
 			m_rectVB,
 			2,
@@ -124,7 +124,7 @@ private:
 			0
 		);
 		gls.SetMGSource(
-			r::MGS_TexCoords,
+			kMaterialGeometrySource_TexCoords,
 			0,
 			m_rectVB,
 			2,
@@ -138,7 +138,11 @@ private:
 			m_rectIB
 		);
 
-		m->shader->BindStates(true, Vec4(1,1,1,1));
+		Shader::Uniforms uniforms;
+		uniforms.blendColor = Vec4(1,1,1,1);
+		uniforms.lights.numLights = 0;
+
+		m->shader->BindStates(uniforms);
 		gls.Commit();
 		gl.DrawElements(GL_TRIANGLES, (OverlayDiv-1)*(OverlayDiv-1)*6, GL_UNSIGNED_SHORT, 0);
 		CHECK_GL_ERRORS();

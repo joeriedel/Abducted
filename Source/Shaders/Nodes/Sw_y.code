@@ -1,0 +1,4 @@
+FIXED Sw_y(FIXED4 rgba GLOBALS)
+{
+	return rgba.y;
+}

@@ -1,0 +1,70 @@
+
+// This bloom kernel has serious problems. First, it requires too many dependant
+// texture reads, and arithmetic instructions.
+
+// Right now it does 24 dependant texture reads per pixel, which is totally insane.
+
+// The right way to do a bloom shader is more work though, we'll do the right thing
+// in our next project (already underway).
+
+FLOAT BloomLuminance(FLOAT4 p) {
+	return dot(FLOAT3(1, 1, 1), FLOAT3(p));
+}
+
+FLOAT4 BloomSumPixel(FLOAT4 p) {
+	const FLOAT kSampleScale = 0.006;
+	FLOAT lum = BloomLuminance(p);
+	return sat((lum-0.4)*16.0) * p * kSampleScale;
+}
+
+FIXED4 BloomSample(sampler2D tex, FLOAT4 st, FIXED4 p GLOBALS) {
+	FLOAT4 sum = FLOAT4(0);
+	FLOAT2 tc = FLOAT2(st);
+	int x;
+	int y;
+
+	const int kQuadrantSize = 4;
+	const FLOAT kSampleSize = 0.004;
+	
+	for (y = 1; y <= kQuadrantSize; ++y) {
+		for (x = 1; x <= kQuadrantSize; ++x) {
+			FLOAT4 z = tex2D(tex, tc + FLOAT2(-x, -y) * kSampleSize);
+			sum += BloomSumPixel(z);
+		}
+		for (x = 1; x <= kQuadrantSize; ++x) {
+			FLOAT4 z = tex2D(tex, tc + FLOAT2(x, -y) * kSampleSize);
+			sum += BloomSumPixel(z); 
+		}
+	}
+
+	for (y = 1; y <= kQuadrantSize; ++y) {
+		for (x = 1; x <= kQuadrantSize; ++x) {
+			FLOAT4 z = tex2D(tex, tc + FLOAT2(-x, y) * kSampleSize);
+			sum += BloomSumPixel(z);
+		}
+		for (x = 1; x <= kQuadrantSize; ++x) {
+			FLOAT4 z = tex2D(tex, tc + FLOAT2(x, y) * kSampleSize);
+			sum += BloomSumPixel(z);
+		}
+	}
+
+	// do +/- x/y's
+	for (y = 1; y <= kQuadrantSize; ++y) {
+		FLOAT4 z = tex2D(tex, tc + FLOAT2(0, y) * kSampleSize);
+		sum += BloomSumPixel(z);
+	}
+	for (y = 1; y <= kQuadrantSize; ++y) {
+		FLOAT4 z = tex2D(tex, tc + FLOAT2(0, -y) * kSampleSize);
+		sum += BloomSumPixel(z);
+	}
+	for (x = 1; x <= kQuadrantSize; ++x) {
+		FLOAT4 z = tex2D(tex, tc + FLOAT2(-x, 0) * kSampleSize);
+		sum += BloomSumPixel(z);
+	}
+	for (x = 1; x <= kQuadrantSize; ++x) {
+		FLOAT4 z = tex2D(tex, tc + FLOAT2(x, 0) * kSampleSize);
+		sum += BloomSumPixel(z);
+	}
+	
+	return p + sum;
+}

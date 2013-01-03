@@ -1,8 +1,10 @@
 
 Ep1/level01
 
-
+Characters/HumanFemale
 Ep1/Handshake_contagion
+UI/TerminalPuzzlesBigFont_TF
+UI/Globals
 
 // System (for DebugUI)
 

@@ -1,0 +1,5 @@
+FIXED3 SplitRGBA(out FIXED alpha, FIXED4 rgba GLOBALS)
+{
+	alpha = rgba.w;
+	return FIXED3(rgba.x, rgba.y, rgba.z);
+}

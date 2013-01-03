@@ -23,15 +23,19 @@ kPlatXBox360 = 4
 kPlatPS3 = 5
 
 -- MoveTypes
-kMT_None = 0
-kMT_Fly = 1
-kMT_Spline = 2
+kMoveType_None = 0
+kMoveType_Fly = 1
+kMoveType_Spline = 2
 
 -- SolidTypes
-kST_None = 0
-kST_BBox = 1
-kST_Brush = 2
-kST_All = 0xff
+kSolidType_None = 0
+kSolidType_BBox = 1
+kSolidType_All = 0xff
+
+-- OccupantTypes
+kOccupantType_None = 0
+kOccupantType_BBox = 1
+kOccupantType_Volume = 2
 
 -- Physics Flags
 kPF_OnGround = 1
@@ -64,9 +68,13 @@ kAT_Font = 6
 kAT_Typeface = 7
 
 -- Motion Types (for ViewModels / Ska Animation)
-kSka_MT_None = 0
-kSka_MT_Relative = 1
-kSka_MT_Absolute = 2
+kSkaMotionType_None = 0
+kSkaMotionType_Relative = 1
+kSkaMotionType_Absolute = 2
+
+-- Waypoints
+
+kWaypointState_Enabled = 1
 
 -- Input
 kI_KeyDown = 0
@@ -95,23 +103,23 @@ kSoundChannel_Music = 3
 kSoundChannel_Max = 4
 
 -- Unload Disposition
-kUD_None = 0
-kUD_Slot = 1
-kUD_All  = 2
+kUnloadDisposition_None = 0
+kUnloadDisposition_Slot = 1
+kUnloadDisposition_All  = 2
 
 -- Cloud File Status
-kCFS_Ready = 0
-kCFS_Downloading = 1
-kCFS_Error = 2
+kCloudFileStatus_Ready = 0
+kCloudFileStatus_Downloading = 1
+kCloudFileStatus_Error = 2
 
 -- Cinematic Flags
-kCF_AnimateCamera = 1
-kCF_CanPlayForever = 2
-kCF_Loop = 4
+kCinematicFlag_AnimateCamera = 1
+kCinematicFlag_CanPlayForever = 2
+kCinematicFlag_Loop = 4
 
 -- Material Timing Modes
-kMat_TM_Absolute = 0
-kMat_TM_Relative = 1
+kMaterialTimingMode_Absolute = 0
+kMaterialTimingMode_TM_Relative = 1
 
 -- String table languages
 kLangId_EN = 0

@@ -10,6 +10,9 @@
     <filename>Source\Scripts\Entity.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Floors.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Game.lua</filename>
   </file>
   <file>

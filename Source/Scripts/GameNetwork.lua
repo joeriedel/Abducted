@@ -29,7 +29,7 @@ function GameNetwork.Initialize()
 	Persistence.WriteBool(Session, "gnAvailable", available)
 	Session:Save()
 	
-	COutLine(C_Debug, "GameNetwork.Initialize(available=%s)", tostring(available))
+	COutLine(kC_Debug, "GameNetwork.Initialize(available=%s)", tostring(available))
 	
 	return available
 	
@@ -46,7 +46,7 @@ function GameNetwork.OnLocalPlayerAuthenticated(authenticated)
 	local changed = false
 	local wasAuthenticated = Persistence.ReadBool(Session, "gnAuthenticated", false)
 	if (wasAuthenticated ~= authenticated) then
-		COutLine(C_Debug, "GameNetwork.OnLocalPlayerAuthenticated(%s)", tostring(authenticated))
+		COutLine(kC_Debug, "GameNetwork.OnLocalPlayerAuthenticated(%s)", tostring(authenticated))
 		Persistence.WriteBool(Session, "gnAuthenticated", authenticated)
 		Session:Save()
 	end
@@ -65,7 +65,7 @@ end
 
 function GameNetwork.OnShowLeaderboard(show)
 
-	COutLine(C_Debug, "GameNetwork.OnShowLeaderboard(%s)", tostring(show))
+	COutLine(kC_Debug, "GameNetwork.OnShowLeaderboard(%s)", tostring(show))
 	
 	if (World.game and World.game.OnShowLeaderboard) then
 		World.game:OnShowLeaderboard(show)
@@ -75,7 +75,7 @@ end
 
 function GameNetwork.OnShowAchievements(show)
 
-	COutLine(C_Debug, "GameNetwork.OnShowAchievements(%s)", tostring(show))
+	COutLine(kC_Debug, "GameNetwork.OnShowAchievements(%s)", tostring(show))
 	
 	if (World.game and World.game.OnShowAchievements) then
 		World.game:OnShowAchievements(show)

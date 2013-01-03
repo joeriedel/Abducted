@@ -13,8 +13,8 @@ function ViewController.Spawn(self)
 	World.SetViewController(self)
 end
 
-function ViewController.LevelStart(self)
-	COutLine(kC_Debug, "ViewController:LevelStart")
+function ViewController.OnLevelStart(self)
+	COutLine(kC_Debug, "ViewController:OnLevelStart")
 	self:Defaults()
 end
 	
@@ -29,12 +29,12 @@ function ViewController.Defaults(self)
 		0, -- in time
 		0, -- out time
 		-1, -- hold time (-1 for infinite)
-		1, -- minimum  units
-		1, -- maximum  units
+		200, -- minimum  units
+		200, -- maximum  units
 		0, -- take X seconds to lerp between those distances
 		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
-		{ 0, -10, -140 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
-		{ 0, -10, -160 }, -- maxAngles
+		{ 0, 10, -140 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
+		{ 0, 10, -160 }, -- maxAngles
 		60, -- Take X seconds to lerp between them
 		-1, -- angle lag (<= 0 means no lag)
 		false -- use pitch angle of target
@@ -55,7 +55,7 @@ function ViewController.Defaults(self)
 	-- It takes a base value, and a plus/minus factor
 	-- If you set a Base Value other than zero the camera simply lerps between those fov's
 	-- If you specify zero for the base, then the FOV is controlled by the distance parameters
-	self:SetCameraFov(
+	self:SetCameraFOV(
 		0, -- in time
 		0, -- out time
 		-1, -- hold time (-1 for infinite)

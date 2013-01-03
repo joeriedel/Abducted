@@ -13,9 +13,10 @@ function Player.Spawn(self)
 	self.model:SetRootController("BlendToController")
 	self.model:BlendToState("manipulate_idle")
 	self:AttachDrawModel(self.model)
-	self:SetDrawModelScale(self.model, {0.4, 0.4, 0.4})
+	self:SetDrawModelScale(self.model, {0.4, 0.4, 0.4}) -- temp art
 	self:SetMins({-24, -24, -48})
 	self:SetMaxs({ 24,  24,  48})
+	self:SetDrawModelBounds(self.model, self:Mins(), self:Maxs())
 	self:SetCameraShift({0, 0, 70}) -- camera looks here
 	
 	local angle = NumberForString(self.keys.angle, 0)

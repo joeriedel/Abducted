@@ -689,10 +689,10 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 			" " << c->props[Connection::kProp_Flags].GetInt() <<
 			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
 			" ) ( " << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << " )\"\n";
-		fs << "\"connection_fwd_start " << i << "\"" << c->props[Connection::kProp_FwdStart].GetString() << "\"\n";
-		fs << "\"connection_fwd_end " << i << "\"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
-		fs << "\"connection_back_start " << i << "\"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
-		fs << "\"connection_back_end " << i << "\"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
+		fs << "\"connection_fwd_start " << i << "\" \"" << c->props[Connection::kProp_FwdStart].GetString() << "\"\n";
+		fs << "\"connection_fwd_end " << i << "\" \"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
+		fs << "\"connection_back_start " << i << "\" \"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
+		fs << "\"connection_back_end " << i << "\" \"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
 	}
 
 	fs << "}\n";

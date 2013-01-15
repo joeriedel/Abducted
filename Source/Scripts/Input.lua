@@ -37,8 +37,14 @@ end
 
 function World.OnInputEvent(e)
 
+	COutLine(kC_Debug,"World.OnInputEvent type=%i",e.type)
 	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
+		COutLine(kC_Debug,"baz")
 		e = MapInputEvent(e)
+		if TerminalPuzzles.OnInputEvent and TerminalPuzzles:OnInputEvent(e) then
+			return false;
+		end
+		
 		if World.game and World.game.OnInputEvent then
 			return World.game:OnInputEvent(e)
 		end

@@ -314,7 +314,7 @@ function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
 end
 
 function TerminalPuzzles.Think(self,dt)
-	local r = self.widgets.current.Rect()
+	local r = self.widgets.current:Rect()
 
 	local dx = self.state.heading.x * dt
 	local dy = self.state.heading.y * dt

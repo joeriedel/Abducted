@@ -9,10 +9,11 @@ TerminalPuzzles.UI_Layer = 5
 function TerminalPuzzles.Spawn(self)
 	TerminalPuzzles.entity = self
 	
-	TerminalPuzzles.entity.active = true
-	
 	self:LoadMaterials()
 	self:InitUI()
+	
+	self.think = TerminalPuzzles.Think
+	self:SetNextThink(0)
 end
 
 function TerminalPuzzles.CreateLevel1x1(self)
@@ -81,17 +82,38 @@ function TerminalPuzzles.CreateBoards(self)
 end
 
 function TerminalPuzzles.GameIsActive()
-	return TerminalPuzzles.entity and TerminalPuzzles.entity.active
+	if (TerminalPuzzles.entity.state) then
+		return true
+	end
+	
+	return false
 end
 
 function TerminalPuzzles.OnInputEvent(self,e)
 	if (e.type == kI_KeyDown) then
 		--COutLine(kC_Debug,"key=%i",e.data[1])
 		if (e.data[1] == kKeyCode_I) then
-			COutLine(kC_Debug,"moving widget")
-			UI:CenterWidget(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
+			--COutLine(kC_Debug,"moving widget")
+			self.state.heading.x = 0
+			self.state.heading.y = -1
+			--UI:CenterWidget(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
 			return true
 		end
+		if (e.data[1] == kKeyCode_K) then
+			self.state.heading.x = 0
+			self.state.heading.y = 1
+			return true
+		end		
+		if (e.data[1] == kKeyCode_J) then
+			self.state.heading.x = -1
+			self.state.heading.y = 0
+			return true
+		end				
+		if (e.data[1] == kKeyCode_L) then
+			self.state.heading.x = 1
+			self.state.heading.y = 0
+			return true
+		end						
 	end
 end
 
@@ -122,6 +144,9 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.root:AddChild(self.widgets.board)	
 	
 	self.state = { }
+	self.state.heading = { }
+	self.state.heading.x = 0
+	self.state.heading.y = 0
 	self.state.victory = { }
 	self.state.current = { }
 		
@@ -286,10 +311,34 @@ end
 
 function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
 	self.gameCompleteCallback = gameCompleteCallback
-
 end
 
-function TerminalPuzzles.Think(self)
+function TerminalPuzzles.Think(self,dt)
+	local r = self.widgets.current.Rect()
+
+	local dx = self.state.heading.x * dt
+	local dy = self.state.heading.y * dt
+	
+	r[1] = r[1] + r[3]/2 + dx
+	r[2] = r[2] + r[4]/2 + dy
+	
+	if (r[1] < r[3]/2) then
+		r[1] = 0
+	end
+	if (r[1] + r[3] > UI.screenWidth) then
+		r[1] = UI.screenWidth - r[3]/2
+	end
+	if (r[2] < r[4]/2) then
+		r[2] = 0
+	end	
+	if (r[2] + r[4] > UI.screenHeight) then
+		r[2] = UI.screenWidth - r[4]/2
+	end
+			
+	COutLine(kC_Debug,"x=%.02f,y=%.02f",r[1],r[2])
+	UI:CenterWidget(self.widgets.current,r[1],r[2])
+--	self.state.heading.x
+	
 
 --	local spiderKill = false
 --	
@@ -330,7 +379,7 @@ function TerminalPuzzles.Think(self)
 --		end		
 --	end
 
-	self.gameCompleteCallback();
+	--self.gameCompleteCallback();
 end
 
 terminal_puzzles = TerminalPuzzles

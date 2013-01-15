@@ -9,6 +9,8 @@ TerminalPuzzles.UI_Layer = 5
 function TerminalPuzzles.Spawn(self)
 	TerminalPuzzles.entity = self
 	
+	TerminalPuzzles.entity.active = true
+	
 	self:LoadMaterials()
 	self:InitUI()
 end
@@ -78,11 +80,16 @@ function TerminalPuzzles.CreateBoards(self)
 		}
 end
 
+function TerminalPuzzles.GameIsActive()
+	return TerminalPuzzles.entity and TerminalPuzzles.entity.active
+end
+
 function TerminalPuzzles.OnInputEvent(self,e)
-	COutLine(kC_Debug,"foo")
-	if (e.type == I_KeyDown) then
+	if (e.type == kI_KeyDown) then
+		--COutLine(kC_Debug,"key=%i",e.data[1])
 		if (e.data[1] == kKeyCode_I) then
-			UI:CenterWidget(self.widgets.current,400,100)
+			COutLine(kC_Debug,"moving widget")
+			UI:CenterWidget(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
 			return true
 		end
 	end

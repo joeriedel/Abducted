@@ -142,6 +142,7 @@ private:
 			kFlag_BtoA,
 			kFlag_BtoAUseAtoBScript,
 			kFlag_AutoFace,
+			kFlag_Interruptible,
 			kFlag_Num
 		};
 
@@ -256,3 +257,5 @@ public:
 	virtual const char *Name() { return "Waypoint Node"; }
 	virtual CMapObject *CreateObject(CTreadDoc *doc) { return CWaypoint::Create(doc); }
 };
+
+#include <Runtime/PopPack.h>

@@ -8,7 +8,7 @@ TerminalPuzzles.UI_Layer = 5
 
 function TerminalPuzzles.Spawn(self)
 	TerminalPuzzles.entity = self
-	
+		
 	self:LoadMaterials()
 	self:InitUI()
 	
@@ -117,17 +117,13 @@ function TerminalPuzzles.OnInputEvent(self,e)
 	end
 end
 
-function tablelength(T)
-  local count = 0
-  for _ in pairs(T) do count = count + 1 end
-  return count
-end
-
 function TerminalPuzzles.InitUI(self)
 	-- constants
-	local REFLEX_CELL_SIZE = 40
-	local REFLEX_BOARD_OFFSET = 80
-
+	self.REFLEX_CELL_SIZE = 40
+	self.REFLEX_BOARD_OFFSET = 80
+	self.INDEX_MAX_X = 22
+	self.INDEX_MAX_Y = 15
+	
 	self:CreateBoards()	
 
 	self.widgets = {}
@@ -135,7 +131,7 @@ function TerminalPuzzles.InitUI(self)
 	World.SetRootWidget(TerminalPuzzles.UI_Layer, self.widgets.root)
 
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect={REFLEX_BOARD_OFFSET,REFLEX_BOARD_OFFSET,UI.screenWidth-REFLEX_BOARD_OFFSET*2,UI.screenHeight-REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
+	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
 	
 	UI:CenterWidget(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
 	UI:CenterWidget(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
@@ -156,11 +152,11 @@ function TerminalPuzzles.InitUI(self)
 	-- goal step: center a,b,c,d list ot top of screen
 	self.widgets.goal = { }
 	for i,v in ipairs(level.goal) do 
-		local xo = REFLEX_CELL_SIZE/2 + REFLEX_CELL_SIZE * (i-1)
-		self.widgets.goal[v] = UI:CreateWidget("MatWidget", {rect={0,0,REFLEX_CELL_SIZE,REFLEX_CELL_SIZE}, material=self.gfx[v]})
+		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)
+		self.widgets.goal[v] = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
 		self.widgets.root:AddChild(self.widgets.goal[v])
 		-- 120 = count(level.goal) * REFLEX_CELL_SIZE
-		UI:CenterWidget(self.widgets.goal[v], UI.screenWidth/2-tablelength(level.goal)*REFLEX_CELL_SIZE/2+xo, REFLEX_CELL_SIZE)
+		UI:CenterWidget(self.widgets.goal[v], UI.screenWidth/2-(#level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)
 		
 		-- djr, work in progress
 		local cell = { }
@@ -170,10 +166,10 @@ function TerminalPuzzles.InitUI(self)
 	-- board step: board grid is x,y structure
 	self.widgets.board = { }	
 	for i,v in ipairs(level.board) do
-		local xo = REFLEX_BOARD_OFFSET + REFLEX_CELL_SIZE/2 + v.x * REFLEX_CELL_SIZE
-		local yo = REFLEX_BOARD_OFFSET + REFLEX_CELL_SIZE/2 + v.y * REFLEX_CELL_SIZE
+		local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.x * self.REFLEX_CELL_SIZE
+		local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.y * self.REFLEX_CELL_SIZE
 			
-		self.widgets.board[i] = UI:CreateWidget("MatWidget", {rect={0,0,REFLEX_CELL_SIZE,REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
+		self.widgets.board[i] = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
 		self.widgets.board[i].state = { }
 		self.widgets.board[i].state.cell = v
 		self.widgets.root:AddChild(self.widgets.board[i])
@@ -181,8 +177,15 @@ function TerminalPuzzles.InitUI(self)
 	end	
 	
 	self.state.currentMove = 1
-	self.widgets.current = UI:CreateWidget("MatWidget", {rect={200,200,REFLEX_CELL_SIZE,REFLEX_CELL_SIZE}, material=self.gfx.mark_current})
+	self.widgets.current = UI:CreateWidget("MatWidget", {rect={200,200,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_current})
 	self.widgets.root:AddChild(self.widgets.current)
+	self.widgets.lines = { }
+	
+	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
+	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
+	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
+	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE
+
 	
 	-- ORIGINAL CODE
 	--[[
@@ -287,6 +290,8 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")				
 
 	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
+	self.gfx.mark_line_v = self.gfx.mark_current
+	self.gfx.mark_line_h = self.gfx.mark_current	
 	--[[
 	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")						
 	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")							
@@ -313,6 +318,14 @@ function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
 	self.gameCompleteCallback = gameCompleteCallback
 end
 
+function TerminalPuzzles.SetPosition(self,w,x,y)
+	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
+	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
+
+	UI:CenterWidget(w,xo,yo)
+	COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
+end
+
 function TerminalPuzzles.Think(self,dt)
 	local r = self.widgets.current:Rect()
 
@@ -332,11 +345,38 @@ function TerminalPuzzles.Think(self,dt)
 		r[2] = 0
 	end	
 	if (r[2] + r[4] > UI.screenHeight) then
-		r[2] = UI.screenWidth - r[4]/2
+		r[2] = UI.screenHeight - r[4]/2
 	end
-			
-	COutLine(kC_Debug,"x=%.02f,y=%.02f",r[1],r[2])
-	UI:CenterWidget(self.widgets.current,r[1],r[2])
+	
+	
+	local x = (r[1] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
+	local y = (r[2] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local ix = math.floor(x)
+	local iy = math.floor(y)
+	if (ix >= 0 and iy >= 0 and ix < self.INDEX_MAX_X and iy < self.INDEX_MAX_Y) then
+		--COutLine(kC_Debug,"x=%.02f,y=%.02f",r[1],r[2])
+		if (r[1] < self.COORD_MIN_X) then
+			r[1] = self.COORD_MIN_X
+		end
+		if (r[1] > self.COORD_MAX_X) then
+			r[1] = self.COORD_MAX_X
+		end
+		if (r[2] < self.COORD_MIN_Y) then
+			r[2] = self.COORD_MIN_Y
+		end		
+		if (r[2] > self.COORD_MAX_Y) then
+			r[2] = self.COORD_MAX_Y
+		end		
+		UI:CenterWidget(self.widgets.current,r[1],r[2])	
+		local index = bit.bor(bit.lshift(iy, 16), ix)
+		if (self.widgets.lines[index] == nil) then	
+			-- add some logic to select line type H, V or A1, A2, A3, A4 (different turns)
+			local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
+			self.widgets.root:AddChild(line)		
+			self.widgets.lines[index] = line
+			self:SetPosition(line,ix,iy)
+		end
+	end		
 --	self.state.heading.x
 	
 

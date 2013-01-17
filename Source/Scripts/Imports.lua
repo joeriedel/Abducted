@@ -2,6 +2,7 @@
 -- Add yours here
 
 -- // System Stuff First // --
+Import("CVars")
 Import("KeyCodes")
 Import("Class")
 Import("Engine")
@@ -14,6 +15,7 @@ Import("Input")
 Import("UI")
 Import("Persistence")
 Import("TerminalPuzzles")
+Import("SCExecContext")
 
 -- // Entities // --
 Import("Entity")

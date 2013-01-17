@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
+    <filename>Source\Scripts\CVars.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Class.lua</filename>
   </file>
   <file>
@@ -41,6 +44,9 @@
   </file>
   <file>
     <filename>Source\Scripts\Player.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\SCExecContext.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\SoundEmitter.lua</filename>

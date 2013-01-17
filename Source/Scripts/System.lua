@@ -159,7 +159,7 @@ World.Precache [ THINK ONLY ]
 function World.Precache(path, async)
 	COutLine(kC_Debug, "Precaching -- %s", path)
 	
-	entity = World.coroutine_entity
+	local entity = World.coroutine_entity
 	if (entity == nil) then
 		COutLine(kC_Error, "ERROR: World.Precache() was not called from an entity coroutine!", path)
 		return nil
@@ -197,7 +197,7 @@ World.Load [ THINK ONLY ]
 
 function World.Load(path, numInstances, async)
 
-	entity = World.coroutine_entity
+	local entity = World.coroutine_entity
 
 	if (entity == nil) then
 		COutLine(kC_Error, "ERROR: World.Load() was not called from an entity coroutine!", path)
@@ -241,7 +241,6 @@ World.Load [ THINK ONLY ]
 --]]
 
 function World.LoadSound(path, numInstances, async, refDistance, maxDistance)
-
 	
 	if (World.coroutine_entity == nil) then
 		COutLine(kC_Error, "ERROR: World.LoadSound() was not called from an entity coroutine!", path)
@@ -272,7 +271,7 @@ World.Spawn [ THINK ONLY ]
 
 function World.Spawn(keys)
 
-	entity = World.coroutine_entity
+	local entity = World.coroutine_entity
 	
 	if (entity == nil) then
 		COutLine(kC_Error, "ERROR: World.Spawn() was not called from an entity coroutine!", path)
@@ -280,7 +279,7 @@ function World.Spawn(keys)
 	end
 
 	COutLine(kC_Debug, "Spawning -- %s", keys.classname)
-	local state = SysCalls.CreateSpawnTask(entity, keys)
+	local state = System.CreateSpawnTask(entity, keys)
 	
 	while (state:Pending()) do
 		coroutine.yield()
@@ -302,9 +301,9 @@ World.TempSpawn [ THINK ONLY ]
 	Spawn a temporary entity
 --]]
 
-function World.TempSpawn(entity, keys)
+function World.TempSpawn(keys)
 
-	entity = World.coroutine_entity
+	local entity = World.coroutine_entity
 	
 	if (entity == nil) then
 		COutLine(kC_Error, "ERROR: World.TempSpawn() was not called from an entity coroutine!", path)
@@ -312,7 +311,7 @@ function World.TempSpawn(entity, keys)
 	end
 	
 	COutLine(kC_Debug, "Spawning -- %s", keys.classname)
-	local state = SysCalls.CreateTempSpawnTask(entity, keys)
+	local state = System.CreateTempSpawnTask(entity, keys)
 	
 	while state:Pending() do
 		coroutine.yield()

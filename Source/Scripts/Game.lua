@@ -18,7 +18,8 @@ game_code = Game
 function World.BuiltIns()
 	return {
 		"game_code",
-		"ui_code"
+		"ui_code",
+		"scexec_code"
 --		"terminal_puzzles"
 	}
 end

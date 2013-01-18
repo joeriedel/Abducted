@@ -63,6 +63,7 @@
 cv_scexec = CVarFunc("sc", "_cv_scexec_func")
 cv_sciexec = CVarFunc("sci", "_cv_sciexec_func")
 cv_r_speeds = CVarBool("r_speeds", false)
+cv_load = CVarFunc("load", "_cv_load_func")
 
 -------------------------------------------------------------------------------
 
@@ -154,4 +155,8 @@ function _cv_sciexec_func(cmd)
 		error(e)
 	end
 	f()
+end
+
+function _cv_load_func(cmd)
+	World.RequestLoad(cmd, kUnloadDisposition_Slot)
 end

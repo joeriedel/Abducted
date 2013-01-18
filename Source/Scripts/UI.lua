@@ -4,6 +4,15 @@
 -- See Abducted/LICENSE for licensing terms
 
 UI = Class:New()
+UI.kLayer_Mask = 0
+UI.kLayer_UI = 1
+UI.kLayer_MainMenu = 2
+UI.kLayer_TerminalPuzzles = 3
+UI.kLayer_Popups = 4
+UI.kLayer_FX = 6
+UI.kLayer_LB = 7
+UI.kLayer_Notifications = 8
+UI.kLayer_Debug = 10
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -19,6 +28,15 @@ function UI.Spawn(self)
 	UI.screenWidth = screenSize.width
 	UI.screenHeight = screenSize.height
 	
+	DebugUI:Spawn()
+	
+	self.think = UI.Think
+	self:SetNextThink(33)
+	
+end
+
+function UI.Think(self)
+	DebugUI:Think()
 end
 
 function UI.CreateWidget(self, type, parms)

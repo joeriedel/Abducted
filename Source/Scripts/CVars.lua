@@ -60,6 +60,12 @@
 				
 ---------------------------------------------------------------------------]]--
 
+cv_scexec = CVarFunc("sc", "_cv_scexec_func")
+cv_sciexec = CVarFunc("sci", "_cv_sciexec_func")
+cv_r_speeds = CVarBool("r_speeds", false)
+
+-------------------------------------------------------------------------------
+
 function tabstr(tabs)
 	local s = ""
 	while (tabs > 0) do
@@ -149,6 +155,3 @@ function _cv_sciexec_func(cmd)
 	end
 	f()
 end
-
-cv_scexec = CVarFunc("sc", "_cv_scexec_func")
-cv_sciexec = CVarFunc("sci", "_cv_sciexec_func")

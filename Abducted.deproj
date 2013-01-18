@@ -7,6 +7,9 @@
     <filename>Source\Scripts\Class.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\DebugUI.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Engine.lua</filename>
   </file>
   <file>

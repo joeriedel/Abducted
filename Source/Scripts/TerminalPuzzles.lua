@@ -21,6 +21,9 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	
 	level.name = "1x1"
 	
+	level.antivirusSpiderSpawnRate = 5
+	level.antivirusSpiderSpeed = 24
+	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
 	level.board = {  { x=0, y=0, img="cell_green" }
@@ -121,9 +124,11 @@ function TerminalPuzzles.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = 40
 	self.REFLEX_BOARD_OFFSET = 80
-	self.INDEX_MAX_X = 22
+	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
+	self.PLAYER_SPEED = 1
 	
+
 	self:CreateBoards()	
 
 	self.widgets = {}
@@ -140,23 +145,24 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.root:AddChild(self.widgets.board)	
 	
 	self.state = { }
+	-- load appropriate level based on skill + difficulty		
+	self.state.level = self.db.levels[1][1]
 	self.state.heading = { }
 	self.state.heading.x = 0
 	self.state.heading.y = 0
 	self.state.victory = { }
 	self.state.current = { }
+	self.state.spawnTimer = self.state.level.antivirusSpiderSpawnRate
 		
-	-- load appropriate level based on skill + difficulty		
-	local level = self.db.levels[1][1]
-	COutLine(kC_Debug, "reflex.level.name=" .. level.name)
+	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 	-- goal step: center a,b,c,d list ot top of screen
 	self.widgets.goal = { }
-	for i,v in ipairs(level.goal) do 
+	for i,v in ipairs(self.state.level.goal) do 
 		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)
 		self.widgets.goal[v] = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
 		self.widgets.root:AddChild(self.widgets.goal[v])
 		-- 120 = count(level.goal) * REFLEX_CELL_SIZE
-		UI:CenterWidget(self.widgets.goal[v], UI.screenWidth/2-(#level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)
+		UI:CenterWidget(self.widgets.goal[v], UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)
 		
 		-- djr, work in progress
 		local cell = { }
@@ -165,7 +171,7 @@ function TerminalPuzzles.InitUI(self)
 	end
 	-- board step: board grid is x,y structure
 	self.widgets.board = { }	
-	for i,v in ipairs(level.board) do
+	for i,v in ipairs(self.state.level.board) do
 		local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.x * self.REFLEX_CELL_SIZE
 		local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.y * self.REFLEX_CELL_SIZE
 			
@@ -186,6 +192,8 @@ function TerminalPuzzles.InitUI(self)
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
 	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE
 
+	self.widgets.spiders = { }
+	self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate
 	
 	-- ORIGINAL CODE
 	--[[
@@ -278,7 +286,7 @@ function TerminalPuzzles.LoadMaterials(self)
 	--		DepthWrite: false
 	
 	self.gfx = {}
---	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
+	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
 	self.gfx.board = World.Load("Reflex-Game/reflex-board_M")
 	self.gfx.border = World.Load("Reflex-Game/reflex-border_M")
 	--[[
@@ -326,11 +334,23 @@ function TerminalPuzzles.SetPosition(self,w,x,y)
 	COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
-function TerminalPuzzles.Think(self,dt)
-	local r = self.widgets.current:Rect()
+function TerminalPuzzles.Vec2Normal(self,x,y)
+	local n = math.sqrt(x * x + y * y)
+	local vec2 = { }
+	vec2.x = 0
+	vec2.y = 0
+	if (n > 0) then
+		vec2.x = x / n
+		vec2.y = y / n
+	end
+	return vec2
+end
 
-	local dx = self.state.heading.x * dt
-	local dy = self.state.heading.y * dt
+function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)	
+	local r = widget:Rect()
+
+	local dx = heading.x * dt * speed
+	local dy = heading.y * dt * speed
 	
 	r[1] = r[1] + r[3]/2 + dx
 	r[2] = r[2] + r[4]/2 + dy
@@ -348,35 +368,116 @@ function TerminalPuzzles.Think(self,dt)
 		r[2] = UI.screenHeight - r[4]/2
 	end
 	
+	local vec2 = { }
+	vec2.x = r[1]
+	vec2.y = r[2]
 	
+	return vec2	
+end
+
+function TerminalPuzzles.GetGridCell(self,widget)
+	local r = widget:Rect()
+	r[1] = r[1] + r[3]/2
+	r[2] = r[2] + r[4]/2	
+
 	local x = (r[1] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
 	local y = (r[2] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
 	local ix = math.floor(x)
 	local iy = math.floor(y)
-	if (ix >= 0 and iy >= 0 and ix < self.INDEX_MAX_X and iy < self.INDEX_MAX_Y) then
-		--COutLine(kC_Debug,"x=%.02f,y=%.02f",r[1],r[2])
-		if (r[1] < self.COORD_MIN_X) then
-			r[1] = self.COORD_MIN_X
-		end
-		if (r[1] > self.COORD_MAX_X) then
-			r[1] = self.COORD_MAX_X
-		end
-		if (r[2] < self.COORD_MIN_Y) then
-			r[2] = self.COORD_MIN_Y
-		end		
-		if (r[2] > self.COORD_MAX_Y) then
-			r[2] = self.COORD_MAX_Y
-		end		
-		UI:CenterWidget(self.widgets.current,r[1],r[2])	
-		local index = bit.bor(bit.lshift(iy, 16), ix)
+
+	local vec2 = { }
+	vec2.x = ix
+	vec2.y = iy
+	
+	return vec2
+end
+
+function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
+	if (x >= 0 and y >= 0 and x < self.INDEX_MAX_X and y < self.INDEX_MAX_Y) then
+		return true
+	end
+		
+	return false
+end
+
+function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
+	if (x < self.COORD_MIN_X) then
+		x = self.COORD_MIN_X
+	end
+	if (x >= self.COORD_MAX_X) then
+		x = self.COORD_MAX_X - 1
+	end
+	if (y < self.COORD_MIN_Y) then
+		y = self.COORD_MIN_Y
+	end		
+	if (y >= self.COORD_MAX_Y) then
+		y = self.COORD_MAX_Y - 1
+	end	
+
+	local vec2 = { }
+	vec2.x = x
+	vec2.y = y
+	return vec2			
+end
+
+function TerminalPuzzles.Think(self,dt)
+
+	-- handle player movement
+	local currentPos = self:LerpWidget(self.widgets.current,self.state.heading,dt,self.PLAYER_SPEED)
+	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
+	local currentGrid = self:GetGridCell(self.widgets.current)
+	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+	--COutLine(kC_Debug,"currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)	
+	if (self:IsGridCellOnBoard(currentGrid.x,currentGrid.y)) then
+		COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
+		currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+		UI:CenterWidget(self.widgets.current,currentPos.x,currentPos.y)	
+		local index = bit.bor(bit.lshift(currentGrid.y, 16), currentGrid.x)
 		if (self.widgets.lines[index] == nil) then	
 			-- add some logic to select line type H, V or A1, A2, A3, A4 (different turns)
 			local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
 			self.widgets.root:AddChild(line)		
 			self.widgets.lines[index] = line
-			self:SetPosition(line,ix,iy)
+			self:SetPosition(line,currentGrid.x,currentGrid.y)
 		end
 	end		
+	
+	-- check for victory
+	-- TODO: Error on side of player and set victory condition before failure conditions
+	
+	-- spider spawn timer, move, delete
+	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
+	if (self.state.antivirusSpawnTimer < 0) then
+		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate		
+		local x = math.random(self.INDEX_MAX_X)-1
+		local y = math.random(self.INDEX_MAX_Y)-1		
+		local index = bit.bor(bit.lshift(y, 16), x)		
+		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
+		self.widgets.root:AddChild(spider)	
+		self.widgets.spiders[index] = spider
+		self:SetPosition(spider,x,y)		
+		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i",x,y)
+		spider.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
+		if (spider.heading.x == 0 and spider.heading.y == 0) then -- failsafe
+			spider.heading.x = 1
+		end
+	end	
+	local spiderDeleteList = { }	
+	for i,v in ipairs(self.widgets.spiders) do	
+		local nextPos = self:LerpWidget(v,v.heading,dt,self.state.level.antivirusSpiderSpeed)		
+		if (not self:IsGridCellOnBoard(nextPos.x,nextPos.y)) then
+			table.insert(spiderDeleteList,v)
+		else
+			self:SetPosition(v,nextPos.x,nextPos.y)	
+			
+			-- TODO: detect failure condition
+		end	
+	end
+	for i,v in ipairs(spiderDeleteList) do
+		self.widgets.root:RemoveChild(v)
+		table.remove(self.state.spiders,v)
+	end
+	
 --	self.state.heading.x
 	
 

@@ -33,6 +33,9 @@ function TerminalPuzzles.CreateLevel1x1(self)
 		, { x=5, y=6, img="cell_b" }
 		, { x=7, y=6, img="cell_d" }
 		, { x=9, y=6, img="cell_e" }
+
+		, { x=0, y=9, img="mark_start" }
+		, { x=self.INDEX_MAX_X-1, y=1, img="mark_end" }				
 		}
 	
 	return level
@@ -172,14 +175,13 @@ function TerminalPuzzles.InitUI(self)
 	-- board step: board grid is x,y structure
 	self.widgets.board = { }	
 	for i,v in ipairs(self.state.level.board) do
-		local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.x * self.REFLEX_CELL_SIZE
-		local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + v.y * self.REFLEX_CELL_SIZE
-			
-		self.widgets.board[i] = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
-		self.widgets.board[i].state = { }
-		self.widgets.board[i].state.cell = v
-		self.widgets.root:AddChild(self.widgets.board[i])
-		UI:CenterWidget(self.widgets.board[i], xo, yo)
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
+		local index = self:ConvertCoordToIndex(v.x,v.y)
+		b.state = { }
+		b.state.cell = v
+		self.widgets.root:AddChild(b)
+		self.widgets.board[index] = b		
+		self:SetPositionByGrid(b,v.x,v.y)
 	end	
 	
 	self.state.currentMove = 1
@@ -300,10 +302,8 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
 	self.gfx.mark_line_v = self.gfx.mark_current
 	self.gfx.mark_line_h = self.gfx.mark_current	
-	--[[
 	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")						
 	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")							
-	]]
 	self.gfx.symbol_a = World.Load("Reflex-Game/reflex-symbol-a_M")
 	self.gfx.symbol_b = World.Load("Reflex-Game/reflex-symbol-b_M")
 	self.gfx.symbol_c = World.Load("Reflex-Game/reflex-symbol-c_M")
@@ -413,6 +413,10 @@ function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
 	return false
 end
 
+function TerminalPuzzles.ConvertCoordToIndex(self,x,y)
+	return bit.bor(bit.lshift(y, 16), x)
+end
+
 function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 	if (x < self.COORD_MIN_X) then
 		x = self.COORD_MIN_X
@@ -446,7 +450,7 @@ function TerminalPuzzles.Think(self,dt)
 		--COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
 		currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 		UI:CenterWidget(self.widgets.current,currentPos.x,currentPos.y)	
-		local index = bit.bor(bit.lshift(currentGrid.y, 16), currentGrid.x)
+		local index = self:ConvertCoordToIndex(currentGrid.x,currentGrid.y)
 		if (self.widgets.lines[index] == nil) then	
 			COutLine(kC_Debug,"line added: x=%i, y=%i",currentGrid.x,currentGrid.y)	
 			-- add some logic to select line type H, V or A1, A2, A3, A4 (different turns)

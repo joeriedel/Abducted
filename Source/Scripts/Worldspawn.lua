@@ -25,7 +25,7 @@ function Worldspawn.PostSpawn(self)
 end
 
 function Worldspawn.OnEvent(self, cmd, args)
-	return false
+	return Game.entity:OnEvent(cmd, args)
 end
 
 worldspawn = Worldspawn

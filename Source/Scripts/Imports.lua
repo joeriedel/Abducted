@@ -17,12 +17,14 @@ Import("DebugUI")
 Import("Persistence")
 Import("TerminalPuzzles")
 Import("SCExecContext")
+Import("Floors")
 
 -- // Entities // --
 Import("Entity")
-Import("Player")
+Import("PlayerPawn")
 Import("SoundEmitter")
 Import("Worldspawn")
 Import("ViewController")
-
+Import("ScriptNode")
+Import("TouchTrigger")
 Import("LuaCrashCourse")

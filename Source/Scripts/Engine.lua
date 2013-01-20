@@ -37,6 +37,9 @@ kOccupantType_None = 0
 kOccupantType_BBox = 1
 kOccupantType_Volume = 2
 
+-- ClassBits
+kEntityClassBits_Any = 0
+
 -- Physics Flags
 kPF_OnGround = 1
 kPF_AutoFace = 2

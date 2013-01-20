@@ -17,13 +17,93 @@ function ViewController.OnLevelStart(self)
 	COutLine(kC_Debug, "ViewController:OnLevelStart")
 	self:Defaults()
 end
+
+function ViewController.OnEvent(self, cmd, args)
+	if (cmd == "Shake") then
+		self:HandleShakeCmd(cmd, args)
+		return true
+	elseif (cmd == "Camera") then
+		self:HandleCameraCmd(args)
+		return true
+	end
+	
+	return false;
+end
+
+function ViewController.HandleCameraCmd(self, args)
+	local x = Tokenize(args)
+	local lx = #x
+	if (lx < 2) then
+		error("Camera command must contain camera name and distance!")
+	end
+		
+	local camera = x[1]
+	local distance = tonumber(x[2])
+	local strict = FindArrayElement(x, "strict=true")
+	local useFOV = FindArrayElement(x, "fov=true")
+	local angles = {180, 180, 180}
+	
+	local specifiedAngles, idx = FindArrayElement(x, "angles=")
+	if (specifiedAngles) then
+		angles = Vec3ForString(x[idx+1])
+	end
+	
+	local loose = FindArrayElement(x, "follow=loose")
+	
+	if (loose) then
+		self:DoLooseCamera(camera, distance, strict, useFOV, angles)
+	else
+		self:DoTightCamera(camera, distance, strict, useFOV, angles)
+	end
+	
+end
+
+function ViewController.DoTightCamera(self, camera, distance, strict, useFOV, angles)
+	
+	self:SetRailMode(
+		camera,
+		distance,
+		strict,
+		1.5,
+		1.5,
+		useFOV,
+		angles
+	)
+	
+end
+
+function ViewController.DoLooseCamera(self, camera, distance, strict, useFOV, angles)
+	
+	self:SetRailMode(
+		camera,
+		distance,
+		strict,
+		0.9,
+		0.9,
+		useFOV,
+		angles
+	)
+	
+end
+
+function ViewController.HandleShakeCmd(self, cmd, args)
+	self:SetCameraSway(
+		0.25,
+		1,
+		0.25,
+		-4,
+		8,
+		0.1,
+		0.5,
+		{1, 1}
+	)
+end
 	
 function ViewController.Defaults(self)
 	
 	COutLine(kC_Debug, "ViewController:Defaults")
 	
-	--self:SetCamera(VecSub(self:Target():WorldPos(), {50, 0, 0}), VecZero())
-	
+--[[	
 	self:SetTargetMode(
 		self.TM_Distance, -- Specify the distance from the target
 		0, -- in time
@@ -33,8 +113,24 @@ function ViewController.Defaults(self)
 		200, -- maximum  units
 		0, -- take X seconds to lerp between those distances
 		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
-		{ 0, 10, -140 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
-		{ 0, 10, -160 }, -- maxAngles
+		{ 0, 10, -3 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
+		{ 0, 10,  3 }, -- maxAngles
+		60, -- Take X seconds to lerp between them
+		-1, -- angle lag (<= 0 means no lag)
+		false -- use pitch angle of target
+	)
+]]
+	self:SetTargetMode(
+		self.TM_Look, -- Specify the target look-pos
+		0, -- in time
+		0, -- out time
+		-1, -- hold time (-1 for infinite)
+		100, -- minimum  units
+		300, -- maximum  units
+		30, -- take X seconds to lerp between those distances
+		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
+		{ 0, 30, -15 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
+		{ 0, 30,  15 }, -- maxAngles
 		60, -- Take X seconds to lerp between them
 		-1, -- angle lag (<= 0 means no lag)
 		false -- use pitch angle of target
@@ -45,7 +141,7 @@ function ViewController.Defaults(self)
 		0, -- out time
 		-1, -- hold time (-1 for infinite)
 		0, -- min sway
-		25,  -- max sway
+		10,  -- max sway
 		10,   -- take 5 seconds to go from min/max
 		19,  -- take 10 seconds to go around the circle
 		{1, 1} -- scaling factors for x/y

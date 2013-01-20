@@ -21,8 +21,8 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	
 	level.name = "1x1"
 	
-	level.antivirusSpiderSpawnRate = 5
-	level.antivirusSpiderSpeed = 24
+	level.antivirusSpiderSpawnRate = 25
+	level.antivirusSpiderSpeed = 4
 	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
@@ -126,7 +126,7 @@ function TerminalPuzzles.InitUI(self)
 	self.REFLEX_BOARD_OFFSET = 80
 	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
-	self.PLAYER_SPEED = 1
+	self.PLAYER_SPEED = 20
 	
 
 	self:CreateBoards()	
@@ -326,12 +326,12 @@ function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
 	self.gameCompleteCallback = gameCompleteCallback
 end
 
-function TerminalPuzzles.SetPosition(self,w,x,y)
+function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
 	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
 	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
 
 	UI:CenterWidget(w,xo,yo)
-	COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
+	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
 function TerminalPuzzles.Vec2Normal(self,x,y)
@@ -373,6 +373,19 @@ function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)
 	vec2.y = r[2]
 	
 	return vec2	
+end
+
+function TerminalPuzzles.GetGridCellFromVec2(self,v)
+	local x = (v.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
+	local y = (v.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local ix = math.floor(x)
+	local iy = math.floor(y)
+
+	local vec2 = { }
+	vec2.x = ix
+	vec2.y = iy
+	
+	return vec2
 end
 
 function TerminalPuzzles.GetGridCell(self,widget)
@@ -421,7 +434,8 @@ function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 end
 
 function TerminalPuzzles.Think(self,dt)
-
+	-- TODO: -djr, -joe this should be in seconds but is currently in milliseconds (fix in main branch)
+	dt = dt / 1000
 	-- handle player movement
 	local currentPos = self:LerpWidget(self.widgets.current,self.state.heading,dt,self.PLAYER_SPEED)
 	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
@@ -429,16 +443,17 @@ function TerminalPuzzles.Think(self,dt)
 	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 	--COutLine(kC_Debug,"currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)	
 	if (self:IsGridCellOnBoard(currentGrid.x,currentGrid.y)) then
-		COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
+		--COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
 		currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 		UI:CenterWidget(self.widgets.current,currentPos.x,currentPos.y)	
 		local index = bit.bor(bit.lshift(currentGrid.y, 16), currentGrid.x)
 		if (self.widgets.lines[index] == nil) then	
+			COutLine(kC_Debug,"line added: x=%i, y=%i",currentGrid.x,currentGrid.y)	
 			-- add some logic to select line type H, V or A1, A2, A3, A4 (different turns)
 			local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
 			self.widgets.root:AddChild(line)		
 			self.widgets.lines[index] = line
-			self:SetPosition(line,currentGrid.x,currentGrid.y)
+			self:SetPositionByGrid(line,currentGrid.x,currentGrid.y)
 		end
 	end		
 	
@@ -446,36 +461,38 @@ function TerminalPuzzles.Think(self,dt)
 	-- TODO: Error on side of player and set victory condition before failure conditions
 	
 	-- spider spawn timer, move, delete
+	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
 	if (self.state.antivirusSpawnTimer < 0) then
 		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate		
 		local x = math.random(self.INDEX_MAX_X)-1
 		local y = math.random(self.INDEX_MAX_Y)-1		
-		local index = bit.bor(bit.lshift(y, 16), x)		
 		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
 		self.widgets.root:AddChild(spider)	
-		self.widgets.spiders[index] = spider
-		self:SetPosition(spider,x,y)		
-		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i",x,y)
+		table.insert(self.widgets.spiders,spider)
+		self:SetPositionByGrid(spider,x,y)		
 		spider.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
 		if (spider.heading.x == 0 and spider.heading.y == 0) then -- failsafe
 			spider.heading.x = 1
 		end
+		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.heading.x,spider.heading.y)
 	end	
-	local spiderDeleteList = { }	
+	
+	--COutLine(kC_Debug,"Spider move")
 	for i,v in ipairs(self.widgets.spiders) do	
-		local nextPos = self:LerpWidget(v,v.heading,dt,self.state.level.antivirusSpiderSpeed)		
-		if (not self:IsGridCellOnBoard(nextPos.x,nextPos.y)) then
-			table.insert(spiderDeleteList,v)
+		local pos = v:Rect()
+		--COutLine(kC_Debug,"pos @ : x=%i, y=%i",pos[1],pos[2])			
+		local nextPos = self:LerpWidget(v,v.heading,dt,self.state.level.antivirusSpiderSpeed)
+		local nextGrid = self:GetGridCellFromVec2(nextPos)
+		if (not self:IsGridCellOnBoard(nextGrid.x,nextGrid.y)) then
+			table.remove(self.widgets.spiders,i)
+			self.widgets.root:RemoveChild(v)
+			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)			
 		else
-			self:SetPosition(v,nextPos.x,nextPos.y)	
-			
+			UI:CenterWidget(v,nextPos.x,nextPos.y)
+			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
 			-- TODO: detect failure condition
 		end	
-	end
-	for i,v in ipairs(spiderDeleteList) do
-		self.widgets.root:RemoveChild(v)
-		table.remove(self.state.spiders,v)
 	end
 	
 --	self.state.heading.x

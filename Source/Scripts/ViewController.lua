@@ -64,8 +64,8 @@ function ViewController.DoTightCamera(self, camera, distance, strict, useFOV, an
 		camera,
 		distance,
 		strict,
-		1.5,
-		1.5,
+		0.4,
+		0.4,
 		useFOV,
 		angles
 	)

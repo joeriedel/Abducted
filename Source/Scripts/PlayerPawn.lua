@@ -24,7 +24,16 @@ function PlayerPawn.Spawn(self)
 	
 	local angleVertex = self:Angles()
 	angleVertex.pos = {0, 0, angle}
+	angleVertex.mass = 5 -- how much mass the crow has (how much he resists changes in direction)
+	angleVertex.drag[1] = 7 -- energy lost when crow is being pulled
+	angleVertex.drag[2] = 7 -- energy lost per second when the crow is in position
+	-- friction effects
+	angleVertex.friction = 0.5
 	self:SetAngles(angleVertex)
+	
+	local spring = self:AngleSpring()
+	spring.elasticity = 40 -- larger numbers mean the spring is stiffer
+	self:SetAngleSpring(spring)
 	
 	self:SetAccel({20, 0, 0})
 	self:SetMaxGroundSpeed(50)

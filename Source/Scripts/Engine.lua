@@ -26,6 +26,7 @@ kPlatPS3 = 5
 kMoveType_None = 0
 kMoveType_Fly = 1
 kMoveType_Spline = 2
+kMoveType_Floor = 3
 
 -- SolidTypes
 kSolidType_None = 0
@@ -98,8 +99,7 @@ kMouseButton_MMask = 2
 kMouseButton_RMask = 4
 
 -- Sound Channels
-kSoundChannel_First = 0
-kSoundChannel_UI = SC_First
+kSoundChannel_UI = 0
 kSoundChannel_Ambient = 1
 kSoundChannel_FX = 2
 kSoundChannel_Music = 3

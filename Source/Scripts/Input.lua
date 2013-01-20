@@ -39,10 +39,9 @@ function World.OnInputEvent(e)
 
 	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
 		e = MapInputEvent(e)
-		if World.game and World.game.OnInputEvent then
-			return World.game:OnInputEvent(e)
+		if (PlayerInput:OnInputEvent(e)) then
+			return true
 		end
-	
 	end
 	
 	return false
@@ -51,9 +50,8 @@ end
 
 function World.OnInputGesture(g)
 
-	if World.game and World.game.OnInputGesture then
-		g = MapInputGesture(g)
-		return World.game:OnInputGesture(g)
+	if (PlayerInput:OnInputGesture(e)) then
+		return true
 	end
 	
 	return false
@@ -66,12 +64,8 @@ function Input.IsTouchBegin(e)
 end
 
 function Input.IsTouchEnd(e, touch)
-	return (e.touch == touch) and 
+	return ((touch == nil) or (e.touch == touch)) and 
 		((e.type == kI_TouchEnd) or (e.type == kI_TouchCancelled))
-end
-
-function Input.IsTouchEndAny(e)
-	return ((e.type == kI_TouchEnd) or (e.type == kI_TouchCancelled))
 end
 
 function Input.IsTouchMove(e, touch)

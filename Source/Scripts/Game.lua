@@ -7,10 +7,10 @@ Game = Class:New()
 
 function Game.Spawn(self)
 	Game.entity = self
+	PlayerInput:Spawn()
 end
 
 function Game.PostSpawn(self)
-
 end
 
 function Game.OnEvent(self, cmd, args)

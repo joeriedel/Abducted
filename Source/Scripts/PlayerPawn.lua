@@ -1,4 +1,4 @@
--- Player.lua
+-- PlayerPawn.lua
 -- Copyright (c) 2012 Sunside Inc., All Rights Reserved
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
@@ -9,12 +9,10 @@ function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
 	Entity.Spawn(self)
 	
-	
 	local x = Tokenize("ab cd ef 1.2f4 \"testing with spaces\" bb yy")
 	
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
-	self.model:BlendToState("idle")
 	self:AttachDrawModel(self.model)
 	self:SetDrawModelScale(self.model, {0.4, 0.4, 0.4}) -- temp art
 	self:SetMins({-24, -24, -48+64})
@@ -28,6 +26,9 @@ function PlayerPawn.Spawn(self)
 	angleVertex.pos = {0, 0, angle}
 	self:SetAngles(angleVertex)
 	
+	self:SetAccel({20, 0, 0})
+	self:SetMaxGroundSpeed(50)
+	self:SetMoveType(kMoveType_Floor)
 	self:SetClassBits(kEntityClass_Player)
 	self:SetOccupantType(kOccupantType_BBox)
 	
@@ -37,14 +38,40 @@ function PlayerPawn.Spawn(self)
 			error("PlayerPawn: unable to find starting waypoint named "..self.keys.start_waypoint)
 		end
 		
-		self.floorPosition = World.WaypointFloorPosition(waypoints[1])
-		self:SetOrigin(self.floorPosition.pos)
+		local floorPosition = World.WaypointFloorPosition(waypoints[1])
+		self.floorPositionInit = true
+		self:SetFloorPosition(floorPosition) -- for moves
+		self:SetOrigin(floorPosition.pos)
 	end
-	
-	self:Link() -- kMoveType_None needs this
 	
 	World.playerPawn = self
 	World.SetPlayerPawn(self)
+	
+	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
+end
+
+function PlayerPawn.TickPhysics(self)
+	local reqState = "idle"
+	
+	if (self.state ~= reqState) then
+		self.state = reqState
+		self.model:BlendToState(reqState)
+	end
+end
+
+function PlayerPawn.MoveToWaypoint(self, waypointNum)
+	if (not self.floorPositionInit) then
+		return false
+	end
+	
+	local targetFloorPos = World.WaypointFloorPosition(waypointNum)
+	local moveCommand = World.CreateFloorMove(self:FloorPosition(), targetFloorPos)
+	if (moveCommand == nil) then
+		return false
+	end
+	
+	self:SetDesiredMove(moveCommand)
+	return true
 end
 
 info_player_start = PlayerPawn

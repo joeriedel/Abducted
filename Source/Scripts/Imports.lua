@@ -22,6 +22,7 @@ Import("Floors")
 -- // Entities // --
 Import("Entity")
 Import("PlayerPawn")
+Import("PlayerInput")
 Import("SoundEmitter")
 Import("Worldspawn")
 Import("ViewController")

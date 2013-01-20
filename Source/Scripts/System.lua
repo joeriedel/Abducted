@@ -195,7 +195,7 @@ World.Load [ THINK ONLY ]
 	Loads an asset.
 --]]
 
-function World.Load(path, numInstances, async)
+function World.LoadOptional(path, numInstances, async)
 
 	local entity = World.coroutine_entity
 
@@ -235,19 +235,23 @@ function World.Load(path, numInstances, async)
 	return r
 end
 
+function World.Load(path, numInstances, async)
+	return assert(World.LoadOptional(path, numInstances, async))
+end
+
 --[[
 World.Load [ THINK ONLY ]
 	Loads a sound and sets default distances.
 --]]
 
-function World.LoadSound(path, numInstances, async, refDistance, maxDistance)
+function World.LoadOptionalSound(path, numInstances, async, refDistance, maxDistance)
 	
 	if (World.coroutine_entity == nil) then
 		COutLine(kC_Error, "ERROR: World.LoadSound() was not called from an entity coroutine!", path)
 		return nil
 	end
 	
-	local sound = World.Load(path, numInstances, async)
+	local sound = World.LoadOptional(path, numInstances, async)
 	if (sound) then
 		if (refDistance == nil) then
 			refDistance = 150
@@ -262,6 +266,10 @@ function World.LoadSound(path, numInstances, async, refDistance, maxDistance)
 	
 	return sound
 	
+end
+
+function World.LoadSound(path, numInstances, async, refDistance, maxDistance)
+	return assert(World.LoadOptionalSound(path, numInstances, async, refDistance, maxDistance))
 end
 
 --[[

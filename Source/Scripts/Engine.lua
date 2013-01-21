@@ -71,11 +71,6 @@ kAT_SkAnimStates = 5
 kAT_Font = 6
 kAT_Typeface = 7
 
--- Motion Types (for ViewModels / Ska Animation)
-kSkaMotionType_None = 0
-kSkaMotionType_Relative = 1
-kSkaMotionType_Absolute = 2
-
 -- Waypoints
 
 kWaypointState_Enabled = 1

@@ -129,117 +129,81 @@ function TerminalPuzzles.InitUI(self)
 	self.REFLEX_BOARD_OFFSET = 80
 	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
-	self.PLAYER_SPEED = 20
-	
-
-	self:CreateBoards()	
-
-	self.widgets = {}
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=UI.EatInput})
-	World.SetRootWidget(TerminalPuzzles.UI_Layer, self.widgets.root)
-
-	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
-	
-	UI:CenterWidget(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
-	UI:CenterWidget(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
-	
-	self.widgets.root:AddChild(self.widgets.border)	
-	self.widgets.root:AddChild(self.widgets.board)	
-	
-	self.state = { }
-	-- load appropriate level based on skill + difficulty		
-	self.state.level = self.db.levels[1][1]
-	self.state.heading = { }
-	self.state.heading.x = 0
-	self.state.heading.y = 0
-	self.state.victory = { }
-	self.state.current = { }
-	self.state.spawnTimer = self.state.level.antivirusSpiderSpawnRate
-		
-	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
-	-- goal step: center a,b,c,d list ot top of screen
-	self.widgets.goal = { }
-	for i,v in ipairs(self.state.level.goal) do 
-		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)
-		self.widgets.goal[v] = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
-		self.widgets.root:AddChild(self.widgets.goal[v])
-		-- 120 = count(level.goal) * REFLEX_CELL_SIZE
-		UI:CenterWidget(self.widgets.goal[v], UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)
-		
-		-- djr, work in progress
-		local cell = { }
-		cell.architype = string.gsub(v,"symbol_","cell_")
-		table.insert(self.state.victory,cell)
-	end
-	-- board step: board grid is x,y structure
-	self.widgets.board = { }	
-	for i,v in ipairs(self.state.level.board) do
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
-		local index = self:ConvertCoordToIndex(v.x,v.y)
-		b.state = { }
-		b.state.cell = v
-		self.widgets.root:AddChild(b)
-		self.widgets.board[index] = b		
-		self:SetPositionByGrid(b,v.x,v.y)
-	end	
-	
-	self.state.currentMove = 1
-	self.widgets.current = UI:CreateWidget("MatWidget", {rect={200,200,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_current})
-	self.widgets.root:AddChild(self.widgets.current)
-	self.widgets.lines = { }
-	
+	self.PLAYER_SPEED = 60
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE
+	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE	
 
-	self.widgets.spiders = { }
-	self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate
+	self:CreateBoards()	
 	
-	-- ORIGINAL CODE
-	--[[
+	-- define structure: self.state
+	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
+	self.state = { }	
+	self.state.heading = { }
+	self.state.victory = { }
+	self.state.current = { }	
+	self.state.heading.x = 0
+	self.state.heading.y = 0
+	self.state.gameOver = false
+	self.state.currentMove = 1
+	self.state.gameOverTimer = 5	
+	self.state.level = level
+	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
+	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
+	
+	-- define structure self.widgets
 	self.widgets = {}
+	self.widgets.goal = { }
+	self.widgets.board = { }		
+	self.widgets.lines = { }
+	self.widgets.spiders = { }
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=UI.EatInput})
 	World.SetRootWidget(TerminalPuzzles.UI_Layer, self.widgets.root)
-
-	-- Make a border
-	local xBorderPadding = UI.screenWidth * 0.1
-	local yBorderPadding = UI.screenHeight * 0.1
-	local xBorderWidth = UI.screenWidth * 0.05
-	local yBorderWidth = xBorderWidth
+	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
+	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
+	UI:CenterWidget(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
+	UI:CenterWidget(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
+	self.widgets.root:AddChild(self.widgets.border)	
+	self.widgets.root:AddChild(self.widgets.board)	
+		
+	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
+	-- goal step: center a,b,c,d list ot top of screen
+	local counter = 0
+	for i,v in ipairs(self.state.level.goal) do 
+		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
+		local goal = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
+		goal.state = self:CreateState(string.gsub(v,"symbol_","cell_"))
+		--self.widgets.goal[counter] = goal
+		self.widgets.root:AddChild(goal)
+		UI:CenterWidget(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
+		counter = counter + 1
+	end
+	COutLine(kC_Debug, "Creating Board")	
+	-- board step: board grid is x,y structure
+	for i,v in ipairs(self.state.level.board) do
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
+		local index = self:ConvertCoordToIndex(v.x,v.y)
+		b.state = self:CreateState(v.img)
+		self.widgets.root:AddChild(b)
+		self.widgets.board[index] = b		
+		self:SetPositionByGrid(b,v.x,v.y)
+		if (v.img == "mark_start") then
+			local current = UI:CreateWidget("MatWidget", {rect={200,200,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_current})		
+			current.state = self:CreateState("mark_current")
+			self.widgets.current = current
+			self.widgets.root:AddChild(current)
+			self:SetPositionByGrid(current,v.x,v.y)	
+			self.state.playerIndex = index
+			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)	
+		end
+	end
 	
-	local horzRect = {0, 0, UI.screenWidth - xBorderPadding * 2, yBorderWidth}
-	local vertRect = {0, 0, xBorderWidth, UI.screenHeight - yBorderPadding * 2}
+	if (self.widgets.current == nil) then
+		COutLine(kC_Debug,"mark_start NOT FOUND --> ERROR")	
+	end
 	
-	self.widgets.borderTop = UI:CreateWidget("MatWidget", {rect=horzRect, material=self.gfx.Border})
-	self.widgets.borderBottom = UI:CreateWidget("MatWidget", {rect=horzRect, material=self.gfx.Border})
-	self.widgets.borderLeft = UI:CreateWidget("MatWidget", {rect=vertRect, material=self.gfx.Border})
-	self.widgets.borderRight = UI:CreateWidget("MatWidget", {rect=vertRect, material=self.gfx.Border})
-	
-	UI:HCenterWidget(self.widgets.borderTop, nil, yBorderPadding)
-	UI:HCenterWidget(self.widgets.borderBottom, nil, 0)
-	UI:VAlignWidget(self.widgets.borderBottom, nil, UI.screenHeight - yBorderPadding)
-	
-	UI:VCenterWidget(self.widgets.borderLeft, xBorderPadding, nil)
-	UI:VCenterWidget(self.widgets.borderRight, xBorderPadding, nil)
-	UI:RAlignWidget(self.widgets.borderRight, UI.screenWidth - xBorderPadding, nil)
-	
-	self.widgets.root:AddChild(self.widgets.borderTop)
-	self.widgets.root:AddChild(self.widgets.borderBottom)
-	self.widgets.root:AddChild(self.widgets.borderLeft)
-	self.widgets.root:AddChild(self.widgets.borderRight)
-	
-	self.widgets.bigTextLabel = UI:CreateWidget("TextLabel", {rect={0, 0, 0, 0}, typeface=self.typefaces.BigText})
-	self.widgets.bigTextLabel:SetText(StringTable.Get("TERMINAL_PUZZLES_TITLE"))
-	UI:HCenterLabel(self.widgets.bigTextLabel, nil, 8)
-	self.widgets.root:AddChild(self.widgets.bigTextLabel)
-	
-	--self.widgets.square = UI:CreateWidget("MatWidget", {rect={0, 0, 64, 64}, material=self.gfx.Border})
-	--UI:CenterWidget(self.widgets.square)
-	--self.widgets.root:AddChild(self.widgets.square)
-	
-	]]	
+	COutLine(kC_Debug, "Board Completed")		
 end
 
 function TerminalPuzzles.LoadMaterials(self)
@@ -308,18 +272,9 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.gfx.symbol_b = World.Load("Reflex-Game/reflex-symbol-b_M")
 	self.gfx.symbol_c = World.Load("Reflex-Game/reflex-symbol-c_M")
 	self.gfx.symbol_d = World.Load("Reflex-Game/reflex-symbol-d_M")
-				
-	-- ORIGINAL CODE
-	--[[	
-	self.gfx = {}
 
-	self.gfx.Green = World.Load("UI/TerminalPuzzleGreen_M")
-	self.gfx.Blue = World.Load("UI/TerminalPuzzleBlue_M")
-	self.gfx.Border = World.Load("UI/TerminalPuzzleBorder_M")
-	
 	self.typefaces = {}
-	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-	]]
+	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
 end
 
 function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
@@ -437,10 +392,44 @@ function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 	return vec2			
 end
 
+function TerminalPuzzles.CreateState(self,architype)
+	local state = { }
+	state.architype = architype
+	return state
+end
+
 function TerminalPuzzles.Think(self,dt)
 	-- TODO: -djr, -joe this should be in seconds but is currently in milliseconds (fix in main branch)
 	dt = dt / 1000
-	-- handle player movement
+
+	if (self.state.gameOver) then
+		self.state.gameOverTimer = self.state.gameOverTimer - dt
+		if (self.state.gameOverTimer < 0) then
+			self.state.gameOverTimer = 0
+			self.gameCompleteCallback();
+		end
+		
+		if (self.widgets.bigTextLabel == nil) then 
+			self.widgets.bigTextLabel = UI:CreateWidget("TextLabel", {rect={0, 0, 0, 0}, typeface=self.typefaces.BigText})
+			self.widgets.root:AddChild(self.widgets.bigTextLabel)		
+		end
+		--self.widgets.bigTextLabel:SetText(string.fromat("%i",self.state.gameOverTimer))
+		self.widgets.bigTextLabel:SetText("Game Over")
+		UI:CenterLabel(self.widgets.bigTextLabel)
+				
+		-- game over never advances past here
+		return
+	end
+
+	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
+		-- NO HEADING: Game hasn't started		
+		return
+	end
+	
+	if (self.widgets.current.heading == nil) then
+		self.widgets.current.heading = self.state.heading
+	end
+
 	local currentPos = self:LerpWidget(self.widgets.current,self.state.heading,dt,self.PLAYER_SPEED)
 	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
 	local currentGrid = self:GetGridCell(self.widgets.current)
@@ -450,21 +439,28 @@ function TerminalPuzzles.Think(self,dt)
 		--COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
 		currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 		UI:CenterWidget(self.widgets.current,currentPos.x,currentPos.y)	
-		local index = self:ConvertCoordToIndex(currentGrid.x,currentGrid.y)
-		if (self.widgets.lines[index] == nil) then	
+		self.state.playerIndex = self:ConvertCoordToIndex(currentGrid.x,currentGrid.y)
+		if (self.widgets.lines[self.state.playerIndex] == nil) then	
 			COutLine(kC_Debug,"line added: x=%i, y=%i",currentGrid.x,currentGrid.y)	
-			-- add some logic to select line type H, V or A1, A2, A3, A4 (different turns)
+			-- TODO: -djr change this out with a rectangle stretch. create a new rect on a direction change
 			local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
+			line.state = self:CreateState("mark_line_v")
 			self.widgets.root:AddChild(line)		
-			self.widgets.lines[index] = line
+			self.widgets.lines[self.state.playerIndex] = line
 			self:SetPositionByGrid(line,currentGrid.x,currentGrid.y)
 		end
 	end		
 	
-	-- check for victory
-	-- TODO: Error on side of player and set victory condition before failure conditions
+	local pieceAtPlayer = self.widgets.board[self.state.playerIndex]	
+	if (pieceAtPlayer) then
+		COutLine(kC_Debug,"pieceAtPlayer found")
+		if (pieceAtPlayer.state.architype =="mark_end") then
+			COutLine(kC_Debug,"Game Over Detected")
+			self.state.gameOver = true
+			return
+		end	
+	end
 	
-	-- spider spawn timer, move, delete
 	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
 	if (self.state.antivirusSpawnTimer < 0) then
@@ -475,9 +471,10 @@ function TerminalPuzzles.Think(self,dt)
 		self.widgets.root:AddChild(spider)	
 		table.insert(self.widgets.spiders,spider)
 		self:SetPositionByGrid(spider,x,y)		
-		spider.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
-		if (spider.heading.x == 0 and spider.heading.y == 0) then -- failsafe
-			spider.heading.x = 1
+		spider.state = self:CreateState("antivirus_spider")
+		spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
+		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
+			spider.state.heading.x = 1
 		end
 		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.heading.x,spider.heading.y)
 	end	
@@ -486,7 +483,7 @@ function TerminalPuzzles.Think(self,dt)
 	for i,v in ipairs(self.widgets.spiders) do	
 		local pos = v:Rect()
 		--COutLine(kC_Debug,"pos @ : x=%i, y=%i",pos[1],pos[2])			
-		local nextPos = self:LerpWidget(v,v.heading,dt,self.state.level.antivirusSpiderSpeed)
+		local nextPos = self:LerpWidget(v,v.state.heading,dt,self.state.level.antivirusSpiderSpeed)
 		local nextGrid = self:GetGridCellFromVec2(nextPos)
 		if (not self:IsGridCellOnBoard(nextGrid.x,nextGrid.y)) then
 			table.remove(self.widgets.spiders,i)
@@ -497,51 +494,7 @@ function TerminalPuzzles.Think(self,dt)
 			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
 			-- TODO: detect failure condition
 		end	
-	end
-	
---	self.state.heading.x
-	
-
---	local spiderKill = false
---	
---	-- determine current player pos
---	local px = 0
---	local py = 0
---	
---	local moveWasValid = true
---	for i,v in ipairs(level.board)  do
---		if v.state.cell.x == px and v.state.cell.y == py then
---			if v.state.moveIndex != 0 then
---				for i,v in ipairs(self.state.victory)
---					
---				end
---
---				v.state.moveIndex = self.state.currentMove
---				self.state.currentMove++
---			end
---			break
---		end
---	end
---
---	local pathComplete = false;	
---	for i,v in ipairs(level.board)  do
---		if v.cell.architype == 'antivirus_spider' then
---			-- move the spider to the player
---			--spikerKill = true
---		end
---		
---		if v.cell.architype == 'cell_a' 
---			or v.cell.architype == 'cell_b' 
---			or v.cell.architype == 'cell_c'
---			or v.cell.architype == 'cell_d' then
---			if v.state.moveIndex == 0 then
---				v.state.move = self.state.currentMove
---				self.state.currentMove = self.state.currentMove + 1
---			end
---		end		
---	end
-
-	--self.gameCompleteCallback();
+	end	
 end
 
 terminal_puzzles = TerminalPuzzles

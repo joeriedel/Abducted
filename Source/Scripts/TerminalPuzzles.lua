@@ -4,7 +4,6 @@
 -- See Abducted/LICENSE for licensing terms
 
 TerminalPuzzles = Class:New()
-TerminalPuzzles.UI_Layer = 5
 
 function TerminalPuzzles.Spawn(self)
 	TerminalPuzzles.entity = self
@@ -22,7 +21,7 @@ function TerminalPuzzles.InitUI(self)
 
 	self.widgets = {}
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=UI.EatInput})
-	World.SetRootWidget(TerminalPuzzles.UI_Layer, self.widgets.root)
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 
 	-- Make a border
 	local xBorderPadding = UI.screenWidth * 0.1

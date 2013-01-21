@@ -8,6 +8,86 @@
 -----------------------------------------------------------------------------]]
 
 --[[---------------------------------------------------------------------------
+	Tokenize a string
+-----------------------------------------------------------------------------]]
+
+function FindArrayElement(array, value)
+	for k,v in pairs(array) do
+		if (v == value) then
+			return true, k
+		end
+	end
+	return false
+end
+
+function Tokenize(s)
+
+	local x = {}
+	
+	if ((s == nil) or (s == "")) then
+		return x
+	end
+	
+	local z = ""
+	
+	local i = 1
+	while (i <= #s) do
+		local c = s:sub(i, i)
+		local b = s:byte(i)
+		
+		if (b <= 32) then
+			if (z ~= "") then
+				table.insert(x, z)
+				z = "" -- new token
+			end
+		else
+			if (c == "\"") then -- quoted
+			
+				if (z ~= "") then
+					table.insert(x, z)
+					z = "" -- new token
+				end
+			
+				-- go until end of quote
+				local k = i+1
+				while (k <= #s) do
+					c = s:sub(k, k)
+					if (c == "\"") then
+						if (z ~= "") then
+							table.insert(x, z)
+							z = "" -- new token
+						end
+						break
+					else
+						z = z..c
+					end
+					k = k+1
+				end
+				
+				i = k
+				
+				if (z ~= "") then
+					table.insert(x, z)
+					z = "" -- new token
+				end
+			else
+				z = z..c -- build token
+			end
+		end
+	
+		i = i+1
+	end
+	
+	if (z ~= "") then
+		table.insert(x, z)
+		z = "" -- new token
+	end
+	
+	return x
+
+end
+
+--[[---------------------------------------------------------------------------
 	Linked List
 -----------------------------------------------------------------------------]]
 

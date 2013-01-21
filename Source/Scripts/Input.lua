@@ -5,7 +5,7 @@
 
 function MapInputEvent(e)
 
-	if (e.type == I_KeyDown) or (e.type == I_KeyUp) then
+	if (e.type == kI_KeyDown) or (e.type == kI_KeyUp) then
 		return e
 	end
 
@@ -37,12 +37,11 @@ end
 
 function World.OnInputEvent(e)
 
-	if Input.IsTouchEvent(e) or (e.type == I_MouseDown or e.type == I_MouseUp) or (e.type == I_KeyDown) then
+	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
 		e = MapInputEvent(e)
-		if World.game and World.game.OnInputEvent then
-			return World.game:OnInputEvent(e)
+		if (PlayerInput:OnInputEvent(e)) then
+			return true
 		end
-	
 	end
 	
 	return false
@@ -51,9 +50,8 @@ end
 
 function World.OnInputGesture(g)
 
-	if World.game and World.game.OnInputGesture then
-		g = MapInputGesture(g)
-		return World.game:OnInputGesture(g)
+	if (PlayerInput:OnInputGesture(e)) then
+		return true
 	end
 	
 	return false
@@ -62,23 +60,19 @@ end
 
 Input = {}
 function Input.IsTouchBegin(e)
-	return (e.type == I_TouchBegin)
+	return (e.type == kI_TouchBegin)
 end
 
 function Input.IsTouchEnd(e, touch)
-	return (e.touch == touch) and 
-		((e.type == I_TouchEnd) or (e.type == I_TouchCancelled))
-end
-
-function Input.IsTouchEndAny(e)
-	return ((e.type == I_TouchEnd) or (e.type == I_TouchCancelled))
+	return ((touch == nil) or (e.touch == touch)) and 
+		((e.type == kI_TouchEnd) or (e.type == kI_TouchCancelled))
 end
 
 function Input.IsTouchMove(e, touch)
-	return  (e.touch == touch) and (e.type == I_TouchMoved)
+	return  (e.touch == touch) and (e.type == kI_TouchMoved)
 end
 
 function Input.IsTouchEvent(e)
-	return (e.type == I_TouchBegin) or (e.type == I_TouchEnd) or (e.type == I_TouchMoved) or (e.type == I_TouchStationary) or (e.type == I_TouchCancelled)	
+	return (e.type == kI_TouchBegin) or (e.type == kI_TouchEnd) or (e.type == kI_TouchMoved) or (e.type == kI_TouchStationary) or (e.type == kI_TouchCancelled)	
 end
 

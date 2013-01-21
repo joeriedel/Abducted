@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
+    <filename>Source\Scripts\CVars.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Class.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\DebugUI.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\Engine.lua</filename>
@@ -40,7 +46,13 @@
     <filename>Source\Scripts\Persistence.lua</filename>
   </file>
   <file>
-    <filename>Source\Scripts\Player.lua</filename>
+    <filename>Source\Scripts\PlayerPawn.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\SCExecContext.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\ScriptNode.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\SoundEmitter.lua</filename>
@@ -50,6 +62,9 @@
   </file>
   <file>
     <filename>Source\Scripts\TerminalPuzzles.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\TouchTrigger.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\UI.lua</filename>

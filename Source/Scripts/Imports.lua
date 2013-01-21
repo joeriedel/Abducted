@@ -2,6 +2,7 @@
 -- Add yours here
 
 -- // System Stuff First // --
+Import("CVars")
 Import("KeyCodes")
 Import("Class")
 Import("Engine")
@@ -12,14 +13,19 @@ Import("GameNetwork")
 Import("Game")
 Import("Input")
 Import("UI")
+Import("DebugUI")
 Import("Persistence")
 Import("TerminalPuzzles")
+Import("SCExecContext")
+Import("Floors")
 
 -- // Entities // --
 Import("Entity")
-Import("Player")
+Import("PlayerPawn")
+Import("PlayerInput")
 Import("SoundEmitter")
 Import("Worldspawn")
 Import("ViewController")
-
+Import("ScriptNode")
+Import("TouchTrigger")
 Import("LuaCrashCourse")

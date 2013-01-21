@@ -21,11 +21,11 @@ end
 
 function Worldspawn.PostSpawn(self)
 	GameNetwork.LogEvent("Loaded ("..self.keys.mappath..")")
---	World.PlayCinematic("intro", kCinematicFlag_AnimateCamera, 0)
+	World.PlayCinematic("intro", kCinematicFlag_AnimateCamera, 0)
 end
 
 function Worldspawn.OnEvent(self, cmd, args)
-	return false
+	return Game.entity:OnEvent(cmd, args)
 end
 
 worldspawn = Worldspawn

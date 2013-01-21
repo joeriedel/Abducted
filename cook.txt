@@ -1,10 +1,17 @@
 
 Ep1/level01
 
-Characters/HumanFemale
 Ep1/Handshake_contagion
-UI/TerminalPuzzlesBigFont_TF
+
+
+// Shared
+Characters/HumanFemale
+
+UI/Solid_M
+UI/loading_icon_M
+UI/finger_shadow_M
 UI/Globals
+UI/TerminalPuzzlesBigFont_TF
 
 // System (for DebugUI)
 
@@ -12,3 +19,6 @@ Sys/Debug_TF
 Sys/DebugWireframe_M
 Sys/DebugPortal_M
 Sys/DebugPortalEdge_M
+Sys/DebugEntityBBox_M
+Sys/DebugWorldBBox_M
+Sys/DebugWaypoint_M

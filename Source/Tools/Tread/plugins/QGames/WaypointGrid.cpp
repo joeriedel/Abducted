@@ -14,7 +14,7 @@
 #include "r_gl.h"
 
 enum {
-	kWaypointSaveVersion = 3
+	kWaypointSaveVersion = 4
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,12 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 			c->props[Connection::kProp_FwdEnd].SetString(MAP_ReadString(pFile));
 			c->props[Connection::kProp_BackStart].SetString(MAP_ReadString(pFile));
 			c->props[Connection::kProp_BackEnd].SetString(MAP_ReadString(pFile));
-			c->props[Connection::kProp_Flags].SetInt(MAP_ReadInt(pFile));
+
+			int flags = MAP_ReadInt(pFile);
+			if (version < 4)
+				flags |= (1 << Connection::kFlag_Interruptible);
+
+			c->props[Connection::kProp_Flags].SetInt(flags);
 		}
 
 		m_connections[c->tailId] = c;
@@ -966,13 +971,19 @@ void CWaypoint::Connection::InitProps() {
 	flags[kFlag_AutoFace].SetType(CObjProp::integer);
 	flags[kFlag_AutoFace].SetInt(1 << kFlag_AutoFace);
 
+	flags[kFlag_Interruptible].SetName("interruptable");
+	flags[kFlag_Interruptible].SetDisplayName("Interruptable");
+	flags[kFlag_Interruptible].SetType(CObjProp::integer);
+	flags[kFlag_Interruptible].SetInt(1 << kFlag_Interruptible);
+
 	props[kProp_Flags].AddChoice(&flags[kFlag_AtoB]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_BtoA]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_BtoAUseAtoBScript]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_AutoFace]);
+	props[kProp_Flags].AddChoice(&flags[kFlag_Interruptible]);
 
 	props[kProp_Flags].SetInt(
-		(1 << kFlag_AtoB) | (1 << kFlag_BtoA) | (1 << kFlag_AutoFace)
+		(1 << kFlag_AtoB) | (1 << kFlag_BtoA) | (1 << kFlag_AutoFace) | (1 << kFlag_Interruptible)
 	);
 }
 

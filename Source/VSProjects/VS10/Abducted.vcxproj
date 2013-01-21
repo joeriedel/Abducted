@@ -375,6 +375,7 @@
     <ClInclude Include="..\..\Game\AbductedGame.h" />
     <ClInclude Include="..\..\Game\Entities\G_Exports.h" />
     <ClInclude Include="..\..\Game\Entities\G_PlayerPawn.h" />
+    <ClInclude Include="..\..\Game\Entities\G_TouchTrigger.h" />
     <ClInclude Include="..\..\Game\Entities\G_ViewController.h" />
     <ClInclude Include="..\..\Game\Lua\G_SkModel.h" />
     <ClInclude Include="Resource.h" />
@@ -389,6 +390,7 @@
     <ClCompile Include="..\..\Game\AbductedGame.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_Exports.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_PlayerPawn.cpp" />
+    <ClCompile Include="..\..\Game\Entities\G_TouchTrigger.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_ViewController.cpp" />
     <ClCompile Include="..\..\Game\Lua\G_SkModel.cpp" />
   </ItemGroup>

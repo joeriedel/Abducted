@@ -15,6 +15,9 @@ function PlayerPawn.Spawn(self)
 	self.model:SetRootController("BlendToController")
 	self:AttachDrawModel(self.model)
 	self:SetDrawModelScale(self.model, {0.4, 0.4, 0.4}) -- temp art
+	self:SetDrawModelMotionScale(self.model, 2.5) -- temp art
+	self:SetDrawModelAngles(self.model, {0, -90, 180})
+	self:SetDrawModelPos(self.model, {0, 0, 64})
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
 	self:SetDrawModelBounds(self.model, self:Mins(), self:Maxs())
@@ -35,8 +38,8 @@ function PlayerPawn.Spawn(self)
 	spring.elasticity = 40 -- larger numbers mean the spring is stiffer
 	self:SetAngleSpring(spring)
 	
-	self:SetAccel({20, 0, 0})
-	self:SetMaxGroundSpeed(50)
+	self:SetAccel({80, 0, 0})
+	self:SetMaxGroundSpeed(80)
 	self:SetMoveType(kMoveType_Floor)
 	self:SetClassBits(kEntityClass_Player)
 	self:SetOccupantType(kOccupantType_BBox)
@@ -60,7 +63,16 @@ function PlayerPawn.Spawn(self)
 end
 
 function PlayerPawn.TickPhysics(self)
-	local reqState = "idle"
+	local reqState
+	local velocity = VecMag(self:Velocity())
+--	COutLine(kC_Debug, "Velocity = %f", velocity)
+--	COutLine(kC_Debug, "DistanceMoved = %f", self:DistanceMoved())
+	
+	if (velocity > 0) then
+		reqState = "walk"
+	else
+		reqState = "idle"
+	end
 	
 	if (self.state ~= reqState) then
 		self.state = reqState

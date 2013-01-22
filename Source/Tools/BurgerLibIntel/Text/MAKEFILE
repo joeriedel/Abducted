@@ -1,0 +1,44 @@
+# Init all my constants
+# Note : All macros are invoked by typing "$" and then the macro
+# name in parenthesis
+
+# Name of the compiler and the parms
+
+#Watcom
+CL=WCC386 /w3 /ei /j /mf /5r /oneatx /zq /i=..\Source;..\PublicHeaders
+ASM=tasm /mx /m /t
+OBJS=video.obj ConBeep.obj ConCoff.obj ConCOn.obj ClearEOL.obj &
+	ClearScr.obj BackSpac.obj SendCRLF.obj SetXY.obj HomeCurs.obj SendSpc.obj &
+	SendSpcs.obj Tab2Spc.obj OutHexB.obj OutHexN.obj OutHexS.obj OutStr.obj &
+	BackSpcs.obj InputNum.obj InputLn.obj HexAsc.obj AscHex.obj MSDelay.obj &
+	OutOnOff.obj OutLW2.obj OutLW.obj OutMoney.obj OutCent.obj &
+	RoundPen.obj InputPrc.obj OutMon2.obj GetACrKe.obj WaitCrKe.obj &
+	KillFWht.obj KillFLn.obj GetAFTk.obj VarToken.obj PostKey.obj &
+	FetFStr.obj FetFWrd.obj FetFBin.obj FetFFlt.obj OutChar.obj &
+	WrtFStr.obj WrtFWrd.obj WrtFBin.obj WrtFFlt.obj WrtFStrs.obj &
+	IrqOn.obj IrqOff.obj ClearEOP.obj OutChars.obj OutTime.obj OutDate.obj &
+	OutTabLs.obj OutCtLs.obj OutCtALs.obj ScanWord.obj OutForm.obj &
+	OutForm2.obj DispKey.obj Set80x50.obj Capture1.obj Capture2.obj &
+	Capture3.obj SOutLW.obj SOutLW2.obj DrInpStu.obj Dr1InStu.obj &
+	DoInput.obj InStru2.obj InStru1.obj SOutMony.obj SOutMon2.obj
+
+# Build the executable
+
+AllFiles: Text.Lib c:\BurgerLib\Dos\text.h       #All programs to build
+
+Text.Lib : $OBJS
+	SET WOW=$OBJS
+	WLIB -b -c -n Text.Lib @WOW
+	copy text.lib c:\BurgerLib\Dos\text.lib
+
+# Build the code
+
+.asm.obj : .AUTODEPEND
+	$(ASM) $*.asm
+
+.c.obj : .AUTODEPEND
+	$(CL) $*.c
+
+c:\BurgerLib\Dos\Text.h : Text.h
+	copy Text.h c:\BurgerLib\Dos\Text.h
+

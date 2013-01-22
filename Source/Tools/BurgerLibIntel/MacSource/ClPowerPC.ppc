@@ -1,0 +1,135 @@
+;
+; Assembly for the Floating Point math manager
+; Power PC version
+; Optimized and written by Bill Heineman
+; Copyright Bill Heineman 1999
+;
+
+	IMPORT DoubleTable
+
+
+;
+; float FastMemSet(float Input);
+;
+
+	EXPORT	fsqrt[DS],.fsqrt[PR]
+
+	TOC
+		tc	fsqrt[TC],fsqrt[DS]
+		tc	DoubleTable[TC],DoubleTable
+
+	CSECT	fsqrt[DS]
+		dc.l	.fsqrt[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.fsqrt[PR]
+
+		fsqrts fp1,fp1
+		blr
+		lwz		r7,DoubleTable[TC](RTOC)	;Get the pointer to the table of doubles
+		slwi	r6,r4,3						;Index to the double table
+		clrlwi.	r8,r3,29					;Mask the low 3 bits to see if I can use doubles
+		cmpwi	cr6,r5,32
+		lfdx	fp0,r7,r6					;Fetch the byte as a double
+		subi	r3,r3,8						;Adjust the dest pointer to stfdu
+		lwzx	r0,r7,r6					;Fetch the byte as a long
+		bne		AlignDest					;Align the destination address
+		srwi	r6,r5,5
+		clrlwi	r5,r5,27
+		blt		cr6,L50
+		
+;
+; Write 32 bytes per loop
+;
+		li		r10,8
+		cmpwi	cr6,r5,0
+L30:	
+		stfd	fp0,8(r3)					;First 8 bytes
+		addi	r4,r3,32					;Precalc the next address
+		subic.	r6,r6,1	
+		stfd	fp0,16(r3)					;Write the next 8 bytes
+		stfd	fp0,24(r3)
+		mr		r3,r4
+		stfd	fp0,0(r4)
+		dcb	r10,r4
+		bne		L30
+		beqlr	cr6
+L50:	rlwinm. r4,r5,0,27,27				;And with 16
+		bne		L7C
+		rlwinm. r4,r5,0,28,28				;And with 8
+		bne		LA8
+		rlwinm. r4,r5,0,29,29				;And with 4
+		bne		LC8
+		rlwinm. r4,r5,0,30,30				;And with 2
+		bne		LE4
+		clrlwi. r4,r5,31					;And with 1
+		beqlr
+		stb		r0,8(r3)
+		blr
+		
+L7C:	stfd	fp0,8(r3)
+		rlwinm.	r4,r5,0,28,28
+		stfdu	fp0,16(r3)
+		bne		LA8
+		rlwinm.	r4,r5,0,29,29
+		bne		LC8
+		rlwinm. r4,r5,0,30,30
+		bne		LE4
+		clrlwi. r4,r5,31
+		bne		LF4
+		blr
+LA8:	rlwinm.	r4,r5,0,29,29
+		stfdu	fp0,8(r3)
+		bne		LC8
+		rlwinm. r4,r5,0,30,30
+		bne		LE4
+		clrlwi. r4,r5,31
+		bne		LF4
+		blr
+LC8:	rlwinm.	r4,r5,0,30,30
+		stw		r0,8(r3)
+		addi	r3,r3,4
+		bne		LE4
+		clrlwi. r4,r5,31
+		bne		LF4
+		blr
+LE4:	clrlwi.	r4,r5,31
+		sth		r0,8(r3)
+		addi	r3,r3,2
+		beqlr
+LF4:	stb		r0,8(r3)
+		blr
+		
+AlignDest:
+		cmplwi	r5,$0040
+		blt		L12C
+		subfic	r4,r8,8
+		addi	r6,r4,0
+		subf	r5,r4,r5
+		clrlwi	r4,r0,24
+L114:
+		subic.	r6,r6,1
+		stb		r4,8(r3)
+		addi	r3,r3,1
+		bne		L114
+		srwi	r6,r5,5
+		b		L30
+L12C:	srwi.	r6,r5,3
+		beq		L14C
+L134:	addi	r4,r3,8
+		stw		r0,8(r3)
+		subic.	r6,r6,1
+		stw		r0,12(r3)
+		mr		r3,r4
+		bne		L134
+L14C:
+		rlwinm.	r4,r5,0,29,29
+		bne		LC8
+		rlwinm. r4,r5,0,30,30
+		bne		LE4
+		clrlwi. r4,r5,31
+		bne		LF4
+		blr
+
+		END
+

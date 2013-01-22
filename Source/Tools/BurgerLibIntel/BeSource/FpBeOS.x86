@@ -1,0 +1,1045 @@
+#/**********************************
+#
+#	BeOS for intel version
+#
+#**********************************/
+
+.data
+	.align	4
+	.type	Zero,@object
+	.size	Zero,4
+Zero:
+	.long	0		#Floating point constants to use
+	.align	4
+	.type	One,@object
+	.size	One,4
+One:
+	.long	0x3F800000	#Floating point 1.0
+
+#/**********************************
+#
+#	Create a square root but I have about a 1%
+#	margin of error for rounding
+#
+#	float FASTCALL SqrtFast(float n)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl SqrtFast
+	.type SqrtFast,@function
+SqrtFast:
+	movl	4(%esp),%eax
+	shrl	$23-9-2,%eax
+	movl	4(%esp),%edx
+	andl	$0xFFC,%eax
+	andl	$0x7FFFFFFF,%edx
+	jz		.L1
+
+	movl	BurgerSqrtTable(%eax),%eax
+	andl	$0x7F000000,%edx
+
+	addl	%edx,%eax
+	shrl	$1,%eax
+	movl	%eax,4(%esp)
+	flds	4(%esp)
+	ret
+.L1:
+	flds	(Zero)
+	ret
+
+.SqrtFastEnd:
+	.size	SqrtFast,.SqrtFastEnd-SqrtFast
+
+#/**********************************
+#
+#	Return a floating point number rounded up
+#
+#	float FASTCALL CeilingFast(float n)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl CeilingFast
+	.type CeilingFast,@function
+CeilingFast:
+	movl	4(%esp),%eax
+	flds	4(%esp)
+	andl	$0x7FFFFFFF,%eax
+	fistl	4(%esp)
+	cmpl	$0x4B000000,%eax
+	jae	.CF0
+	fildl	4(%esp)
+	fxch	%st(1)
+	xorl	%eax,%eax
+	fcomp	%st(1)
+	fnstsw	%ax
+	andl	$0x4100,%eax
+	jz	.CF1
+.CF0:
+	ret
+.CF1:
+	fadds	(One)
+	ret
+.CeilingFastEnd:
+	.size	CeilingFast,..CeilingFastEnd-CeilingFast
+
+#/**********************************
+#
+#	Return a floating point number rounded up
+#
+#	int FASTCALL CeilingFastInt(float n)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl CeilingFastInt
+	.type CeilingFastInt,@function
+CeilingFastInt:
+	movl		4(%esp),%eax
+	flds		4(%esp)
+	cmpl		$0x4F000000,%eax
+	fistl		4(%esp)
+	movl		$0x7FFFFFFF,%eax
+	jge		.CFI0
+	fildl		4(%esp)
+	xorl		%eax,%eax
+	fcompp
+	fnstsw	%ax
+	andl		$0x100,%eax
+	movl		4(%esp),%eax
+	jnz		.CFI1
+.CFI0:
+	ret
+.CFI1:
+	incl		%eax
+	ret
+
+.CeilingFastInt:
+	.size	CeilingFastInt,.CeilingFastInt-CeilingFastInt
+
+#/**********************************
+#
+#	Return a floating point number floored
+#
+#	float FASTCALL FloorFast(float n)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FloorFast
+	.type FloorFast,@function
+FloorFast:
+	movl		4(%esp),%eax
+	flds		4(%esp)
+	andl		$0x7FFFFFFF,%eax
+	fistl		4(%esp)
+	cmpl		$0x4B000000,%eax
+	jae		.FF0
+	fildl		4(%esp)
+	fxch		%st(1)
+	xorl		%eax,%eax
+	fcomp	%st(1)
+	fnstsw	%ax
+	andl		$0x100,%eax
+	jnz		.FF1
+.FF0:
+	ret
+.FF1:
+	fsubs		(One)
+	ret
+
+.FloorFastEnd:
+	.size	FloorFast,.FloorFastEnd-FloorFast
+
+#/**********************************
+#
+#	Return a floating point number floored
+#
+#	int FASTCALL FloorFastInt(float n)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FloorFastInt
+	.type FloorFastInt,@function
+FloorFastInt:
+	movl		4(%esp),%eax
+	flds		4(%esp)
+	cmpl		$0x4F000000,%eax
+	fistl		4(%esp)
+	movl		$0x7FFFFFFF,%eax
+	jge		.FFI0
+	fildl		4(%esp)
+	xorl		%eax,%eax
+	fcompp
+	fnstsw	%ax
+	andl		$0x4100,%eax
+	movl		4(%esp),%eax
+	jz		.FFI1
+	ret
+.FFI1:
+	cmpl		$0x80000000,%eax
+	jz		.FFI0
+	decl		%eax
+.FFI0:
+	ret
+
+.FloorFastIntEnd:
+	.size	FloorFastInt,.FloorFastIntEnd-FloorFastInt
+
+#/**********************************
+#
+#	Convert a floating point number to an integer
+#	but use round to nearest
+#
+#	int FASTCALL FloatToInt(float Input)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FloatToInt
+	.type FloatToInt,@function
+FloatToInt:
+	cmpl		$0x4F000000,4(%esp)
+	movl		$0x7FFFFFFF,%eax
+	jge		.FTI1
+	flds		4(%esp)
+	fistpl		4(%esp)
+	movl		4(%esp),%eax
+.FTI1:
+	ret
+
+.FloatToIntEnd:
+	.size	FloatToInt,.FloatToIntEnd-FloatToInt
+
+/#**********************************
+#
+#	Given an angle of the range
+#	of ANGLERANGE (ANGLERANGE==360.0 degrees)
+#	return the sine.
+#
+#	float FASTCALL FloatSine(float Angle)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FloatSine
+	.type FloatSine,@function
+FloatSine:
+	movl		4(%esp),%eax
+	flds		4(%esp)
+	cmpl		$0x4F000000,%eax
+	fistpl		4(%esp)
+	movl		$0x7FF,%eax
+	jge		.FS1
+	movl		4(%esp),%eax
+	andl		$0x7FF,%eax
+.FS1:
+	flds		FSineTable(,%eax,4)
+	ret
+
+.FloatSineEnd:
+	.size	FloatSine,.FloatSineEnd-FloatSine
+
+#/**********************************
+#
+#	Given an angle of the range
+#	of ANGLERANGE (ANGLERANGE==360.0 degrees)
+#	return the cosine.
+#
+#	float FASTCALL FloatCosine(float Angle)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FloatCosine
+	.type FloatCosine,@function
+FloatCosine:
+	movl		4(%esp),%eax
+	flds		4(%esp)
+	cmpl		$0x4F000000,%eax
+	fistpl		4(%esp)
+	movl		$0x7FF,%eax
+	jge		.FC1
+	movl		4(%esp),%eax
+	andl		$0x7FF,%eax
+.FC1:
+	flds		FSineTable+2048(,%eax,4)
+	ret
+
+.FloatCosineEnd:
+	.size	FloatCosine,.FloatCosineEnd-FloatCosine
+
+	.if	0
+
+/**********************************
+
+	Return a dot product of two 3D vectors
+
+**********************************/
+
+asm float FASTCALL Vector3DDot(const Vector3D_t *Input1,const Vector3D_t *Input2)
+{
+	_asm {
+	mov		eax,[esp+4]
+	mov		edx,[esp+8]
+	fld		dword ptr [eax+0]
+	fmul	dword ptr [edx+0]
+	fld		dword ptr [eax+4]
+	fmul	dword ptr [edx+4]
+	fld		dword ptr [eax+8]
+	fmul	dword ptr [edx+8]
+	fxch	st(1)
+	faddp	st(2),st(0)
+	faddp	st(1),st(0)
+	ret
+	}
+}
+
+/**********************************
+
+	Return a cross product of two 3D vectors
+
+**********************************/
+
+asm void FASTCALL Vector3DCross(Vector3D_t *Output,const Vector3D_t *Input1,const Vector3D_t *Input2)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	mov		eax,[esp+12]
+	fld		dword ptr [edx+4]
+	fmul	dword ptr [eax+8]
+	fld		dword ptr [edx+8]
+	fmul	dword ptr [eax+0]
+	fld		dword ptr [edx+0]
+	fmul	dword ptr [eax+4]
+	fld		dword ptr [edx+8]
+	fmul	dword ptr [eax+4]
+	fld		dword ptr [edx+0]
+	fmul	dword ptr [eax+8]
+	fld		dword ptr [edx+4]
+	fmul	dword ptr [eax+0]
+	fxch	st(2)
+	fsubp	st(5),st
+	fsubp	st(3),st
+	fsubp	st(1),st
+	fxch	st(2)
+	fstp	dword ptr [ecx+0]
+	fstp	dword ptr [ecx+4]
+	fstp	dword ptr [ecx+8]
+	ret
+	}
+}
+
+/**********************************
+
+	Returns the square of the radius of a 3D vector
+
+**********************************/
+
+asm float FASTCALL Vector3DGetRadiusSqr(const Vector3D_t *Input)
+{
+	_asm {
+	mov		eax,[esp+4]		;Get the pointer
+	fld		dword ptr [eax+0]
+	fmul	st,st
+	fld		dword ptr [eax+4]
+	fmul	st,st
+	fld		dword ptr [eax+8]
+	fmul	st,st
+	fxch	st(1)
+	faddp	st(2), st(0)
+	faddp	st(1), st(0)	;The only stall
+	ret
+	}
+}
+
+/**********************************
+
+	Normalize a 3D vector
+	(Set its distance to 1.0)
+	(High precision)
+
+**********************************/
+
+asm void FASTCALL Vector3DNormalize(Vector3D_t *Input)
+{
+	_asm {
+	mov ecx,[esp+4]
+	fld dword ptr [ecx]
+	fmul st,st
+	fld dword ptr [ecx+4]
+	fmul st,st
+	fld dword ptr [ecx+8]
+	fmul st,st
+	fxch st(1)
+	faddp st(2),st(0)
+	faddp st(1),st(0)
+	fsqrt
+	fld dword ptr [One]
+	fxch st(1)
+	fstp dword ptr [esp+4]
+	mov eax,[esp+4]
+	test eax,0x7FFFFFFF
+	jz NoGood
+	fdiv dword ptr [esp+4]
+	fld dword ptr [ecx+0]
+	fld dword ptr [ecx+4]
+	fld dword ptr [ecx+8]
+	fxch st(2)
+	fmul st(0),st(3)
+	fxch st(1)
+	fmul st(0),st(3)
+	fxch st(2)
+	fmulp st(3),st(0)
+	fstp dword ptr [ecx+0]
+	fstp dword ptr [ecx+4]
+	fstp dword ptr [ecx+8]
+	ret
+NoGood:
+	fstp st(0)
+	ret
+	}
+}
+
+
+/**********************************
+
+	Assembly for Matrix code
+
+**********************************/
+
+#define XX 0
+#define XY 4
+#define XZ 8
+#define YX 12
+#define YY 16
+#define YZ 20
+#define ZX 24
+#define ZY 28
+#define ZZ 32
+
+/**********************************
+
+	Create a rotation matrix with angles for
+	the yaw (X), pitch (Y), and roll (Z)
+
+**********************************/
+
+asm void FASTCALL Matrix3DSet(Matrix3D_t *Output,float yaw,float pitch,float roll)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	fld		dword ptr [esp+8]
+	fld		dword ptr [esp+12]
+	fld		dword ptr [esp+16]
+	mov		[esp+4],ebx
+	mov		[esp+8],ebp
+	fistp	dword ptr [esp+12]
+	fistp	dword ptr [esp+16]
+	mov		ebp,[esp+12]
+	mov		ebx,[esp+16]
+	fistp	dword ptr [esp+12]
+	mov		edx,[esp+12]
+	and		ebp,0x7FF
+	and		ebx,0x7FF
+	and		edx,0x7FF
+
+	fld		dword ptr [FSineTable + ebp*4]	;sroll * spitch
+	fmul	dword ptr [FSineTable + ebx*4]
+	fld		dword ptr [FSineTable + 2048 + ebp*4]	;croll* spitch
+	fmul	dword ptr [FSineTable + ebx*4]
+
+	fld		dword ptr [FSineTable + 2048 + ebp*4]	;croll * cyaw
+	fmul	dword ptr [FSineTable + 2048 + edx*4]
+	fld		dword ptr [FSineTable + ebp*4]	;sroll * cyaw
+	fmul	dword ptr [FSineTable + 2048 + edx*4]
+	fld		dword ptr [FSineTable + 2048 + ebx*4]	;cpitch * syaw
+	fmul	dword ptr [FSineTable + edx*4]
+
+	fld		dword ptr [FSineTable + edx*4]	;(sroll * spitch) * syaw
+	fmul	st,st(5)
+	fld		dword ptr [FSineTable + edx*4]	;(croll * spitch) * syaw
+	fmul	st,st(5)
+	fxch	st(2)
+	fstp	dword ptr [ecx+XZ]
+	faddp	st(3),st
+	fsubp	st(1),st
+
+	fld		dword ptr [FSineTable + ebp*4]		;sroll * cpitch
+	fmul	dword ptr [FSineTable + 2048 + ebx*4]
+	fxch	st(2)
+	fstp	dword ptr [ecx+XX]
+	fstp	dword ptr [ecx+XY]
+	fchs
+	fld		dword ptr [FSineTable + 2048 + ebp*4]	;croll*cpitch
+	fmul	dword ptr [FSineTable + 2048 + ebx*4]
+	fxch	st(1)
+	fstp	dword ptr [ecx+YX]
+
+	fld		dword ptr [FSineTable + 2048 + ebp*4]	;croll * syaw
+	fmul	dword ptr [FSineTable + edx*4]
+	fxch	st(1)
+	fstp	dword ptr [ecx+YY]
+	fld		dword ptr [FSineTable + ebp*4]	;sroll*syaw
+	fmul	dword ptr [FSineTable + edx*4]
+	fld		dword ptr [FSineTable + 2048 + ebx*4]	;cpitch * cyaw
+	fmul	dword ptr [FSineTable + 2048 + edx*4]
+
+	fld		dword ptr [FSineTable + 2048 + edx*4]
+	fmulp	st(5),st
+	fld		dword ptr [FSineTable + 2048 + edx*4]
+	fmulp	st(4),st
+	fstp	dword ptr [ecx+ZZ]
+	fchs
+	fsubrp	st(2),st
+	fsubp	st(2),st
+
+	mov		eax,[FSineTable+ebx*4]
+	mov		ebx,[esp+4]
+	mov		ebp,[esp+8]
+	mov		[ecx+YZ],eax
+	fstp	dword ptr [ecx+ZY]
+	fstp	dword ptr [ecx+ZX]
+	ret
+	}
+}
+
+/**********************************
+
+	Create a rotation matrix with angle for
+	yaw (X)
+
+**********************************/
+
+asm void FASTCALL Matrix3DSetYaw(Matrix3D_t *Output,float yaw)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	fld		dword ptr [esp+8]
+	fistp	dword ptr [esp+8]
+	mov		edx,[esp+8]
+	xor		eax,eax
+	and		edx,0x7FF
+	mov		[ecx+XY],eax
+	mov		[ecx+YX],eax
+	mov		[ecx+YZ],eax
+	fld		dword ptr [FSineTable + edx*4]
+	mov		[ecx+ZY],eax
+	mov		eax,[FSineTable + edx*4]
+	fchs
+	mov		[ecx+XZ],eax
+	mov		eax,0x3F800000
+	mov		edx,[FSineTable+2048 + edx*4]
+	mov		[ecx+YY],eax
+	fstp	dword ptr [ecx+ZX]
+	mov		dword ptr [ecx+XX],edx
+	mov		dword ptr [ecx+ZZ],edx
+	ret
+	}
+}
+
+/**********************************
+
+	Create a rotation matrix with angle for
+	pitch (Y)
+
+**********************************/
+
+asm void FASTCALL Matrix3DSetPitch(Matrix3D_t *Output,float pitch)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	fld		dword ptr [esp+8]
+	fistp	dword ptr [esp+8]
+	mov		edx,[esp+8]
+	xor		eax,eax
+	and		edx,0x7FF
+	mov		[ecx+XY],eax
+	mov		[ecx+XZ],eax
+	mov		[ecx+YX],eax
+	fld		dword ptr [FSineTable + edx*4]
+	mov		[ecx+ZX],eax
+	mov		eax,[FSineTable + edx*4]
+	fchs
+	mov		[ecx+YZ],eax
+	mov		eax,0x3F800000
+	mov		edx,[FSineTable+2048 + edx*4]
+	mov		[ecx+XX],eax
+	fstp	dword ptr [ecx+ZY]
+	mov		dword ptr [ecx+YY],edx
+	mov		dword ptr [ecx+ZZ],edx
+	ret
+	}
+}
+
+/**********************************
+
+	Create a rotation matrix with angle for
+	roll (Z)
+
+**********************************/
+
+asm void FASTCALL Matrix3DSetRoll(Matrix3D_t *Output,float roll)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	fld		dword ptr [esp+8]
+	fistp	dword ptr [esp+8]
+	mov		edx,[esp+8]
+	xor		eax,eax
+	and		edx,0x7FF
+	mov		[ecx+XZ],eax
+	mov		[ecx+YZ],eax
+	mov		[ecx+ZX],eax
+	fld		dword ptr [FSineTable + edx*4]
+	mov		[ecx+ZY],eax
+	mov		eax,[FSineTable + edx*4]
+	fchs
+	mov		[ecx+XY],eax
+	mov		eax,0x3F800000
+	mov		edx,[FSineTable+2048 + edx*4]
+	mov		[ecx+ZZ],eax
+	fstp	dword ptr [ecx+YX]
+	mov		dword ptr [ecx+XX],edx
+	mov		dword ptr [ecx+YY],edx
+	ret
+	}
+}
+
+/**********************************
+
+	Perform a matrix multiply on the output matrix
+
+**********************************/
+
+asm void FASTCALL Matrix3DMul(Matrix3D_t *Output,const Matrix3D_t *Input)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	sub		esp,48
+	mov		eax,[ecx+0]
+	mov		[esp+12],eax
+	mov		eax,[ecx+4]
+	mov		[esp+16],eax
+	mov		eax,[ecx+8]
+	mov		[esp+20],eax
+	mov		eax,[ecx+12]
+	mov		[esp+24],eax
+	mov		eax,[ecx+16]
+	mov		[esp+28],eax
+	mov		eax,[ecx+20]
+	mov		[esp+32],eax
+	mov		eax,[ecx+24]
+	mov		[esp+36],eax
+	mov		eax,[ecx+28]
+	mov		[esp+40],eax
+	mov		eax,[ecx+32]
+	mov		[esp+44],eax
+	mov		[esp+8],edx
+	lea		edx,[esp+12]
+	mov		[esp+0],ecx
+	mov		[esp+4],edx
+	call	Matrix3DMul2
+	mov		eax,[esp+48]
+	add		esp,52
+	jmp		eax
+	}
+}
+
+/**********************************
+
+	Perform a matrix multiply
+	Floating point will rot your brain on the Pentium
+	
+**********************************/
+
+#define Output ECX
+#define Input1 EDX
+#define Input2 EAX
+
+asm void FASTCALL Matrix3DMul2(Matrix3D_t *Output,const Matrix3D_t *Input1,const Matrix3D_t *Input2)
+{
+	_asm {
+
+	mov	Output,[esp+4]
+	mov	Input1,[esp+8]
+	mov	Input2,[ESP+12]
+
+;
+; First I do the Muls for XX
+;
+
+	fld	dword ptr [Input1+XX]	;XX
+	fmul	dword ptr [Input2+XX]
+	fld	dword ptr [Input1+YX]	;XX XX
+	fmul	dword ptr [Input2+XY]
+	fld	dword ptr [Input1+ZX]	;XX XX XX
+	fmul	dword ptr [Input2+XZ]
+	fxch	st(1)
+	faddp	st(2),st		;XX XX
+
+;
+; As I perform the Muls for XY
+; I interleave the adds for XX
+; to prevent any lame matrix multiply stalls
+;
+
+	fld	dword ptr [Input1+XY]	;XY XX XX
+	fmul	dword ptr [Input2+XX]
+	fxch	st(2)			;XX XX XY
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YY]
+	fmul	dword ptr [Input2+XY]
+	fld	dword ptr [Input1+ZY]	;XY XY XX XY
+	fmul	dword ptr [Input2+XZ]
+	fxch	st(2)
+	fstp	dword ptr [Output+XX]	;Store result
+	faddp	st(2),st		;XY XY
+
+;
+; As you see above, I have a pattern,
+; Follow the pattern to it's logical conclusion
+;
+
+; XZ
+
+	fld	dword ptr [Input1+XZ]	;XZ XY XY
+	fmul	dword ptr [Input2+XX]
+	fxch	st(2)			;XY XY XZ
+	faddp	st(1),st			;Second add
+	fld	dword ptr [Input1+YZ]	;XZ XY XZ
+	fmul	dword ptr [Input2+XY]
+	fld	dword ptr [Input1+ZZ]	;XZ XZ XY XZ
+	fmul	dword ptr [Input2+XZ]
+	fxch	st(2)			;XY XZ XZ XZ
+	fstp	dword ptr [Output+XY]	;Store result
+	faddp	st(2),st		;XZ XZ
+
+;YX
+
+	fld	dword ptr [Input1+XX]	;YX XZ XZ
+	fmul	dword ptr [Input2+YX]
+	fxch	st(2)			;XZ XZ YX
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YX]
+	fmul	dword ptr [Input2+YY]
+	fld	dword ptr [Input1+ZX]	;YX YX XZ YX
+	fmul	dword ptr [Input2+YZ]
+	fxch	st(2)			;XZ YX YX YX
+	fstp	dword ptr [Output+XZ]	;Store result
+	faddp	st(2),st		;YX YX
+
+;YY
+
+	fld	dword ptr [Input1+XY]	;YY YX YX
+	fmul	dword ptr [Input2+YX]
+	fxch	st(2)			;YX YX YY
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YY]
+	fmul	dword ptr [Input2+YY]
+	fld	dword ptr [Input1+ZY]	;YY YY YX YY
+	fmul	dword ptr [Input2+YZ]
+	fxch	st(2)
+	fstp	dword ptr [Output+YX]	;Store result
+	faddp	st(2),st		;YY YY
+
+;YZ
+
+	fld	dword ptr [Input1+XZ]	;YZ YY YY
+	fmul	dword ptr [Input2+YX]
+	fxch	st(2)			;YY YY YZ
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YZ]
+	fmul	dword ptr [Input2+YY]
+	fld	dword ptr [Input1+ZZ]	;YZ YZ YY YZ
+	fmul	dword ptr [Input2+YZ]
+	fxch	st(2)			;YY YZ YZ YZ
+	fstp	dword ptr [Output+YY]	;Store result
+	faddp	st(2),st		;YZ YZ
+
+;
+; Now I don't save, I keep them on the stack
+; to eat latency cycles at the end of the routine
+;
+
+;ZX
+
+	fld	dword ptr [Input1+XX]	;ZX YZ YZ
+	fmul	dword ptr [Input2+ZX]
+	fxch	st(2)			;YZ YZ ZX
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YX]
+	fmul	dword ptr [Input2+ZY]
+	fld	dword ptr [Input1+ZX]	;ZX ZX YZ ZX
+	fmul	dword ptr [Input2+ZZ]
+	fxch	st(1)
+	faddp	st(3),st		;ZX YZ ZX
+
+;ZY
+
+	fld	dword ptr [Input1+XY]	;ZY ZX YZ ZX
+	fmul	dword ptr [Input2+ZX]
+	fxch	st(3)			;ZX ZX YZ ZY
+	faddp	st(1),st		;Second add
+	fld	dword ptr [Input1+YY]
+	fmul	dword ptr [Input2+ZY]
+	fld	dword ptr [Input1+ZY]	;ZY ZY ZX YZ ZY
+	fmul	dword ptr [Input2+ZZ]
+	fxch	st(1)
+	faddp	st(4),st		;ZY ZX YZ ZY
+
+;ZZ
+
+	fld	dword ptr [Input1+XZ]	;ZZ ZY ZX YZ ZY
+	fmul	dword ptr [Input2+ZX]
+	fxch	st(4)			;ZY ZY ZX YZ ZZ
+	faddp	st(1),st		;Second add
+	fxch	st(3)			;ZZ ZX YZ ZY
+	fld	dword ptr [Input1+YZ]	;ZZ ZZ ZX YZ ZY
+	fmul	dword ptr [Input2+ZY]
+	fld	dword ptr [Input1+ZZ]	;ZZ ZZ ZZ ZX YZ ZY
+	fmul	dword ptr [Input2+ZZ]
+	fxch	st(1)
+	faddp	st(2),st		;ZZ ZZ ZX YZ ZY
+	fxch	st(2)			;ZX ZZ ZZ YZ ZY
+
+
+; Since I can't interleave anymore I have to
+; eat the 2 cycle + 2 cycle stall
+
+	fstp	dword ptr [Output+ZX]	;Store result
+	faddp	st(1),st		;ZZ YZ ZY
+	fxch	st(2)			;ZY YZ ZZ
+	fstp	dword ptr [Output+ZY]	;Store result
+	fstp	dword ptr [Output+YZ]	;Store result
+	fstp	dword ptr [Output+ZZ]	;Store result
+	ret
+	}
+}
+
+#undef Output
+#undef Input1
+#undef Input2
+
+/**********************************
+
+	Multiply a vector by a matrix
+
+**********************************/
+
+asm void FASTCALL Matrix3DMulVector(Vector3D_t *Output,const Matrix3D_t *Input)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	fld		dword ptr [edx+XX]
+	fmul	dword ptr [ecx+0]
+	fld		dword ptr [edx+XY]
+	fmul	dword ptr [ecx+4]
+	fld		dword ptr [edx+XZ]
+	fmul	dword ptr [ecx+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [edx+YX]
+	fmul	dword ptr [ecx+0]
+	fld		dword ptr [edx+YY]
+	fmul	dword ptr [ecx+4]
+	fld		dword ptr [edx+YZ]
+	fmul	dword ptr [ecx+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [edx+ZX]
+	fmul	dword ptr [ecx+0]
+	fld		dword ptr [edx+ZY]
+	fmul	dword ptr [ecx+4]
+	fld		dword ptr [edx+ZZ]
+	fmul	dword ptr [ecx+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fxch	st(5)
+	faddp	st(4),st
+	fxch	st(1)
+	faddp	st(2),st
+	faddp	st(3),st
+	fxch	st(1)
+	fstp	dword ptr [ecx+0]
+	fstp	dword ptr [ecx+4]
+	fstp	dword ptr [ecx+8]
+	ret
+	}
+}
+
+/**********************************
+
+	Multiply a vector by a matrix
+
+**********************************/
+
+asm void FASTCALL Matrix3DMulVector2(Vector3D_t *Output,const Matrix3D_t *Input,const Vector3D_t *Input2)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	mov		eax,[esp+12]
+	fld		dword ptr [edx+XX]
+	fmul	dword ptr [eax+0]
+	fld		dword ptr [edx+XY]
+	fmul	dword ptr [eax+4]
+	fld		dword ptr [edx+XZ]
+	fmul	dword ptr [eax+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [edx+YX]
+	fmul	dword ptr [eax+0]
+	fld		dword ptr [edx+YY]
+	fmul	dword ptr [eax+4]
+	fld		dword ptr [edx+YZ]
+	fmul	dword ptr [eax+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [edx+ZX]
+	fmul	dword ptr [eax+0]
+	fld		dword ptr [edx+ZY]
+	fmul	dword ptr [eax+4]
+	fld		dword ptr [edx+ZZ]
+	fmul	dword ptr [eax+8]
+	fxch	st(1)
+	faddp	st(2),st
+	fxch	st(5)
+	faddp	st(4),st
+	fxch	st(1)
+	faddp	st(2),st
+	faddp	st(3),st
+	fxch	st(1)
+	fstp	dword ptr [ecx+0]
+	fstp	dword ptr [ecx+4]
+	fstp	dword ptr [ecx+8]
+	ret
+	}
+}
+
+/**********************************
+
+	Transform a vector and then add a point
+
+**********************************/
+
+asm void FASTCALL Matrix3DMulVectorAddVector(Vector3D_t *Output,const Matrix3D_t *Input,const Vector3D_t *Add)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	mov		eax,[esp+12]
+	fld		dword ptr [ecx+0]
+	fmul	dword ptr [edx+XX]
+	fld		dword ptr [ecx+4]
+	fmul	dword ptr [edx+XY]
+	fld		dword ptr [ecx+8]
+	fmul	dword ptr [edx+XZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [ecx+0]
+	fmul	dword ptr [edx+YX]
+	fld		dword ptr [ecx+4]
+	fmul	dword ptr [edx+YY]
+	fld		dword ptr [ecx+8]
+	fmul	dword ptr [edx+YZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [ecx+0]
+	fmul	dword ptr [edx+ZX]
+	fld		dword ptr [ecx+4]
+	fmul	dword ptr [edx+ZY]
+	fld		dword ptr [ecx+8]
+	fmul	dword ptr [edx+ZZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fxch	st(4)
+	faddp	st(5),st
+	fxch	st(1)
+	faddp	st(2),st
+	faddp	st(2),st
+	fxch	st(2)
+	fadd	dword ptr [eax+0]
+	fxch	st(2)
+	fadd	dword ptr [eax+4]
+	fxch	st(1)
+	fadd	dword ptr [eax+8]
+	fxch	st(2)
+	fstp	dword ptr [ecx+0]
+	fstp	dword ptr [ecx+4]
+	fstp	dword ptr [ecx+8]
+	ret
+	}
+}
+
+/**********************************
+
+	Transform a vector and then add a point
+
+**********************************/
+
+asm void FASTCALL Matrix3DMulVectorAddVector2(Vector3D_t *Output,const Matrix3D_t *Input,const Vector3D_t *Add,const Vector3D_t *InputV)
+{
+	_asm {
+	mov		ecx,[esp+4]
+	mov		edx,[esp+8]
+	mov		eax,[esp+12]
+	mov		[esp+4],ebx
+	mov		ebx,[esp+16]
+	fld		dword ptr [edx+XX]
+	fmul	dword ptr [ebx+0]
+	fld		dword ptr [ebx+4]
+	fmul	dword ptr [edx+XY]
+	fld		dword ptr [ebx+8]
+	fmul	dword ptr [edx+XZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [ebx+0]
+	fmul	dword ptr [edx+YX]
+	fld		dword ptr [ebx+4]
+	fmul	dword ptr [edx+YY]
+	fld		dword ptr [ebx+8]
+	fmul	dword ptr [edx+YZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fld		dword ptr [ebx+0]
+	fmul	dword ptr [edx+ZX]
+	fld		dword ptr [ebx+4]
+	fmul	dword ptr [edx+ZY]
+	fld		dword ptr [ebx+8]
+	fmul	dword ptr [edx+ZZ]
+	fxch	st(1)
+	faddp	st(2),st
+	fxch	st(4)
+	faddp	st(5),st
+	fxch	st(1)
+	faddp	st(2),st
+	faddp	st(2),st
+	fxch	st(2)
+	fadd	dword ptr [eax+0]
+	fxch	st(2)
+	fadd	dword ptr [eax+4]
+	fxch	st(1)
+	fadd	dword ptr [eax+8]
+	fxch	st(2)
+	mov		ebx,[esp+4]
+	fstp	dword ptr [ecx+0]
+	fstp	dword ptr [ecx+4]
+	fstp	dword ptr [ecx+8]
+	ret
+	}
+}
+	.endif

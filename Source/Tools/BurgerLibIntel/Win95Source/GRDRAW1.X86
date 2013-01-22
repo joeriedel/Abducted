@@ -1,0 +1,407 @@
+	.586
+
+_DATA	SEGMENT DWORD PUBLIC 'DATA'
+	EXTRN   _VideoPointer:DWORD,_VideoWidth:DWORD
+PrefixCount DD	0
+CenterCount	DD	0
+SuffixCount	DD	0
+_DATA	ENDS
+
+;
+; Draw a shape VERY FAST!
+;
+; Note : Due to the fact that virtual screen buffers cannot handle
+; crossing page boundaries, I need to validate the memory address
+; to make sure that the destination is NOT crossing a long word boundary
+; This will prevent a bad thing. I.E. a crash bug in a virtual memory
+; endless loop.
+;
+; I also must copy the memory from top to bottom WITHOUT ever backtracking
+; to reduce the amount of overhead possible from virtual memory "Hits"
+;
+;
+; void DrawShapeLowLevel(Word x,Word y,Word Width,Word Height,
+;	Word Skip,void *ShapePtr);
+;
+
+_TEXT	SEGMENT PARA PUBLIC 'CODE'
+
+	assume	CS:_TEXT,DS:_DATA
+
+	IFDEF __WATCOM__
+;	PUBLIC DrawShapeLowLevel16_
+	PUBLIC DrawShapeLowLevel_
+
+;DrawShapeLowLevel16_ PROC
+;	ADD	ECX,ECX		;Mul the width by 2
+;	ADD	EAX,EAX		;Mul the X offset by 2
+DrawShapeLowLevel_:
+
+Remove	EQU	8		;2 extra parms on stack
+Added	EQU	16		;3 registers + ret
+	ELSE
+
+;	PUBLIC @DrawShapeLowLevel16@24
+	PUBLIC @DrawShapeLowLevel@24
+
+;@DrawShapeLowLevel16@24 PROC
+
+;	SHL	DWORD PTR [ESP+4],1
+;	ADD	ECX,ECX		;Mul the X offset by 2
+
+@DrawShapeLowLevel@24:
+	PUSH	EBX		;I must preserve EBX for MSC
+	MOV	EAX,ECX		;Move since I optimize for WATCOM parms
+
+Remove	EQU	16		;Stack frame offset
+Added	EQU	28	;4 registers + ret + 2 parms
+	ENDIF
+
+	PUSH	ESI
+	MOV	ESI,[_VideoWidth]
+
+	IMUL	EDX,ESI		;Get Y offset
+
+	ADD     EDX,EAX		;Get the base screen location
+	PUSH	EDI
+
+	MOV     EDI,[_VideoPointer]     ;Get the screen pointer
+	PUSH	EBP
+
+	ADD     EDI,EDX		;Make the final pointer to screen
+	MOV     EAX,ESI		;Get the maximum screen width
+
+;
+; The tight loops uses...
+; EAX Temp count
+; EBX Width in longs
+; ECX Height
+; EDX Data
+; ESI Source image
+; EDI Screen pointer
+; EBP Width in bytes
+; [ESP+0] Skip adder
+; [ESP+4] Scan line adjust
+;
+
+	IFNDEF	__WATCOM__	;For MicroSquish "C" to prevent stalls
+	MOV	EBX,[ESP+Added-8]	;Get the dest width (Watcom loads this already)
+	MOV	ECX,[ESP+Added-4]	;Get the dest height
+	ENDIF
+
+	MOV     ESI,[ESP+Added+4]	;Copy the pointer to shape
+	SUB	EAX,EBX		;Get the scan line adjust
+
+	MOV	EBP,EBX		;Copy the width
+	MOV	[ESP+Added+4],EAX	;Save the scan line adjust
+
+	SHR     EBX,2		;Shift to long count
+	JZ	Bytes		;Only 1,2 or 3 bytes wide?
+
+;
+; It is more than 3 bytes in width, see if I can use long word
+; data movement.
+;
+
+;
+; Since the destination is long word aligned
+; I do it the easy way!!
+;
+
+	TEST	EDI,3		;Is the destination long word aligned?
+	JNZ	MustAlign	;Damn!!
+
+	AND	EBP,3		;Do I have trailing bytes?
+	JNZ     PadBytes	;I have to pad! After copying!
+
+;
+; I only copy long words, this is the BEST case scenario!
+; Destination is long word aligned, only long words
+;
+; EBX Width in long words
+; ECX Height
+; ESI Source pointer
+; EDI Screen Pointer
+; ESP+0 Source Skip
+; ESP+4 Dest Skip
+;
+
+	SHR	EBX,1
+	JC	OddLongs
+
+EvenLongs:
+	MOV     EBP,EBX		;U Reset the long count
+Longs1:
+	MOV	EAX,[ESI]	;Copy dual longs
+	MOV	EDX,[ESI+4]
+
+	MOV	[EDI],EAX	;Store the 64 bits
+	MOV	[EDI+4],EDX
+
+	LEA	ESI,[ESI+8]	;Inc the pointers
+	LEA	EDI,[EDI+8]
+
+	DEC	EBP		;Count down the dual longs
+	JNZ	Longs1
+
+Longs2:	ADD	ESI,[ESP+Added]	;Add the skip
+	ADD     EDI,[ESP+Added+4]	;Next scan line down
+	DEC     ECX		;Count down
+	JNZ     EvenLongs	;Loop?
+
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+OddLongs:
+	MOV	EDX,[ESI]	;U Get the first long word
+	LEA	ESI,[ESI+4]	;V Adjust source
+	MOV	[EDI],EDX	;U Save the first long word
+	LEA	EDI,[EDI+4]	;V Adjust dest
+	TEST	EBX,EBX
+	JZ	Longs5		;Done already? (1 long word)
+	MOV     EAX,EBX		;U Reset the long count
+Longs3:
+	MOV	EDX,[ESI]	;Copy dual longs
+	MOV	EBP,[ESI+4]
+
+	MOV	[EDI],EDX	;Store the 64 bits
+	MOV	[EDI+4],EBP
+
+	LEA	ESI,[ESI+8]	;Inc the pointers
+	LEA	EDI,[EDI+8]
+
+	DEC	EAX		;Count down the dual longs
+	JNZ	Longs3
+
+Longs5:	ADD	ESI,[ESP+Added]	;Add the skip
+	ADD     EDI,[ESP+Added+4]	;Next scan line down
+	DEC     ECX		;Count down
+	JNZ     OddLongs	;Loop?
+
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+;
+; This routine will handle all the degenerate cases.
+; I set 3 variables, PrefixCount, CenterCount and SuffixCount, these are preset
+; to contain the number of bytes/longs/bytes to copy per pass
+; so that the destination is long word aligned.
+; Zeros can be present in any of the Pad vars, so check for it...
+;
+
+;
+; EBX Width in long words
+; ECX Height
+; EBP Width in bytes (excess 1,2,3)
+; ESI Source pointer
+; EDI Screen Pointer
+; ESP+0 Source Skip
+; ESP+4 Dest Skip
+; PrefixCount Number of bytes to copy for long word alignment (0,1,2,3)
+; CenterCount Number of longword to copy for the center
+; SuffixCount Number of bytes to copy at the end (Longword aligned) (0,1,2,3)
+;
+
+MustAlign:
+	XOR	EAX,EAX
+	SUB	EAX,EDI
+	AND	EAX,3
+	MOV	[PrefixCount],EAX	;Pad count
+	SUB	EBP,EAX
+	MOV	EBX,EBP
+	SHR	EBX,2
+	AND	EBP,3
+	MOV	[SuffixCount],EBP
+	MOV	[CenterCount],EBX
+	JMP	SHORT PadLeft
+
+
+PadBytes:			;Case for no padding
+	XOR	EAX,EAX		;No padding for the center
+	MOV	[SuffixCount],EBP	;Suffix bytes (1,2,3)
+	MOV	[CenterCount],EBX	;Center longs (1+)
+	MOV	[PrefixCount],EAX	;Prefix bytes (0)
+
+;
+; Main entry for the workhorse routine
+;
+
+;
+; Left padding
+;
+
+PadLeft:
+	MOV	EBP,[PrefixCount]	;How many to copy in the first group
+	MOV	EAX,[CenterCount]	;Preload long word count
+	TEST	EBP,EBP		;Test for zero
+	JZ	PadCenter0	;Go straight to longwords
+
+	MOV	DL,[ESI]	;Copy the bytes
+	CMP	EBP,2		;Test for 1,2,3
+
+	MOV	[EDI],DL	;At least one byte
+	JB	SHORT PadCenter
+	MOV	DL,[ESI+1]	;Grab 2 bytes
+	MOV	BL,[ESI+2]
+	MOV	[EDI+1],DL	;Save the second
+	JZ	SHORT PadCenter
+	MOV	[EDI+2],BL	;Save the third
+
+PadCenter:
+	ADD	ESI,EBP		;Adjust for first padding (1,2,3)
+	ADD	EDI,EBP
+
+;
+; Center padding
+;
+
+PadCenter0:
+	TEST	EAX,EAX		;No center padding?
+	JZ	SHORT PadRight
+
+	SHR	EAX,1		;Convert to dual longwords
+	JNC	SHORT Pad1	;V
+
+	MOV	EDX,[ESI]	;U Get the first long word
+	LEA	ESI,[ESI+4]	;V Adjust source
+	MOV	[EDI],EDX	;U Save the first long word
+	LEA	EDI,[EDI+4]	;V Adjust dest
+	JZ	SHORT PadRight	;Done already? (1 long word only)
+
+Pad1:
+	MOV	EDX,[ESI]	;Copy dual longs
+	MOV	EBP,[ESI+4]
+	MOV	[EDI],EDX	;Store the 64 bits
+	MOV	[EDI+4],EBP
+	LEA	ESI,[ESI+8]	;Inc the pointers
+	LEA	EDI,[EDI+8]
+	DEC	EAX		;Count down the dual longs
+	JNZ	SHORT Pad1
+
+;
+; Right padding
+;
+
+PadRight:
+	MOV	EBP,[SuffixCount]	;Suffix to append
+	TEST	EBP,EBP		;No suffix?
+	JZ	PadEnd
+	MOV	DL,[ESI]	;Copy the bytes
+	CMP	EBP,2
+	MOV	[EDI],DL
+	JB	SHORT Pad2
+	MOV	DL,[ESI+1]	;Grab 2 bytes
+	MOV	BL,[ESI+2]
+	MOV	[EDI+1],DL	;Save the second
+	JZ	SHORT Pad2
+	MOV	[EDI+2],BL	;Save the third
+Pad2:	ADD	ESI,EBP		;Add last adjustment (1,2,3)
+	ADD	EDI,EBP
+
+PadEnd:
+	ADD	ESI,[ESP+Added]	;Add the skip
+	ADD     EDI,[ESP+Added+4]	;Next scan line down
+	DEC     ECX	;Count down
+	JNZ     PadLeft	;Loop?
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+;
+; Copy only bytes (1,2,3 bytes in width)
+; No need to check bounds since I only use byte operations
+; on destination addresses
+;
+
+Bytes:
+	MOV	EBX,EBP		;Copy to EBX for test
+	MOV	EDX,[ESP+Added]	;Get the source skip
+
+	ADD	EBP,EAX		;Get the dest scan line value
+	CMP	EBX,2		;Test for 1,2,3
+
+	LEA	EAX,[EDX+EBX]	;Get the dest skip value
+
+;
+; On entry...
+; ECX Heigth in pixels
+; ESI Source
+; EDI Dest
+; EAX Skip value for ESI
+; EBP Skip value for EDI
+;
+
+	JB	SHORT Single	;1 byte wide?
+	JZ	SHORT Double	;2 bytes wide?
+
+; 3 byte loop
+; I can't use 16 bit addressing for fear
+; of making a page fault!
+
+Triple:	MOV	DL,[ESI]	;Get the first two bytes
+	MOV	BL,[ESI+1]
+	MOV	[EDI],DL	;Save the first two bytes
+	MOV	[EDI+1],BL
+	MOV	DL,[ESI+2]	;Get the third byte
+	ADD	ESI,EAX		;Adjust source
+	MOV	[EDI+2],DL	;Save it
+	ADD	EDI,EBP
+	DEC	ECX		;Count down
+	JNZ	Triple
+Exit:	POP	EBP		;Exit now
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+; 1 byte loop
+
+Single:	MOV	DL,[ESI]	;Get the first byte
+	ADD	ESI,EAX		;Add the source offset
+	MOV	[EDI],DL	;Store the byte
+	ADD	EDI,EBP		;Add the dest offset
+	DEC	ECX		;Count down
+	JNZ	Single
+	POP	EBP		;Exit now
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+; 2 byte loop
+
+Double:	MOV	DL,[ESI]	;Get the first byte
+	MOV	BL,[ESI+1]	;Get the second
+	MOV	[EDI],DL	;Save the two bytes
+	MOV	[EDI+1],BL
+	ADD	ESI,EAX
+	ADD	EDI,EBP
+	DEC	ECX		;Loop
+	JNZ	Double
+	POP	EBP		;Exit now
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+_TEXT	ENDS
+	END

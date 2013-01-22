@@ -139,12 +139,12 @@ function ViewController.Defaults(self)
 		0, -- in time
 		0, -- out time
 		-1, -- hold time (-1 for infinite)
-		200, -- minimum  units
-		300, -- maximum  units
+		50, -- minimum  units
+		100, -- maximum  units
 		30, -- take X seconds to lerp between those distances
 		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
-		{ 0, 10, 0 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
-		{ 0, 10,  0 }, -- maxAngles
+		{ 0, -10, -5 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it
+		{ 0, 10,  5 }, -- maxAngles
 		60, -- Take X seconds to lerp between them
 		-1, -- angle lag (<= 0 means no lag)
 		false -- use pitch angle of target

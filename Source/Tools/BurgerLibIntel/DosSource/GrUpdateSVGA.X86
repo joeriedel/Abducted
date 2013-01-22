@@ -1,0 +1,77 @@
+	.386
+	.MODEL	FLAT,SYSCALL
+
+	IFNDEF __WIN32__
+;
+; Copy a linear SVGA (640*480) screen to
+; the video screen
+; void UpdateSVGA(Byte *Offscreen)
+;
+
+	.DATA
+
+	EXTRN	__x32_zero_base_ptr:DWORD
+
+	.CODE
+
+	PUBLIC	UpdateSVGA_
+UpdateSVGA_	PROC
+	PUSH	EBX	;Save all registers
+	PUSH	ECX
+	PUSH	EDX
+	PUSH	EDI
+	PUSH	ESI
+	PUSH	EBP
+
+	MOV	ESI,EAX		;Get the source pointer
+	MOV	EDX,0		;Bank #0
+Again:
+	PUSH	EDX
+	MOV	EAX,04F05H	;VESA set bank call
+	MOV	EBX,00000H	;Window #0
+	PUSH	ESI
+	INT	010H
+	POP	ESI
+	POP	EDX
+	MOV	EDI,[__x32_zero_base_ptr]	;Get VMM base pointer
+	INC	EDX
+	MOV	ECX,0B000H/32	;Assume short copy
+	ADD	EDI,0A0000H	;Point to true video screen
+	CMP	EDX,5
+	JZ	CopyLoop
+	MOV	ECX,08000H/16	;Full 64K copy
+
+CopyLoop:
+	MOV	EAX,[ESI]	;Copy the contents quickly!
+	MOV	EBX,[ESI+4]
+	MOV	[EDI],EAX
+	MOV	[EDI+4],EBX
+	MOV	EAX,[ESI+8]
+	MOV	EBX,[ESI+12]
+	MOV	[EDI+8],EAX
+	MOV	[EDI+12],EBX
+	MOV	EAX,[ESI+16]
+	MOV	EBX,[ESI+20]
+	MOV	[EDI+16],EAX
+	MOV	[EDI+20],EBX
+	MOV	EAX,[ESI+24]
+	MOV	EBX,[ESI+28]
+	MOV	[EDI+24],EAX
+	MOV	[EDI+28],EBX
+	LEA	ESI,[ESI+32]	;Inc the pointers
+	LEA	EDI,[EDI+32]
+	DEC	ECX
+	JNZ	CopyLoop	;All done?
+	CMP	EDX,5
+	JB	Again
+
+	POP	EBP		;Restore all registers
+	POP	ESI
+	POP	EDI
+	POP	EDX
+	POP	ECX
+	POP	EBX
+	RET
+UpdateSVGA_ ENDP
+	ENDIF
+	END

@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugFast|Win32">
+      <Configuration>DebugFast</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\JPegDebug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\JPegDebug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">.\JPegDebugFast\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">.\JPegDebugFast\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\JPegRelease\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\JPegRelease\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\JPegSource;..\PublicHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__BURGERNONEW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <PrecompiledHeaderOutputFile>.\JPegDebug/JPeg6b.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\JPegDebug/</AssemblerListingLocation>
+      <ObjectFileName>.\JPegDebug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\JPegDebug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>JPegDebug\JPeg6bDebug.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\JPegSource;..\PublicHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;__BURGERNONEW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\JPegDebugFast/JPeg6b.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\JPegDebugFast/</AssemblerListingLocation>
+      <ObjectFileName>.\JPegDebugFast/</ObjectFileName>
+      <ProgramDataBaseFileName>.\JPegDebugFast/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>JPegDebugFast\JPeg6bDebugFast.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\JPegSource;..\PublicHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;__BURGERNONEW__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\JPegRelease/JPeg6b.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\JPegRelease/</AssemblerListingLocation>
+      <ObjectFileName>.\JPegRelease/</ObjectFileName>
+      <ProgramDataBaseFileName>.\JPegRelease/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>.\JPegRelease\JPeg6b.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\PublicHeaders\jerror.h" />
+    <ClInclude Include="..\PublicHeaders\jmorecfg.h" />
+    <ClInclude Include="..\PublicHeaders\jpeglib.h" />
+    <ClInclude Include="..\JpegSource\jchuff.h" />
+    <ClInclude Include="..\JpegSource\jdct.h" />
+    <ClInclude Include="..\JpegSource\jdhuff.h" />
+    <ClInclude Include="..\JpegSource\jinclude.h" />
+    <ClInclude Include="..\JpegSource\jmemsys.h" />
+    <ClInclude Include="..\JpegSource\jpegint.h" />
+    <ClInclude Include="..\JpegSource\jversion.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JpegSource\jcapimin.c" />
+    <ClCompile Include="..\JpegSource\jcapistd.c" />
+    <ClCompile Include="..\JpegSource\jccoefct.c" />
+    <ClCompile Include="..\JpegSource\jccolor.c" />
+    <ClCompile Include="..\JpegSource\jcdctmgr.c" />
+    <ClCompile Include="..\JpegSource\jchuff.c" />
+    <ClCompile Include="..\JpegSource\jcinit.c" />
+    <ClCompile Include="..\JpegSource\jcmainct.c" />
+    <ClCompile Include="..\JpegSource\jcmarker.c" />
+    <ClCompile Include="..\JpegSource\jcmaster.c" />
+    <ClCompile Include="..\JpegSource\jcomapi.c" />
+    <ClCompile Include="..\JpegSource\jcparam.c" />
+    <ClCompile Include="..\JpegSource\jcphuff.c" />
+    <ClCompile Include="..\JpegSource\jcprepct.c" />
+    <ClCompile Include="..\JpegSource\jcsample.c" />
+    <ClCompile Include="..\JpegSource\jctrans.c" />
+    <ClCompile Include="..\JpegSource\jdapimin.c" />
+    <ClCompile Include="..\JpegSource\jdapistd.c" />
+    <ClCompile Include="..\JpegSource\jdcoefct.c" />
+    <ClCompile Include="..\JpegSource\JDColor.cpp" />
+    <ClCompile Include="..\JpegSource\jddctmgr.c" />
+    <ClCompile Include="..\JpegSource\jdhuff.c" />
+    <ClCompile Include="..\JpegSource\jdinput.c" />
+    <ClCompile Include="..\JpegSource\jdmainct.c" />
+    <ClCompile Include="..\JpegSource\jdmarker.c" />
+    <ClCompile Include="..\JpegSource\jdmaster.c" />
+    <ClCompile Include="..\JpegSource\jdmerge.c" />
+    <ClCompile Include="..\JpegSource\jdphuff.c" />
+    <ClCompile Include="..\JpegSource\jdpostct.c" />
+    <ClCompile Include="..\JpegSource\jdsample.c" />
+    <ClCompile Include="..\JpegSource\jdtrans.c" />
+    <ClCompile Include="..\JpegSource\JError.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTFlt.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTFst.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTSlw.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTFlt.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTFst.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTInt.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTRed.cpp" />
+    <ClCompile Include="..\JpegSource\jmemmgr.c" />
+    <ClCompile Include="..\JpegSource\jmemnobs.c" />
+    <ClCompile Include="..\JpegSource\JQuant.cpp" />
+    <ClCompile Include="..\JpegSource\JQuant1.cpp" />
+    <ClCompile Include="..\JpegSource\JQuant2.cpp" />
+    <ClCompile Include="..\JpegSource\JUtils.cpp" />
+    <ClCompile Include="..\JpegSource\JVersion.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

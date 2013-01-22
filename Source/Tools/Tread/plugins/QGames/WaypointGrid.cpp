@@ -37,6 +37,7 @@ CWaypoint::CWaypoint() {
 	m_boxPos = vec3::zero;
 	m_inAddSelection = false;
 	m_beingSelected = false;
+	m_numValidConnections = -1;
 	InitProps();
 }
 
@@ -59,23 +60,12 @@ CWaypoint::CWaypoint(const CWaypoint &m) : CMapObject(m) {
 	m_pos = m.m_pos;
 	m_boxPos = vec3::zero;
 	m_drag = false;
-	m_tails = m.m_tails;
-
-	for (Connection::Map::const_iterator it = m.m_connections.begin(); it != m.m_connections.end(); ++it) {
-		const Connection::Ref &c = it->second;
-		Connection::Ref clone(new Connection());
-		clone->ctrls[0] = c->ctrls[0];
-		clone->ctrls[1] = c->ctrls[1];
-		clone->headId = c->headId;
-		clone->tailId = c->tailId;
-		clone->InitMesh();
-		m_connections[it->first] = clone;
-	}
-
+	
 	UpdateBoxMesh();
 	InitProps();
 	m_inAddSelection = false;
 	m_beingSelected = false;
+	m_numValidConnections = -1;
 
 	m_props[0].SetValue(&m.m_props[0]);
 	m_props[1].SetValue(&m.m_props[1]);
@@ -404,27 +394,61 @@ CMapObject* CWaypoint::Clone() {
 	return new CWaypoint(*this);
 }
 
+void CWaypoint::CopyState( CMapObject* src, CTreadDoc* pDoc ) {
+	CMapObject::CopyState(src, pDoc);
+
+	const CWaypoint &m = *static_cast<CWaypoint*>(src);
+
+	m_tails = m.m_tails;
+	m_connections.clear();
+
+	for (Connection::Map::const_iterator it = m.m_connections.begin(); it != m.m_connections.end(); ++it) {
+		const Connection::Ref &c = it->second;
+		Connection::Ref clone(new Connection());
+		clone->ctrls[0] = c->ctrls[0];
+		clone->ctrls[1] = c->ctrls[1];
+		clone->headId = c->headId;
+		clone->tailId = c->tailId;
+		clone->InitMesh();
+		m_connections[it->first] = clone;
+	}
+
+	m_numValidConnections = -1;
+}
+
 int CWaypoint::GetNumRenderMeshes( CMapView* pView ) {
+	if (m_numValidConnections < 0) {
+		m_numValidConnections = 0;
+		for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
+			if (it->second->tail)
+				++m_numValidConnections;
+		}
+	}
+
 	m_meshIt = m_connections.begin();
-	return 1 + (int)(m_connections.size() * 2);
+	return 1 + (m_numValidConnections * 2);
 }
 
 CRenderMesh* CWaypoint::GetRenderMesh( int num, CMapView* pView ) {
 	if (num == 0)
 		return &m_boxMesh;
-	if (m_meshIt != m_connections.end()) {
+	while(m_meshIt != m_connections.end()) {
 		const Connection::Ref &c = m_meshIt->second;
-		if ((num-1) & 1) {
+		if (c->tail) {
+			if ((num-1) & 1) {
+				++m_meshIt;
+				return &c->arrow;
+			}
+			return &c->mesh;
+		} else {
 			++m_meshIt;
-			return &c->arrow;
 		}
-		return &c->mesh;
 	}
 	return 0;
 }
 
 const char* CWaypoint::GetRootName() {
-	return "Waypoint Mesh";
+	return "Waypoint Node";
 }
 
 void CWaypoint::CalcBounds() {
@@ -472,6 +496,7 @@ void CWaypoint::NotifyDetach(CTreadDoc *doc) {
 }
 
 void CWaypoint::NotifyAttach(CTreadDoc *doc, CWaypoint &src) {
+	m_numValidConnections = -1;
 	Connection::Map::const_iterator it = m_connections.find(src.GetUID());
 	if (it != m_connections.end()) {
 		const Connection::Ref &c = it->second;
@@ -480,6 +505,7 @@ void CWaypoint::NotifyAttach(CTreadDoc *doc, CWaypoint &src) {
 }
 
 void CWaypoint::NotifyDetach(CTreadDoc *doc, CWaypoint &src) {
+	m_numValidConnections = -1;
 	Connection::Map::const_iterator it = m_connections.find(src.GetUID());
 	if (it != m_connections.end()) {
 		const Connection::Ref &c = it->second;
@@ -664,6 +690,8 @@ void CWaypoint::Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst) {
 
 	src.m_connections[dst.GetUID()] = c;
 	dst.m_tails.insert(src.GetUID());
+
+	src.m_numValidConnections = -1; // recalc
 }
 
 void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool flip) {
@@ -676,6 +704,10 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 	it->second->DeleteGizmos(doc);
 	src.m_connections.erase(it);
 	dst.m_tails.erase(src.GetUID());
+
+	src.m_numValidConnections = -1; // recalc
+	src.AddSelectedConnectionProps(doc);
+	dst.AddSelectedConnectionProps(doc);
 }
 
 void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
@@ -688,8 +720,11 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "\"flags\" \"" << m_props[kProp_Flags].GetInt() << "\"\n";
 	
 	int i = 0;
-	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it, ++i) {
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
 		const Connection::Ref &c = it->second;
+		if (!c->tail)
+			continue;
+
 		fs << "\"connection " << i << "\" \"" << it->second->tailId << 
 			" " << c->props[Connection::kProp_Flags].GetInt() <<
 			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
@@ -698,6 +733,8 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 		fs << "\"connection_fwd_end " << i << "\" \"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
 		fs << "\"connection_back_start " << i << "\" \"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
 		fs << "\"connection_back_end " << i << "\" \"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
+
+		++i;
 	}
 
 	fs << "}\n";

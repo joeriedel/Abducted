@@ -1,0 +1,318 @@
+#/**********************************
+#
+#	BeOS for Intel
+#
+#**********************************/
+
+#/**********************************
+#
+#	Calculate the square root of a 32 bit unsigned
+#	value. The maximum value is 46341 for the square root
+#	of 0x7FFFFFFF. This routine is 100% accurate.
+#
+#	Word FASTCALL IMIntSqrt(LongWord Input)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl IMIntSqrt
+	.type IMIntSqrt,@function
+IMIntSqrt:
+	fildl	4(%esp)
+	fsqrt
+	fistpl	4(%esp)
+	mov		4(%esp),%eax
+	ret
+.IMIntSqrtEnd:
+	.size	IMIntSqrt,.IMIntSqrtEnd-IMIntSqrt
+
+#/**********************************
+#
+#	Multiply two 32 bit values and divide
+#	the 64 bit result by a thrid value. This way I
+#	get a high accuracy ratio of Value*(Numerator/Denominator)
+#
+#	long FASTCALL IMIntMulRatioFast(long Mul1,long Mul2,long Div)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl IMIntMulRatioFast
+	.type IMIntMulRatioFast,@function
+IMIntMulRatioFast:
+	mov		4(%esp),%eax
+	mov		8(%esp),%edx
+	mov		12(%esp),%ecx
+	imul	%edx
+	idiv	%ecx
+	ret
+.IMIntMulRatioFastEnd:
+	.size	IMIntMulRatioFast,.IMIntMulRatioFastEnd-IMIntMulRatioFast
+
+#/**********************************
+#
+#	Multiply two 16.16 fixed point numbers
+#
+#	Fixed32 FASTCALL IMFixMul(Fixed32 Val1,Fixed32 Val2)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl IMFixMul
+	.type IMFixMul,@function
+IMFixMul:
+	mov		4(%esp),%eax
+	mov		8(%esp),%edx
+	imull		%edx
+	cmpl		$0x8000,%edx
+	jge		.Maximum
+	cmpl		$0xFFFF8000,%edx
+	jl		.Minimum
+	shrdl		$16,%edx,%eax
+	ret
+.Maximum:
+	movl		$0x7FFFFFFF,%eax
+	ret
+.Minimum:
+	movl		$0x80000000,%eax
+	ret
+.IMFixMulEnd:
+	.size	IMFixMul,.IMFixMulEnd-IMFixMul
+
+#/**********************************
+#
+#	Multiply two 16.16 fixed point numbers
+#	with no error checking
+#
+#	Fixed32 FASTCALL IMFixMulFast(Fixed32 Val1,Fixed32 Val2)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl IMFixMulFast
+	.type IMFixMulFast,@function
+IMFixMulFast:
+	mov		4(%esp),%eax
+	mov		8(%esp),%edx
+	imull		%edx
+	shrdl		$16,%edx,%eax
+	ret
+.IMFixMulFastEnd:
+	.size	IMFixMulFast,.IMFixMulFastEnd-IMFixMulFast
+
+#/***************************
+#
+#	Divide two fixed point numbers and return a fixed point result
+#
+#	Fixed32 FASTCALL IMFixDiv(Fixed32 Numerator,Fixed32 Denominator)
+#
+#***************************/
+
+.text
+	.align 16
+.globl IMFixDiv
+	.type IMFixDiv,@function
+IMFixDiv:
+	movl		4(%esp),%ecx
+	movl		8(%esp),%edx
+	pushl		%ebx
+	pushl		%ebp
+	movl		%ecx,%eax
+	movl		%eax,%ebp
+	xorl		%edx,%ebp
+	movl		%eax,%ecx
+	sarl		$31,%ecx
+	movl		%edx,%ebx
+	sarl		$31,%ebx
+	xorl		%ecx,%eax
+	xorl		%ebx,%edx
+	subl		%ecx,%eax
+	subl		%ebx,%edx
+	movl		%eax,%ecx
+	shrl		$15,%ecx
+	movl		%edx,%ebx
+	cmpl		%edx,%ecx
+	jae		.Overflow
+	movl		%eax,%edx
+	shll		$16,%eax
+	shrl		$16,%edx
+	divl		%ebx
+	cmpl		$0,%ebp
+	js		.NegIt
+	popl		%ebp
+	popl		%ebx
+	ret
+.NegIt:
+	popl		%ebp
+	popl		%ebx
+	negl		%eax
+	ret
+.Overflow:
+	cmpl		$0,%ebp
+	js		.Minimumv
+.Maximumv:
+	popl		%ebp
+	popl		%ebx
+	movl		$0x7FFFFFFF,%eax
+	ret
+.Minimumv:
+	popl		%ebp
+	popl		%ebx
+	movl		$0x80000000,%eax
+	ret
+.IMFixDivEnd:
+	.size	IMFixDiv,.IMFixDivEnd-IMFixDiv
+
+#/***************************
+#
+#	Divide two fixed point numbers and return a fixed point result
+#	no error checking
+#
+#	Fixed32 FASTCALL IMFixDivFast(Fixed32 Numerator,Fixed32 Denominator)
+#
+#***************************/
+
+.text
+	.align 16
+.globl IMFixDivFast
+	.type IMFixDivFast,@function
+IMFixDivFast:
+	movl		4(%esp),%eax
+	shll		$16,%eax
+	movl		4(%esp),%edx
+	sarl		$16,%edx
+	movl		8(%esp),%ecx
+	idivl		%ecx
+	ret
+.IMFixDivFastEnd:
+	.size	IMFixDivFast,.IMFixDivFastEnd-IMFixDivFast
+
+#/***************************
+#
+#	Return the reciprocal of a fixed point number
+#
+#	Fixed32 FASTCALL IMFixReciprocal(Fixed32 Input)
+#
+#***************************/
+
+.text
+	.align 16
+.globl IMFixReciprocal
+	.type IMFixReciprocal,@function
+IMFixReciprocal:
+	movl		4(%esp),%ecx
+	xorl		%eax,%eax
+	cmpl		$-1,%ecx
+	jz		.Minimumr
+	cmpl		$2,%ecx
+	jb		.Zeror
+	movl		$1,%edx
+	idivl		%ecx
+	ret
+.Zeror:
+	movl		$0x7FFFFFFF,%eax
+	ret
+.Minimumr:
+	movl		$0x80000000,%eax
+	ret
+.IMFixReciprocalEnd:
+	.size	IMFixReciprocal,.IMFixReciprocalEnd-IMFixReciprocal
+
+#/**********************************
+#
+#	Multiply two 2.30 fixed point numbers
+#
+#	Frac32 FASTCALL IMFracMul(Frac32 Val1,Frac32 Val2)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl IMFracMul
+	.type IMFracMul,@function
+IMFracMul:
+	movl		4(%esp),%eax
+	movl		8(%esp),%edx
+	imull		%edx
+	cmpl		$0x20000000,%edx
+	jge		.Maximumf
+	cmpl		$0xE0000000,%edx
+	jl		.Minimumf
+	shrdl		$30,%edx,%eax
+	ret
+.Maximumf:
+	movl		$0x7FFFFFFF,%eax
+	ret
+.Minimumf:
+	movl		$0x80000000,%eax
+	ret
+.IMFracMulEnd:
+	.size	IMFracMul,.IMFracMulEnd-IMFracMul
+
+#/***************************
+#
+#	Divide two 2:30 fixed point numbers and return a fixed point result
+#
+#	Frac32 FASTCALL IMFracDiv(Frac32 Numerator,Frac32 Denominator)
+#
+#***************************/
+
+.text
+	.align 16
+.globl IMFracDiv
+	.type IMFracDiv,@function
+IMFracDiv:
+	movl		4(%esp),%ecx
+	movl		8(%esp),%edx
+	pushl		%ebx
+	pushl		%ebp
+	movl		%ecx,%eax
+	movl		%eax,%ebp
+	xorl		%edx,%ebp
+	movl		%eax,%ecx
+	sarl		$31,%ecx
+	movl		%edx,%ebx
+	sarl		$31,%ebx
+	xorl		%ecx,%eax
+	xorl		%ebx,%edx
+	subl		%ecx,%eax
+	subl		%ebx,%edx
+	movl		%eax,%ecx
+	shrl		$1,%ecx
+	movl		%edx,%ebx
+	cmpl		%edx,%ecx
+	jae		.Overflowc
+	movl		%eax,%edx
+	shll		$30,%eax
+	shrl		$2,%edx
+	divl		%ebx
+	cmpl		$0,%ebp
+	js		.NegItc
+	popl		%ebp
+	popl		%ebx
+	ret
+.NegItc:
+	popl		%ebp
+	popl		%ebx
+	negl		%eax
+	ret
+.Overflowc:
+	cmpl		$0,%ebp
+	js		.Minimumc
+.Maximumc:
+	popl		%ebp
+	popl		%ebx
+	movl		$0x7FFFFFFF,%eax
+	ret
+.Minimumc:
+	popl		%ebp
+	popl		%ebx
+	movl		$0x80000000,%eax
+	ret
+.IMFracDivEnd:
+	.size	IMFracDiv,.IMFracDivEnd-IMFracDiv
+

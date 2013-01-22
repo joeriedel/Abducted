@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{5a1227d4-2a22-4356-8cab-9ba4eb9d42e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compressor">
+      <UniqueIdentifier>{3b481478-e273-45da-accf-2453fb55094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{84869ad7-f45c-48ee-b7c5-3ec783d43e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{5b886ee5-1e67-4869-b19b-4577b2ca9002}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\PublicHeaders\jerror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PublicHeaders\jmorecfg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PublicHeaders\jpeglib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JpegSource\jchuff.h">
+      <Filter>Compressor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JpegSource\jinclude.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JpegSource\jmemsys.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JpegSource\jpegint.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\JpegSource\jdct.h" />
+    <ClInclude Include="..\JpegSource\jdhuff.h" />
+    <ClInclude Include="..\JpegSource\jversion.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\JpegSource\jcapimin.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcapistd.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jccoefct.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jccolor.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcdctmgr.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jchuff.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcinit.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcmainct.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcmarker.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcmaster.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcomapi.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcparam.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcphuff.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcprepct.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jcsample.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jctrans.c">
+      <Filter>Compressor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jmemmgr.c">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\JpegSource\jdapimin.c" />
+    <ClCompile Include="..\JpegSource\jdapistd.c" />
+    <ClCompile Include="..\JpegSource\jdcoefct.c" />
+    <ClCompile Include="..\JpegSource\jddctmgr.c" />
+    <ClCompile Include="..\JpegSource\jdhuff.c" />
+    <ClCompile Include="..\JpegSource\jdinput.c" />
+    <ClCompile Include="..\JpegSource\jdmainct.c" />
+    <ClCompile Include="..\JpegSource\jdmarker.c" />
+    <ClCompile Include="..\JpegSource\jdmaster.c" />
+    <ClCompile Include="..\JpegSource\jdmerge.c" />
+    <ClCompile Include="..\JpegSource\jdphuff.c" />
+    <ClCompile Include="..\JpegSource\jdpostct.c" />
+    <ClCompile Include="..\JpegSource\jdsample.c" />
+    <ClCompile Include="..\JpegSource\jdtrans.c" />
+    <ClCompile Include="..\JpegSource\jmemnobs.c" />
+    <ClCompile Include="..\JpegSource\JDColor.cpp" />
+    <ClCompile Include="..\JpegSource\JError.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTFlt.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTFst.cpp" />
+    <ClCompile Include="..\JpegSource\JFDCTSlw.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTFlt.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTFst.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTInt.cpp" />
+    <ClCompile Include="..\JpegSource\JIDCTRed.cpp" />
+    <ClCompile Include="..\JpegSource\JQuant.cpp" />
+    <ClCompile Include="..\JpegSource\JQuant1.cpp" />
+    <ClCompile Include="..\JpegSource\JQuant2.cpp" />
+    <ClCompile Include="..\JpegSource\JUtils.cpp" />
+    <ClCompile Include="..\JpegSource\JVersion.cpp" />
+  </ItemGroup>
+</Project>

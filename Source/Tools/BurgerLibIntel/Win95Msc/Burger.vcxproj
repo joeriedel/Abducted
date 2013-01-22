@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugFast|Win32">
+      <Configuration>DebugFast</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\BurgerDebug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\BurgerDebug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\BurgerRelease\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\BurgerRelease\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">.\BurgerDebugFast\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">.\BurgerDebugFast\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\Source;..\Win95Source;..\DosSource;..\PublicHeaders;..\Win95Extern\QT6;..\Win95Extern\gl;..\Win95Extern\IForce;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <PrecompiledHeaderOutputFile>.\BurgerDebug/Burger.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\BurgerDebug/</AssemblerListingLocation>
+      <ObjectFileName>.\BurgerDebug/</ObjectFileName>
+      <ProgramDataBaseFileName>.\BurgerDebug/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>BurgerDebug\BurgerDebug.lib</OutputFile>
+    </Lib>
+    <PreLinkEvent>
+      <Command>editbin $(OutDir)*.obj /nologo /release</Command>
+    </PreLinkEvent>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\Source;..\Win95Source;..\DosSource;..\PublicHeaders;..\Win95Extern\QT6;..\Win95Extern\gl;..\Win95Extern\IForce;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\BurgerRelease/Burger.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\BurgerRelease/</AssemblerListingLocation>
+      <ObjectFileName>.\BurgerRelease/</ObjectFileName>
+      <ProgramDataBaseFileName>.\BurgerRelease/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>.\BurgerRelease\Burger.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <PreLinkEvent>
+      <Command>editbin $(OutDir)*.obj /nologo /release</Command>
+    </PreLinkEvent>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\Source;..\Win95Source;..\DosSource;..\PublicHeaders;..\Win95Extern\QT6;..\Win95Extern\gl;..\Win95Extern\IForce;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <StructMemberAlignment>1Byte</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>.\BurgerDebugFast/Burger.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\BurgerDebugFast/</AssemblerListingLocation>
+      <ObjectFileName>.\BurgerDebugFast/</ObjectFileName>
+      <ProgramDataBaseFileName>.\BurgerDebugFast/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CallingConvention>FastCall</CallingConvention>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>BurgerDebugFast\BurgerDebugFast.lib</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <PreLinkEvent>
+      <Command>editbin $(OutDir)*.obj /nologo /release</Command>
+    </PreLinkEvent>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\BrTypes.h" />
+    <ClInclude Include="..\PublicHeaders\Burger.h" />
+    <ClInclude Include="..\PublicHeaders\Burger.hpp" />
+    <ClInclude Include="..\PublicHeaders\KeyCodes.h" />
+    <ClInclude Include="..\Source\BRString.h" />
+    <ClInclude Include="..\Source\PkOgg.h" />
+    <ClInclude Include="..\Source\PkPack.h" />
+    <ClInclude Include="..\Source\PkVorbisBackends.h" />
+    <ClInclude Include="..\Source\PkVorbisBitrate.h" />
+    <ClInclude Include="..\Source\PkVorbisCodebook.h" />
+    <ClInclude Include="..\Source\PkVorbisCodec.h" />
+    <ClInclude Include="..\Source\PkVorbisCodecInternal.h" />
+    <ClInclude Include="..\Source\PkVorbisEnvelope.h" />
+    <ClInclude Include="..\Source\PkVorbisIIR.h" />
+    <ClInclude Include="..\Source\PkVorbisLpc.h" />
+    <ClInclude Include="..\Source\PkVorbisLsp.h" />
+    <ClInclude Include="..\Source\PkVorbisMasking.h" />
+    <ClInclude Include="..\Source\PkVorbisMdct.h" />
+    <ClInclude Include="..\Source\PkVorbisPsy.h" />
+    <ClInclude Include="..\Source\PkVorbisRegistry.h" />
+    <ClInclude Include="..\Source\PkVorbisScales.h" />
+    <ClInclude Include="..\Source\PkVorbisSmallft.h" />
+    <ClInclude Include="..\Source\PkVorbisWindow.h" />
+    <ClInclude Include="..\Source\DmDialogControl.h" />
+    <ClInclude Include="..\Source\FmFile.h" />
+    <ClInclude Include="..\Source\RsReadStream.h" />
+    <ClInclude Include="..\Source\FxFixed.h" />
+    <ClInclude Include="..\Source\FpFloat.h" />
+    <ClInclude Include="..\Source\GrGraphics.h" />
+    <ClInclude Include="..\Source\GuGuid.h" />
+    <ClInclude Include="..\Source\ImImage.h" />
+    <ClInclude Include="..\Source\InInput.h" />
+    <ClInclude Include="..\Source\LkLinkList.h" />
+    <ClInclude Include="..\Source\LlList.h" />
+    <ClInclude Include="..\Source\L664Bit.h" />
+    <ClInclude Include="..\Source\MmMemory.h" />
+    <ClInclude Include="..\Source\MvMovie.h" />
+    <ClInclude Include="..\Source\NtNet.h" />
+    <ClInclude Include="..\Source\OcOSCursor.h" />
+    <ClInclude Include="..\Source\PlPalette.h" />
+    <ClInclude Include="..\Source\PfPrefs.h" />
+    <ClInclude Include="..\Source\PgPrefFile.h" />
+    <ClInclude Include="..\Source\PrProfile.h" />
+    <ClInclude Include="..\Source\RnRandom.h" />
+    <ClInclude Include="..\Source\LrRect.h" />
+    <ClInclude Include="..\Source\RbRedBook.h" />
+    <ClInclude Include="..\Source\RzRez.h" />
+    <ClInclude Include="..\Source\RqRunQueue.h" />
+    <ClInclude Include="..\Source\SsScreenShape.h" />
+    <ClInclude Include="..\Source\SnMADMusic.h" />
+    <ClInclude Include="..\Source\SnSound.h" />
+    <ClInclude Include="..\Source\ClStdLib.h" />
+    <ClInclude Include="..\Source\ShStream.h" />
+    <ClInclude Include="..\Source\StString.h" />
+    <ClInclude Include="..\Source\TkTick.h" />
+    <ClInclude Include="..\Source\W9Win95.h" />
+    <ClInclude Include="..\Source\FnFont.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\BREndian.cpp" />
+    <ClCompile Include="..\Source\BRString.cpp" />
+    <ClCompile Include="..\Source\PkADPCM.c" />
+    <ClCompile Include="..\Source\PkALaw.c" />
+    <ClCompile Include="..\Source\PkDeflate.c" />
+    <ClCompile Include="..\Source\PkDlzss.c" />
+    <ClCompile Include="..\Source\PkDlzssF.c" />
+    <ClCompile Include="..\Source\PkDRle.c" />
+    <ClCompile Include="..\Source\PkInflate.c" />
+    <ClCompile Include="..\Source\PkLzss.c" />
+    <ClCompile Include="..\Source\PkMACE.c" />
+    <ClCompile Include="..\Source\PkOggBitWise.c" />
+    <ClCompile Include="..\Source\PkOggFraming.c" />
+    <ClCompile Include="..\Source\PkRle.c" />
+    <ClCompile Include="..\Source\PkRleF.c" />
+    <ClCompile Include="..\Source\PkULaw.c" />
+    <ClCompile Include="..\Source\PkVorbisAnalysis.c" />
+    <ClCompile Include="..\Source\PkVorbisBitrate.c" />
+    <ClCompile Include="..\Source\PkVorbisBlock.c" />
+    <ClCompile Include="..\Source\PkVorbisCodebook.c" />
+    <ClCompile Include="..\Source\PkVorbisEnvelope.c" />
+    <ClCompile Include="..\Source\PkVorbisFloor0.c" />
+    <ClCompile Include="..\Source\PkVorbisFloor1.c" />
+    <ClCompile Include="..\Source\PkVorbisIIR.c" />
+    <ClCompile Include="..\Source\PkVorbisInfo.c" />
+    <ClCompile Include="..\Source\PkVorbislpc.c" />
+    <ClCompile Include="..\Source\PkVorbislsp.c" />
+    <ClCompile Include="..\Source\PkVorbisMapping0.c" />
+    <ClCompile Include="..\Source\PkVorbisMDct.c" />
+    <ClCompile Include="..\Source\PkVorbisPsy.c" />
+    <ClCompile Include="..\Source\PkVorbisRegistry.c" />
+    <ClCompile Include="..\Source\PkVorbisRes0.c" />
+    <ClCompile Include="..\Source\PkVorbisSharedBook.c" />
+    <ClCompile Include="..\Source\PkVorbisSmallft.c" />
+    <ClCompile Include="..\Source\PkVorbisSynthesis.c" />
+    <ClCompile Include="..\Source\PkVorbisTime0.c" />
+    <ClCompile Include="..\Source\PkVorbisWindow.c" />
+    <ClCompile Include="..\Source\DbDebugManager.c" />
+    <ClCompile Include="..\Win95Source\DbWin95Code.c" />
+    <ClCompile Include="..\Source\DmDialogControl.c" />
+    <ClCompile Include="..\Source\FmFileManager.c" />
+    <ClCompile Include="..\Win95Source\FmWin95Code.c" />
+    <ClCompile Include="..\Source\RsReadStream.c" />
+    <ClCompile Include="..\Win95Source\RsWinCode.c" />
+    <ClCompile Include="..\Source\FxFixedPoint.c" />
+    <ClCompile Include="..\Win95Source\FxMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\FpFloatingPoint.c" />
+    <ClCompile Include="..\Win95Source\FpMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\GrGraphicsManager.c" />
+    <ClCompile Include="..\Win95Source\GrMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\GrOpenGL.c" />
+    <ClCompile Include="..\Win95Source\GrWin95Code.c" />
+    <ClCompile Include="..\Source\GuGuidManager.c" />
+    <ClCompile Include="..\Source\ImImage2BMPFile.c" />
+    <ClCompile Include="..\Source\ImImage2LBMFile.c" />
+    <ClCompile Include="..\Source\ImImage2PBMFile.c" />
+    <ClCompile Include="..\Source\ImImage2PCXFile.c" />
+    <ClCompile Include="..\Source\ImImage2TGAFile.c" />
+    <ClCompile Include="..\Source\ImImageManager.c" />
+    <ClCompile Include="..\Source\ImImageParseBMP.c" />
+    <ClCompile Include="..\Source\ImImageParseCicn.c" />
+    <ClCompile Include="..\Source\ImImageParseGIF.c" />
+    <ClCompile Include="..\Source\ImImageParseJPeg.c" />
+    <ClCompile Include="..\Source\ImImageParseLBM.c" />
+    <ClCompile Include="..\Source\ImImageParsePCX.c" />
+    <ClCompile Include="..\Source\ImImageParsePict.c" />
+    <ClCompile Include="..\Source\ImImageParsePPat.c" />
+    <ClCompile Include="..\Source\ImImageParsePSD.c" />
+    <ClCompile Include="..\Source\ImImageParseTGA.c" />
+    <ClCompile Include="..\Source\InForceFeedback.c" />
+    <ClCompile Include="..\Win95Source\InForceFeedbackWin95.c" />
+    <ClCompile Include="..\Source\InJoystick.c" />
+    <ClCompile Include="..\Win95Source\InJoystickWin95.c" />
+    <ClCompile Include="..\Source\InKeyboard.c" />
+    <ClCompile Include="..\Win95Source\InKeyboardWin95.c" />
+    <ClCompile Include="..\Source\InMouse.c" />
+    <ClCompile Include="..\Win95Source\InMouseWin95.c" />
+    <ClCompile Include="..\Source\LkLinkListManager.c" />
+    <ClCompile Include="..\Source\LsListManager.c" />
+    <ClCompile Include="..\Source\LlLongLong.c" />
+    <ClCompile Include="..\Win95Source\LlMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\MMMemoryGeneric.c" />
+    <ClCompile Include="..\Source\MMMemoryManager.c" />
+    <ClCompile Include="..\Source\MMMemPool.c" />
+    <ClCompile Include="..\Source\MvDPaintAnim.c" />
+    <ClCompile Include="..\Source\MvFlic.c" />
+    <ClCompile Include="..\Source\NtNetManager.c" />
+    <ClCompile Include="..\Win95Source\NtWinCode.c" />
+    <ClCompile Include="..\Source\OCOSCursorManager.c" />
+    <ClCompile Include="..\Win95Source\OCWin95Code.c" />
+    <ClCompile Include="..\Source\PlPaletteManager.c" />
+    <ClCompile Include="..\Source\PlRGBHSL.c" />
+    <ClCompile Include="..\Win95Source\PlWin95Code.c" />
+    <ClCompile Include="..\Source\PfPrefsManager.c" />
+    <ClCompile Include="..\Source\PgPrefFile.c" />
+    <ClCompile Include="..\Source\PrProfileManager.c" />
+    <ClCompile Include="..\Win95Source\PrWin95Code.c" />
+    <ClCompile Include="..\Source\RnRandomManager.c" />
+    <ClCompile Include="..\Source\LrRectManager.c" />
+    <ClCompile Include="..\Source\RbRedbookManager.c" />
+    <ClCompile Include="..\Win95Source\RbWin95Code.c" />
+    <ClCompile Include="..\Source\RzResourceManager.c" />
+    <ClCompile Include="..\Source\RQRunQueue.c" />
+    <ClCompile Include="..\Source\SSScreenShape.c" />
+    <ClCompile Include="..\Source\SnMADIT.c" />
+    <ClCompile Include="..\Source\SnMADMADI.c" />
+    <ClCompile Include="..\Source\SnMADMainDriver.c" />
+    <ClCompile Include="..\Source\SnMADS3M.c" />
+    <ClCompile Include="..\Win95Source\SnMADWinCode.c" />
+    <ClCompile Include="..\Source\SnMADXM.c" />
+    <ClCompile Include="..\Source\SnDigitalSong.c" />
+    <ClCompile Include="..\Win95Source\SnSngWinCode.c" />
+    <ClCompile Include="..\Source\SnSoundManager.c" />
+    <ClCompile Include="..\Win95Source\SnWinCode.c" />
+    <ClCompile Include="..\Source\ClFastMemCpy.c" />
+    <ClCompile Include="..\Source\ClFastMemSet.c" />
+    <ClCompile Include="..\Source\ClFastMemSet16.c" />
+    <ClCompile Include="..\Win95Source\ClMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\ClStdlib.c" />
+    <ClCompile Include="..\Win95Source\ClWinCode.c" />
+    <ClCompile Include="..\Source\ShStreamHandle.c" />
+    <ClCompile Include="..\Source\StStringManager.c" />
+    <ClCompile Include="..\Win95Source\StStringWin95.c" />
+    <ClCompile Include="..\Source\TkTimeManager.c" />
+    <ClCompile Include="..\Win95Source\TkWin95Code.c" />
+    <ClCompile Include="..\Win95Source\W9Win95Code.c" />
+    <ClCompile Include="..\Win95Source\ThMicrosoftVC5.c" />
+    <ClCompile Include="..\Source\ThThreads.c" />
+    <ClCompile Include="..\Win95Source\ThWinCode.c" />
+    <ClCompile Include="..\Source\FnFontManager.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Win95Source\GrDraw1.X86">
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">GrDraw1.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw1.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">$(OutDir)GrDraw1.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GrDraw1.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw1.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)GrDraw1.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GrDraw1.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw1.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)GrDraw1.obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\GrDraw2.X86">
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">GrDraw2.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw2.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">$(OutDir)GrDraw2.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GrDraw2.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw2.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)GrDraw2.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GrDraw2.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)GrDraw2.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)GrDraw2.obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\ClFastMemSet16Intel.X86">
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">ClFastMemSet16Intel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSet16Intel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">$(OutDir)ClFastMemSet16Intel.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ClFastMemSet16Intel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSet16Intel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)ClFastMemSet16Intel.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ClFastMemSet16Intel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSet16Intel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)ClFastMemSet16Intel.obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\ClFastMemSetIntel.X86">
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">ClFastMemSetIntel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSetIntel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">$(OutDir)ClFastMemSetIntel.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ClFastMemSetIntel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSetIntel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)ClFastMemSetIntel.obj;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ClFastMemSetIntel.X86</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\WATCOM\binnt\wasm.exe -5r -fp5 -zq -fo=$(OutDir)ClFastMemSetIntel.obj %(FullPath)
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)ClFastMemSetIntel.obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|Win32'">true</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

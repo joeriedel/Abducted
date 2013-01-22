@@ -1,0 +1,421 @@
+	.386p
+	.MODEL FLAT,SYSCALL
+
+;
+; This routine will fill memory faster than memset
+; Copyright 1997 Bill Heineman.
+; Optimized for Pentium processors
+;
+
+	.DATA
+;
+; Table to expand a byte to a longword
+;
+
+LongTable DD	000000000H,001010101H,002020202H,003030303H
+	DD	004040404H,005050505H,006060606H,007070707H
+	DD	008080808H,009090909H,00A0A0A0AH,00B0B0B0BH
+	DD	00C0C0C0CH,00D0D0D0DH,00E0E0E0EH,00F0F0F0FH
+	DD	010101010H,011111111H,012121212H,013131313H
+	DD	014141414H,015151515H,016161616H,017171717H
+	DD	018181818H,019191919H,01A1A1A1AH,01B1B1B1BH
+	DD	01C1C1C1CH,01D1D1D1DH,01E1E1E1EH,01F1F1F1FH
+	DD	020202020H,021212121H,022222222H,023232323H
+	DD	024242424H,025252525H,026262626H,027272727H
+	DD	028282828H,029292929H,02A2A2A2AH,02B2B2B2BH
+	DD	02C2C2C2CH,02D2D2D2DH,02E2E2E2EH,02F2F2F2FH
+	DD	030303030H,031313131H,032323232H,033333333H
+	DD	034343434H,035353535H,036363636H,037373737H
+	DD	038383838H,039393939H,03A3A3A3AH,03B3B3B3BH
+	DD	03C3C3C3CH,03D3D3D3DH,03E3E3E3EH,03F3F3F3FH
+	DD	040404040H,041414141H,042424242H,043434343H
+	DD	044444444H,045454545H,046464646H,047474747H
+	DD	048484848H,049494949H,04A4A4A4AH,04B4B4B4BH
+	DD	04C4C4C4CH,04D4D4D4DH,04E4E4E4EH,04F4F4F4FH
+	DD	050505050H,051515151H,052525252H,053535353H
+	DD	054545454H,055555555H,056565656H,057575757H
+	DD	058585858H,059595959H,05A5A5A5AH,05B5B5B5BH
+	DD	05C5C5C5CH,05D5D5D5DH,05E5E5E5EH,05F5F5F5FH
+	DD	060606060H,061616161H,062626262H,063636363H
+	DD	064646464H,065656565H,066666666H,067676767H
+	DD	068686868H,069696969H,06A6A6A6AH,06B6B6B6BH
+	DD	06C6C6C6CH,06D6D6D6DH,06E6E6E6EH,06F6F6F6FH
+	DD	070707070H,071717171H,072727272H,073737373H
+	DD	074747474H,075757575H,076767676H,077777777H
+	DD	078787878H,079797979H,07A7A7A7AH,07B7B7B7BH
+	DD	07C7C7C7CH,07D7D7D7DH,07E7E7E7EH,07F7F7F7FH
+	DD	080808080H,081818181H,082828282H,083838383H
+	DD	084848484H,085858585H,086868686H,087878787H
+	DD	088888888H,089898989H,08A8A8A8AH,08B8B8B8BH
+	DD	08C8C8C8CH,08D8D8D8DH,08E8E8E8EH,08F8F8F8FH
+	DD	090909090H,091919191H,092929292H,093939393H
+	DD	094949494H,095959595H,096969696H,097979797H
+	DD	098989898H,099999999H,09A9A9A9AH,09B9B9B9BH
+	DD	09C9C9C9CH,09D9D9D9DH,09E9E9E9EH,09F9F9F9FH
+	DD	0A0A0A0A0H,0A1A1A1A1H,0A2A2A2A2H,0A3A3A3A3H
+	DD	0A4A4A4A4H,0A5A5A5A5H,0A6A6A6A6H,0A7A7A7A7H
+	DD	0A8A8A8A8H,0A9A9A9A9H,0AAAAAAAAH,0ABABABABH
+	DD	0ACACACACH,0ADADADADH,0AEAEAEAEH,0AFAFAFAFH
+	DD	0B0B0B0B0H,0B1B1B1B1H,0B2B2B2B2H,0B3B3B3B3H
+	DD	0B4B4B4B4H,0B5B5B5B5H,0B6B6B6B6H,0B7B7B7B7H
+	DD	0B8B8B8B8H,0B9B9B9B9H,0BABABABAH,0BBBBBBBBH
+	DD	0BCBCBCBCH,0BDBDBDBDH,0BEBEBEBEH,0BFBFBFBFH
+	DD	0C0C0C0C0H,0C1C1C1C1H,0C2C2C2C2H,0C3C3C3C3H
+	DD	0C4C4C4C4H,0C5C5C5C5H,0C6C6C6C6H,0C7C7C7C7H
+	DD	0C8C8C8C8H,0C9C9C9C9H,0CACACACAH,0CBCBCBCBH
+	DD	0CCCCCCCCH,0CDCDCDCDH,0CECECECEH,0CFCFCFCFH
+	DD	0D0D0D0D0H,0D1D1D1D1H,0D2D2D2D2H,0D3D3D3D3H
+	DD	0D4D4D4D4H,0D5D5D5D5H,0D6D6D6D6H,0D7D7D7D7H
+	DD	0D8D8D8D8H,0D9D9D9D9H,0DADADADAH,0DBDBDBDBH
+	DD	0DCDCDCDCH,0DDDDDDDDH,0DEDEDEDEH,0DFDFDFDFH
+	DD	0E0E0E0E0H,0E1E1E1E1H,0E2E2E2E2H,0E3E3E3E3H
+	DD	0E4E4E4E4H,0E5E5E5E5H,0E6E6E6E6H,0E7E7E7E7H
+	DD	0E8E8E8E8H,0E9E9E9E9H,0EAEAEAEAH,0EBEBEBEBH
+	DD	0ECECECECH,0EDEDEDEDH,0EEEEEEEEH,0EFEFEFEFH
+	DD	0F0F0F0F0H,0F1F1F1F1H,0F2F2F2F2H,0F3F3F3F3H
+	DD	0F4F4F4F4H,0F5F5F5F5H,0F6F6F6F6H,0F7F7F7F7H
+	DD	0F8F8F8F8H,0F9F9F9F9H,0FAFAFAFAH,0FBFBFBFBH
+	DD	0FCFCFCFCH,0FDFDFDFDH,0FEFEFEFEH,0FFFFFFFFH
+
+JmpTable DD	 Zap0, Zap1, Zap2, Zap3
+	DD	 Zap4, Zap5, Zap6, Zap7
+	DD	 Zap8, Zap9,Zap10,Zap11
+	DD	Zap12,Zap13,Zap14,Zap15
+	DD	Zap16,Zap17,Zap18,Zap19
+	DD	Zap20,Zap21,Zap22,Zap23
+	DD	Zap24,Zap25,Zap26,Zap27
+	DD	Zap28,Zap29,Zap30,Zap31
+
+;
+; void FASTCALL FastMemSet(void *DestPtr,Word Fill,LongWord Length);
+;
+
+	.CODE
+
+;
+; Parms under WATCOM
+;
+
+	IFDEF	__WATCOM__
+Dest	EQU	EAX
+Fill	EQU	EDX
+Len	EQU	EBX
+FillShort EQU	DX
+FillByte EQU	DL
+ExitRet	EQU	RET
+	PUBLIC	FastMemSet_
+FastMemSet_ PROC
+
+	ELSE
+
+Dest	EQU	ECX
+Fill	EQU	EDX
+Len	EQU	EAX
+FillShort EQU	DX
+FillByte EQU	DL
+ExitRet	EQU	RET 4
+	PUBLIC	@FastMemSet@12
+@FastMemSet@12 PROC
+
+	MOV	Len,[ESP+4]	;Get the length from the stack
+
+	ENDIF
+
+	test    Dest,3		;Is the pointer long word aligned?
+	mov     Fill,[LongTable+Fill*4]	;Convert from byte to longword
+	jne     AlignIt		;Align the pointer
+
+Check32:
+	sub	Len,32		;Preremove 32 bytes from the length
+	js	AndFill		;Less than 32 bytes?
+Main:
+	mov     [Dest],Fill	;Store 32 bytes
+	mov     [Dest+4],Fill
+	mov     [Dest+8],Fill
+	mov     [Dest+12],Fill
+	mov     [Dest+16],Fill
+	mov     [Dest+20],Fill
+	mov     [Dest+24],Fill
+	mov     [Dest+28],Fill
+	sub	Len,32		;Remove another 32 bytes from length
+	lea	Dest,[Dest+32]	;Adjust the pointer
+	jns	Main		;Ok?
+AndFill:
+	JMP	[JmpTable+(32*4)+(Len*4)] ;Call the fill routine via table
+
+;
+; These 32 routines will fill 0-31 bytes
+; in an ascending order to help the CPU cache
+; and go really fast!
+;
+
+Zap1:
+	mov	[Dest],FillByte	;Just a single byte
+Zap0:
+	ExitRet
+
+Zap2:
+	mov	[Dest],FillShort ;Store two bytes
+	ExitRet
+
+Zap3:
+	mov	[Dest],FillShort
+	mov	[Dest+2],FillByte
+	ExitRet
+
+Zap4:
+	mov	[Dest],Fill
+	ExitRet
+
+Zap5:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillByte
+	ExitRet
+
+Zap6:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillShort
+	ExitRet
+
+Zap7:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillShort
+	mov	[Dest+6],FillByte
+	ExitRet
+
+Zap8:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	ExitRet
+
+Zap9:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillByte
+	ExitRet
+
+Zap10:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillShort
+	ExitRet
+
+Zap11:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillShort
+	mov	[Dest+10],FillByte
+	ExitRet
+
+Zap12:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	ExitRet
+
+Zap13:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillByte
+	ExitRet
+
+Zap14:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillShort
+	ExitRet
+
+Zap15:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillShort
+	mov	[Dest+14],FillByte
+	ExitRet
+
+Zap16:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	ExitRet
+
+Zap17:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillByte
+	ExitRet
+
+Zap18:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillShort
+	ExitRet
+
+Zap19:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillShort
+	mov	[Dest+18],FillByte
+	ExitRet
+
+Zap20:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	ExitRet
+
+Zap21:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillByte
+	ExitRet
+
+Zap22:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillShort
+	ExitRet
+
+Zap23:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillShort
+	mov	[Dest+22],FillByte
+	ExitRet
+
+Zap24:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	ExitRet
+
+Zap25:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillByte
+	ExitRet
+
+Zap26:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillShort
+	ExitRet
+
+Zap27:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillShort
+	mov	[Dest+26],FillByte
+	ExitRet
+
+Zap28:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	ExitRet
+
+Zap29:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillByte
+	ExitRet
+
+Zap30:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillShort
+	ExitRet
+
+Zap31:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillShort
+	mov	[Dest+30],FillByte
+	ExitRet
+
+;
+; Align the dest address to longword
+; The low 2 bits must be 1,2 or 3
+;
+
+AlignIt:
+	cmp	Len,4		;I must have at least 4 bytes of length
+	jb	Fill31		;Just go to the jump table
+	test	Dest,1		;Test for 1 or 3
+	jz	EvenAdr		;Just do 2 bytes
+	mov	[Dest],FillByte	;Pad to even address
+	inc	Dest		;Inc dest address
+	dec	Len		;Sub 1 from length
+	test	Dest,2		;Test for 3
+	jz	Check32		;Begin
+EvenAdr:
+	mov	[Dest],FillShort ;Write a short
+	add	Dest,2		;Pad to longword address
+	sub	Len,2+32	;Sub 2 from length
+	jns	Main		;Begin
+	JMP	[JmpTable+(32*4)+Len*4] ;Call the fill routine via table
+Fill31:
+	JMP	[JmpTable+Len*4] ;Call the fill routine via table
+
+	IFDEF	__WATCOM__
+FastMemSet_ ENDP
+	ELSE
+@FastMemSet@12 ENDP
+	ENDIF
+
+	END
+

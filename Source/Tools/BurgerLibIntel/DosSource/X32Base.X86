@@ -1,0 +1,12 @@
+	.386
+	.MODEL FLAT,SYSCALL
+
+	IFDEF __DOS4G__
+	.DATA
+	PUBLIC	__x32_zero_base_ptr
+	PUBLIC	__x32_zero_base_selector
+
+__x32_zero_base_ptr DD	0
+__x32_zero_base_selector DW SEG _DATA
+	ENDIF
+	END

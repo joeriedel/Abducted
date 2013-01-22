@@ -1,0 +1,201 @@
+	.386
+	.MODEL	FLAT,SYSCALL
+
+	.DATA
+	EXTRN	_VideoPointer:DWORD,_VideoWidth:DWORD
+
+;
+; Draw a masked shape
+; void DrawMShapeLowLevel(Word x,Word y,Word Width,Word Height,Word Skip,void *ShapePtr);
+;
+
+	.CODE
+
+	IFDEF __WATCOM__
+	PUBLIC DrawMShapeLowLevel_
+DrawMShapeLowLevel_ PROC
+Remove	EQU	8		;2 extra parms on stack
+Added	EQU	16		;3 registers + ret
+
+	ELSE
+
+	PUBLIC @DrawMShapeLowLevel@24
+@DrawMShapeLowLevel@24 PROC
+Remove	EQU	16    	;Stack frame offset
+Added	EQU	28	;4 registers + ret + 2 parms
+
+	PUSH	EBX		;I must preserve EBX for MSC
+	MOV	EAX,ECX		;Move since I optimize for WATCOM parms
+	MOV	EBX,[ESP+4+4]	;Get the dest width (Watcom loads this already)
+	MOV	ECX,[ESP+8+4]	;Get the dest height
+
+	ENDIF
+
+	PUSH	ESI
+	MOU	ESI,[_VideoWidth]
+
+	IMUL	EDX,ESI			;Get the base screen location
+	PUSH	EDI
+
+	ADD	EDX,EAX			;Get the address (Y*VideoWidth+X)
+	PUSH	EBP
+
+	MOV	EDI,[_VideoPointer]	;Get the screen pointer
+	MOV	EBP,ESI			;Get the maximum screen width
+
+	ADD	EDI,EDX			;Make the final pointer (EDI=Dest)
+	MOV	ESI,[ESP+Added+4]	;Get the source address
+
+	SUB	EBP,EBX		 	;Get the scan line adjust
+	CMP	EBX,2			;Fast code?
+
+	JB	SHORT Single		;Single entry code
+
+	MOV	[ESP+Added+4],EBP	;Save new dest skip value
+	JZ	Double		;Double entry code?
+
+;
+; EAX = Temp1
+; EBX = Width
+; ECX = Height
+; EDX = Temp2
+; ESI = Shape pointer
+; EDI = Screen pointer
+; EBP = Word counter
+;
+; Now, to assist in preventing pipeline stalls,
+; I have two loops, one assumes that the pixels are zero, the
+; other assumes the pixels are not zero. I enter with the code
+; assuming the pixels are zero
+;
+
+MainLoop:
+	MOV	EBP,EBX			;Reset width
+	SHR	EBP,1
+	JNC	SHORT Clear0
+
+;
+; Get a single pixel to make the count even
+; Since I must have at least 3 pixels width, I can assume I fall through
+;
+
+	MOV	AL,[ESI]	;Get single
+	LEA	ESI,[ESI+1]	;Inc source pointer
+	TEST	AL,AL		;Test
+	JNZ	SHORT SetX	;Enter single pixel mode
+	LEA	EDI,[EDI+1]	;Inc dest
+
+Clear0:	MOV	AL,[ESI]	;Fetch dual pixels
+	MOV	DL,[ESI+1]
+	TEST	AL,AL		;Test first
+	JNZ	SHORT Set1	;Set?
+Clear1:	TEST	DL,DL		;Test second
+	JNZ	SHORT Set2	;Ok?
+Clear2:	LEA	ESI,[ESI+2]	;Inc both
+	LEA	EDI,[EDI+2]
+	DEC	EBP		;All shorts done?
+	JNZ	SHORT Clear0
+
+	ADD	EDI,[ESP+Added+4]	;Next scan line down
+	ADD	ESI,[ESP+Added]
+	DEC	ECX			;Count down
+	JNZ	MainLoop			;Loop?
+Exit:	POP	EBP
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+
+SetX:	MOV	[EDI],AL	;Save odd pixel
+	LEA	EDI,[EDI+1]	;Inc odd pixel entry
+
+Set0:	MOV	AL,[ESI]	;Get dual pixels
+	MOV	DL,[ESI+1]
+	TEST	AL,AL		;Test first pixel
+	JZ	SHORT Clear1	;Not drawn?
+Set1:	MOV	[EDI],AL	;Draw pixel
+	TEST	DL,DL		;Check second pixel
+	JZ	SHORT Clear2
+Set2:	MOV	[EDI+1],DL
+	LEA	ESI,[ESI+2]	;Inc pointer
+	LEA	EDI,[EDI+2]
+	DEC	EBP
+	JNZ	SHORT Set0
+	ADD	EDI,[ESP+Added+4]	;Next scan line down
+	ADD	ESI,[ESP+Added]
+	DEC	ECX			;Count down
+	JNZ	MainLoop			;Loop?
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+;
+; Fast routine to draw single pixel wide masked shapes
+;
+
+Single:
+	MOV	EDX,[ESP+Added]	;Get the source offset
+	ADD	EBP,EBX		;Restore VideoWidth
+	ADD	EDX,EBX		;Get true source offset
+
+SingleLoop:
+	MOV	AL,[ESI]	;Get shape byte
+	LEA	ESI,[ESI+EDX]	;Next source address
+	TEST	AL,AL
+	JZ	SHORT SingleX	;Don't draw
+	MOV	[EDI],AL	;Store it
+SingleX:
+	LEA	EDI,[EDI+EBP]	;Next dest address
+	DEC	ECX		;All done?
+	JNZ	SingleLoop	;Loop for more
+
+	POP	EBP		;Exit
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+;
+; Fast routine to draw double pixel wide masked shapes
+;
+
+Double:
+	MOV	EDX,[ESP+Added]	;Get the source offset
+	ADD	EBP,EBX		;Restore VideoWidth
+	ADD	EDX,EBX		;Get true source offset
+
+DoubleLoop:
+	MOV	AL,[ESI]	;Get shape byte
+	MOV	BL,[ESI+1]	;And the next one
+	LEA	ESI,[ESI+EDX]	;Next source address
+	TEST	AL,AL
+	JZ	SHORT DoubleX	;Don't draw
+	MOV	[EDI],AL	;Store it
+DoubleX:
+	TEST	BL,BL
+	JZ	SHORT DoubleY
+	MOV	[EDI+1],BL
+DoubleY:
+	LEA	EDI,[EDI+EBP]	;Next dest address
+	DEC	ECX		;All done?
+	JNZ	DoubleLoop	;Loop for more
+
+	POP	EBP		;Exit
+	POP	EDI
+	POP	ESI
+	IFNDEF	__WATCOM__
+	POP	EBX
+	ENDIF
+	RET	Remove
+
+	ENDP
+	END

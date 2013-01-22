@@ -1,0 +1,590 @@
+;
+; Assembly for fixed Point math manager
+; Power PC version
+; Optimized and written by Bill Heineman
+; Copyright Bill Heineman
+;
+
+	IMPORT	.__div2i
+
+;
+; Word FASTCALL IMIntSqrt(Word32 x)
+;
+
+	EXPORT	IMIntSqrt[DS],.IMIntSqrt[PR]
+
+	TOC
+	tc	IMIntSqrt[TC],IMIntSqrt[DS]
+
+	CSECT	IMIntSqrt[DS]
+		dc.l	.IMIntSqrt[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMIntSqrt[PR]
+
+		lis		r0,16384
+		li		r4,0
+		cmplw	r3,r0
+		blt		Sqrt1
+		lis		r4,16384
+		subis	r3,r3,16384
+Sqrt1:
+		addis	r0,r4,4096
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt2
+		addis	r4,r4,4096
+		subf	r3,r0,r3
+Sqrt2:
+		addis	r0,r4,1024
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt3
+		addis	r4,r4,1024
+		subf	r3,r0,r3
+Sqrt3:
+		addis	r0,r4,256
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt4
+		addis	r4,r4,256
+		subf	r3,r0,r3
+Sqrt4:
+		addis	r0,r4,64
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt5
+		addis	r4,r4,64
+		subf	r3,r0,r3
+Sqrt5:
+		addis	r0,r4,16
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt6
+		addis	r4,r4,16
+		subf	r3,r0,r3
+Sqrt6:
+		addis	r0,r4,4
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt7
+		addis	r4,r4,4
+		subf	r3,r0,r3
+Sqrt7:
+		addis	r0,r4,1
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt8
+		addis	r4,r4,1
+		subf	r3,r0,r3
+Sqrt8:
+		addi	r0,r4,16384
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt9
+		addi	r4,r4,16384
+		subf	r3,r0,r3
+Sqrt9:
+		addi	r0,r4,4096
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt10
+		addi	r4,r4,4096
+		subf	r3,r0,r3
+Sqrt10:
+		addi	r0,r4,1024
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt11
+		addi	r4,r4,1024
+		subf	r3,r0,r3
+Sqrt11:
+		addi	r0,r4,256
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt12
+		addi	r4,r4,256
+		subf	r3,r0,r3
+Sqrt12:
+		addi	r0,r4,64
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt13
+		addi	r4,r4,64
+		subf	r3,r0,r3
+Sqrt13:
+		addi	r0,r4,16
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt14
+		addi	r4,r4,16
+		subf	r3,r0,r3
+Sqrt14:
+		addi	r0,r4,4
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt15
+		addi	r4,r4,4
+		subf	r3,r0,r3
+Sqrt15:
+		addi	r0,r4,1
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		Sqrt16
+		addi	r4,r4,1
+		subf	r3,r0,r3
+Sqrt16:
+		cmplw	r3,r4
+		mr		r3,r4
+		blelr
+		addi	r3,r4,1
+		blr
+
+;
+; Word32 FASTCALL IMFixSqrt(Word32 x)
+;
+
+	EXPORT	IMFixSqrt[DS],.IMFixSqrt[PR]
+
+	TOC
+	tc	IMFixSqrt[TC],IMFixSqrt[DS]
+
+	CSECT	IMFixSqrt[DS]
+		dc.l	.IMFixSqrt[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMFixSqrt[PR]
+
+		lis		r0,16384
+		li		r4,0
+		cmplw	r3,r0
+		blt		FSqrt1
+		lis		r4,16384
+		subis	r3,r3,16384
+FSqrt1:
+		addis	r0,r4,4096
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt2
+		addis	r4,r4,4096
+		subf	r3,r0,r3
+FSqrt2:
+		addis	r0,r4,1024
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt3
+		addis	r4,r4,1024
+		subf	r3,r0,r3
+FSqrt3:
+		addis	r0,r4,256
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt4
+		addis	r4,r4,256
+		subf	r3,r0,r3
+FSqrt4:
+		addis	r0,r4,64
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt5
+		addis	r4,r4,64
+		subf	r3,r0,r3
+FSqrt5:
+		addis	r0,r4,16
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt6
+		addis	r4,r4,16
+		subf	r3,r0,r3
+FSqrt6:
+		addis	r0,r4,4
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt7
+		addis	r4,r4,4
+		subf	r3,r0,r3
+FSqrt7:
+		addis	r0,r4,1
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt8
+		addis	r4,r4,1
+		subf	r3,r0,r3
+FSqrt8:
+		addi	r0,r4,16384
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt9
+		addi	r4,r4,16384
+		subf	r3,r0,r3
+FSqrt9:
+		addi	r0,r4,4096
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt10
+		addi	r4,r4,4096
+		subf	r3,r0,r3
+FSqrt10:
+		addi	r0,r4,1024
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt11
+		addi	r4,r4,1024
+		subf	r3,r0,r3
+FSqrt11:
+		addi	r0,r4,256
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt12
+		addi	r4,r4,256
+		subf	r3,r0,r3
+FSqrt12:
+		addi	r0,r4,64
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt13
+		addi	r4,r4,64
+		subf	r3,r0,r3
+FSqrt13:
+		addi	r0,r4,16
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt14
+		addi	r4,r4,16
+		subf	r3,r0,r3
+FSqrt14:
+		addi	r0,r4,4
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt15
+		addi	r4,r4,4
+		subf	r3,r0,r3
+FSqrt15:
+		addi	r0,r4,1
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt16
+		addi	r4,r4,1
+		subf	r3,r0,r3
+FSqrt16:
+		slwi	r4,r4,16
+		slwi	r3,r3,16
+		addi	r0,r4,16384
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt17
+		addi	r4,r4,16384
+		subf	r3,r0,r3
+FSqrt17:
+		addi	r0,r4,4096
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt18
+		addi	r4,r4,4096
+		subf	r3,r0,r3
+FSqrt18:
+		addi	r0,r4,1024
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt19
+		addi	r4,r4,1024
+		subf	r3,r0,r3
+FSqrt19:
+		addi	r0,r4,256
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt20
+		addi	r4,r4,256
+		subf	r3,r0,r3
+FSqrt20:
+		addi	r0,r4,64
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt21
+		addi	r4,r4,64
+		subf	r3,r0,r3
+FSqrt21:
+		addi	r0,r4,16
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt22
+		addi	r4,r4,16
+		subf	r3,r0,r3
+FSqrt22:
+		addi	r0,r4,4
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt23
+		addi	r4,r4,4
+		subf	r3,r0,r3
+FSqrt23:
+		addi	r0,r4,1
+		srwi	r4,r4,1
+		cmplw	r3,r0
+		blt		FSqrt24
+		addi	r4,r4,1
+		subf	r3,r0,r3
+FSqrt24:
+		cmplw	r3,r4
+		mr		r3,r4
+		blelr
+		addi	r3,r4,1
+		blr
+
+;
+; Fixed32 IMFixMul(Fixed32 a,Fixed32 b);
+;
+
+	EXPORT	IMFixMul[DS],.IMFixMul[PR]
+
+	TOC
+	tc	IMFixMul[TC],IMFixMul[DS]
+
+	CSECT	IMFixMul[DS]
+		dc.l	.IMFixMul[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMFixMul[PR]
+
+		mulhw		r5,r3,r4		;Perform the first multiply
+		mr			r6,r3			;Copy r3 to temp
+		cmpwi		r5,-0x8000		;Is the result too small?
+		lis			r3,0x8000		;Assume the answer is yes (Minimum number)
+		bltlr						;Exit now
+		cmpwi		r5,0x7FFF		;Is the result too big?
+		subi		r3,r3,1			;Convert 0x80000000 to 0x7FFFFFFF
+		bgtlr						;Exit now
+		mullw		r6,r6,r4		;I now need the lower 32 bits
+		slwi		r3,r5,16		;Shift it up
+		inslwi		r3,r6,16,16		;Blend in the lower 16 bits
+		blr							;Exit with answer in r3
+
+;
+; Fixed32 IMFixMulFast(Fixed32 a,Fixed32 b);
+;
+
+	EXPORT	IMFixMulFast[DS],.IMFixMulFast[PR]
+
+	TOC
+		tc	IMFixMulFast[TC],IMFixMulFast[DS]
+
+	CSECT	IMFixMulFast[DS]
+		dc.l	.IMFixMulFast[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMFixMulFast[PR]
+
+		mulhw		r5,r3,r4		;Perform the first multiply
+		mullw		r6,r3,r4		;I now need the lower 32 bits
+		slwi		r3,r5,16		;Shift it up
+		inslwi		r3,r6,16,16		;Blend in the lower 16 bits
+		blr 					;Exit with answer in r3
+
+;
+; Fixed32 IMFixDiv(Fixed32 a,Fixed32 b);
+;
+; I have found that floating point kicks ass for powerpc divides
+;
+
+	EXPORT	IMFixDiv[DS],.IMFixDiv[PR]
+
+	TOC
+		tc	IMFixDiv[TC],IMFixDiv[DS]
+
+	CSECT	IMFixDiv[DS]
+		dc.l	.IMFixDiv[PR]
+		dc.l	TOC[tc0]
+
+
+	CSECT	.IMFixDiv[PR]
+
+Numerator set	r3				;High number to divide
+Denominator set r4				;Number to divide with
+
+		cmpwi	Denominator,0x0000			;Check for a divide by zero (Bad!)
+		beq		@DivByZero		;Forget it!!!
+		xoris	Numerator,Numerator,$8000	;Prepare the floats
+		lis		r5,0x4430		;Fake mul by 65536
+		stw		Numerator,-4(SP)
+		xoris	Denominator,Denominator,$8000
+		stw		r5,-8(SP)
+		subis	r5,r5,0x0100	;Do not mul by anything
+		stw		Denominator,-12(SP)
+		stw		r5,-16(SP)
+
+		lis		r5,0x8000		;Normal integer
+		lfd		fp0,-8(SP)		;Numerator
+		lfd		fp1,-16(SP)		;Denominator
+		stw		r5,-4(SP)		;Create the normal
+		stw		r5,-12(SP)		;Create the normal
+		lfd		fp2,-8(SP)		;Normal for numerator
+		lfd		fp3,-16(SP)		;Normal for denominator
+
+		fsub	fp0,fp0,fp2		;Convert to a float
+		fsub	fp1,fp1,fp3		;Convert to a float
+
+		fdiv	fp0,fp0,fp1		;Perform the divide
+		fctiwz	fp0,fp0			;Convert the result back to an integer
+		stfd	fp0,-8(SP)		;Store the result
+		lwz		r3,-4(SP)		;Get the value (Lower 32 bits)
+		blr						;Done!
+
+@DivByZero:
+		cmpwi	Numerator,0x0000	;What is the sign of the result?
+		lis		r3,-32768		;Negative? 0x80000000
+		bltlr					;Exit now
+		subi	r3,r3,1			;Positive? 0x7FFFFFFF
+		blr						;Bye bye
+
+;
+; Fixed32 IMFixDivFast(Fixed32 a,Fixed32 b);
+;
+; No error checking!
+;
+
+	EXPORT	IMFixDivFast[DS],.IMFixDivFast[PR]
+
+	TOC
+		tc	IMFixDivFast[TC],IMFixDivFast[DS]
+
+	CSECT	IMFixDivFast[DS]
+		dc.l	.IMFixDivFast[PR]
+		dc.l	TOC[tc0]
+
+
+	CSECT	.IMFixDivFast[PR]
+
+Numerator set	r3				;High number to divide
+Denominator set r4				;Number to divide with
+
+		xoris	Numerator,Numerator,$8000	;Prepare the floats
+		lis		r5,0x4430		;Fake mul by 65536
+		stw		Numerator,-4(SP)
+		xoris	Denominator,Denominator,$8000
+		stw		r5,-8(SP)
+		subis	r5,r5,0x0100	;Do not mul by anything
+		stw		Denominator,-12(SP)
+		stw		r5,-16(SP)
+
+		lis		r5,0x8000		;Normal integer
+		lfd		fp0,-8(SP)		;Numerator
+		lfd		fp1,-16(SP)		;Denominator
+		stw		r5,-4(SP)		;Create the normal
+		stw		r5,-12(SP)		;Create the normal
+		lfd		fp2,-8(SP)		;Normal for numerator
+		lfd		fp3,-16(SP)		;Normal for denominator
+
+		fsub	fp0,fp0,fp2		;Convert to a float
+		fsub	fp1,fp1,fp3		;Convert to a float
+
+		fdiv	fp0,fp0,fp1		;Perform the divide
+		fctiwz	fp0,fp0			;Convert the result back to an integer
+		stfd	fp0,-8(SP)		;Store the result
+		lwz		r3,-4(SP)		;Get the value (Lower 32 bits)
+		blr						;Done!
+
+;
+; Fixed32 IMFixReciprocal(Fixed32 a);
+;
+
+	EXPORT	IMFixReciprocal[DS],.IMFixReciprocal[PR]
+
+	TOC
+		tc	IMFixReciprocal[TC],IMFixReciprocal[DS]
+
+	CSECT	IMFixReciprocal[DS]
+		dc.l	.IMFixReciprocal[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMFixReciprocal[PR]
+		cmpwi	cr6,r3,-1		;Negative out of range?
+		srawi.	r5,r3,31		;Get the sign (0 for positive, -1 for negative)
+		beq		cr6,RecipNeg	;Out of range
+		cmplwi	cr6,r3,2		;Positive out of range?
+		add		r6,r5,r3		;Make absolute value
+		blt		cr6,RecipPos	;Out of range
+		xor		r3,r5,r6		;Finish absolute value
+		lis		r4,-32768		;Get 0x80000000U
+		srwi	r3,r3,1			;Adjust for 0x80000000 division
+		divwu	r3,r4,r3		;Make the reciprocal
+		bgelr					;Positive?
+		neg		r3,r3			;Make negative
+		blr						;Exit
+
+RecipPos:
+		lis        r3,-32768
+		subi       r3,r3,1
+		blr
+RecipNeg:
+		lis		r3,-32768
+		blr
+
+;
+; long FASTCALL IMIntMulRatioFast(long Mul1,long Mul2,long Div);
+;
+
+	EXPORT	IMIntMulRatioFast[DS],.IMIntMulRatioFast[PR]
+
+	TOC
+		tc	IMIntMulRatioFast[TC],IMIntMulRatioFast[DS]
+
+	CSECT	IMIntMulRatioFast[DS]
+		dc.l	.IMIntMulRatioFast[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IMIntMulRatioFast[PR]
+		mullw	r7,r3,r4		;Low 32 bits
+		mflr	r0				;Make stack frame
+		mr		r6,r5			;Get ready for the __divs64
+		stw		r0,8(SP)		;Save return address
+		srawi	r5,r5,31		;Sign extend
+		mulhw	r3,r3,r4		;Get high 32 bits
+		stwu	SP,-64(SP)		;Finish stack frame
+		mr		r4,r7			;Move the low 32 bits
+		bl		.__div2i		;Perform the divide
+		lwz		r0,72(SP)		;Clean up
+		addi	SP,SP,64
+		mtlr	r0
+		mr		r3,r4			;Return the LOWER 32 bits
+		blr
+
+;
+; long FASTCALL IntDblMulAdd(long Mul1,long Mul2,long Mul3,long Mul4);
+;
+
+	EXPORT	IntDblMulAdd[DS],.IntDblMulAdd[PR]
+
+	TOC
+		tc	IntDblMulAdd[TC],IntDblMulAdd[DS]
+
+	CSECT	IntDblMulAdd[DS]
+		dc.l	.IntDblMulAdd[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IntDblMulAdd[PR]
+		mullw	r8,r3,r4		;Mul the low 32 bits
+		mullw	r10,r5,r6		;Last values
+		mulhw	r7,r3,r4		;Mul the high 32 bits
+		mulhw	r9,r5,r6		;Last values
+		addc	r12,r8,r10		;I only care about the carry
+		adde	r3,r7,r9		;Add the high 32 bits and return the result
+		blr
+
+;
+; long FASTCALL IntMulHigh32(long Mul1,long Mul2);
+;
+
+	EXPORT	IntMulHigh32[DS],.IntMulHigh32[PR]
+
+	TOC
+		tc	IntMulHigh32[TC],IntMulHigh32[DS]
+
+	CSECT	IntMulHigh32[DS]
+		dc.l	.IntMulHigh32[PR]
+		dc.l	TOC[tc0]
+
+	CSECT	.IntMulHigh32[PR]
+		mulhw	r3,r3,r4		;Mul the high 32 bits
+		blr
+
+		END

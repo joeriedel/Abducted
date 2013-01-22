@@ -1,0 +1,59 @@
+	.386
+	.MODEL	FLAT,SYSCALL
+
+	.DATA
+	EXTRN	_VideoPointer:DWORD,_VideoWidth:DWORD
+
+;
+; Erase a shape VERY FAST!
+; void EraseShape(Word x,Word y,void *ShapePtr);
+;
+
+	.CODE
+	PUBLIC EraseShape_
+EraseShape_ PROC USES EBX ECX EDX ESI EDI EBP
+	IMUL	EDX,[_VideoWidth]
+	MOV	EDI,[_VideoPointer]	;Get the screen pointer
+	ADD	EAX,EDX			;Get the base screen location
+	MOVZX	EDX,WORD PTR [EBX]	;Get the shape width in bytes
+	ADD	EDI,EAX			;Make the final pointer
+	MOVZX	ESI,WORD PTR [EBX+2]	;Get the shape height in bytes
+	TEST	EDX,EDX		;Zero Width?
+	JZ	SHORT Exit
+	TEST	ESI,ESI		;Zero height?
+	JZ	SHORT Exit
+	CLD
+	XOR	EAX,EAX		;Force EAX to zero for the fill
+	MOV	EBX,[_VideoWidth]	;Get the maximum screen width
+	SUB	EBX,EDX		;Get the scan line adjust
+	MOV	EBP,EDX		;Copy the width
+	SHR	EDX,2		;Shift to long count
+	JZ	SHORT Bytes	;No longs?
+	AND	EBP,3		;Long aligned?
+	JNZ	SHORT PadBytes	;I have to pad!
+Longs:
+	MOV	ECX,EDX		;Reset the long count
+	REP	STOSD		;Copy the longs
+	ADD	EDI,EBX		;Next scan line down
+	DEC	ESI		;Count down
+	JNZ	Longs		;Loop?
+Exit:	RET
+
+Bytes:	MOV	ECX,EBP		;Get the byte count
+	REP	STOSB		;Copy the bytes
+	ADD	EDI,EBX		;Next scan line down
+	DEC	ESI		;Count down
+	JNZ	Bytes		;Loop?
+	RET
+
+PadBytes:
+	MOV	ECX,EDX		;Reset the long count
+	REP	STOSD		;Copy the longs
+	MOV	ECX,EBP		;Get the byte count
+	REP	STOSB		;Copy the bytes
+	ADD	EDI,EBX		;Next scan line down
+	DEC	ESI		;Count down
+	JNZ	PadBytes	;Loop?
+	RET
+EraseShape_ ENDP
+	END

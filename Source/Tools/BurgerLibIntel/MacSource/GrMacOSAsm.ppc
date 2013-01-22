@@ -1,0 +1,100 @@
+;
+; Assembly for the graphics manager
+; Power PC version
+; Optimized and written by Bill Heineman
+; Copyright Bill Heineman
+;
+
+		include 'PPCAsm.ppc'
+	
+;
+;void VideoPixelDouble16(const Byte *SourcePtr, Byte *DestPtr,Word SourceRowBytes,
+;	Word DestRowBytes,Word Width,Word Height)
+;
+; Simple pixel doubling
+;
+
+		DeclareProc VideoPixelDouble16
+	
+		slwi		r9,r7,2				; r9 = width*4
+		slwi		r10,r7,1			; r10 = width*2
+		slwi		r11,r6,1			; Step by 2 lines instead of 1
+		add			r12,r4,r6			; r12 is the dest+the next scan line offset
+		srwi		r0,r7,1				; Width / 2 for 2 pixels per iteration
+		subf		r9,r9,r11			; Adjust the byte offset for the dest image
+		subf		r5,r10,r5			; Adjust the byte offset for the source image
+@YLooper:
+		mr			r7,r0				; Reset the width counter
+@XLooper:
+		lwz			r11,0(r3)			; Get 2 pixels to double
+		addi		r3,r3,4				; Adjust source pointer
+		slwi		r10,r11,16			; Isolate the right pixel
+		rlwimi		r11,r11,16,16,31	; Double the left pixel
+		subic.		r7,r7,1				; Count down an iteration
+		rlwimi		r10,r10,16,16,31	; Double the right pixel
+		stw			r11,-8(SP)			; Save the left pixel
+		stw			r10,-4(SP)			; Save the right pixel
+		lfd			fp0,-8(SP)			; Load the value into a double
+		stfd		fp0,0(r4)			; Store the double to video memory
+		addi		r4,r4,8				; Adjust the upper line
+		stfd		fp0,0(r12)			; Store the double to video memory
+		addi		r12,r12,8			; Adjust the pointer
+		bne+		@XLooper			; All done in the X
+
+		subic.		r8,r8,1				; Count down the height
+		add			r3,r3,r5			; Adjust the source pointer
+		add			r4,r4,r9			; Adjust the even line dest pointer
+		add			r12,r12,r9			; Adjust the odd line dest pointer
+		bne+		@YLooper			; All done
+		blr
+
+;
+;void VideoPixelDoubleChecker16(const Byte *SourcePtr, Byte *DestPtr,Word SourceRowBytes,
+;	Word DestRowBytes,Word Width,Word Height)
+;
+; Checkerboard pixel doubling
+;
+
+		DeclareProc VideoPixelDoubleChecker16
+
+		stw			r31,-20(SP)			; save r31
+		li			r0,0				; Get black
+		slwi		r10,r7,1			; r10 = width*2
+		slwi		r9,r7,2				; r9 = width*4
+		sth			r0,-6(SP)			; Zero the black pixel
+		slwi		r11,r6,1			; Step by 2 lines instead of 1
+		sth			r0,-2(SP)			; Zero the black pixel
+		sth			r0,-16(SP)			; Zero the black pixel
+		add			r12,r4,r6			; r12 is the dest+the next scan line offset
+		sth			r0,-12(SP)			; Zero the black pixel
+		srwi		r31,r7,1			; Width / 2 for 2 pixels per iteration
+		subf		r9,r9,r11			; Adjust the byte offset for the dest image
+		subf		r5,r10,r5			; Adjust the byte offset for the source image
+@YLooper2:
+		mr			r7,r31				; Reset the width counter
+@XLooper2:
+		lwz			r11,0(r3)			; Get 2 pixels to double
+		addi		r3,r3,4
+		srwi		r0,r11,16			; Isolate the left pixel
+		sth			r11,-4(SP)			; Save the right pixel
+		sth			r0,-8(SP)			; Save the left pixel
+		lfd			fp0,-8(SP)			; Load the value into a double
+		stfd		fp0,0(r4)			; Store the double to video memory
+		addi		r4,r4,8
+		sth			r11,-10(SP)			; Save the right pixel
+		subic.		r7,r7,1				; Dec the width
+		sth			r0,-14(SP)			; Save the left pixel
+		lfd			fp1,-16(SP)			; Load the value into a double
+		stfd		fp1,0(r12)			; Store the double to video memory
+		addi		r12,r12,8
+		bne+		@XLooper2			; All done in the X
+		subic.		r8,r8,1				; Count down the height
+		add			r3,r3,r5			; Adjust the source pointer
+		add			r4,r4,r9			; Adjust the even line dest pointer
+		add			r12,r12,r9			; Adjust the odd line dest pointer
+		bne+		@YLooper2			; All done
+		lwz			r31,-20(SP)			; Restore r31
+		blr
+
+		END
+

@@ -10,7 +10,7 @@ function TouchTrigger.Spawn(self)
 	-- TouchTrigger is primarily implemented in C++. Engine side code however
 	-- doesn't know about our game specific classbits so we set those here.
 	
-	local triggerTypes = StringForKey(self.keys.types, "all")
+	local triggerTypes = StringForString(self.keys.types, "all")
 	if (triggerTypes == "all") then
 		self:SetTouchClassBits(kEntityClassBits_All)
 	elseif (triggerTypes == "player") then

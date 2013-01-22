@@ -18,6 +18,7 @@ Import("Persistence")
 Import("TerminalPuzzles")
 Import("SCExecContext")
 Import("Floors")
+Import("Animation")
 
 -- // Entities // --
 Import("Entity")
@@ -28,4 +29,5 @@ Import("Worldspawn")
 Import("ViewController")
 Import("ScriptNode")
 Import("TouchTrigger")
+Import("ManipulatableObject")
 Import("LuaCrashCourse")

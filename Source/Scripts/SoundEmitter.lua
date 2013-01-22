@@ -111,9 +111,6 @@ function SoundEmitter.Trigger(self)
 	elseif playing and (not on) then
 		if (self.fadeTime) then
 			self.sound:FadeVolume(0, self.fadeTime)
-			self.think = SoundEmitter.Stop
-			self:SetNextThink(self.fadeTime*1000)
-			self.stopTime = World.Time() + self.fadeTime*1000
 			self.fadeTime = nil
 		else
 			self.sound:Stop()
@@ -123,11 +120,5 @@ function SoundEmitter.Trigger(self)
 
 end
 
-function SoundEmitter.Stop(self)
-	if World.Time() >= self.stopTime then
-		self.sound:Stop()
-		self.think = nil
-	end
-end
 
 info_sound_emitter = SoundEmitter

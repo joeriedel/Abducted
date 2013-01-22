@@ -46,7 +46,7 @@ end
 function ScriptNode.Trigger(self, input, reset)
 
 	if not self.enabled then
-		COutLine(C_Debug, "ScriptNode(%s).Trigger(%d) -- DISABLED IGNORING", self.name, input)
+		COutLine(kC_Debug, "ScriptNode(%s).Trigger(%d) -- DISABLED IGNORING", self.name, input)
 		return
 	end
 	

@@ -19,10 +19,10 @@ function ViewController.OnLevelStart(self)
 end
 
 function ViewController.OnEvent(self, cmd, args)
-	if (cmd == "Shake") then
+	if (cmd == "shake") then
 		self:HandleShakeCmd(cmd, args)
 		return true
-	elseif (cmd == "Camera") then
+	elseif (cmd == "camera") then
 		self:HandleCameraCmd(args)
 		return true
 	end

@@ -1,0 +1,85 @@
+	.386
+	.MODEL FLAT,SYSCALL
+
+	IFDEF __X32__
+	.DATA
+	EXTRN	_OldInt8:FWORD,__x32_zero_base_selector:WORD
+	EXTRN	__x32_zero_base_ptr:DWORD
+
+	.CODE
+
+	EXTRN	MyIrq8_:PROC,__GETDS:PROC
+
+;
+; This glue will fix the fact that "Chain_Intr" doesn't work
+; too good with Watcom 10.0a
+; void interrupt SoundIrq(void);
+;
+
+	PUBLIC	Timer8Irq_
+Timer8Irq_ PROC
+	PUSH	EAX	;Save all registers
+	PUSH	EBX
+	PUSH	ECX
+	PUSH	EDX
+	PUSH	ESI
+	PUSH	EDI
+	PUSH	EBP
+	PUSH	DS
+	PUSH	ES
+	PUSH	FS
+	PUSH	GS
+	CLD
+	CALL	__GETDS	;Get the local data selector
+	CALL	MyIrq8_	;Call the ReadTick function
+	POP	GS	;Restore all registers
+	POP	FS
+	POP	ES
+	POP	DS
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	POP	EDX
+	POP	ECX
+	POP	EBX
+	TEST	EAX,EAX	;Should I chain?
+	JZ	SHORT ExitNowSI
+	POP	EAX
+	JMP	CS:PWORD PTR [_MyOldInt8]	;Call the real routine
+ExitNowSI: POP	EAX	;Exit now
+	IRETD
+
+_MyOldInt8 DB 0,0,0,0,0,0	;Must be in my code segment!!
+
+Timer8Irq_ ENDP
+
+;
+; Install a task into timer 8
+;
+
+	PUBLIC	InitTimer8Irq_
+InitTimer8Irq_ PROC
+
+	PUSH	EDI
+	PUSH	FS
+	MOV	AX,__x32_zero_base_selector	;Get the selector
+	TEST	AX,AX
+	JNZ	SHORT X32
+	MOV	AX,DS		;DOS 4GW
+X32:
+	MOV	FS,AX
+	MOV	EDI,OFFSET _MyOldInt8
+	SUB	EDI,__x32_zero_base_ptr
+	MOV	EAX,DWORD PTR [_OldInt8]
+	MOV	FS:[EDI],EAX		;Save into interrupt 8
+	MOV	AX,WORD PTR [_OldInt8+4]
+	MOV	FS:[EDI+4],AX		;Save the selector #
+	POP	FS
+	POP	EDI
+	RET
+
+InitTimer8Irq_ ENDP
+	ENDIF
+
+        END
+

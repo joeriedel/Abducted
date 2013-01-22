@@ -1,0 +1,151 @@
+;
+; Assembly for Standard "C" library manager
+; Power PC version
+; Optimized and written by Bill Heineman
+; Copyright Bill Heineman
+;
+
+		include 'PPCAsm.ppc'
+
+;
+; Word FastStrLen(const char * str);
+; I will check 4 bytes at a time by subtracting $01010101
+; from the longword and detecting whether each and every byte changed
+; sign from positive to negative. This can be done in a vector operation
+;
+
+		DeclareProc FastStrLen
+	
+;
+; First I need to longword align the pointer
+; r3 = Source string pointer
+; r5 = 0x80808080
+; r6 = 0x01010101
+; r12 = scratch register
+;
+
+		clrlwi		r12,r3,30		;(r12 = r3 & 3) (0-3 from the pointer) 
+		clrlslwi	r0,r3,30,3		;Copy the low 2 bit up and mul by 8 (0,8,16,24)
+		neg			r12,r12			;0,-1,-2,-3
+		li			r9,-1			;Init the mask
+		lwzx		r8,r3,r12		;Fetch the longword aligned data
+		subfic		r0,r0,32		;Convert 0,8,16,24 to 32,24,16,8
+		lis			r6,$101			;Store $01010101 in r6
+		slw			r9,r9,r0		;Shift off the or mask (Could be 32 for zero)
+		ori			r6,r6,$0101		;Finish the load of $01010101
+		or			r8,r8,r9		;Force the invalid values to $FF
+		slwi		r5,r6,7			;Load r5 with $80808080
+
+		subfc		r10,r6,r8		;Subtract $01010101 from text
+		andc		r11,r5,r8		;And the bit compliment from $80808080
+		addi		r12,r12,4		;Assume 1-4 bytes to be valid
+		and.		r10,r10,r11		;Perform the test
+		bne-		strlenexit		;First time hit!
+strlenl:
+		lwzx		r8,r12,r3		;Fetch 4 bytes
+		addi		r12,r12,4		;Increase the string length by 4
+		subfc		r10,r6,r8		;Subtract $01010101 from the value
+		andc		r11,r5,r8		;And the bit compliment from $80808080
+		and.		r10,r10,r11		;Mask only those that changed from positive to negative
+		beq			strlenl			;Any changed?
+strlenexit:							;I've got a change. Wrap up
+		clrrwi.		r10,r8,24		;Check the first byte
+		subi		r3,r12,4			;Offset by zero
+		beqlr						;Exit now
+		rlwinm.		r10,r8,0,8,15	;Check the second byte
+		subi		r3,r12,3
+		beqlr
+		rlwinm.		r10,r8,0,16,23	;Check the third byte
+		subi		r3,r12,2
+		beqlr
+		subi		r3,r12,1		;Assume the forth byte did it.
+		blr
+
+;
+; size_t strncmp(const char * str1,const char *str2,size_t len);
+; Quickly scan through the two strings for a match
+;
+
+		DeclareProc FastStrncmp
+	
+;
+; First I need to longword align the pointer
+;
+
+		mr.			r0,r5			;Get the maximum count
+		mtctr		r5				;Store the count in the counter register
+		ble			strncmp0		;If less than or equal to 0 for the length, quit now!
+		lbz			r8,0(r3)		;Get the first character
+		lbz			r7,0(r4)		;Get the second character
+		addi		r6,r3,1
+		cmpwi		cr1,r8,0		;End of the source string?
+		subfc.		r3,r7,r8		;Perform the compare
+		bdzf		cr1_EQ,strncmp1	;Is it not the end of the string and not counter
+strncmpx:
+		bnelr						;Are they the same? (If not, then continue)
+		lbz			r8,0(r6)		;Get the next character
+		lbz			r7,1(r4)
+		addi		r6,r6,1
+		addi		r4,r4,1
+		cmpwi		cr1,r8,0		;End of source string?
+		subfc.		r3,r7,r8		;Compare
+		bdnzf		cr1_EQ,strncmpx	;Loop if not the end of the string
+strncmp1:
+		blr							;Exit with r3 being -, + or zero
+strncmp0:
+		li         r3,0				;I have a match
+		blr
+
+;
+; Word32 FASTCALL PowerOf2(Word32 Input)
+;
+
+		DeclareProc PowerOf2
+		
+		lis		r4,16384			;Load 0x40000000
+		subi	r0,r3,1				;Get Input-1
+		cmplw	r3,r4				;Now Input to 0x40000000
+		bgt		Maximum				;If greater than 0x40000000, return 0x80000000
+		cntlzw	r3,r0				;Count the leading zeros
+		li		r4,1				;Get the output bit
+		subfic	r0,r3,32			;Reverse the bit count (0-32 -> 32-0)
+		slw		r3,r4,r0			;1<<(32-Bitcount)
+		blr							;Return the rounded up number
+Maximum:
+		lis		r3,-32768			;Ah, just return 0x80000000
+		blr
+		
+;
+; void PollRTC601(LongWord64_t *Output)
+; Poll the PowerPC 601 Real Time Clock register
+;
+
+		DeclareProc PollRTC601
+
+@XLoop:
+		mfspr	r4,4			;RTCU
+		mfspr	r5,5			;RTCL
+		mfspr	r6,4			;Did the upper 32 bits change?
+		cmpw	r4,r6			;Match?
+		bne		@XLoop			;Try again
+		stw		r4,0(r3)		;Store the 64 bit result
+		stw		r5,4(r3)
+		blr						;Exit
+		
+;
+; void PollTBR603(LongWord64_t *Output)
+; Poll the PowerPC 603 timer register
+;
+
+		DeclareProc PollTBR603
+
+@XLoop2:
+		mftbu	r4				;Upper 32 bits
+		mftb	r5 				;Lower 32 bits
+		mftbu	r6				;Did the upper 32 bits change?
+		cmpw	r4,r6			;Match?
+		bne		@XLoop2			;Try again
+		stw		r4,0(r3)		;Store the 64 bit result
+		stw		r5,4(r3)
+		blr						;Exit
+

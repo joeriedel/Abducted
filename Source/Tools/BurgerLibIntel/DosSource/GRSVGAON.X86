@@ -1,0 +1,71 @@
+	.386
+	.MODEL	FLAT,SYSCALL
+
+;
+; Turn on graphics mode
+; Word SVGAOn(void);
+;
+
+	.DATA
+
+	EXTRN	__x32_zero_base_ptr:DWORD
+	EXTRN	_ScreenWidth:DWORD,_ScreenHeight:DWORD
+	EXTRN	_VideoWidth:DWORD,_VideoPointer:DWORD
+	EXTRN	_ScreenClipTop:DWORD,_ScreenClipLeft:DWORD
+	EXTRN	_ScreenClipBottom:DWORD,_ScreenClipRight:DWORD
+
+	.CODE
+
+	PUBLIC	SVGAOn_
+SVGAOn_	PROC
+	PUSH	EBX
+	PUSH	ECX
+	PUSH	EDX
+	PUSH	ESI
+	PUSH	EDI
+	PUSH	EBP
+	MOV	EAX,00013H	;Turn on MCGA to fix a bug with
+	INT	010H		;windows 95 (DO NOT REMOVE!!!)
+
+	MOV	EAX,04F02H	;VESA setmode call
+	MOV	EBX,00101H	;640x480
+	INT	010H
+	CMP	AH,04FH
+	JZ	SHORT OhOh	;There was an error!
+
+	MOV	EAX,04F05H	;Bank switch
+	XOR	EBX,EBX		;Window #0
+	MOV	EDX,2		;Bank #2
+	INT	010H
+	CMP	EDX,2		;Did it work?
+	JNZ	OhOh		;Too bad!
+	MOV	EAX,04F05H
+	XOR	EBX,EBX
+	XOR	EDX,EDX		;Bank it back!
+	INT	010H
+
+	MOV	EAX,[__x32_zero_base_ptr] ;Get VMM base pointer
+	MOV	EBX,640			;Preload register
+	ADD	EAX,0A0000H		;Point to true video screen
+	MOV	[_VideoWidth],EBX	;Save the width
+	MOV	[_ScreenWidth],EBX	;Save the width in true global
+	MOV	[_VideoPointer],EAX	;Save the video pointer
+	MOV	[_ScreenHeight],480	;Set the height
+	MOV	[_ScreenClipRight],EBX
+	MOV	[_ScreenClipBottom],480
+	MOV	[_ScreenClipTop],0
+	MOV	[_ScreenClipLeft],0
+	XOR	EAX,EAX		;No error
+ByeBye:
+	POP	EBP
+	POP	EDI
+	POP	ESI
+	POP	EDX
+	POP	ECX
+	POP	EBX
+	RET
+OhOh:
+	MOV	EAX,1		;Error occured
+	JMP	ByeBye
+SVGAOn_	ENDP
+	END

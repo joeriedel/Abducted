@@ -1,0 +1,358 @@
+	.386p
+	.MODEL FLAT,SYSCALL
+
+;
+; This routine will fill memory faster than memset
+; I store a SHORT!!!
+; Copyright 1997 Bill Heineman.
+; Optimized for Pentium processors
+;
+
+	.DATA
+JmpTable DD	Zap0,Zap1,Zap2,Zap3
+	DD	Zap4,Zap5,Zap6,Zap7
+	DD	Zap8,Zap9,Zap10,Zap11
+	DD	Zap12,Zap13,Zap14,Zap15
+	DD	Zap16,Zap17,Zap18,Zap19
+	DD	Zap20,Zap21,Zap22,Zap23
+	DD	Zap24,Zap25,Zap26,Zap27
+	DD	Zap28,Zap29,Zap30,Zap31
+
+Foo	DD	0
+
+;
+; void FASTCALL FastMemSet16(void *DestPtr,Word Fill,LongWord Length);
+;
+
+	.CODE
+
+;
+; Parms under WATCOM
+;
+
+	IFDEF	__WATCOM__
+Dest	EQU	EAX
+Fill	EQU	EDX
+Len	EQU	EBX
+FillShort EQU	DX
+FillByte EQU	DL
+ExitRet	EQU	RET
+	PUBLIC	FastMemSet16_
+FastMemSet16_ PROC
+
+	ELSE
+
+Dest	EQU	ECX
+Fill	EQU	EDX
+Len	EQU	EAX
+FillShort EQU	DX
+FillByte EQU	DL
+ExitRet	EQU	RET 4
+	PUBLIC	@FastMemSet16@12
+@FastMemSet16@12 PROC
+
+	MOV	Len,[ESP+4]	;Get the length from the stack
+
+	ENDIF
+
+	test    Dest,3		;Is the pointer long word aligned?
+	mov	[Foo],Fill	;Convert to a longword
+	SHL	Fill,16
+	OR	Fill,[Foo]
+	jne     AlignIt		;Align the pointer
+
+Check32:
+	sub	Len,32		;Preremove 32 bytes from the length
+	js	AndFill		;Less than 32 bytes?
+Main:
+	mov     [Dest],Fill	;Store 32 bytes
+	mov     [Dest+4],Fill
+	mov     [Dest+8],Fill
+	mov     [Dest+12],Fill
+	mov     [Dest+16],Fill
+	mov     [Dest+20],Fill
+	mov     [Dest+24],Fill
+	mov     [Dest+28],Fill
+	sub	Len,32		;Remove another 32 bytes from length
+	lea	Dest,[Dest+32]	;Adjust the pointer
+	jns	Main		;Ok?
+AndFill:
+	JMP	[JmpTable+(32*4)+Len*4] ;Call the fill routine via table
+
+;
+; These 32 routines will fill 0-31 bytes
+; in an ascending order to help the CPU cache
+; and go really fast!
+;
+
+Zap1:
+	mov	[Dest],FillByte	;Just a single byte
+Zap0:
+	ExitRet
+
+Zap2:
+	mov	[Dest],FillShort ;Store two bytes
+	ExitRet
+
+Zap3:
+	mov	[Dest],FillShort
+	mov	[Dest+2],FillByte
+	ExitRet
+
+Zap4:
+	mov	[Dest],Fill
+	ExitRet
+
+Zap5:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillByte
+	ExitRet
+
+Zap6:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillShort
+	ExitRet
+
+Zap7:
+	mov	[Dest],Fill
+	mov	[Dest+4],FillShort
+	mov	[Dest+6],FillByte
+	ExitRet
+
+Zap8:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	ExitRet
+
+Zap9:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillByte
+	ExitRet
+
+Zap10:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillShort
+	ExitRet
+
+Zap11:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],FillShort
+	mov	[Dest+10],FillByte
+	ExitRet
+
+Zap12:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	ExitRet
+
+Zap13:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillByte
+	ExitRet
+
+Zap14:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillShort
+	ExitRet
+
+Zap15:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],FillShort
+	mov	[Dest+14],FillByte
+	ExitRet
+
+Zap16:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	ExitRet
+
+Zap17:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillByte
+	ExitRet
+
+Zap18:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillShort
+	ExitRet
+
+Zap19:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],FillShort
+	mov	[Dest+18],FillByte
+	ExitRet
+
+Zap20:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	ExitRet
+
+Zap21:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillByte
+	ExitRet
+
+Zap22:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillShort
+	ExitRet
+
+Zap23:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],FillShort
+	mov	[Dest+22],FillByte
+	ExitRet
+
+Zap24:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	ExitRet
+
+Zap25:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillByte
+	ExitRet
+
+Zap26:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillShort
+	ExitRet
+
+Zap27:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],FillShort
+	mov	[Dest+26],FillByte
+	ExitRet
+
+Zap28:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	ExitRet
+
+Zap29:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillByte
+	ExitRet
+
+Zap30:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillShort
+	ExitRet
+
+Zap31:
+	mov	[Dest],Fill
+	mov	[Dest+4],Fill
+	mov	[Dest+8],Fill
+	mov	[Dest+12],Fill
+	mov	[Dest+16],Fill
+	mov	[Dest+20],Fill
+	mov	[Dest+24],Fill
+	mov	[Dest+28],FillShort
+	mov	[Dest+30],FillByte
+	ExitRet
+
+;
+; Align the dest address to longword
+; The low 2 bits must be 1,2 or 3
+;
+
+AlignIt:
+	cmp	Len,4		;I must have at least 4 bytes of length
+	jb	Fill31		;Just go to the jump table
+	test	Dest,1		;Test for 1 or 3
+	jz	EvenAdr		;Just do 2 bytes
+	mov	[Dest],FillByte	;Pad to even address
+	inc	Dest		;Inc dest address
+	ror	Fill,8		;Fix the value
+	dec	Len		;Sub 1 from length
+	test	Dest,2		;Test for 3
+	jz	Check32		;Begin
+EvenAdr:
+	mov	[Dest],FillShort ;Write a short
+	add	Dest,2		;Pad to longword address
+	sub	Len,2+32	;Sub 2 from length
+	jns	Main		;Begin
+	JMP	[JmpTable+(32*4)+Len*4] ;Call the fill routine via table
+Fill31:
+	JMP	[JmpTable+Len*4] ;Call the fill routine via table
+
+	IFDEF	__WATCOM__
+FastMemSet16_ ENDP
+	ELSE
+@FastMemSet16@12 ENDP
+	ENDIF
+
+	END
+

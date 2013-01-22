@@ -1,0 +1,701 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1a3ed085-b1fb-4650-8670-30393d6e251c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C++ Libs">
+      <UniqueIdentifier>{2c9c864c-14fd-4d7d-b545-e6fa9106a9f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compression Routines">
+      <UniqueIdentifier>{1931a549-9805-49da-b28f-107f257c24f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug Manager">
+      <UniqueIdentifier>{dadee33c-0f6a-49b2-a620-005aecf44c95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialog Manager">
+      <UniqueIdentifier>{5ba53ba5-537c-4f7d-8dc6-3e034839474b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File Manager">
+      <UniqueIdentifier>{ba17913b-8c7f-4467-bbe6-a9116bc2220d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fixed Point">
+      <UniqueIdentifier>{96687662-fcd4-4893-ad75-f120ab95bafa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Floating Point routines">
+      <UniqueIdentifier>{8651f3fc-f79f-466c-b133-359a26536a4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{0389890d-136d-47d1-8a5c-fbebba1bbac4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Guid Manager">
+      <UniqueIdentifier>{f7be4caf-cdae-4849-80e7-6a58674fd52e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Image routines">
+      <UniqueIdentifier>{2ef114b1-6444-4b86-bcbe-84d6d80363fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input Manager">
+      <UniqueIdentifier>{ff98f9b3-a7c7-45c3-b3f4-8e099b79d617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linked List Manager">
+      <UniqueIdentifier>{c9f39642-2f75-4375-bd0f-21edb5cf6a0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="List Manager">
+      <UniqueIdentifier>{1c317723-7043-4ecc-a3c2-81c237a4b2e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LongWord64 Manager">
+      <UniqueIdentifier>{16b45423-21cc-4a39-bfb2-e9365c992ed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory Manager">
+      <UniqueIdentifier>{63cb19b2-d50c-48d2-95de-d703f8b6070b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Movie Manager">
+      <UniqueIdentifier>{e812b9cb-5e25-4089-8cfb-0cedb6365457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Net Manager">
+      <UniqueIdentifier>{f7e7a88f-1dcb-4e45-80f7-b562b06eb876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS Cursor Manager">
+      <UniqueIdentifier>{83830768-18e3-4bd6-9cc9-c48ec7a2a577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Palette Manager">
+      <UniqueIdentifier>{6e513540-bed6-47b3-9de6-e2c97a401be3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prefs Manager">
+      <UniqueIdentifier>{f0e16837-7346-4d11-a225-9c7abdaea59f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profile Manager">
+      <UniqueIdentifier>{863594f7-440c-451f-b0ae-428d96e59722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Random number generator">
+      <UniqueIdentifier>{11ddba93-c5e1-44f7-8ebd-636146a5e119}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rect Manager">
+      <UniqueIdentifier>{b29fe72d-d727-487c-8db4-44ed6bb2ba1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Redbook Audio Manager">
+      <UniqueIdentifier>{2b49f64b-333c-417a-8abe-cb5a1fbe7d70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Manager">
+      <UniqueIdentifier>{94a98436-ad94-42dc-8149-142c16869a80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Run Queue Manager">
+      <UniqueIdentifier>{1c060bcf-4eac-4829-89a9-4fbdb830755b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Screen Shapes">
+      <UniqueIdentifier>{299ad5f4-36f6-452e-a303-fc130c72bf94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound Manager">
+      <UniqueIdentifier>{869d1b1e-0a97-46ca-9ea3-6b1fc7f6b9ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound Manager\Mod Music Player">
+      <UniqueIdentifier>{0e4ed89a-2094-43de-96c5-9b6c252e5d3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound Manager\Digital Music">
+      <UniqueIdentifier>{d1216bd0-a598-4af7-9b88-f4df301944c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound Manager\Sound Player">
+      <UniqueIdentifier>{22482525-d605-4572-9797-b6911cdfb35d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Standard Lib">
+      <UniqueIdentifier>{d91dcde7-902d-4833-a4e5-692bf5bbb503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stream Handler">
+      <UniqueIdentifier>{f044a961-04f3-4a6f-89cd-6f7df7e153d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String Manager">
+      <UniqueIdentifier>{6a59beb7-2f8d-4067-aff1-d677d48a0f4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time and Events">
+      <UniqueIdentifier>{7d1595ea-8694-48b0-b012-41f8cc014383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win95 Code">
+      <UniqueIdentifier>{5ea29acb-597a-4d43-bea1-126987b7bb91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thread Manager">
+      <UniqueIdentifier>{d0015c5b-e1dc-4de5-9a85-c7af9bae921b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Font Manager">
+      <UniqueIdentifier>{78c2082d-9395-4a1c-918c-efac720c7d54}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\BrTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PublicHeaders\Burger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PublicHeaders\Burger.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PublicHeaders\KeyCodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\BRString.h">
+      <Filter>C++ Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkOgg.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkPack.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisBackends.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisBitrate.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisCodebook.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisCodec.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisCodecInternal.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisEnvelope.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisIIR.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisLpc.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisLsp.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisMasking.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisMdct.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisPsy.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisRegistry.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisScales.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisSmallft.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PkVorbisWindow.h">
+      <Filter>Compression Routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\DmDialogControl.h">
+      <Filter>Dialog Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\FmFile.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RsReadStream.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\FxFixed.h">
+      <Filter>Fixed Point</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\FpFloat.h">
+      <Filter>Floating Point routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GrGraphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GuGuid.h">
+      <Filter>Guid Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ImImage.h">
+      <Filter>Image routines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\InInput.h">
+      <Filter>Input Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\LkLinkList.h">
+      <Filter>Linked List Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\LlList.h">
+      <Filter>List Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\L664Bit.h">
+      <Filter>LongWord64 Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MmMemory.h">
+      <Filter>Memory Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MvMovie.h">
+      <Filter>Movie Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\NtNet.h">
+      <Filter>Net Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\OcOSCursor.h">
+      <Filter>OS Cursor Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PlPalette.h">
+      <Filter>Palette Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PfPrefs.h">
+      <Filter>Prefs Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PgPrefFile.h">
+      <Filter>Prefs Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PrProfile.h">
+      <Filter>Profile Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RnRandom.h">
+      <Filter>Random number generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\LrRect.h">
+      <Filter>Rect Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RbRedBook.h">
+      <Filter>Redbook Audio Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RzRez.h">
+      <Filter>Resource Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RqRunQueue.h">
+      <Filter>Run Queue Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SsScreenShape.h">
+      <Filter>Screen Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SnMADMusic.h">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SnSound.h">
+      <Filter>Sound Manager\Sound Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ClStdLib.h">
+      <Filter>Standard Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ShStream.h">
+      <Filter>Stream Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\StString.h">
+      <Filter>String Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TkTick.h">
+      <Filter>Time and Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\W9Win95.h">
+      <Filter>Win95 Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\FnFont.h">
+      <Filter>Font Manager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\BRString.cpp">
+      <Filter>C++ Libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkADPCM.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkALaw.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkDeflate.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkDlzss.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkDlzssF.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkDRle.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkInflate.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkLzss.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkMACE.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkOggBitWise.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkOggFraming.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkRle.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkRleF.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkULaw.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisAnalysis.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisBitrate.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisBlock.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisCodebook.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisEnvelope.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisFloor0.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisFloor1.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisIIR.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisInfo.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbislpc.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbislsp.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisMapping0.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisMDct.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisPsy.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisRegistry.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisRes0.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisSharedBook.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisSmallft.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisSynthesis.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisTime0.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PkVorbisWindow.c">
+      <Filter>Compression Routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\DbDebugManager.c">
+      <Filter>Debug Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\DbWin95Code.c">
+      <Filter>Debug Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\DmDialogControl.c">
+      <Filter>Dialog Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\FmFileManager.c">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\FmWin95Code.c">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RsReadStream.c">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\RsWinCode.c">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\FxFixedPoint.c">
+      <Filter>Fixed Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\FxMicrosoftVC5.c">
+      <Filter>Fixed Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\FpFloatingPoint.c">
+      <Filter>Floating Point routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\FpMicrosoftVC5.c">
+      <Filter>Floating Point routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\GrGraphicsManager.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\GrMicrosoftVC5.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\GrOpenGL.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\GrWin95Code.c">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\GuGuidManager.c">
+      <Filter>Guid Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImage2BMPFile.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImage2LBMFile.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImage2PBMFile.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImage2PCXFile.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImage2TGAFile.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageManager.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseBMP.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseCicn.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseGIF.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseJPeg.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseLBM.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParsePCX.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParsePict.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParsePPat.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParsePSD.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ImImageParseTGA.c">
+      <Filter>Image routines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\InForceFeedback.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\InForceFeedbackWin95.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\InJoystick.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\InJoystickWin95.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\InKeyboard.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\InKeyboardWin95.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\InMouse.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\InMouseWin95.c">
+      <Filter>Input Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\LkLinkListManager.c">
+      <Filter>Linked List Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\LsListManager.c">
+      <Filter>List Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\LlLongLong.c">
+      <Filter>LongWord64 Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\LlMicrosoftVC5.c">
+      <Filter>LongWord64 Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MMMemoryGeneric.c">
+      <Filter>Memory Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MMMemoryManager.c">
+      <Filter>Memory Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MMMemPool.c">
+      <Filter>Memory Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MvDPaintAnim.c">
+      <Filter>Movie Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\MvFlic.c">
+      <Filter>Movie Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\NtNetManager.c">
+      <Filter>Net Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\NtWinCode.c">
+      <Filter>Net Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\OCOSCursorManager.c">
+      <Filter>OS Cursor Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\OCWin95Code.c">
+      <Filter>OS Cursor Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PlPaletteManager.c">
+      <Filter>Palette Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PlRGBHSL.c">
+      <Filter>Palette Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\PlWin95Code.c">
+      <Filter>Palette Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PfPrefsManager.c">
+      <Filter>Prefs Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PgPrefFile.c">
+      <Filter>Prefs Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PrProfileManager.c">
+      <Filter>Profile Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\PrWin95Code.c">
+      <Filter>Profile Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RnRandomManager.c">
+      <Filter>Random number generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\LrRectManager.c">
+      <Filter>Rect Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RbRedbookManager.c">
+      <Filter>Redbook Audio Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\RbWin95Code.c">
+      <Filter>Redbook Audio Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RzResourceManager.c">
+      <Filter>Resource Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RQRunQueue.c">
+      <Filter>Run Queue Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SSScreenShape.c">
+      <Filter>Screen Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnMADIT.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnMADMADI.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnMADMainDriver.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnMADS3M.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\SnMADWinCode.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnMADXM.c">
+      <Filter>Sound Manager\Mod Music Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnDigitalSong.c">
+      <Filter>Sound Manager\Digital Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\SnSngWinCode.c">
+      <Filter>Sound Manager\Digital Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SnSoundManager.c">
+      <Filter>Sound Manager\Sound Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\SnWinCode.c">
+      <Filter>Sound Manager\Sound Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ClFastMemCpy.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ClFastMemSet.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ClFastMemSet16.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\ClMicrosoftVC5.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ClStdlib.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\ClWinCode.c">
+      <Filter>Standard Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ShStreamHandle.c">
+      <Filter>Stream Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\StStringManager.c">
+      <Filter>String Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\StStringWin95.c">
+      <Filter>String Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TkTimeManager.c">
+      <Filter>Time and Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\TkWin95Code.c">
+      <Filter>Time and Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\W9Win95Code.c">
+      <Filter>Win95 Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\ThMicrosoftVC5.c">
+      <Filter>Thread Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ThThreads.c">
+      <Filter>Thread Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Win95Source\ThWinCode.c">
+      <Filter>Thread Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\FnFontManager.c">
+      <Filter>Font Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\BREndian.cpp">
+      <Filter>C++ Libs</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Win95Source\GrDraw1.X86">
+      <Filter>Graphics</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\GrDraw2.X86">
+      <Filter>Graphics</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\ClFastMemSet16Intel.X86">
+      <Filter>Standard Lib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Win95Source\ClFastMemSetIntel.X86">
+      <Filter>Standard Lib</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

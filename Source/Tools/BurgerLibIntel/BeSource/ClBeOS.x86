@@ -1,0 +1,148 @@
+#/**********************************
+#
+#	BeOS for Intel
+#
+#**********************************/
+
+#/**********************************
+#
+#	Swap the endian of a long
+#
+#	long FASTCALL SwapLong(long Val)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl SwapLong
+	.type SwapLong,@function
+SwapLong:
+	movl	4(%esp),%eax
+	bswap	%eax
+	ret
+.SwapLongEnd:
+	.size	SwapLong,.SwapLongEnd-SwapLong
+
+#/**********************************
+#
+#	Swap the endian of a LongWord
+#
+#	LongWord FASTCALL SwapULong(LongWord Val)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl SwapULong
+	.type SwapULong,@function
+SwapULong:
+	movl	4(%esp),%eax
+	bswap	%eax
+	ret
+.SwapULongEnd:
+	.size	SwapULong,.SwapULongEnd-SwapULong
+
+#/**********************************
+#
+#	Swap the endian of a short
+#
+#	short FASTCALL SwapShort(short Val)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl SwapShort
+	.type SwapShort,@function
+SwapShort:
+	mov		5(%esp),%al
+	mov		4(%esp),%ah
+	ret
+.SwapShortEnd:
+	.size	SwapShort,.SwapShortEnd-SwapShort
+
+#/**********************************
+#
+#	Swap the endian of a short
+#
+#	Short FASTCALL SwapUShort(Short Val)
+#
+#**********************************/
+
+.text
+	.align 16
+.globl SwapUShort
+	.type SwapUShort,@function
+SwapUShort:
+	mov		5(%esp),%al
+	mov		4(%esp),%ah
+	ret
+.SwapUShortEnd:
+	.size	SwapUShort,.SwapUShortEnd-SwapUShort
+
+#/**********************************
+#
+#	Perform the ANSI function strlen()
+#	This is in optimized Pentium assembly
+#	The algorithm is explained in the generic "C" version
+#
+#**********************************/
+
+.text
+	.align 16
+.globl FastStrLen
+	.type FastStrLen,@function
+FastStrLen:
+	movl	4(%esp),%eax
+	pushl %ebx
+	movl %eax,%ebx
+	andl $0x3,%eax
+	negl %eax
+	jz .LL
+	movl $0xFFFFFFFF,%edx
+	leal 32(%eax*8),%ecx
+	shrl %cl,%edx
+	movl (%ebx+%eax),%ecx
+	addl $0x4,%eax
+	orl %edx,%ecx
+	movl %ecx,%edx
+	xorl $0xFFFFFFFF,%ecx
+	subl $0x01010101,%edx
+	andl $0x80808080,%ecx
+	testl %edx,%ecx
+	jnz .L0
+.LL:
+	movl (%ebx+%eax),%edx
+	movl (%ebx+%eax),%ecx
+	addl $0x4,%eax
+	xorl $0xFFFFFFFF,%ecx
+	subl $0x01010101,%edx
+	andl $0x80808080,%ecx
+	testl %edx,%ecx
+	jz .LL
+.L0:
+	addl $0x01010101,%edx
+	testl $0xFF,%edx
+	jz .L4
+	testl $0xFF00,%edx
+	jz .L3
+	testl $0xFF0000,%edx
+	jz .L2
+	decl %eax
+	popl %ebx
+	ret
+.L2:
+	subl $0x2,%eax
+	popl %ebx
+	ret
+.L3:
+	subl $0x3,%eax
+	popl %ebx
+	ret
+.L4:
+	subl $0x4,%eax
+	popl %ebx
+	ret
+.FastStrLenEnd:
+	.size	FastStrLen,.FastStrLenEnd-FastStrLen
+

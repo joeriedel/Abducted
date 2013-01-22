@@ -3,7 +3,7 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
-PlayerPawn = Class:New()
+PlayerPawn = Entity:New()
 
 function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")

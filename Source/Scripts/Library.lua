@@ -102,6 +102,14 @@ function LL_New(list)
 
 end
 
+function LL_Head(list)
+	return list.ll_head
+end
+
+function LL_Tail(list)
+	return list.ll_tail
+end
+
 function LL_Empty(list)
 	return list.ll_head == nil
 end

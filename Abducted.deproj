@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
+    <filename>Source\Scripts\Animation.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\CVars.lua</filename>
   </file>
   <file>
@@ -40,10 +43,16 @@
     <filename>Source\Scripts\LuaCrashCourse.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ManipulatableObject.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\Persistence.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\PlayerInput.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\PlayerPawn.lua</filename>

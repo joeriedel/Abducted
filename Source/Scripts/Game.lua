@@ -14,34 +14,34 @@ function Game.PostSpawn(self)
 end
 
 function Game.OnEvent(self, cmd, args)
-	if cmd == "FadeIn" then
+	if cmd == "fadein" then
 		UI:FadeIn(tonumber(args))
 		return true
-	elseif cmd == "FadeToBlack" then
+	elseif cmd == "fadetoblack" then
 		UI:FadeToColor({0, 0, 0, 1}, tonumber(args))
 		return true
-	elseif cmd == "FadeToWhite" then
+	elseif cmd == "fadetowhite" then
 		UI:FadeToColor({1, 1, 1, 1}, tonumber(args))
 		return true
-	elseif cmd == "FadeInLetterBox" then
+	elseif cmd == "fadeinletterbox" then
 		UI:FadeInLetterBox({0, 0, 0, 1}, tonumber(args))
 		return true
-	elseif cmd == "FadeOutLetterBox" then
+	elseif cmd == "fadeoutletterbox" then
 		UI:FadeOutLetterBox(tonumber(args))
 		return true
-	elseif cmd == "SoundFadeOut" then
+	elseif cmd == "soundfadeout" then
 		World.SoundFadeMasterVolume(0, tonumber(args))
 		return true
-	elseif cmd == "SoundFadeIn" then
+	elseif cmd == "soundfadein" then
 		World.SoundFadeMasterVolume(1, tonumber(args))
 		return true
-	elseif (cmd == "EnableWaypointTargetname") then
+	elseif (cmd == "enablewaypoints") then
 		Floors.SetWaypointTargetnameState(args, kWaypointState_Enabled)
-	elseif (cmd == "DisableWaypointTargetname") then
+	elseif (cmd == "disablewaypoints") then
 		Floors.SetWaypointTargetnameState(args, nil, bit.bnot(kWaypointState_Enabled))
-	elseif (cmd == "EnableWaypointUserId") then
+	elseif (cmd == "enablewaypointuserid") then
 		Floors.SetWaypointUserIdState(args, kWaypointState_Enabled)
-	elseif (cmd == "DisableWaypointUserId") then
+	elseif (cmd == "disablewaypointuserid") then
 		Floors.SetWaypointUserIdState(args, nil, bit.bnot(kWaypointState_Enabled))
 	end
 end

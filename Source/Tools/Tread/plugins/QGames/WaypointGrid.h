@@ -57,6 +57,7 @@ public:
 	}
 
 	virtual CMapObject* Clone();
+	virtual void CopyState( CMapObject* src, CTreadDoc* pDoc );
 
 	virtual int GetNumRenderMeshes( CMapView* pView );
 	virtual CRenderMesh* GetRenderMesh( int num, CMapView* pView );
@@ -244,6 +245,7 @@ private:
 	vec3 m_local[2];
 	vec3 m_pos;
 	vec3 m_boxPos;
+	int m_numValidConnections;
 	bool m_drag;
 	bool m_inAddSelection;
 	bool m_beingSelected;

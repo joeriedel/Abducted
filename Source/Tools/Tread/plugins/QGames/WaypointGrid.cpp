@@ -720,7 +720,7 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "\"flags\" \"" << m_props[kProp_Flags].GetInt() << "\"\n";
 	
 	int i = 0;
-	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it, ++i) {
+	for (Connection::Map::const_iterator it = m_connections.begin(); it != m_connections.end(); ++it) {
 		const Connection::Ref &c = it->second;
 		if (!c->tail)
 			continue;
@@ -733,6 +733,8 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 		fs << "\"connection_fwd_end " << i << "\" \"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
 		fs << "\"connection_back_start " << i << "\" \"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
 		fs << "\"connection_back_end " << i << "\" \"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
+
+		++i;
 	}
 
 	fs << "}\n";

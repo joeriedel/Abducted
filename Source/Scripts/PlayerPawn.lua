@@ -11,24 +11,23 @@ function PlayerPawn.Spawn(self)
 	
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
-	self:AttachDrawModel(self.model)
-	self:SetDrawModelScale(self.model, {0.4, 0.4, 0.4}) -- temp art
-	self:SetDrawModelMotionScale(self.model, 2.5) -- temp art
-	self:SetDrawModelAngles(self.model, {0, -90, 180})
-	self:SetDrawModelPos(self.model, {0, 0, 64})
+	self.model.dm = self:AttachDrawModel(self.model)
+	self.model.dm:SetScale({0.4, 0.4, 0.4}) -- temp art
+	self.model.dm:SetMotionScale(2.5) -- temp art
+	self.model.dm:SetAngles({0, -90, 180})
+	self.model.dm:SetPos({0, 0, 64})
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
-	self:SetDrawModelBounds(self.model, self:Mins(), self:Maxs())
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetCameraShift({0, 0, 90}) -- camera looks here
 	
 	local angle = NumberForString(self.keys.angle, 0)
 	
 	local angleVertex = self:Angles()
 	angleVertex.pos = {0, 0, angle}
-	angleVertex.mass = 5 -- how much mass the crow has (how much he resists changes in direction)
-	angleVertex.drag[1] = 7 -- energy lost when crow is being pulled
-	angleVertex.drag[2] = 7 -- energy lost per second when the crow is in position
-	-- friction effects
+	angleVertex.mass = 5
+	angleVertex.drag[1] = 7
+	angleVertex.drag[2] = 7
 	angleVertex.friction = 0.5
 	self:SetAngles(angleVertex)
 	

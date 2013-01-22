@@ -257,5 +257,3 @@ public:
 	virtual const char *Name() { return "Waypoint Node"; }
 	virtual CMapObject *CreateObject(CTreadDoc *doc) { return CWaypoint::Create(doc); }
 };
-
-#include <Runtime/PopPack.h>

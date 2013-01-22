@@ -9,8 +9,6 @@ function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
 	Entity.Spawn(self)
 	
-	local x = Tokenize("ab cd ef 1.2f4 \"testing with spaces\" bb yy")
-	
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
 	self:AttachDrawModel(self.model)

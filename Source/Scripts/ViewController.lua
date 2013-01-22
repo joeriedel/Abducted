@@ -41,6 +41,7 @@ function ViewController.HandleCameraCmd(self, args)
 	local distance = tonumber(x[2])
 	local strict = FindArrayElement(x, "strict=true")
 	local useFOV = FindArrayElement(x, "fov=true")
+	local forceBehind = not FindArrayElement(x, "behind=false")
 	local angles = {180, 180, 180}
 	
 	local specifiedAngles, idx = FindArrayElement(x, "angles=")
@@ -51,14 +52,20 @@ function ViewController.HandleCameraCmd(self, args)
 	local loose = FindArrayElement(x, "follow=loose")
 	
 	if (loose) then
-		self:DoLooseCamera(camera, distance, strict, useFOV, angles)
+		self:DoLooseCamera(camera, distance, strict, forceBehind, useFOV, angles)
 	else
-		self:DoTightCamera(camera, distance, strict, useFOV, angles)
+		self:DoTightCamera(camera, distance, strict, forceBehind, useFOV, angles)
 	end
 	
 end
 
-function ViewController.DoTightCamera(self, camera, distance, strict, useFOV, angles)
+function ViewController.DoTightCamera(self, camera, distance, strict, forceBehind, useFOV, angles)
+	
+	if (not forceBehind) then
+		forceBehind = -1
+	else
+		forceBehind = 1 -- take 1 second to switch sides
+	end
 	
 	self:SetRailMode(
 		camera,
@@ -66,13 +73,19 @@ function ViewController.DoTightCamera(self, camera, distance, strict, useFOV, an
 		strict,
 		0.4,
 		0.4,
+		forceBehind,
 		useFOV,
 		angles
 	)
 	
 end
 
-function ViewController.DoLooseCamera(self, camera, distance, strict, useFOV, angles)
+function ViewController.DoLooseCamera(self, camera, distance, strict, forceBehind, useFOV, angles)
+	if (not forceBehind) then
+		forceBehind = -1
+	else
+		forceBehind = 1 -- take 1 second to switch sides
+	end
 	
 	self:SetRailMode(
 		camera,
@@ -80,6 +93,7 @@ function ViewController.DoLooseCamera(self, camera, distance, strict, useFOV, an
 		strict,
 		0.9,
 		0.9,
+		forceBehind,
 		useFOV,
 		angles
 	)

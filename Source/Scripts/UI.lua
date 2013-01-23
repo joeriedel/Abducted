@@ -7,31 +7,51 @@ UI = Class:New()
 UI.kLayer_Mask = 0
 UI.kLayer_UI = 1
 UI.kLayer_MainMenu = 2
-UI.kLayer_TerminalPuzzles = 3
-UI.kLayer_Popups = 4
+UI.kLayer_HUD = 2 -- not used at same time as main menu
+UI.kLayer_Arm = 3
+UI.kLayer_TerminalPuzzles = 4
 UI.kLayer_LB = 5
-UI.kLayer_Notifications = 6
-UI.kLayer_Feedback = 7
-UI.kLayer_FX = 8
-UI.kLayer_Debug = 9
+UI.kLayer_Popups = 6
+UI.kLayer_Notifications = 7
+UI.kLayer_Feedback = 8
+UI.kLayer_FX = 9
+UI.kLayer_Debug = 10
 
 function UI.Spawn(self)
 	UI.entity = self
 	
-	local screenSize = System.ScreenSize()
-	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", screenSize.width, screenSize.height)
-	World.SetUIViewport(0, 0, screenSize.width, screenSize.height)
+	local systemScreen = System.ScreenSize()
+	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", systemScreen.width, systemScreen.height)
+		
+	UI.systemRect = {0, 0, systemScreen.width, systemScreen.height}
+	UI.aspect = systemScreen.aspect
 	
-	UI.fullscreenRect = {0, 0, screenSize.width, screenSize.height}
-	UI.aspect = screenSize.aspect
-	UI.xAspect = screenSize.width / screenSize.height
-	UI.yAspect = screenSize.height / screenSize.width
-	UI.screenWidth = screenSize.width
-	UI.screenHeight = screenSize.height
+	local uiScreen
+	
+	if ((UI.aspect == "16x9") or (UI.aspect == "16x10")) then
+		uiScreen = {width=1280, height=720}
+		UI.wideScreen = true
+	else
+		uiScreen = {width=1280, height=720}
+	end
+	
+	World.SetUIViewport(0, 0, uiScreen.width, uiScreen.height)
+	UI.fullscreenRect = {0, 0, uiScreen.width, uiScreen.height}
+	
+	UI.xAspect = uiScreen.width / uiScreen.height
+	UI.yAspect = uiScreen.height / uiScreen.width
+	UI.screenWidth = uiScreen.width
+	UI.screenHeight = uiScreen.height
+	UI.screenUIScale = {
+		uiScreen.width / systemScreen.width,
+		uiScreen.height / systemScreen.height
+	}
+	
+	UI.gestureMode = false
 	
 	UI.gfx = {}
 	UI.widgets = {}
-			
+	
 	UI:LoadSharedMaterials()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
@@ -63,9 +83,8 @@ function UI.CreateFeedbackLayer(self)
 	self.gfx.feedback = {}
 	self.widgets.feedback = {}
 	
-	self.widgets.feedback.Root = self:CreateWidget("Widget", {rect=UI.fullscreenRect})
-	World.SetRootWidget(UI.kLayer_Feedback, self.widgets.feedback.Root)
-	
+	self.widgets.feedback.Root = UI:CreateRoot(UI.kLayer_Feedback)
+		
 	self.gfx.feedback.Finger = World.Load("UI/finger_shadow_M")
 	self.widgets.feedback.Finger = self:CreateWidget("MatWidget", {rect={0, 0, 128, 128}, material=self.gfx.feedback.Finger}) 
 	self.widgets.feedback.Root:AddChild(self.widgets.feedback.Finger)
@@ -129,6 +148,12 @@ function UI.FadeOutLetterBox(self, color, time)
 
 end
 
+function UI.CreateRoot(self, layer)
+	local root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+	World.SetRootWidget(layer, root)
+	return root
+end
+
 function UI.CreateWidget(self, type, parms)
 
 	local w = World.CreateWidget(type, parms)
@@ -149,6 +174,55 @@ end
 --[[---------------------------------------------------------------------------
 	Widget Positioning Utils
 -----------------------------------------------------------------------------]]
+
+function UI.MapInputEvent(self, e)
+
+	if (e.type == kI_KeyDown) or (e.type == kI_KeyUp) then
+		return e
+	end
+	
+	local x = { 
+		original = e,
+		type = e.type,
+		data = { 
+			e.data[1] * UI.screenUIScale[1], 
+			e.data[2] * UI.screenUIScale[2], 
+			e.data[3] 
+		}
+	}
+	
+	return x
+
+end
+
+function UI.MapInputGesture(self, g)
+
+	local x = {
+		original = g,
+		mins = {
+			g.mins[1] * UI.screenUIScale[1],
+			g.mins[2] * UI.screenUIScale[2]
+		},
+		maxs = {
+			g.maxs[1] * UI.screenUIScale[1],
+			g.maxs[2] * UI.screenUIScale[2]
+		},
+		origin = {
+			g.origin[1] * UI.screenUIScale[1],
+			g.origin[2] * UI.screenUIScale[2]
+		}
+	}
+
+	return x
+
+end
+
+function UI.MoveWidget(self, widget, x, y)
+	local r = widget:Rect()
+	r[1] = x
+	r[2] = y
+	widget:SetRect(r)
+end
 
 function UI.HCenterWidget(self, widget, xp, yf)
 
@@ -443,6 +517,15 @@ function UI.SizeLabel(self, label)
 	label:SetRect(r)
 	return r
 	
+end
+
+function UI.MaterialSize(self, material, rect)
+	rect = rect or {}
+	local w, h = material:Dimensions()
+	rect[3] = w
+	rect[4] = h
+	
+	return rect
 end
 
 ui_code = UI

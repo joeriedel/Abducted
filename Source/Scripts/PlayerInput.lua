@@ -7,7 +7,6 @@ PlayerInput = Class:New()
 PlayerInput.Enabled = true
 
 function PlayerInput.Spawn(self)
-	World.SetEnabledGestures(0)
 	self:Load()
 end
 
@@ -20,6 +19,8 @@ function PlayerInput.OnInputEvent(self, e)
 	if (not self.Enabled) then
 		return false
 	end
+	
+	e = UI:MapInputEvent(e)
 	
 	if (Input.IsTouchBegin(e)) then
 		UI:ShowFinger(true, 0.25)

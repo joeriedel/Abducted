@@ -68,10 +68,10 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	if cmd == "start" or cmd == "play" then
 		self.on = true
 		self.fadeTime = nil
-	elseif cmd == "fadeIn" then
+	elseif cmd == "fadein" then
 		self.on = true
 		self.fadeTime = tonumber(args)
-	elseif cmd == "fadeOut" then
+	elseif cmd == "fadeout" then
 		self.on = false
 		self.fadeTime = tonumber(args)
 	elseif cmd == "rewind" then	

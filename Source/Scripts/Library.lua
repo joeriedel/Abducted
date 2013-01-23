@@ -4,8 +4,15 @@
 -- See Abducted/LICENSE for licensing terms
 
 --[[---------------------------------------------------------------------------
-	Common Utilities
+	Tokenize a string
 -----------------------------------------------------------------------------]]
+
+function map(list, f, ...)
+	for k,v in pairs(list) do
+		list[k] = f(v, ...)
+	end
+	return list
+end
 
 --[[---------------------------------------------------------------------------
 	Tokenize a string
@@ -108,6 +115,18 @@ end
 
 function LL_Tail(list)
 	return list.ll_tail
+end
+
+function LL_Next(item)
+	return item.ll_next
+end
+
+function LL_Prev(item)
+	return item.ll_prev
+end
+
+function LL_Size(list)
+	return list.ll_size
 end
 
 function LL_Empty(list)

@@ -28,6 +28,9 @@
     <filename>Source\Scripts\GameNetwork.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\HUD.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Imports.lua</filename>
   </file>
   <file>
@@ -73,10 +76,16 @@
     <filename>Source\Scripts\TerminalPuzzles.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Timers.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\TouchTrigger.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\UI.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\UIWidgets.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\ViewController.lua</filename>

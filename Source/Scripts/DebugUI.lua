@@ -20,9 +20,8 @@ function DebugUI.Spawn(self)
 	local w,h = self.gfx.Typeface:Size()
 
 	self.widgets = {}
-	self.widgets.root =UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
-	World.SetRootWidget(UI.kLayer_Debug, self.widgets.root)
-	
+	self.widgets.root = UI:CreateRoot(UI.kLayer_Debug)
+		
 	self.widgets.rspeeds = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
 	self.widgets.root:AddChild(self.widgets.rspeeds);
 	

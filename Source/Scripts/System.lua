@@ -135,7 +135,7 @@ function World.CoThink(entity)
 		while true do
 			local dt = World.GameTime() - time;
 			if entity.think then
-				entity.think(entity, dt / 1000)
+				entity.think(entity, dt)
 			end
 			if not entity.think then
 				entity:SetNextThink(1000000) -- don't call back in here

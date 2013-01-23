@@ -44,7 +44,7 @@ function PlayerInput.OnInputGesture(self, g)
 end
 
 function PlayerInput.TapWaypoint(self, x, y)
-	local waypoint = World.PickWaypoint(x, y,  100)
+	local waypoint = World.PickWaypoint(x, y,  350)
 	if (waypoint) then
 		if (World.playerPawn:MoveToWaypoint(waypoint)) then
 			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)

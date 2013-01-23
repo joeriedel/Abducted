@@ -19,7 +19,7 @@ function PlayerPawn.Spawn(self)
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self:SetCameraShift({0, 0, 90}) -- camera looks here
+	self:SetCameraShift({0, 0, 50}) -- camera looks here
 	
 	local angle = NumberForString(self.keys.angle, 0)
 	

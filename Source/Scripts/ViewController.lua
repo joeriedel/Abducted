@@ -71,8 +71,8 @@ function ViewController.DoTightCamera(self, camera, distance, strict, forceBehin
 		camera,
 		distance,
 		strict,
-		0.4,
-		0.4,
+		0.8,
+		0.8,
 		forceBehind,
 		useFOV,
 		angles
@@ -139,8 +139,8 @@ function ViewController.Defaults(self)
 		0, -- in time
 		0, -- out time
 		-1, -- hold time (-1 for infinite)
-		10, -- minimum  units
-		20, -- maximum  units
+		30, -- minimum  units
+		50, -- maximum  units
 		10, -- take X seconds to lerp between those distances
 		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
 		{ 0, -10, -5 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it

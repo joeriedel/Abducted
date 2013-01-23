@@ -39,8 +39,8 @@ function ViewController.HandleCameraCmd(self, args)
 		
 	local camera = x[1]
 	local distance = tonumber(x[2])
-	local strict = FindArrayElement(x, "strict=true")
-	local useFOV = FindArrayElement(x, "fov=true")
+	local strict = not FindArrayElement(x, "strict=false")
+	local useFOV = not FindArrayElement(x, "fov=false")
 	local forceBehind = not FindArrayElement(x, "behind=false")
 	local angles = {180, 180, 180}
 	
@@ -139,8 +139,8 @@ function ViewController.Defaults(self)
 		0, -- in time
 		0, -- out time
 		-1, -- hold time (-1 for infinite)
-		50, -- minimum  units
-		100, -- maximum  units
+		0, -- minimum  units
+		0, -- maximum  units
 		30, -- take X seconds to lerp between those distances
 		-1, -- this is the "lag", a quasi number between 0 and 1 that controls how "loosly" the distance is tracked (<= 0 means no lag)
 		{ 0, -10, -5 }, -- minAngles (X, Y, Z) NOTE: Y pitches up over the object, Z rotates around it

@@ -1,13 +1,11 @@
--- Class.lua
+-- PlayerSkills.lua
 -- Copyright (c) 2012 Sunside Inc., All Rights Reserved
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
-Class = {}
+PlayerSkills = Class:New()
 
-function Class:New(x)
-	local x = x or {}
-	setmetatable(x, self)
-	self.__index = self
-	return x
+function PlayerSkills.Load(self)
+	self.Manipulate = 0
 end
+

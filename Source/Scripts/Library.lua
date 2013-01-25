@@ -109,6 +109,10 @@ function LL_New(list)
 
 end
 
+function LL_List(item)
+	return item.ll_list
+end
+
 function LL_Head(list)
 	return list.ll_head
 end
@@ -137,8 +141,21 @@ function LL_Append(list, item)
 	return LL_Insert(list, item, list.ll_tail)
 end
 
+function LL_Iterate(list, f)
+
+	local item = LL_Head(list)
+	
+	while (item) do
+		f(item)
+		item = LL_Next(item)
+	end
+
+end
+
 function LL_Insert(list, item, after)
 
+	assert(item.ll_list == nil)
+	
 	-- special case insert at head
 	if after == nil then
 		item.ll_prev = nil
@@ -163,6 +180,7 @@ function LL_Insert(list, item, after)
 		end
 	end
 	
+	item.ll_list = list
 	list.ll_size = list.ll_size + 1
 	
 	return item
@@ -174,6 +192,8 @@ function LL_Remove(list, item) -- removes item, and returns next item in list
 	if not item then
 		return nil
 	end
+	
+	assert(item.ll_list == list)
 	
 	local next = item.ll_next
 	
@@ -193,6 +213,7 @@ function LL_Remove(list, item) -- removes item, and returns next item in list
 	
 	item.ll_next = nil
 	item.ll_prev = nil
+	item.ll_list = nil
 	
 	list.ll_size = list.ll_size - 1
 	

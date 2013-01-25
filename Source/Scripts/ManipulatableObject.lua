@@ -4,12 +4,17 @@
 -- See Abducted/LICENSE for licensing terms
 
 ManipulatableObject = Entity:New()
+ManipulatableObject.Objects = LL_New()
 
 function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
 	
 	self.model = LoadSkModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
+	self.model.vision = self.model.dm:CreateInstance()
+	self:AttachDrawModel(self.model.vision) -- manipulate vision model
+	self.model.vision:BlendTo({1,1,1,0}, 0)
+	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
 	
@@ -18,6 +23,11 @@ function ManipulatableObject.Spawn(self)
 	local angleVertex = self:Angles()
 	angleVertex.pos = {0, 0, angle}
 	self:SetAngles(angleVertex)
+	
+	self.skillRequired = NumberForString(self.keys.skill, 0)
+	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
+	
+	self.enabled = false
 	
 	self:LoadSounds()
 	self:Dormant()
@@ -91,6 +101,49 @@ function ManipulatableObject.Idle(self)
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end
+	
+	if (not self.enabled) then
+		self.enabled = true
+		LL_Append(ManipulatableObject.Objects, {entity=self})
+		if (Game.entity.manipulate) then -- show ourselves
+			ManipulatableObject.NotifyManipulate(true)
+		end
+	end
+end
+
+function ManipulatableObject.NotifyManipulate(enabled)
+
+	local time = 0.5
+	local hidden = {1,1,1,0}
+	
+	if (enabled) then
+		time = 0.15
+	end
+	
+	local f = function (x)
+		local rgba
+		if (enabled) then
+			rgba = x.entity:SelectColor()
+		else
+			rgba = hidden
+		end
+		
+		x.entity.model.vision:BlendTo(rgba, time)
+	end
+	
+	LL_Iterate(ManipulatableObject.Objects, f)
+
+end
+
+function ManipulatableObject.SelectColor(self)
+		
+	if (self.skillRequired > PlayerSkills.Manipulate+1) then
+		return {1,0,0,1}
+	elseif (self.skillRequired <= PlayerSkills.Manipulate) then
+		return {0,1,0,1}
+	end
+	
+	return {1,1,0,1}
 end
 
 --[[---------------------------------------------------------------------------
@@ -102,13 +155,18 @@ Tentacle = ManipulatableObject:New()
 function Tentacle.Spawn(self)
 	ManipulatableObject.Spawn(self)
 	
-	self.model.dm:SetScale({0.4, 0.4, 0.4})
-	self.model.dm:SetAngles({0, -90, 180})
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
+	self.model.dm:SetScale({0.4, 0.4, 0.4})
+	self.model.dm:SetAngles({0, -90, 180})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self:Link() -- kMoveType_None
 	
+	self.model.vision:SetScale({0.4, 0.4, 0.4})
+	self.model.vision:SetAngles({0, -90, 180})
+--	self.model.vision:SetPos({0, 100, 0})
+	self.model.vision:SetBounds(self:Mins(), self:Maxs())
+	
+	self:Link() -- kMoveType_None
 end
 
 info_tentacle = Tentacle

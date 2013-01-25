@@ -3,7 +3,7 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
-Game = Class:New()
+Game = Entity:New()
 
 function Game.Spawn(self)
 	Game.entity = self
@@ -11,38 +11,19 @@ function Game.Spawn(self)
 	World.gameCode = self
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()
-	self.think = Game.Think
-	self:SetNextThink(0)
 end
 
-function Game.SpawnType(self, type)
+function Game.Initialize(self, type)
 	Game.type = type
 	
 	World.SetEnabledGestures(0)
 	
 	if (type == "Map") then
-		PlayerInput:Spawn()
-		HUD:Spawn()
-		Game.OnInputEvent = Game.HandleGameInputEvent
-		Game.OnInputGesture = Game.HandleGameInputGesture
+		Abducted:New(Game.entity)
+		Game.entity:Initialize()
 	end
 end
 
-function Game.HandleGameInputEvent(e)
-	return PlayerInput:OnInputEvent(e)
-end
-
-function Game.HandleGameInputGesture(e)
-	return PlayerInput:OnInputGesture(e)
-end
-
-function Game.HandleMainMenuInputEvent(e)
-	return false
-end
-
-function Game.HandleMainMenuInputGesture(g)
-	return false
-end
 
 function Game.Think(self)
 	local time = World.GameTime()

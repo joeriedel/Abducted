@@ -27,8 +27,9 @@ function HUD.Load(self)
 	self.gfx = {
 		Arm = "UI/arm_button_M",
 		ArmPressed = "UI/arm_button_pressed_M",
-		Manipulate = "UI/manipulate_button_M",
-		ManipulatePressed = "UI/manipulate_button_pressed_M",
+--		ManipulateDisabled = "UI/manipulate_button_disabled_M",
+		ManipulateEnabled = "UI/manipulate_button_M",
+		ManipulateFlashing = "UI/manipulate_button_flashing_M",
 		Pulse = "UI/pulse_button_M",
 		PulsePressed = "UI/pulse_button_pressed_M",
 		Shield = "UI/shield_button_M",
@@ -39,7 +40,7 @@ function HUD.Load(self)
 	
 	self.widgets.Arm = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
-		{pressed = self.gfx.ArmPressed, unpressed = self.gfx.Arm},
+		{pressed = self.gfx.ArmPressed, enabled = self.gfx.Arm},
 		nil,
 		{pressed=function (widget) HUD:ArmPressed(widget) end},
 		nil,
@@ -47,17 +48,23 @@ function HUD.Load(self)
 	)
 	
 	self.widgets.Manipulate = UIPushButton:Create(
-		UI:MaterialSize(self.gfx.Manipulate, {0, 0}),
-		{pressed = self.gfx.ManipulatePressed, unpressed = self.gfx.Manipulate},
+		UI:MaterialSize(self.gfx.ManipulateEnabled, {0, 0}),
+		{ -- we go to disabled state when manipulate gets activated
+			pressed = self.gfx.ManipulateEnabled, 
+			enabled = self.gfx.ManipulateEnabled
+		},
 		nil,
 		{pressed=function (widget) HUD:ManipulatePressed(widget) end},
 		nil,
 		self.widgets.root
 	)
 	
+	self.widgets.Manipulate.flashing = false
+--	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	
 	self.widgets.Shield = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Shield, {0, 0}),
-		{pressed = self.gfx.ShieldPressed, unpressed = self.gfx.Shield},
+		{pressed = self.gfx.ShieldPressed, enabled = self.gfx.Shield},
 		nil,
 		{pressed=function (widget) HUD:ShieldPressed(widget) end},
 		nil,
@@ -66,7 +73,7 @@ function HUD.Load(self)
 	
 	self.widgets.Pulse = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Pulse, {0, 0}),
-		{pressed = self.gfx.PulsePressed, unpressed = self.gfx.Pulse},
+		{pressed = self.gfx.PulsePressed, enabled = self.gfx.Pulse},
 		nil,
 		{pressed=function (widget) HUD:PulsePressed(widget) end},
 		nil,
@@ -81,6 +88,7 @@ end
 
 function HUD.ManipulatePressed(self, widget)
 	COutLine(kC_Debug, "Manipulate Pressed!")
+	Game.entity:BeginManipulate()
 end
 function HUD.ShieldPressed(self, widget)
 	COutLine(kC_Debug, "Shield Pressed!")
@@ -101,5 +109,22 @@ function HUD.LayoutWide(self)
 end
 
 function HUD.Think(self)
-	
+	self:UpdateManipulateButton()
+end
+
+function HUD.UpdateManipulateButton(self)
+	local flashing = Game.entity.manipulate
+	if (flashing ~= self.widgets.Manipulate.flashing) then
+		self.widgets.Manipulate.flashing = flashing
+		local gfx = {}
+		if (flashing) then
+			gfx.pressed = self.gfx.ManipulateFlashing
+			gfx.enabled = self.gfx.ManipulateFlashing
+		else
+			gfx.pressed = self.gfx.ManipulateEnabled
+			gfx.enabled = self.gfx.ManipulateEnabled
+		end
+		
+		self.widgets.Manipulate.class:ChangeGfx(self.widgets.Manipulate, gfx)
+	end
 end

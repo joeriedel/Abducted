@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
   <file>
+    <filename>Source\Scripts\Abducted.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Animation.lua</filename>
   </file>
   <file>

@@ -9,25 +9,38 @@ function TimerList.Create(self)
 	local fnList = {}
 	
 	fnList.list = LL_New()
+	fnList.time = 0
 	fnList.Tick = function (self, time, ...)
+		self.time = time
 		local x = LL_Head(self.list)
 		local dt
 		while (x) do
+			local next = LL_Next(x)
 			dt = time - x.time
 			if (dt >= x.freq) then
 				x.fn(dt, time, ...)
 				x.time = time
+				if (x.singleShot) then
+					LL_Remove(x)
+				end
 			end
-			x = LL_Next(x)
+			x = next
 		end
 	end
-	fnList.Add = function(self, fn, freq)
+	fnList.Add = function(self, fn, freq, singleShot)
 		local x = {
 			fn = fn, 
 			freq = freq, 
-			time = 0,
+			time = self.time,
+			singleShot = singleShot,
 			SetFreq = function(self, freq)
 				self.freq = freq
+			end,
+			Clean = function(self)
+				local list = LL_List(self)
+				if (list) then
+					LL_Remove(list, self)
+				end
 			end
 		}
 		return LL_Append(self.list, x)

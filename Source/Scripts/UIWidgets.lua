@@ -39,9 +39,13 @@ function UIPushButton.Create(self, size, gfx, sfx, events, options, layer)
 
 	local params = {
 		rect = size,
-		material = gfx.pressed,
+		material = gfx.enabled,
 		OnInputEvent = UIPushButton.OnInputEvent
 	}
+	
+	if (gfx.disabled == nil) then
+		gfx.disabled = gfx.enabled
+	end
 	
 	local widget = UI:CreateWidget("MatWidget", params)
 	widget.events = events or {}
@@ -59,6 +63,18 @@ function UIPushButton.Create(self, size, gfx, sfx, events, options, layer)
 	return widget
 end
 
+function UIPushButton.SetEnabled(self, widget, enabled)
+	if (widget.enabled == enabled) then
+		return
+	end
+	
+	widget.enabled = enabled
+	widget.state.pressed = false
+	widget.busy = nil
+	widget:SetCapture(false)
+	self:SetGfxState(widget)
+end
+
 function UIPushButton.OnInputEvent(widget, e)
 	
 	if (widget.events.filter) then
@@ -73,6 +89,7 @@ function UIPushButton.OnInputEvent(widget, e)
 	elseif ((widget.state.pressed) and Input.IsTouchMove(e, widget.busy)) then
 		return true
 	elseif ((widget.state.pressed) and widget.busy and Input.IsTouchEnd(e, widget.busy)) then
+		widget:SetCapture(false)
 		if (widget.options.manualUnpress) then
 			widget.busy = nil
 			return true
@@ -100,12 +117,10 @@ function UIPushButton.DoPressed(self, widget, e)
 		return true
 	end
 	
-	widget.busy = e
+	widget.busy = e.touch
 	widget.state.pressed = true
 	
-	if (widget.gfx.pressed) then
-		widget:SetMaterial(widget.gfx.pressed)
-	end
+	widget.class:SetGfxState(widget)
 	
 	if (widget.sfx.pressed) then
 		widget.sfx.pressed:Play(kSoundChannel_UI, 0)
@@ -115,14 +130,19 @@ function UIPushButton.DoPressed(self, widget, e)
 		widget.events.pressed(widget, e)
 	end
 	
+	widget:SetCapture(true)
+	
+	return true
+	
 end
 
 function UIPushButton.DoUnpressed(self, widget)
 
 	widget.busy = nil
+	widget.state.pressed = false
 	
-	if (widget.gfx.unpressed) then
-		widget:SetMaterial(widget.gfx.unpressed)
+	if (widget.gfx.enabled) then
+		widget:SetMaterial(widget.gfx.enabled)
 	end
 	
 	if (widget.sfx.unpressed) then
@@ -133,8 +153,32 @@ function UIPushButton.DoUnpressed(self, widget)
 		widget.events.unpressed(widget)
 	end
 	
+	return true
+	
 end
 
 function UIPushButton.Reset(self, widget)
 	self:DoUnpressed(widget)
+end
+
+function UIPushButton.SetGfxState(self, widget)
+	if (widget.state.pressed) then
+		widget:SetMaterial(widget.gfx.pressed)
+	else
+		if (widget.enabled) then
+			widget:SetMaterial(widget.gfx.enabled)
+		else
+			widget:SetMaterial(widget.gfx.disabled)
+		end
+	end
+end
+
+function UIPushButton.ChangeGfx(self, widget, gfx)
+	widget.gfx = gfx or {}
+	
+	if (gfx.disabled == nil) then
+		gfx.disabled = gfx.enabled
+	end
+	
+	self:SetGfxState(widget)
 end

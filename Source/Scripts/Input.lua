@@ -6,10 +6,8 @@
 function World.OnInputEvent(e)
 
 	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
-		if (Game.OnInputEvent) then
-			if (Game.OnInputEvent(e)) then
-				return true
-			end
+		if (Game.entity:OnInputEvent(e)) then
+			return true
 		end
 	end
 	
@@ -19,10 +17,8 @@ end
 
 function World.OnInputGesture(g)
 
-	if (Game.OnInputGesture) then
-		if (Game.OnInputGesture(e)) then
-			return true
-		end
+	if (Game.entity:OnInputGesture(e)) then
+		return true
 	end
 	
 	return false

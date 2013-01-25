@@ -52,6 +52,13 @@ kPF_SplineEvents = 64
 kPF_SplineBank = 128
 kPF_FlipSplineBank = 256
 
+-- ska::Notify mask flags
+kSkaNotifyMaskFlag_Tags = 1
+kSkaNotifyMaskFlag_EndFrame = 2
+kSkaNotifyMaskFlag_Finished = 4
+kSkaNotifyMaskFlag_All = 7
+kSkaNotifyMaskFlag_None = 0
+
 -- Tick flags
 kTF_PreTick = 1
 kTF_PostTick = 2

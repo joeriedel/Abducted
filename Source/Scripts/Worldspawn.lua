@@ -17,7 +17,7 @@ function Worldspawn.Spawn(self)
 	World.cloudEnabled = Persistence.ReadBool(Globals, "icloud", true)
 	SaveGame:EnableCloudStorage(World.cloudEnabled)
 	
-	Game.entity:SpawnType(StringForString(self.keys.type, "Map"))
+	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
 end
 
 function Worldspawn.PostSpawn(self)

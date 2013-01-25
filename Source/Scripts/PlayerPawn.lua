@@ -9,13 +9,15 @@ function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
 	Entity.Spawn(self)
 	
+	MakeAnimatable(self)
+	
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.dm:SetScale({0.4, 0.4, 0.4}) -- temp art
 	self.model.dm:SetMotionScale(2.5) -- temp art
 	self.model.dm:SetAngles({0, -90, 180})
-	self.model.dm:SetPos({0, 0, 64})
+	self.model.dm:SetPos({0, 0, 60})
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
@@ -60,6 +62,10 @@ function PlayerPawn.Spawn(self)
 end
 
 function PlayerPawn.TickPhysics(self)
+	if (self.manipulate) then
+		return -- manipulation logic controls us right now
+	end
+	
 	local reqState
 	local velocity = VecMag(self:Velocity())
 --	COutLine(kC_Debug, "Velocity = %f", velocity)
@@ -73,7 +79,7 @@ function PlayerPawn.TickPhysics(self)
 	
 	if (self.state ~= reqState) then
 		self.state = reqState
-		self.model:BlendToState(reqState)
+		self:PlayAnim(reqState, self.model)
 	end
 end
 
@@ -90,6 +96,16 @@ function PlayerPawn.MoveToWaypoint(self, waypointNum)
 	
 	self:SetDesiredMove(moveCommand)
 	return true
+end
+
+function PlayerPawn.NotifyManipulate(self, enabled)
+	self.manipulate = enabled
+	
+	if (enabled) then
+		self.state = nil
+		self:PlayAnim("manipulate_idle", self.model)
+		self:SetDesiredMove(nil)
+	end
 end
 
 info_player_start = PlayerPawn

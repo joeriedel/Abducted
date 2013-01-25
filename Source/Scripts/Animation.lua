@@ -54,7 +54,9 @@ function Animation.Play(entity, state, model)
 		LL_Append(entity.animationStates.chain, {seq=state})
 	end
 	
-	if (model:BlendToState(state, nil, true, entity, blend)) then
+	entity.animationStates.notify = model:BlendToState(state, nil, true, entity, blend)
+	
+	if (entity.animationStates.notify) then
 		return blend
 	end
 	
@@ -64,7 +66,7 @@ end
 function Animation.Cancel(entity)
 	if (entity.animationStates) then
 		if (entity.animationStates.notify) then
-			entity.animationStates.notify:SetMasked()
+			entity.animationStates.notify:SetMasked(kSkaNotifyMaskFlag_All)
 		end
 	end
 	entity.animationStates = nil

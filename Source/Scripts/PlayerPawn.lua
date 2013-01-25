@@ -62,8 +62,8 @@ function PlayerPawn.Spawn(self)
 end
 
 function PlayerPawn.TickPhysics(self)
-	if (self.manipulate) then
-		return -- manipulation logic controls us right now
+	if (self.disableAnimTick) then
+		return -- other logic controls us right now
 	end
 	
 	local reqState
@@ -99,13 +99,34 @@ function PlayerPawn.MoveToWaypoint(self, waypointNum)
 end
 
 function PlayerPawn.NotifyManipulate(self, enabled)
-	self.manipulate = enabled
+	
 	
 	if (enabled) then
+		self.disableAnimTick = true
 		self.state = nil
 		self:PlayAnim("manipulate_idle", self.model)
 		self:SetDesiredMove(nil)
+	else 
+		if (self.manipulateDir == nil) then
+			self:EndManipulate()
+		end
 	end
+end
+
+function PlayerPawn.ManipulateDir(self, dir)
+	self.manipulateDir = dir
+	
+	local f = function()
+		self:EndManipulate()
+	end
+	
+	self:PlayAnim("manipulate_"..dir, self.model).Seq(f)
+	
+end
+
+function PlayerPawn.EndManipulate(self)
+	self.manipulateDir = nil
+	self.disableAnimTick = false
 end
 
 info_player_start = PlayerPawn

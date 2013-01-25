@@ -184,12 +184,12 @@ function VecsFromAngles(angles)
 	return VecsFromQuatFrame(qx, qy, qz)
 end
 
-function ForwardVecFromAngle(angle)
-	local q = QuatFromAngles({ 0, 0, angle })
+function ForwardVecFromAngles(angles)
+	local qx, qy, qz = QuatFrameFromAngles(angles)
 	local rotate = QuatRotateVec
-	local x = rotate(q, {1,0,0})
-	x = rotate(qf[2], x)
-	x = rotate(qf[3], x)
+	local x = rotate(qx, {1,0,0})
+	x = rotate(qy, x)
+	x = rotate(qz, x)
 	return x
 end
 
@@ -438,7 +438,7 @@ function QuatFromAngles(angles)
 	local cysz = cy*sz
 	local sycz = sy*cz
 	
-	return { sx*cyz+cx*sysz, cx*sycz+sx*cysz, cx*cysz+sz*sycz, cx*cycz+sx*sysz }
+	return { sx*cycz+cx*sysz, cx*sycz+sx*cysz, cx*cysz+sz*sycz, cx*cycz+sx*sysz }
 end
 	
 

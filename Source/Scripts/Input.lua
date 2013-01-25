@@ -17,7 +17,7 @@ end
 
 function World.OnInputGesture(g)
 
-	if (Game.entity:OnInputGesture(e)) then
+	if (Game.entity:OnInputGesture(g)) then
 		return true
 	end
 	

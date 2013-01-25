@@ -20,15 +20,14 @@ UI.kLayer_Debug = 10
 function UI.Spawn(self)
 	UI.entity = self
 	
-	local systemScreen = System.ScreenSize()
-	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", systemScreen.width, systemScreen.height)
+	UI.systemScreen = System.ScreenSize()
+	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", UI.systemScreen.width, UI.systemScreen.height)
 		
-	UI.systemRect = {0, 0, systemScreen.width, systemScreen.height}
-	UI.aspect = systemScreen.aspect
+	UI.systemRect = {0, 0, UI.systemScreen.width, UI.systemScreen.height}
 	
 	local uiScreen
 	
-	if ((UI.aspect == "16x9") or (UI.aspect == "16x10")) then
+	if ((UI.systemScreen.aspect == "16x9") or (UI.systemScreen.aspect == "16x10")) then
 		uiScreen = {width=1280, height=720}
 		UI.wideScreen = true
 	else
@@ -43,8 +42,8 @@ function UI.Spawn(self)
 	UI.screenWidth = uiScreen.width
 	UI.screenHeight = uiScreen.height
 	UI.screenUIScale = {
-		uiScreen.width / systemScreen.width,
-		uiScreen.height / systemScreen.height
+		uiScreen.width / UI.systemScreen.width,
+		uiScreen.height / UI.systemScreen.height
 	}
 	
 	UI.gestureMode = false

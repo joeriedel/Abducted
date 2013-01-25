@@ -40,19 +40,40 @@ function Animation.Play(entity, state, model)
 	blend.OnEndFrame = function (self)
 		local next = LL_Pop(self.animationStates.chain)
 		if (next) then
+			assert(next.seq)
 			next.seq(entity)
+			
+			next = LL_Head(self.animationStates.chain)
+			while (next and next._and) do
+				next = LL_Pop(self.animationStates.chain)
+				assert(next._and)
+				next._and(entity)
+				next = LL_Head(self.animationStates.chain)
+			end
 		end
 	end
 	
 	blend.Seq = function (state)
-		if (type(seq) == "string") then
+		if (type(state) == "string") then
 			local x = state
 			state = function (entity)
 				model:BlendToState(x, nil, true, entity, blend)
 			end
 		end
 		LL_Append(entity.animationStates.chain, {seq=state})
+		return blend
 	end
+	
+	blend.And = function (state)
+		if (type(state) == "string") then
+			local x = state
+			state = function (entity)
+				model:BlendToState(x, nil, true, entity, blend)
+			end
+		end
+		LL_Append(entity.animationStates.chain, {_and=state})
+		return blend
+	end	
 	
 	entity.animationStates.notify = model:BlendToState(state, nil, true, entity, blend)
 	

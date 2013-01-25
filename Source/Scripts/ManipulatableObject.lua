@@ -5,6 +5,7 @@
 
 ManipulatableObject = Entity:New()
 ManipulatableObject.Objects = LL_New()
+ManipulatableObject.MaxManipulateDistancePct = 1/5 -- max distance to target center
 
 function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
@@ -28,6 +29,7 @@ function ManipulatableObject.Spawn(self)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
 	
 	self.enabled = false
+	self.swipePos = {0, 0, 0}
 	
 	self:LoadSounds()
 	self:Dormant()
@@ -104,7 +106,7 @@ function ManipulatableObject.Idle(self)
 	
 	if (not self.enabled) then
 		self.enabled = true
-		LL_Append(ManipulatableObject.Objects, {entity=self})
+		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		if (Game.entity.manipulate) then -- show ourselves
 			ManipulatableObject.NotifyManipulate(true)
 		end
@@ -144,6 +146,218 @@ function ManipulatableObject.SelectColor(self)
 	end
 	
 	return {1,1,0,1}
+end
+
+function ManipulatableObject.FindSwipeTarget(g)
+
+	-- figure out line normal
+	assert(g.id == kIG_Line)
+	
+	local kMaxSqDist = (UI.systemScreen.width*UI.systemScreen.width) +
+		(UI.systemScreen.height*UI.systemScreen.height)
+	kMaxSqDist = kMaxSqDist * ManipulatableObject.MaxManipulateDistancePct
+	
+	local normal = { -g.args[2], g.args[1] } -- orthogonal to line
+	local lineDist = (normal[1]*g.start[1]) + (normal[2]*g.start[2])
+	local lineSegDist = {
+		g.args[1]*g.start[1] + g.args[2]*g.start[2],
+		g.args[1]*g.finish[1] + g.args[2]*g.finish[2]
+	}
+	
+	local lineStart = g.start
+	local lineEnd = g.finish
+	
+	if (lineSegDist[2] > lineSegDist[1]) then
+		local x = lineSegDist[1]
+		lineSegDist[1] = lineSegDist[2]
+		lineSegDist[2] = x
+		
+		x = lineStart
+		lineStart = lineEnd
+		lineEnd = lineStart
+	end
+
+	local cameraFwd = World.CameraFwd()
+	local cameraPos = World.CameraPos()
+
+	local best
+	local bestWorldDist
+	local x = LL_Head(ManipulatableObject.Objects)
+	
+	while (x) do
+	
+		local world = x.entity:WorldPos()
+		local screen,r = World.Project(world)
+		local dx, dy, dd
+		
+		if (r) then
+			
+			-- must be on screen
+			if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
+			    (screen[2] >= 1) and (screen[2] < UI.systemScreen.height)) then
+				
+				local keep = false
+				
+				-- closer than another matching object?
+				local worldDist = VecDot(world, cameraFwd)
+				if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
+					-- within max distance?
+					local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
+					if (segPos < lineSegDist[1]) then
+						-- distance to endpoints check:
+						dx = screen[1] - lineStart[1]
+						dy = screen[2] - lineStart[2]
+						dd = dx*dx + dy*dy
+						if (dd <= kMaxSqDist) then
+							keep = true
+						end
+					elseif (segPos > lineSegDist[2]) then
+						dx = screen[1] - lineEnd[1]
+						dy = screen[2] - lineEnd[2]
+						dd = dx*dx + dy*dy
+						if (dd <= kMaxSqDist) then
+							keep = true
+						end
+					else
+						-- orthogonal distance check
+						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
+						dd = math.abs(dd - lineDist)
+						dd = dd*dd
+						if (dd <= kKaxSqDist) then
+							keep = true
+						end
+					end
+				end
+				
+				if (keep) then
+					bestWorldDist = worldDist
+					best = x.entity
+				end
+			end
+		
+		end
+		
+		x = LL_Next(x)
+	
+	end
+	
+	return best
+
+end
+
+function ManipulatableObject.ManipulateGesture(g)
+
+	local target = ManipulatableObject.FindSwipeTarget(g)
+	
+	if (target == nil) then
+		return nil
+	end
+	
+	-- figure out which direction to manipulate the target
+	local leftRight = target.model:HasState("manipulate_left") or target.model:HasState("manipulate_right")
+	local upDown = target.model:HasState("manipulate_up") or target.model:HasState("manipulate_down")
+	if (leftRight and upDown) then
+		-- ambiguous, select using direction swiped
+		if ((g.args[1] > 0.707) or (g.args[1] < -0.707)) then
+			return ManipulatableObject.ManipulateLeftRight(target, g)
+		else
+			return ManipulatableObject.ManipulateUpDown(target, g)
+		end
+	elseif (leftRight) then
+		return ManipulatableObject.ManipulateLeftRight(target, g)
+	elseif (upDown) then
+		return ManipulatableObject.ManipulateUpDown(target, g)
+	end
+	
+	return false
+
+end
+
+function ManipulatableObject.ManipulateLeftRight(target, g)
+
+	-- may need to flip direction if we are facing towards the object
+	local targetFwd = ForwardVecFromAngles(target:WorldAngles())
+	local playerFwd = ForwardVecFromAngles(World.playerPawn:WorldAngles())
+	local cameraFwd = World.CameraFwd()
+		
+	local objDir = ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, cameraFwd, g)
+	local playerDir = ManipulatableObject.GetObserverOrientedLeftRight(playerFwd, cameraFwd, g)
+	
+	return target:Manipulate(objDir, playerDir)
+
+end
+
+function ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, observerFwd, g)
+	local flip = false
+	
+	if (VecDot(observerFwd, targetFwd) < 0) then
+		flip = true -- facing eachother
+	end
+	
+	local sign = g.args[1]
+	
+	if (flip) then
+		sign = -sign
+	end
+	
+	local dir
+	
+	if (sign >= 0) then
+		dir = "right"
+	else
+		dir = "left"
+	end
+	
+	return dir
+end
+
+function ManipulatableObject.ManipulateUpDown(target, g)
+	local dir
+	if (g.args[1] >= 0) then
+		dir = "down"
+	else
+		dir = "up"
+	end
+	
+	return target:Manipulate(dir, dir)
+end
+
+function ManipulatableObject.Manipulate(self, objDir, playerDir)
+
+	local state = "manipulate_"..objDir
+	local idle  = "manipulate_"..objDir.."_idle"
+	local ret   = "manipulate_"..objDir.."_return"
+	
+	if (not self.model:HasState(state)) then
+		return false -- this model has no manipulate in that direction
+	end
+	
+	self.manipulate = objDir
+	self:PlayAnim(state, self.model).Seq(idle)
+	
+	-- no longer manipulatable
+	if (self.listItem) then
+		self.model.vision:BlendTo({1,1,1,0}, 0.5)
+		LL_Remove(ManipulatableObject.Objects, self.listItem)
+		self.listItem = nil
+	end
+	
+	-- how long do we sit here?
+	if (self.skillRequired > PlayerSkills.Manipulate) then
+		local f = function ()
+			self.manipulate = nil
+			self:PlayAnim(ret, self.model).Seq("idle")
+			-- manipulatable again
+			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+		end
+		World.gameTimers:Add(f, self.manipulateWindow, true)
+	end
+	
+	-- tell the player they moved us
+	World.playerPawn:ManipulateDir(playerDir)
+	
+	return true
+
 end
 
 --[[---------------------------------------------------------------------------

@@ -30,11 +30,23 @@ function Abducted.Load(self)
 end
 
 function Abducted.OnInputEvent(self, e)
+	if (self.manipulate) then
+		return false
+	end
 	return PlayerInput:OnInputEvent(e)
 end
 
-function Abducted.OnInputGesture(self, e)
-	return PlayerInput:OnInputGesture(e)
+function Abducted.OnInputGesture(self, g)
+	if (self.manipulate) then
+		if (g.id == kIG_Line) then
+			COutLine(kC_Debug, "Detected a line (%f, %f)!", g.args[1], g.args[2])
+			if (ManipulatableObject.ManipulateGesture(g)) then
+				self:EndManipulate()
+			end
+		end
+		return true
+	end
+	return PlayerInput:OnInputGesture(g)
 end
 
 function Abducted.BeginManipulate(self)
@@ -49,6 +61,8 @@ function Abducted.BeginManipulate(self)
 	self.manipulate = true
 	ManipulatableObject.NotifyManipulate(true)
 	World.playerPawn:NotifyManipulate(true)
+	World.SetEnabledGestures(kIG_Line)
+	World.FlushInput(true)
 	
 	local f = function ()
 		self:EndManipulate()
@@ -71,6 +85,8 @@ function Abducted.EndManipulate(self)
 	self.manipulate = false
 	ManipulatableObject.NotifyManipulate(false)
 	World.playerPawn:NotifyManipulate(false)
+	World.SetEnabledGestures(0)
+	World.FlushInput(true)
 	
 	self.endManipulateTimer:Clean()
 	self.setGameSpeedTimer:Clean()

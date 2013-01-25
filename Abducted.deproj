@@ -64,6 +64,9 @@
     <filename>Source\Scripts\PlayerPawn.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\PlayerSkills.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\SCExecContext.lua</filename>
   </file>
   <file>

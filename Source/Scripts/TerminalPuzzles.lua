@@ -141,10 +141,13 @@ function TerminalPuzzles.InitUI(self)
 	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
 	self.state = { }	
 	self.state.heading = { }
+	self.state.lastHeading = { }
 	self.state.victory = { }
 	self.state.current = { }	
 	self.state.heading.x = 0
 	self.state.heading.y = 0
+	self.state.lastHeading.x = 0
+	self.state.lastHeading.y = 0
 	self.state.gameOver = false
 	self.state.currentMove = 1
 	self.state.gameOverTimer = 5	
@@ -195,6 +198,9 @@ function TerminalPuzzles.InitUI(self)
 			self.widgets.root:AddChild(current)
 			self:SetPositionByGrid(current,v.x,v.y)	
 			self.state.playerIndex = index
+			current.state.startPos = self:GetPosition(current) 
+			current.state.endPos = current.state.startPos
+			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
 			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)	
 		end
 	end
@@ -301,33 +307,48 @@ function TerminalPuzzles.Vec2Normal(self,x,y)
 	return vec2
 end
 
-function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)	
-	local r = widget:Rect()
-
+function TerminalPuzzles.LerpVec2(self,v,heading,dt,speed)	
 	local dx = heading.x * dt * speed
 	local dy = heading.y * dt * speed
 	
-	r[1] = r[1] + r[3]/2 + dx
-	r[2] = r[2] + r[4]/2 + dy
-	
-	if (r[1] < r[3]/2) then
-		r[1] = 0
-	end
-	if (r[1] + r[3] > UI.screenWidth) then
-		r[1] = UI.screenWidth - r[3]/2
-	end
-	if (r[2] < r[4]/2) then
-		r[2] = 0
-	end	
-	if (r[2] + r[4] > UI.screenHeight) then
-		r[2] = UI.screenHeight - r[4]/2
-	end
-	
+	local x = v.x + dx
+	local y = v.y + dy
+		
 	local vec2 = { }
-	vec2.x = r[1]
-	vec2.y = r[2]
+	vec2.x = x
+	vec2.y = y
 	
 	return vec2	
+end
+
+function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)	
+	local r = widget:Rect()
+	
+	local width = r[3]
+	local height = r[4]
+	local half_width = width/2
+	local half_height = height/2
+
+	local wv = { }
+	wv.x = r[1] + half_width
+	wv.y = r[2] + half_height
+
+	local o = self:LerpVec2(wv,heading,dt,speed)
+
+	if (o.x < half_width) then
+		wv.x = 0
+	end
+	if (wv.x + width > UI.screenWidth) then
+		wv.x = UI.screenWidth - half_width
+	end
+	if (wv.y < half_height) then
+		wv.y = 0
+	end	
+	if (wv.y + height > UI.screenHeight) then
+		wv.y = UI.screenHeight - half_height
+	end
+	
+	return wv
 end
 
 function TerminalPuzzles.GetGridCellFromVec2(self,v)
@@ -344,12 +365,10 @@ function TerminalPuzzles.GetGridCellFromVec2(self,v)
 end
 
 function TerminalPuzzles.GetGridCell(self,widget)
-	local r = widget:Rect()
-	r[1] = r[1] + r[3]/2
-	r[2] = r[2] + r[4]/2	
+	local pos = self:GetPosition(widget)
 
-	local x = (r[1] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
-	local y = (r[2] - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local x = (pos.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
+	local y = (pos.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 
@@ -392,10 +411,58 @@ function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 	return vec2			
 end
 
+function TerminalPuzzles.GetPosition(self,w)
+	local r = w:Rect()
+	local vec2 = { } 
+	vec2.x = r[1] + r[3]/2
+	vec2.y = r[2] + r[4]/2	
+	return vec2
+end
+
+
 function TerminalPuzzles.CreateState(self,architype)
 	local state = { }
 	state.architype = architype
 	return state
+end
+
+function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
+	--COutLine(kC_Debug,"SetLineSegment start/end @ start=%i,%i, end=%i,%i",startPos.x,startPos.y,endPos.x,endPos.y)		
+
+	local x = startPos.x
+	local y = startPos.y
+	
+	local xx = endPos.x
+	local yy = endPos.y
+	
+	if (x > xx) then
+		x = endPos.x
+		xx = startPos.x
+	end
+	
+	if (y > yy) then
+		y = endPos.y
+		yy = startPos.y
+	end 
+	
+	local width = xx - x
+	if (width == 0) then
+		width = 5
+	end
+	
+	local height = yy - y
+	if (height == 0) then
+		height = 5
+	end
+	
+	local r = { }
+	r[1] = x
+	r[2] = y
+	r[3] = width
+	r[4] = height
+	
+	--COutLine(kC_Debug,"SetLineSegment @ x=%i, y=%i, width=%i, height=%i",x,y,width,height)		
+	line:SetRect(r)
 end
 
 function TerminalPuzzles.Think(self,dt)
@@ -426,20 +493,45 @@ function TerminalPuzzles.Think(self,dt)
 		return
 	end
 	
+	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
+		self.state.lastHeading.x = self.state.heading.x
+		self.state.lastHeading.y = self.state.heading.y
+	end
+	
 	if (self.widgets.current.heading == nil) then
 		self.widgets.current.heading = self.state.heading
 	end
 
-	local currentPos = self:LerpWidget(self.widgets.current,self.state.heading,dt,self.PLAYER_SPEED)
+	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.heading,dt,self.PLAYER_SPEED)
 	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
-	local currentGrid = self:GetGridCell(self.widgets.current)
-	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+	local currentGrid = self:GetGridCellFromVec2(currentPos)
 	--COutLine(kC_Debug,"currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)	
 	if (self:IsGridCellOnBoard(currentGrid.x,currentGrid.y)) then
 		--COutLine(kC_Debug,"isOnBoard @ currentGrid: x=%i, y=%i",currentGrid.x,currentGrid.y)
 		currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+		self.widgets.current.state.endPos = currentPos
+		self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
+		
+		-- detect change of direction
+		if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+			COutLine(kC_Debug,"newLineSegment @ currentGrid: x=%i, y=%i",currentPos.x,currentPos.y)
+			local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
+			line.state = self:CreateState("mark_line_v")
+			self.widgets.lines[self.state.playerIndex] = line
+			self.widgets.current = line
+			self.widgets.root:AddChild(line)		
+						
+			line.state.startPos = currentPos
+			line.state.endPos = line.state.startPos
+			self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
+			
+			self.state.lastHeading.x = self.state.heading.x
+			self.state.lastHeading.y = self.state.heading.y
+		end
+		
+--[[
 		UI:CenterWidget(self.widgets.current,currentPos.x,currentPos.y)	
-		self.state.playerIndex = self:ConvertCoordToIndex(currentGrid.x,currentGrid.y)
+
 		if (self.widgets.lines[self.state.playerIndex] == nil) then	
 			COutLine(kC_Debug,"line added: x=%i, y=%i",currentGrid.x,currentGrid.y)	
 			-- TODO: -djr change this out with a rectangle stretch. create a new rect on a direction change
@@ -449,6 +541,7 @@ function TerminalPuzzles.Think(self,dt)
 			self.widgets.lines[self.state.playerIndex] = line
 			self:SetPositionByGrid(line,currentGrid.x,currentGrid.y)
 		end
+]]		
 	end		
 	
 	local pieceAtPlayer = self.widgets.board[self.state.playerIndex]	
@@ -492,7 +585,7 @@ function TerminalPuzzles.Think(self,dt)
 		else
 			UI:CenterWidget(v,nextPos.x,nextPos.y)
 			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
-			-- TODO: detect failure condition
+			-- TODO: detect spider crossing a line segment
 		end	
 	end	
 end

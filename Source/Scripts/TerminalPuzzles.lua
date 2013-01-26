@@ -26,16 +26,38 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
-	level.board = {  { x=0, y=0, img="cell_green" }
-		, { x=10, y=3, img="cell_green" }
-		, { x=5, y=5, img="cell_green" }
-		, { x=3, y=6, img="cell_a" }		
-		, { x=5, y=6, img="cell_b" }
-		, { x=7, y=6, img="cell_d" }
-		, { x=9, y=6, img="cell_e" }
-
-		, { x=0, y=9, img="mark_start" }
-		, { x=self.INDEX_MAX_X-1, y=1, img="mark_end" }				
+	level.board = { 
+		-- row 0
+		-- row 1
+		{ x=0, y=1, img="mark_start" }				
+		, { x=3, y=1, img="cell_green" }
+		, { x=11, y=1, img="cell_green" }		
+		-- row 2
+		, { x=3, y=2, img="cell_green" }
+		, { x=4, y=2, img="cell_b" }
+		, { x=11, y=2, img="cell_green" }		
+		, { x=12, y=2, img="cell_green" }				
+		-- row 3
+		, { x=5, y=3, img="cell_green" }
+		-- row 4
+		, { x=12, y=4, img="cell_green" }
+		, { x=13, y=4, img="cell_d" }
+		-- row 5
+		, { x=6, y=5, img="cell_green" }
+		, { x=13, y=5, img="cell_c" }
+		-- row 6
+		, { x=2, y=6, img="cell_green" }
+		, { x=3, y=6, img="cell_green" }
+		-- row 7
+		, { x=3, y=7, img="cell_a" }		
+		, { x=14, y=1, img="mark_end" }				
+		-- row 8
+		-- row 9
+		-- row 10
+		-- row 11
+		-- row 12
+		-- row 13
+		-- row 14
 		}
 	
 	return level
@@ -154,10 +176,11 @@ function TerminalPuzzles.InitUI(self)
 	self.state.level = level
 	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
 	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
+	self.state.goalCounter = 1
 	
 	-- define structure self.widgets
 	self.widgets = {}
-	self.widgets.goal = { }
+	self.widgets.goals = { }
 	self.widgets.board = { }		
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
@@ -171,16 +194,13 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.root:AddChild(self.widgets.board)	
 		
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
-	-- goal step: center a,b,c,d list ot top of screen
-	local counter = 0
 	for i,v in ipairs(self.state.level.goal) do 
 		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
 		local goal = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
 		goal.state = self:CreateState(string.gsub(v,"symbol_","cell_"))
-		--self.widgets.goal[counter] = goal
+		table.insert(self.widgets.goals,goal)
 		self.widgets.root:AddChild(goal)
 		UI:CenterWidget(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
-		counter = counter + 1
 	end
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
@@ -261,12 +281,12 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
 	self.gfx.board = World.Load("Reflex-Game/reflex-board_M")
 	self.gfx.border = World.Load("Reflex-Game/reflex-border_M")
-	--[[
+
 	self.gfx.cell_a = World.Load("Reflex-Game/reflex-cell-a_M")	
 	self.gfx.cell_b = World.Load("Reflex-Game/reflex-cell-b_M")	
 	self.gfx.cell_c = World.Load("Reflex-Game/reflex-cell-c_M")	
 	self.gfx.cell_d = World.Load("Reflex-Game/reflex-cell-d_M")			
-	]]
+
 	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")				
 
 	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
@@ -547,11 +567,20 @@ function TerminalPuzzles.Think(self,dt)
 	local pieceAtPlayer = self.widgets.board[self.state.playerIndex]	
 	if (pieceAtPlayer) then
 		COutLine(kC_Debug,"pieceAtPlayer found")
-		if (pieceAtPlayer.state.architype =="mark_end") then
+		
+		if (self.state.goalCounter < #self.widgets.goals) then
+			local goalPiece = self.widgets.goals[self.state.goalCounter]
+			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
+				COutLine(kC_Debug,"Goal accomplished: x=%s",gaolPiece.state.architype)	
+				self.state.goalCounter = self.state.goalCounter + 1
+			end
+		end		
+		
+		if (pieceAtPlayer.state.architype == "mark_end" and self.state.currentGoal > #self.state.goals) then
 			COutLine(kC_Debug,"Game Over Detected")
 			self.state.gameOver = true
 			return
-		end	
+		end		
 	end
 	
 	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
@@ -569,7 +598,7 @@ function TerminalPuzzles.Think(self,dt)
 		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
 			spider.state.heading.x = 1
 		end
-		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.heading.x,spider.heading.y)
+		COutLine(kC_Debug,"spawnedSpider @ currentGrid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
 	end	
 	
 	--COutLine(kC_Debug,"Spider move")

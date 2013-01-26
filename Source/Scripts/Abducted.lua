@@ -39,7 +39,6 @@ end
 function Abducted.OnInputGesture(self, g)
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then
-			COutLine(kC_Debug, "Detected a line (%f, %f)!", g.args[1], g.args[2])
 			if (ManipulatableObject.ManipulateGesture(g)) then
 				self:EndManipulate()
 			end

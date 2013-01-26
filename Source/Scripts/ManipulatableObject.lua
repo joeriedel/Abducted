@@ -25,7 +25,7 @@ function ManipulatableObject.Spawn(self)
 	angleVertex.pos = {0, 0, angle}
 	self:SetAngles(angleVertex)
 	
-	self.skillRequired = NumberForString(self.keys.skill, 0)
+	self.skillRequired = NumberForString(self.keys.required_skill, 0)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
 	
 	self.enabled = false

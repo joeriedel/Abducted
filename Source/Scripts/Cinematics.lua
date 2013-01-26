@@ -12,10 +12,20 @@ function Cinematics.Play(self, args)
 	
 	args = Tokenize(args)
 	local animateCamera = not FindArrayElement(args, "camera=no")
+	local looping = FindArrayElement(args, "loop=true")
+	local playForever = FindArrayElement(args, "forever=true")
 	local flags = 0
 	
 	if (animateCamera) then
 		flags = bit.bor(flags, kCinematicFlag_AnimateCamera)
+	end
+	
+	if (playForever) then
+		flags = bit.bor(flags, kCinematicFlag_CanPlayForever)
+	end
+	
+	if (looping) then
+		flags = bit.bor(flags, kCinematicFlag_Loop)
 	end
 	
 	if (World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.Callbacks)) then

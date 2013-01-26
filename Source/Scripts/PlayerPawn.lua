@@ -23,8 +23,11 @@ function PlayerPawn.Spawn(self)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetCameraShift({0, 0, 50}) -- camera looks here
 	
+	-- Angles > than these get snapped immediately
+	-- The last number is Z angle, which is the player facing.
+	self:SetSnapTurnAngles({360, 360, 60})
+
 	local angle = NumberForString(self.keys.angle, 0)
-	
 	local angleVertex = self:Angles()
 	angleVertex.pos = {0, 0, angle}
 	angleVertex.mass = 5
@@ -34,11 +37,11 @@ function PlayerPawn.Spawn(self)
 	self:SetAngles(angleVertex)
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 40 -- larger numbers mean the spring is stiffer
+	spring.elasticity = 160 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	
-	self:SetAccel({80, 0, 0})
-	self:SetMaxGroundSpeed(80)
+	self:SetAccel({200, 0, 0}) -- <-- How fast the player accelerates (units per second).
+	self:SetMaxGroundSpeed(100) -- <-- How fast the player moves (units per second).
 	self:SetMoveType(kMoveType_Floor)
 	self:SetClassBits(kEntityClass_Player)
 	self:SetOccupantType(kOccupantType_BBox)

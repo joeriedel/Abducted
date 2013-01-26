@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; };
+		33982E8C16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
+		33982E8D16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
+		33982E8E16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
 		339BA572163656B40017FD79 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		339BA573163656B40017FD79 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		339BA574163656C40017FD79 /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
@@ -309,6 +312,8 @@
 
 /* Begin PBXFileReference section */
 		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_TouchTrigger.cpp; sourceTree = "<group>"; };
+		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
 		33BF3E6B1633255E006DEAAE /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33DB15241627D97A00963A33 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
@@ -690,6 +695,8 @@
 				33EC06241626689800F8C9FF /* G_Exports.h */,
 				33EC06251626689800F8C9FF /* G_PlayerPawn.cpp */,
 				33EC06261626689800F8C9FF /* G_PlayerPawn.h */,
+				33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */,
+				33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */,
 				33EC06271626689800F8C9FF /* G_ViewController.cpp */,
 				33EC06281626689800F8C9FF /* G_ViewController.h */,
 			);
@@ -1157,6 +1164,7 @@
 				339BA578163656D50017FD79 /* G_Exports.cpp in Sources */,
 				339BA579163656D50017FD79 /* G_PlayerPawn.cpp in Sources */,
 				339BA57A163656D50017FD79 /* G_ViewController.cpp in Sources */,
+				33982E8D16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1170,6 +1178,7 @@
 				339BA57B163656D50017FD79 /* G_Exports.cpp in Sources */,
 				339BA57C163656D50017FD79 /* G_PlayerPawn.cpp in Sources */,
 				339BA57D163656D50017FD79 /* G_ViewController.cpp in Sources */,
+				33982E8E16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1184,6 +1193,7 @@
 				33EC062E1626689800F8C9FF /* G_PlayerPawn.cpp in Sources */,
 				33EC062F1626689800F8C9FF /* G_ViewController.cpp in Sources */,
 				33EC06301626689800F8C9FF /* G_SkModel.cpp in Sources */,
+				33982E8C16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -37,9 +37,17 @@ function Game.Think(self)
 end
 
 function Game.PostSpawn(self)
+	Cinematics:PlayLevelCinematics()
 end
 
 function Game.OnEvent(self, cmd, args)
+
+	if (args) then
+		COutLine(kC_Debug, "Game.OnEvent(%s, %s)", cmd, args)
+	else
+		COutLine(kC_Debug, "Game.OnEvent(%s)", cmd)
+	end
+
 	if cmd == "fadein" then
 		UI:FadeIn(tonumber(args))
 		return true
@@ -62,13 +70,15 @@ function Game.OnEvent(self, cmd, args)
 		World.SoundFadeMasterVolume(1, tonumber(args))
 		return true
 	elseif (cmd == "enablewaypoints") then
-		Floors.SetWaypointTargetnameState(args, kWaypointState_Enabled)
+		Floors:SetWaypointTargetnameState(args, kWaypointState_Enabled)
 	elseif (cmd == "disablewaypoints") then
-		Floors.SetWaypointTargetnameState(args, nil, bit.bnot(kWaypointState_Enabled))
+		Floors:SetWaypointTargetnameState(args, nil, bit.bnot(kWaypointState_Enabled))
 	elseif (cmd == "enablewaypointuserid") then
-		Floors.SetWaypointUserIdState(args, kWaypointState_Enabled)
+		Floors:SetWaypointUserIdState(args, kWaypointState_Enabled)
 	elseif (cmd == "disablewaypointuserid") then
-		Floors.SetWaypointUserIdState(args, nil, bit.bnot(kWaypointState_Enabled))
+		Floors:SetWaypointUserIdState(args, nil, bit.bnot(kWaypointState_Enabled))
+	elseif (cmd == "play") then
+		Cinematics:Play(args)
 	end
 end
 

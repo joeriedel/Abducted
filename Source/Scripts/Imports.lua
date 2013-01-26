@@ -21,6 +21,7 @@ Import("Floors")
 Import("Animation")
 Import("Timers")
 Import("PlayerSkills")
+Import("Cinematics")
 
 -- // Entities // --
 Import("Entity")

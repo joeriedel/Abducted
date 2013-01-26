@@ -20,6 +20,10 @@ function HUD.Spawn(self)
 	)
 end
 
+function HUD.SetVisible(self, visible)
+	self.widgets.root:SetVisible(visible)
+end
+
 function HUD.Load(self)
 	self.widgets = {}
 	self.widgets.root = UI:CreateRoot(UI.kLayer_HUD)

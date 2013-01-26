@@ -31,8 +31,24 @@ function ManipulatableObject.Spawn(self)
 	self.enabled = false
 	self.swipePos = {0, 0, 0}
 	
+	self:LoadAndSwapManipulateMaterials()
 	self:LoadSounds()
 	self:Dormant()
+end
+
+function ManipulatableObject.LoadAndSwapManipulateMaterials(self)
+
+	local materials = self.model.vision:MaterialList()
+	if (materials == nil) then
+		return
+	end
+	
+	for k,v in pairs(materials) do
+		local x = v:Name().."_manipulate"
+		local z = World.Load(x)
+		self.model.vision:ReplaceMaterial(v, z)
+	end
+
 end
 
 function ManipulatableObject.LoadSounds(self)

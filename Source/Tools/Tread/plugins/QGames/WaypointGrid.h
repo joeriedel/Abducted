@@ -225,7 +225,8 @@ private:
 
 	static void Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst);
 	static void Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool flip);
-	
+	static int AddSelectedConnectionProps(CMapObject* pObject, void* p, void* p2);
+
 	enum Properties {
 		kProp_First,
 		kProp_Name = kProp_First,

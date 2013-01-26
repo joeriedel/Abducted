@@ -203,6 +203,13 @@ CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* doc ) {
 	return &m_propList;
 }
 
+int CWaypoint::AddSelectedConnectionProps(CMapObject* pObject, void* p, void* p2) {
+	CWaypoint *waypoint = dynamic_cast<CWaypoint*>(pObject);
+	CTreadDoc *doc = (CTreadDoc*)p;
+	waypoint->AddSelectedConnectionProps(doc);
+	return 0;
+}
+
 void CWaypoint::AddSelectedConnectionProps(CTreadDoc* doc) {
 
 	if (m_inAddSelection)
@@ -220,7 +227,7 @@ void CWaypoint::AddSelectedConnectionProps(CTreadDoc* doc) {
 		const Connection::Ref &c = it->second;
 		if (c->tail && (c->tail->IsSelected() || c->tail->m_beingSelected)) {
 			AddConnectionProps(*c);
-			c->tail->AddSelectedConnectionProps(doc);
+//			c->tail->AddSelectedConnectionProps(doc);
 		}
 	}
 
@@ -231,7 +238,7 @@ void CWaypoint::AddSelectedConnectionProps(CTreadDoc* doc) {
 				const Connection::Ref &c = it->second;
 				if (c->tail == this) {
 					AddConnectionProps(*c);
-					waypoint->AddSelectedConnectionProps(doc);
+//					waypoint->AddSelectedConnectionProps(doc);
 				}
 			}
 		}
@@ -312,7 +319,8 @@ void CWaypoint::OnAddToSelection( CTreadDoc* pDoc ) {
 	m_beingSelected = true;
 	CreateGizmos(pDoc);
 	CMapObject::OnAddToSelection(pDoc);
-	AddSelectedConnectionProps(pDoc);
+//	AddSelectedConnectionProps(pDoc);
+	pDoc->GetSelectedObjectList()->WalkList(CWaypoint::AddSelectedConnectionProps, pDoc, 0);
 	m_beingSelected = false;
 }
 
@@ -626,9 +634,20 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 
 			Connect(view->GetDocument(), *src, *dst);
 		}
+	}
+
+	view->GetDocument()->GetSelectedObjectList()->WalkList(CWaypoint::AddSelectedConnectionProps, view->GetDocument(), 0);
+
+	/*for (CMapObject *x = selection->ResetPos(); x; x = xNext) {
+		selection->SetPosition(x);
+		xNext = selection->GetNextItem();
+
+		CWaypoint *src = dynamic_cast<CWaypoint*>(x);
+		if (!src)
+			continue;
 
 		src->AddSelectedConnectionProps(view->GetDocument());
-	}
+	}*/
 	
 	view->GetDocument()->Prop_UpdateSelection();
 	Sys_RedrawWindows();
@@ -663,6 +682,7 @@ void CWaypoint::PopupMenu_OnDisconnectWaypoints(CMapView *view) {
 		}
 	}
 	
+	view->GetDocument()->GetSelectedObjectList()->WalkList(CWaypoint::AddSelectedConnectionProps, view->GetDocument(), 0);
 	view->GetDocument()->Prop_UpdateSelection();
 	Sys_RedrawWindows();
 }
@@ -706,8 +726,8 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 	dst.m_tails.erase(src.GetUID());
 
 	src.m_numValidConnections = -1; // recalc
-	src.AddSelectedConnectionProps(doc);
-	dst.AddSelectedConnectionProps(doc);
+//	src.AddSelectedConnectionProps(doc);
+//	dst.AddSelectedConnectionProps(doc);
 }
 
 void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {

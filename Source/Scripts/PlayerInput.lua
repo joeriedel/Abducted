@@ -24,7 +24,7 @@ function PlayerInput.OnInputEvent(self, e)
 	
 	if (Input.IsTouchBegin(e)) then
 		UI:ShowFinger(true, 0.25)
-		self:TapWaypoint(e.data[1], e.data[2])
+		self:TapWaypoint(e.original.data[1], e.original.data[2])
 	elseif (Input.IsTouchEnd(e)) then
 		UI:ShowFinger(false, 0.5)
 	end

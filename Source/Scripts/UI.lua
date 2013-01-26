@@ -58,7 +58,7 @@ function UI.Spawn(self)
 	DebugUI:Spawn()
 	
 	self.think = UI.Think
-	self:SetNextThink(33)
+	self:SetNextThink(1/30)
 	
 	UI:FadeToColor({0, 0, 0, 1}, 0) -- start black
 	
@@ -218,8 +218,14 @@ end
 
 function UI.MoveWidget(self, widget, x, y)
 	local r = widget:Rect()
-	r[1] = x
-	r[2] = y
+	if (x) then
+		r[1] = x
+	end
+	
+	if (y) then
+		r[2] = y
+	end
+	
 	widget:SetRect(r)
 end
 

@@ -153,7 +153,7 @@ function PlayerPawn.CheckTappedOn(self, e)
 		local dx = screen[1] - e.data[1]
 		local dy = screen[2] - e.data[2]
 		local dd = math.sqrt(dx*dx + dy*dy)
-		local maxDist = UI.systemScreen.diagonal * 1/15
+		local maxDist = UI.systemScreen.diagonal * 1/20
 		if (dd <= maxDist) then
 			return true
 		end

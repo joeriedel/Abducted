@@ -33,8 +33,11 @@ function UI.Spawn(self)
 		UI.systemScreen.aspect = "16x9"
 		uiScreen = {width=1280, height=720}
 		UI.wideScreen = true
+	elseif (UI.systemScreen.aspect == "4x3") then
+		uiScreen = {width=1024, height=768}
 	else
-		uiScreen = {width=1280, height=720}
+		assert(UI.systemScreen.aspect == "3x2")
+		uiScreen = {width=960, height=640}
 	end
 	
 	World.SetUIViewport(0, 0, uiScreen.width, uiScreen.height)
@@ -65,7 +68,7 @@ function UI.Spawn(self)
 	self.think = UI.Think
 	self:SetNextThink(1/30)
 	
-	UI:FadeToColor({0, 0, 0, 1}, 0) -- start black
+	UI:BlendTo({0, 0, 0, 1}, 0) -- start black
 	
 end
 
@@ -92,7 +95,7 @@ function UI.CreateFeedbackLayer(self)
 	self.gfx.feedback.Finger = World.Load("UI/finger_shadow_M")
 	self.widgets.feedback.Finger = self:CreateWidget("MatWidget", {rect={0, 0, 128, 128}, material=self.gfx.feedback.Finger}) 
 	self.widgets.feedback.Root:AddChild(self.widgets.feedback.Finger)
-	self.widgets.feedback.Finger:FadeTo({0, 0, 0, 0}, 0)
+	self.widgets.feedback.Finger:BlendTo({0, 0, 0, 0}, 0)
 	
 end
 
@@ -101,7 +104,7 @@ function UI.CreateFXLayer(self)
 	self.widgets.fx.Screen = self:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=self.gfx.shared.Solid})
 	World.SetRootWidget(UI.kLayer_FX, self.widgets.fx.Screen)
 	self.widgets.fx.Screen.color = { 0, 0, 0, 0 }
-	self.widgets.fx.Screen:FadeTo({0, 0, 0, 0}, 0) -- disable
+	self.widgets.fx.Screen:BlendTo({0, 0, 0, 0}, 0) -- disable
 end
 
 --[[---------------------------------------------------------------------------
@@ -117,9 +120,9 @@ end
 function UI.ShowFinger(self, show, time)
 
 	if show then
-		self.widgets.feedback.Finger:FadeTo({1, 1, 1, 1}, time)
+		self.widgets.feedback.Finger:BlendTo({1, 1, 1, 1}, time)
 	else
-		self.widgets.feedback.Finger:FadeTo({0, 0, 0, 0}, time)
+		self.widgets.feedback.Finger:BlendTo({0, 0, 0, 0}, time)
 	end
 
 end
@@ -135,13 +138,13 @@ end
 function UI.FadeIn(self, time)
 
 	local c = self.widgets.fx.Screen.color
-	self.widgets.fx.Screen:FadeTo({c[1], c[2], c[3], 0}, time)
+	self.widgets.fx.Screen:BlendTo({c[1], c[2], c[3], 0}, time)
 
 end
 
-function UI.FadeToColor(self, color, time)
+function UI.BlendTo(self, color, time)
 	self.widgets.fx.Screen.color = color
-	self.widgets.fx.Screen:FadeTo(color, time)
+	self.widgets.fx.Screen:BlendTo(color, time)
 end
 
 function UI.FadeInLetterBox(self, color, time)
@@ -234,71 +237,33 @@ function UI.MoveWidget(self, widget, x, y)
 	widget:SetRect(r)
 end
 
-function UI.HCenterWidget(self, widget, xp, yf)
+function UI.HCenterWidget(self, widget, rect)
 
 	local r = widget:Rect()
 	
-	if (xp == nil) then
-		xp = UI.fullscreenRect[3] / 2
-	end
-	
-	xp = xp * 2
-	
-	if (type(yf) == "function") then
-		yf = yf(r[4])
-	end
-	
-	local x = (xp-r[3])/2
-	
-	r[1] = x
-	r[2] = yf
+	r[1] = rect[1] + ((rect[3]-r[3]) / 2)
 	
 	widget:SetRect(r)
 	
 	return r
 end
 
-function UI.VCenterWidget(self, widget, xf, yp)
+function UI.VCenterWidget(self, widget, rect)
 
 	local r = widget:Rect()
 		
-	if (yp == nil) then
-		yp = UI.fullscreenRect[4] / 2
-	end
+	r[2] = rect[2] + ((rect[4]-r[4]) / 2)
 	
-	yp = yp * 2
-	
-	if (type(xf) == "function") then
-		xf = xf(r[3])
-	end
-	
-	local y = (yp-r[4])/2
-	
-	r[1] = xf
-	r[2] = y
 	widget:SetRect(r)
 	return r
 end
 
-function UI.CenterWidget(self, widget, xp, yp)
+function UI.CenterWidget(self, widget, rect)
 
 	local r = widget:Rect()
 	
-	if (xp == nil) then
-		xp = UI.fullscreenRect[3] / 2
-	end
-	if (yp == nil) then
-		yp = UI.fullscreenRect[4] / 2
-	end
-	
-	xp = xp * 2
-	yp = yp * 2
-	
-	local x = (xp-r[3])/2
-	local y = (yp-r[4])/2
-	
-	r[1] = x
-	r[2] = y
+	r[1] = rect[1] + ((rect[3]-r[3]) / 2)
+	r[2] = rect[2] + ((rect[4]-r[4]) / 2)
 	
 	widget:SetRect(r)
 	return r
@@ -364,23 +329,15 @@ function UI.RVAlignWidget(self, widget, x, y)
 
 end
 
-function UI.HCenterLabel(self, label, xp, yf)
+function UI.HCenterLabel(self, label, rect)
 
 	local w, h = label:Dimensions()
+	local r = label:Rect()
 	
-	if (xp == nil) then
-		xp = UI.fullscreenRect[3] / 2
-	end
+	r[1] = rect[1] + ((rect[3]-w) / 2)
+	r[3] = w
+	r[4] = h
 	
-	xp = xp * 2
-	
-	if (type(yf) == "function") then
-		yf = yf(h)
-	end
-	
-	local x = (xp-w)/2
-	
-	local r = {x,yf,w,h}
 	label:SetRect(r)
 	return r
 end
@@ -389,19 +346,12 @@ function UI.VCenterLabel(self, label, xf, yp)
 
 	local w, h = label:Dimensions()
 	
-	if (yp == nil) then
-		yp = UI.fullscreenRect[4] / 2
-	end
+	local r = label:Rect()
 	
-	yp = yp * 2
+	r[2] = rect[2] + ((rect[4]-h) / 2)
+	r[3] = w
+	r[4] = h
 	
-	if (type(xf) == "function") then
-		xf = xf(w)
-	end
-	
-	local y = (yp-h)/2
-	
-	local r = {xf,y,w,h}
 	label:SetRect(r)
 	return r
 end
@@ -410,20 +360,13 @@ function UI.CenterLabel(self, label, xp, yp)
 
 	local w, h = label:Dimensions()
 	
-	if (xp == nil) then
-		xp = UI.fullscreenRect[3] / 2
-	end
-	if (yp == nil) then
-		yp = UI.fullscreenRect[4] / 2
-	end
+	local r = {
+		rect[1] + ((rect[3]-w) / 2),
+		rect[2] + ((rect[4]-h) / 2),
+		w,
+		h
+	}
 	
-	xp = xp * 2
-	yp = yp * 2
-	
-	local x = (xp-w)/2
-	local y = (yp-h)/2
-	
-	local r = {x,y,w,h}
 	label:SetRect(r)
 	return r
 end

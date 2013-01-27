@@ -6,9 +6,12 @@
 Abducted = Game:New()
 
 function Abducted.Initialize(self)
+	self.eatInput = false
+	
 	self:Load()
 	PlayerInput:Spawn()
 	HUD:Spawn()
+	Arm:Spawn()
 	PlayerSkills:Load()
 	
 	self.think = Abducted.Think
@@ -30,8 +33,14 @@ function Abducted.Load(self)
 end
 
 function Abducted.OnInputEvent(self, e)
-	if (Cinematics.busy > 0) then
+	if (self.eatInput) then
+		return true
+	end
+	if (Arm.active) then
 		return false
+	end
+	if (Cinematics.busy > 0) then
+		return true
 	end
 	if (self.manipulate) then
 		return false
@@ -40,6 +49,13 @@ function Abducted.OnInputEvent(self, e)
 end
 
 function Abducted.OnInputGesture(self, g)
+	if (self.eatInput) then
+		return true
+	end
+	if (Arm.active) then
+		return false
+	end
+	
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then
 			if (ManipulatableObject.ManipulateGesture(g)) then

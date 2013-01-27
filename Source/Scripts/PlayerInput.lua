@@ -49,7 +49,14 @@ function PlayerInput.OnInputGesture(self, g)
 end
 
 function PlayerInput.TapWaypoint(self, x, y)
-	local waypoint = World.PickWaypoint(x, y,  350)
+	-- PickWaypoint(x, y, radiusOnScreen, dropDistance)
+	-- dropDistance: all points that are within radiusOnScreen are
+	-- collected and sorted front to back based on distance from the
+	-- camera. And points that are more than dropDistance from the
+	-- closest candidate waypoint are removed from consideration.
+	--
+	-- ZERO means no points are ever dropped.
+	local waypoint = World.PickWaypoint(x, y,  350, 0)
 	if (waypoint) then
 		if (World.playerPawn:MoveToWaypoint(waypoint)) then
 			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)

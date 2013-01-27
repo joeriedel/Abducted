@@ -200,12 +200,12 @@ kPauseCinematics = 4
 kPauseAll = bit.bor(kPauseGame, kPauseUI, kPauseCinematics)
 
 -- Widgets
-kHA_Left = 0
-kHA_Right = 1
-kHA_Center = 2
-kVA_Top = 0
-kVA_Bottom = 1
-kVA_Center = 2
+kHorizontalAlign_Left = 0
+kHorizontalAlign_Right = 1
+kHorizontalAlign_Center = 2
+kVerticalAlign_Top = 0
+kVerticalAlign_Bottom = 1
+kVerticalAlign_Center = 2
 
 
 

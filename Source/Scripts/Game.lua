@@ -52,10 +52,10 @@ function Game.OnEvent(self, cmd, args)
 		UI:FadeIn(tonumber(args))
 		return true
 	elseif cmd == "fadetoblack" then
-		UI:FadeToColor({0, 0, 0, 1}, tonumber(args))
+		UI:BlendTo({0, 0, 0, 1}, tonumber(args))
 		return true
 	elseif cmd == "fadetowhite" then
-		UI:FadeToColor({1, 1, 1, 1}, tonumber(args))
+		UI:BlendTo({1, 1, 1, 1}, tonumber(args))
 		return true
 	elseif cmd == "fadeinletterbox" then
 		UI:FadeInLetterBox({0, 0, 0, 1}, tonumber(args))
@@ -86,8 +86,8 @@ game_code = Game
 
 function World.BuiltIns()
 	return {
-		"game_code",
 		"ui_code",
+		"game_code",
 		"scexec_code"
 --		"terminal_puzzles"
 	}

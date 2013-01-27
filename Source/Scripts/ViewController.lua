@@ -42,7 +42,7 @@ function ViewController.HandleCameraCmd(self, args)
 	local strict = not FindArrayElement(x, "strict=false")
 	local useFOV = not FindArrayElement(x, "fov=false")
 	local forceBehind = not FindArrayElement(x, "behind=false")
-	local angles = {180, 180, 180}
+	local angles = {0, 180, 180}
 	
 	local specifiedAngles, idx = FindArrayElement(x, "angles=")
 	if (specifiedAngles) then

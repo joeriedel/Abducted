@@ -28,6 +28,7 @@ function UI.Spawn(self)
 	local uiScreen
 	
 	if ((UI.systemScreen.aspect == "16x9") or (UI.systemScreen.aspect == "16x10")) then
+		UI.systemScreen.aspect = "16x9"
 		uiScreen = {width=1280, height=720}
 		UI.wideScreen = true
 	else

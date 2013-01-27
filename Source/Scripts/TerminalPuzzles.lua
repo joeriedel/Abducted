@@ -488,9 +488,20 @@ function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
 	line:SetRect(r)
 end
 
-function TerminalPuzzles.CollideWithLine(self,x,y)
+function TerminalPuzzles.CollideWithLine(self,x,y,ignore)
+	local count = #self.widgets.lines
+	if (ignore) then
+		count = count - 2
+	end	
+
 	for i, k in pairs(self.widgets.lines) do
+		local r = k:Rect()
+		if (i < count and x >= r[1] and x < r[1]+r[3] and y >= r[2] and y < r[2] + r[4]) then
+			return true
+		end
 	end
+	
+	return false
 end
 
 function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
@@ -635,6 +646,11 @@ function TerminalPuzzles.Think(self,dt)
 			return
 		end		
 	end
+	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
+		COutLine(kC_Debug,"Game Over - collided with own line")
+		self.state.gameOver = true
+		return
+	end
 	
 	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
@@ -667,7 +683,11 @@ function TerminalPuzzles.Think(self,dt)
 			UI:CenterWidget(k,nextPos.x,nextPos.y)						
 			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
 			-- TODO: detect spider crossing a line segment
-
+			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
+				COutLine(kC_Debug,"Game Over - spider crossed player line")
+				self.state.gameOver = true
+				return
+			end
 		end	
 	end	
 end

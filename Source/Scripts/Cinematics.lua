@@ -4,12 +4,10 @@
 -- See Abducted/LICENSE for licensing terms
 
 Cinematics = Class:New()
+Cinematics.busy = 0
 
 function Cinematics.Play(self, args)
-	if (self.busy == nil) then
-		self.busy = 0
-	end
-	
+		
 	args = Tokenize(args)
 	local animateCamera = not FindArrayElement(args, "camera=no")
 	local looping = FindArrayElement(args, "loop=true")

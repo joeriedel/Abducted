@@ -74,7 +74,7 @@ public:
 
 protected:
 
-	virtual bool ExportTextures(const char *filename, CTreadDoc *doc) { return true; }
+	virtual bool ExportTextures(const char *filename, CTreadDoc *doc) { return false; }
 };
 
 

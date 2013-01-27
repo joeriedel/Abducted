@@ -30,6 +30,9 @@ function Abducted.Load(self)
 end
 
 function Abducted.OnInputEvent(self, e)
+	if (Cinematics.busy > 0) then
+		return false
+	end
 	if (self.manipulate) then
 		return false
 	end

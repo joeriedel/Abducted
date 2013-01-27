@@ -169,15 +169,13 @@ function ManipulatableObject.FindSwipeTarget(g)
 	-- figure out line normal
 	assert(g.id == kIG_Line)
 	
-	local kMaxSqDist = (UI.systemScreen.width*UI.systemScreen.width) +
-		(UI.systemScreen.height*UI.systemScreen.height)
-	kMaxSqDist = kMaxSqDist * ManipulatableObject.MaxManipulateDistancePct
-	
+	local kMaxDist = UI.systemScreen.diagonal * ManipulatableObject.MaxManipulateDistancePct
+		
 	local normal = { -g.args[2], g.args[1] } -- orthogonal to line
-	local lineDist = (normal[1]*g.start[1]) + (normal[2]*g.start[2])
+	local lineDist = math.sqrt((normal[1]*g.start[1]) + (normal[2]*g.start[2]))
 	local lineSegDist = {
-		g.args[1]*g.start[1] + g.args[2]*g.start[2],
-		g.args[1]*g.finish[1] + g.args[2]*g.finish[2]
+		math.sqrt(g.args[1]*g.start[1] + g.args[2]*g.start[2]),
+		math.sqrt(g.args[1]*g.finish[1] + g.args[2]*g.finish[2])
 	}
 	
 	local lineStart = g.start
@@ -217,29 +215,30 @@ function ManipulatableObject.FindSwipeTarget(g)
 				-- closer than another matching object?
 				local worldDist = VecDot(world, cameraFwd)
 				if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
-					-- within max distance?
+					-- capsule distance
+					
 					local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
 					if (segPos < lineSegDist[1]) then
 						-- distance to endpoints check:
 						dx = screen[1] - lineStart[1]
 						dy = screen[2] - lineStart[2]
-						dd = dx*dx + dy*dy
-						if (dd <= kMaxSqDist) then
+						dd = math.sqrt(dx*dx + dy*dy)
+						if (dd <= kMaxDist) then
 							keep = true
 						end
 					elseif (segPos > lineSegDist[2]) then
 						dx = screen[1] - lineEnd[1]
 						dy = screen[2] - lineEnd[2]
-						dd = dx*dx + dy*dy
-						if (dd <= kMaxSqDist) then
+						dd = math.sqrt(dx*dx + dy*dy)
+						if (dd <= kMaxDist) then
 							keep = true
 						end
 					else
 						-- orthogonal distance check
-						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
+						dd = math.sqrt((normal[1]*screen[1]) + (normal[2]*screen[2]))
 						dd = math.abs(dd - lineDist)
-						dd = dd*dd
-						if (dd <= kKaxSqDist) then
+						
+						if (dd <= kKaxDist) then
 							keep = true
 						end
 					end

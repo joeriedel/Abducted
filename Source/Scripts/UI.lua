@@ -24,6 +24,8 @@ function UI.Spawn(self)
 	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", UI.systemScreen.width, UI.systemScreen.height)
 		
 	UI.systemRect = {0, 0, UI.systemScreen.width, UI.systemScreen.height}
+	UI.systemScreen.diagonalSq = UI.systemScreen.width*UI.systemScreen.width + UI.systemScreen.height*UI.systemScreen.height
+	UI.systemScreen.diagonal = math.sqrt(UI.systemScreen.diagonalSq)
 	
 	local uiScreen
 	
@@ -42,6 +44,8 @@ function UI.Spawn(self)
 	UI.yAspect = uiScreen.height / uiScreen.width
 	UI.screenWidth = uiScreen.width
 	UI.screenHeight = uiScreen.height
+	UI.screenDiagonalSq = UI.screenWidth*UI.screenWidth + UI.screenHeight*UI.screenHeight
+	UI.screenDiagonal = math.sqrt(UI.screenDiagonalSq)
 	UI.screenUIScale = {
 		uiScreen.width / UI.systemScreen.width,
 		uiScreen.height / UI.systemScreen.height

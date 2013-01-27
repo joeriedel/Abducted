@@ -224,6 +224,8 @@ void CQuakeMap::WriteEntity(std::fstream &file, CEntity *entity, CTreadDoc *doc)
 		}
 	}
 
+	file << "\"uuid\" \"" << entity->GetUID() << "\"\n";
+
 	//
 	// write any owned brushes.
 	//

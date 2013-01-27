@@ -42,15 +42,15 @@ kOccupantType_Volume = 2
 kEntityClassBits_Any = 0
 
 -- Physics Flags
-kPF_OnGround = 1
-kPF_AutoFace = 2
-kPF_Friction = 4
-kPF_SeekAngles = 8
-kPF_ResetSpline = 16
-kPF_LoopSpline = 32
-kPF_SplineEvents = 64
-kPF_SplineBank = 128
-kPF_FlipSplineBank = 256
+kPhysicsFlag_OnGround = 1
+kPhysicsFlag_AutoFace = 2
+kPhysicsFlag_Friction = 4
+kPhysicsFlag_SeekAngles = 8
+kPhysicsFlag_ResetSpline = 16
+kPhysicsFlag_LoopSpline = 32
+kPhysicsFlag_SplineEvents = 64
+kPhysicsFlag_SplineBank = 128
+kPhysicsFlag_FlipSplineBank = 256
 
 -- ska::Notify mask flags
 kSkaNotifyMaskFlag_Tags = 1
@@ -200,12 +200,12 @@ kPauseCinematics = 4
 kPauseAll = bit.bor(kPauseGame, kPauseUI, kPauseCinematics)
 
 -- Widgets
-kHA_Left = 0
-kHA_Right = 1
-kHA_Center = 2
-kVA_Top = 0
-kVA_Bottom = 1
-kVA_Center = 2
+kHorizontalAlign_Left = 0
+kHorizontalAlign_Right = 1
+kHorizontalAlign_Center = 2
+kVerticalAlign_Top = 0
+kVerticalAlign_Bottom = 1
+kVerticalAlign_Center = 2
 
 
 

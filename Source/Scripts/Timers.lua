@@ -20,8 +20,8 @@ function TimerList.Create(self)
 			if (dt >= x.freq) then
 				x.fn(dt, time, ...)
 				x.time = time
-				if (x.singleShot) then
-					LL_Remove(x)
+				if (x.singleShot and (LL_List(x) == self.list)) then
+					LL_Remove(self.list, x)
 				end
 			end
 			x = next

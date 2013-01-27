@@ -10,6 +10,9 @@
     <filename>Source\Scripts\CVars.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Cinematics.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Class.lua</filename>
   </file>
   <file>

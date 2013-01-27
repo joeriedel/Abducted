@@ -3,9 +3,9 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
-Floors = {}
+Floors = Class:New()
 
-function Floors.SetWaypointTargetnameState(name, _or, _and)
+function Floors.SetWaypointTargetnameState(self, name, _or, _and)
 	local l = World.WaypointsForTargetname(name)
 	if (l) then
 		for k,v in pairs(l) do
@@ -21,7 +21,7 @@ function Floors.SetWaypointTargetnameState(name, _or, _and)
 	end
 end
 
-function Floors.SetWaypointUserIdState(name, _or, _and)
+function Floors.SetWaypointUserIdState(self, name, _or, _and)
 	local l = World.WaypointsForUserId(name)
 	if (l) then
 		for k,v in pairs(l) do

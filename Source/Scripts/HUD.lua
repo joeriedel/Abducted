@@ -20,9 +20,13 @@ function HUD.Spawn(self)
 	)
 end
 
+function HUD.SetVisible(self, visible)
+	self.widgets.Root:SetVisible(visible)
+end
+
 function HUD.Load(self)
 	self.widgets = {}
-	self.widgets.root = UI:CreateRoot(UI.kLayer_HUD)
+	self.widgets.Root = UI:CreateRoot(UI.kLayer_HUD)
 	
 	self.gfx = {
 		Arm = "UI/arm_button_M",
@@ -44,7 +48,7 @@ function HUD.Load(self)
 		nil,
 		{pressed=function (widget) HUD:ArmPressed(widget) end},
 		nil,
-		self.widgets.root
+		self.widgets.Root
 	)
 	
 	self.widgets.Manipulate = UIPushButton:Create(
@@ -56,7 +60,7 @@ function HUD.Load(self)
 		nil,
 		{pressed=function (widget) HUD:ManipulatePressed(widget) end},
 		nil,
-		self.widgets.root
+		self.widgets.Root
 	)
 	
 	self.widgets.Manipulate.flashing = false
@@ -68,7 +72,7 @@ function HUD.Load(self)
 		nil,
 		{pressed=function (widget) HUD:ShieldPressed(widget) end},
 		nil,
-		self.widgets.root
+		self.widgets.Root
 	)
 	
 	self.widgets.Pulse = UIPushButton:Create(
@@ -77,13 +81,14 @@ function HUD.Load(self)
 		nil,
 		{pressed=function (widget) HUD:PulsePressed(widget) end},
 		nil,
-		self.widgets.root
+		self.widgets.Root
 	)
 	
 end
 
 function HUD.ArmPressed(self, widget)
 	COutLine(kC_Debug, "Arm Pressed!")
+	Arm:Start("chat")
 end
 
 function HUD.ManipulatePressed(self, widget)

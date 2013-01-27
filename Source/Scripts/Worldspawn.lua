@@ -22,7 +22,6 @@ end
 
 function Worldspawn.PostSpawn(self)
 	GameNetwork.LogEvent("Loaded ("..self.keys.mappath..")")
-	World.PlayCinematic("intro", kCinematicFlag_AnimateCamera, 0)
 end
 
 function Worldspawn.OnEvent(self, cmd, args)

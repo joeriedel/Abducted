@@ -20,10 +20,10 @@ function DebugUI.Spawn(self)
 	local w,h = self.gfx.Typeface:Size()
 
 	self.widgets = {}
-	self.widgets.root = UI:CreateRoot(UI.kLayer_Debug)
+	self.widgets.Root = UI:CreateRoot(UI.kLayer_Debug)
 		
 	self.widgets.rspeeds = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
-	self.widgets.root:AddChild(self.widgets.rspeeds);
+	self.widgets.Root:AddChild(self.widgets.rspeeds);
 	
 	local pos = { DebugUI.Pos[1], DebugUI.Pos[2] }
 	self.widgets.fps = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})

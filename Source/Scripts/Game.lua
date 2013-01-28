@@ -89,6 +89,6 @@ function World.BuiltIns()
 		"ui_code",
 		"game_code",
 		"scexec_code"
---		"terminal_puzzles"
+		"terminal_puzzles"
 	}
 end

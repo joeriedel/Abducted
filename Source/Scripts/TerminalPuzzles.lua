@@ -123,7 +123,7 @@ function TerminalPuzzles.OnInputEvent(self,e)
 			--COutLine(kC_Debug,"moving widget")
 			self.state.heading.x = 0
 			self.state.heading.y = -1
-			--UI:CenterWidget(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
+			--UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
 			return true
 		end
 		if (e.data[1] == kKeyCode_K) then
@@ -186,11 +186,11 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.spiders = { }
 	self.widgets.grid = { }
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=UI.EatInput})
-	World.SetRootWidget(TerminalPuzzles.UI_Layer, self.widgets.root)
+	World.SetRootWidget(UI.kLayer_UI, self.widgets.root)
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
 	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
-	UI:CenterWidget(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
-	UI:CenterWidget(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
+	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
+	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
 	self.widgets.root:AddChild(self.widgets.border)	
 	self.widgets.root:AddChild(self.widgets.board)	
 		
@@ -201,7 +201,7 @@ function TerminalPuzzles.InitUI(self)
 		goal.state = self:CreateState(string.gsub(v,"symbol_","cell_"))
 		table.insert(self.widgets.goals,goal)
 		self.widgets.root:AddChild(goal)
-		UI:CenterWidget(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
+		UI:MoveWidgetByCenter(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
 	end
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
@@ -312,7 +312,7 @@ function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
 	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
 	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
 
-	UI:CenterWidget(w,xo,yo)
+	UI:MoveWidgetByCenter(w,xo,yo)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
@@ -676,7 +676,7 @@ function TerminalPuzzles.Think(self,dt)
 			self.widgets.root:RemoveChild(k)
 			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)			
 		else
-			UI:CenterWidget(k,nextPos.x,nextPos.y)						
+			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)						
 			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
 			-- TODO: detect spider crossing a line segment
 			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then

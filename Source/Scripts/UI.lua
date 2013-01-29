@@ -224,6 +224,16 @@ function UI.MapInputGesture(self, g)
 
 end
 
+function UI.MoveWidgetByCenter(self, widget, x, y)
+	local r = widget:Rect()
+	
+	r[1] = x - r[3]/2
+	r[2] = y - r[4]/2
+	
+	widget:SetRect(r)
+end
+
+
 function UI.MoveWidget(self, widget, x, y)
 	local r = widget:Rect()
 	if (x) then

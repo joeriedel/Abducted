@@ -207,5 +207,6 @@ kVerticalAlign_Top = 0
 kVerticalAlign_Bottom = 1
 kVerticalAlign_Center = 2
 
-
+kPositionMode_Relative = 1
+kPositoinMode_Absolute = 2
 

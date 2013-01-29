@@ -7,6 +7,12 @@
     <filename>Source\Scripts\Animation.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Arm.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\ArmChat.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\CVars.lua</filename>
   </file>
   <file>

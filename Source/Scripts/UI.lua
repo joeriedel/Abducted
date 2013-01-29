@@ -62,11 +62,9 @@ function UI.Spawn(self)
 	UI:LoadSharedMaterials()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
-	
-	DebugUI:Spawn()
-	
-	self.think = UI.Think
-	self:SetNextThink(1/30)
+		
+--	self.think = UI.Think
+--	self:SetNextThink(1/30)
 	
 	UI:BlendTo({0, 0, 0, 1}, 0) -- start black
 	
@@ -77,7 +75,6 @@ function UI.OnLevelStart(self)
 end
 
 function UI.Think(self)
-	DebugUI:Think()
 end
 
 function UI.LoadSharedMaterials(self)
@@ -331,10 +328,10 @@ end
 
 function UI.HCenterLabel(self, label, rect)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	local r = label:Rect()
 	
-	r[1] = rect[1] + ((rect[3]-w) / 2)
+	r[1] = rect[1] + ((rect[3]-d[1]) / 2)
 	r[3] = w
 	r[4] = h
 	
@@ -344,11 +341,11 @@ end
 
 function UI.VCenterLabel(self, label, xf, yp)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	local r = label:Rect()
 	
-	r[2] = rect[2] + ((rect[4]-h) / 2)
+	r[2] = rect[2] + ((rect[4]-d[2]) / 2)
 	r[3] = w
 	r[4] = h
 	
@@ -358,11 +355,11 @@ end
 
 function UI.CenterLabel(self, label, xp, yp)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	local r = {
-		rect[1] + ((rect[3]-w) / 2),
-		rect[2] + ((rect[4]-h) / 2),
+		rect[1] + ((rect[3]-d[1]) / 2),
+		rect[2] + ((rect[4]-d[2]) / 2),
 		w,
 		h
 	}
@@ -373,7 +370,7 @@ end
 
 function UI.RAlignLabel(self, label, x, y)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -386,7 +383,7 @@ function UI.RAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x-w, y, w, h}
+	local r = {x-w, y, d[1], d[2]}
 	label:SetRect(r)
 	return r
 
@@ -395,7 +392,7 @@ end
 
 function UI.VAlignLabel(self, label, x, y)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -408,7 +405,7 @@ function UI.VAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x, y-h, w, h}
+	local r = {x, y-h, d[1], d[2]}
 	label:SetRect(r)
 	return r
 
@@ -416,7 +413,7 @@ end
 
 function UI.RVAlignLabel(self, label, x, y)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -429,7 +426,7 @@ function UI.RVAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x-w, y-h, w, h}
+	local r = {x-w, y-h, d[1], d[2]}
 	label:SetRect(r)
 	return r
 
@@ -437,7 +434,7 @@ end
 
 function UI.SizeLabelToContents(self, label, x, y)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -450,7 +447,7 @@ function UI.SizeLabelToContents(self, label, x, y)
 		end
 	end
 	
-	local r = {x, y, w, h}
+	local r = {x, y, d[1], d[2]}
 	label:SetRect(r)
 	return r
 
@@ -462,11 +459,11 @@ end
 
 function UI.SizeLabel(self, label)
 
-	local w, h = label:Dimensions()
+	local d = label:Dimensions()
 	
 	local r = label:Rect()
-	r[3] = w
-	r[4] = h
+	r[3] = d[1]
+	r[4] = d[1]
 	label:SetRect(r)
 	return r
 	
@@ -474,9 +471,9 @@ end
 
 function UI.MaterialSize(self, material, rect)
 	rect = rect or {}
-	local w, h = material:Dimensions()
-	rect[3] = w
-	rect[4] = h
+	local d = material:Dimensions()
+	rect[3] = d[1]
+	rect[4] = d[2]
 	
 	return rect
 end

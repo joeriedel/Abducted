@@ -33,6 +33,11 @@ function Abducted.Load(self)
 end
 
 function Abducted.OnInputEvent(self, e)
+	if (e.type == kI_KeyDown) then
+		if (e.data[1] == kKeyCode_P) then
+			World.PauseGame(not World.paused)
+		end
+	end
 	if (self.eatInput) then
 		return true
 	end
@@ -112,4 +117,8 @@ end
 
 function Abducted.Think(self, dt)
 	Game.Think(self, dt)
+	
+	if (Arm.think) then
+		Arm:think(dt)
+	end
 end

@@ -11,6 +11,7 @@ function Game.Spawn(self)
 	World.gameCode = self
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()
+	DebugUI:Spawn()
 end
 
 function Game.Initialize(self, type)

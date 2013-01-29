@@ -35,6 +35,9 @@ function Arm.SpawnShared(self)
 	self.gfx.Symbol = World.Load("UI/locked_symbol_M")
 	self.gfx.SymbolFlash = World.Load("UI/locked_symbol_flash_M")
 	
+	self.sfx = {}
+	self.sfx.ArmIntro = World.Load("Audio/armintro1")
+	
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
 	
@@ -62,9 +65,9 @@ function Arm.SpawnShared(self)
 	self.screen[3] = UI.screenWidth - (self.screen[1]*2)
 	self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 	
-	local dw, dh = self.gfx.LineBorder2:Dimensions()
-	local w = dw * xScale
-	local h = (dh/dw) * w
+	local size = self.gfx.LineBorder2:Dimensions()
+	local w = size[1] * xScale
+	local h = (size[2]/size[1]) * w
 		
 	self.workspaceLeft = {
 		self.screen[1],
@@ -86,6 +89,20 @@ function Arm.SpawnShared(self)
 	self.workspaceRight[3] = w
 	self.workspaceRight[4] = h
 	
+	self.workspaceLeftSize = {
+		0,
+		0,
+		self.workspaceLeft[3],
+		self.workspaceLeft[4]
+	}
+	
+	self.workspaceRightSize = {
+		0,
+		0,
+		self.workspaceRight[3],
+		self.workspaceRight[4]
+	}
+	
 	self.widgets.Border = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.Border})
 	self.widgets.Root:AddChild(self.widgets.Border)
 	
@@ -99,8 +116,11 @@ function Arm.SpawnShared(self)
 	symbolSize[3] = UI.screenWidth * 0.40
 	symbolSize[4] = symbolSize[3]
 	
+	self.widgets.WorkspaceLeft = UI:CreateWidget("Widget", {rect=self.workspaceLeft})
+	self.widgets.Root:AddChild(self.widgets.WorkspaceLeft)
+	
 	self.widgets.Symbol = UI:CreateWidget("MatWidget", {rect=symbolSize, material=self.gfx.Symbol})
-	self.widgets.Root:AddChild(self.widgets.Symbol)
+	self.widgets.WorkspaceLeft:AddChild(self.widgets.Symbol)	
 	
 end
 
@@ -122,6 +142,9 @@ function Arm.Start(self, mode)
 	UI:BlendTo({1,1,1,1}, 0.2)
 	self:ResetWidgets()
 	
+	self.sfx.ArmIntro:Rewind()
+	self.sfx.ArmIntro:Play(kSoundChannel_UI, 0)
+	
 	local f = function()
 		UI:BlendTo({1,1,1,0}, 0.2)
 		HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
@@ -129,7 +152,7 @@ function Arm.Start(self, mode)
 		Arm:Intro()
 	end
 	
-	World.gameTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2, true)
 end
 
 function Arm.Intro(self)
@@ -139,7 +162,7 @@ function Arm.Intro(self)
 		Arm:DoShimmer()
 	end
 	
-	World.gameTimers:Add(f, 0.5, true)
+	World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.DoShimmer(self)
@@ -155,14 +178,14 @@ function Arm.DoShimmer(self)
 		self.widgets.Shimmer:SetHAlign(kHorizontalAlign_Right)
 		self.widgets.Shimmer:SetVAlign(kVerticalAlign_Bottom)
 		self.widgets.Shimmer:ScaleTo({0, 0}, {0.15, 0.1})
-		self:DoInitialize()
+		Arm:DoInitialize()
 	end
 	
-	World.gameTimers:Add(f, 0.1, true)
+	World.globalTimers:Add(f, 0.1, true)
 end
 
 function Arm.DoInitialize(self)
-	local r = UI:CenterWidget(self.widgets.Symbol, self.workspaceLeft)
+	local r = UI:CenterWidget(self.widgets.Symbol, {0, 0, self.workspaceLeft[3], self.workspaceLeft[4]})
 	local x = r[1]
 	r[1] = r[1] + self.workspaceLeft[3] * 0.08
 	self.widgets.Symbol:SetRect(r)
@@ -174,12 +197,38 @@ function Arm.DoInitialize(self)
 			singleShot = true
 		}
 	)
+	
 	self.widgets.Symbol:MoveTo({x, r[2]}, {3.5, 0})
 	self.widgets.Symbol:BlendTo({1,1,1,1}, 0.5)
 	
 	self.widgets.LineBorder1:BlendTo({1,1,1,1}, 0)
 	self.widgets.LineBorder1:ScaleTo({0, 0}, {0, 0})
 	self.widgets.LineBorder1:ScaleTo({1, 1}, {1, 1})
+	
+	local f = function()
+		Arm:TransitionChat()
+	end
+	
+	World.globalTimers:Add(f, 2.8, true)
+end
+
+function Arm.TransitionChat(self)
+	self:ActivateSymbol(
+		true,
+		{
+			flashMin = 1,
+			flashMin = 1,
+			singleShot = true
+		}
+	)
+	
+	self.widgets.Symbol:BlendTo({0,0,0,0}, 0.5)
+	
+	local f = function()
+		Arm:StartChat()
+	end
+	
+	World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.ActivateSymbol(self, active, options)
@@ -201,14 +250,14 @@ function Arm.ToggleSymbolFlash(self, flash, options)
 		local f = function ()
 			Arm:ToggleSymbolFlash(false, options)
 		end
-		World.gameTimers:Add(f, FloatRand(options.flashMin, options.flashMax), true)
+		World.globalTimers:Add(f, FloatRand(options.flashMin, options.flashMax), true)
 	else
 		self.widgets.Symbol:SetMaterial(self.gfx.Symbol)
 		if (not options.singleShot) then
 			local f = function ()
 				Arm:ToggleSymbolFlash(true, options)
 			end
-			World.gameTimers:Add(f, FloatRand(options.solidMin, options.solidMax), true)
+			World.globalTimers:Add(f, FloatRand(options.solidMin, options.solidMax), true)
 		end
 	end
 end

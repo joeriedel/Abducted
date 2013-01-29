@@ -345,7 +345,7 @@ function World.PauseGame(pause)
 
 	World.paused = pause
 	if pause then
-		World.SetPauseState(bit.bor(PauseGame, PauseCinematics))
+		World.SetPauseState(bit.bor(kPauseGame, kPauseCinematics))
 	else
 		World.SetPauseState(0)
 	end

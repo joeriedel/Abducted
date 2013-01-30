@@ -22,6 +22,7 @@ Import("Animation")
 Import("Timers")
 Import("PlayerSkills")
 Import("Cinematics")
+Import("Markup")
 
 -- // Entities // --
 Import("Entity")

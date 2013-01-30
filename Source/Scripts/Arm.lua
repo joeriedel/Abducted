@@ -81,7 +81,7 @@ function Arm.SpawnShared(self)
 	
 	self.workspaceRight = {
 		self.workspaceLeft[1] + self.workspaceLeft[3],
-		self.workspaceLeft[2] + self.workspaceLeft[4],
+		self.workspaceLeft[2],
 		0,
 		0
 	}
@@ -112,6 +112,9 @@ function Arm.SpawnShared(self)
 	self.widgets.LineBorder1 = UI:CreateWidget("MatWidget", {rect=self.workspaceLeft, material=self.gfx.LineBorder1})
 	self.widgets.Root:AddChild(self.widgets.LineBorder1)
 	
+	self.widgets.LineBorder2 = UI:CreateWidget("MatWidget", {rect=self.workspaceRight, material=self.gfx.LineBorder2})
+	self.widgets.Root:AddChild(self.widgets.LineBorder2)
+	
 	local symbolSize = UI:MaterialSize(self.gfx.Symbol)
 	symbolSize[3] = UI.screenWidth * 0.40
 	symbolSize[4] = symbolSize[3]
@@ -132,6 +135,7 @@ function Arm.ResetWidgets(self)
 	self.widgets.Shimmer:BlendTo({0,0,0,0}, 0)
 	self.widgets.Symbol:BlendTo({0,0,0,0}, 0)
 	self.widgets.LineBorder1:BlendTo({0,0,0,0}, 0)
+	self.widgets.LineBorder2:BlendTo({0,0,0,0}, 0)
 end
 
 function Arm.Start(self, mode)
@@ -210,6 +214,13 @@ function Arm.DoInitialize(self)
 	end
 	
 	World.globalTimers:Add(f, 2.8, true)
+	
+	f = function()
+		Arm:ButtonsIntro()
+	end
+	
+	World.globalTimers:Add(f, 1.0, true)
+	
 end
 
 function Arm.TransitionChat(self)
@@ -260,6 +271,20 @@ function Arm.ToggleSymbolFlash(self, flash, options)
 			World.globalTimers:Add(f, FloatRand(options.solidMin, options.solidMax), true)
 		end
 	end
+end
+
+function Arm.ButtonsIntro(self)
+	self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5)
+	
+	local f = function()
+		Arm:ListButtons()
+	end
+	
+	World.globalTimers:Add(f, 1.5, true)
+end
+
+function Arm.ListButtons(self, num)
+	
 end
 
 arm_ui = Arm

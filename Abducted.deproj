@@ -61,6 +61,9 @@
     <filename>Source\Scripts\ManipulatableObject.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Markup.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>

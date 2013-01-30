@@ -42,7 +42,7 @@ function Arm.TestChatList(self)
 		self.widgets.chat.ChatList:AddItem(w)
 	end
 	
-	self.widgets.chat.ChatList:ItemChanged()
+	self.widgets.chat.ChatList:DoVerticalLayout()
 	
 end
 

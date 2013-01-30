@@ -172,16 +172,16 @@ function ManipulatableObject.FindSwipeTarget(g)
 	local kMaxDist = UI.systemScreen.diagonal * ManipulatableObject.MaxManipulateDistancePct
 		
 	local normal = { -g.args[2], g.args[1] } -- orthogonal to line
-	local lineDist = math.sqrt((normal[1]*g.start[1]) + (normal[2]*g.start[2]))
+	local lineDist = (normal[1]*g.start[1]) + (normal[2]*g.start[2])
 	local lineSegDist = {
-		math.sqrt(g.args[1]*g.start[1] + g.args[2]*g.start[2]),
-		math.sqrt(g.args[1]*g.finish[1] + g.args[2]*g.finish[2])
+		g.args[1]*g.start[1] + g.args[2]*g.start[2],
+		g.args[1]*g.finish[1] + g.args[2]*g.finish[2]
 	}
 	
 	local lineStart = g.start
 	local lineEnd = g.finish
 	
-	if (lineSegDist[2] > lineSegDist[1]) then
+	if (lineSegDist[1] > lineSegDist[2]) then
 		local x = lineSegDist[1]
 		lineSegDist[1] = lineSegDist[2]
 		lineSegDist[2] = x
@@ -235,10 +235,10 @@ function ManipulatableObject.FindSwipeTarget(g)
 						end
 					else
 						-- orthogonal distance check
-						dd = math.sqrt((normal[1]*screen[1]) + (normal[2]*screen[2]))
+						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
 						dd = math.abs(dd - lineDist)
 						
-						if (dd <= kKaxDist) then
+						if (dd <= kMaxDist) then
 							keep = true
 						end
 					end

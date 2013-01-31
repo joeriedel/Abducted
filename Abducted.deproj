@@ -13,6 +13,9 @@
     <filename>Source\Scripts\ArmChat.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ArmChatTrees.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\CVars.lua</filename>
   </file>
   <file>

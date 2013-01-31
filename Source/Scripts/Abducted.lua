@@ -32,7 +32,7 @@ function Abducted.Load(self)
 	self.overlays.Manipulate = World.CreateScreenOverlay(self.gfx.Manipulate)
 end
 
-function Abducted.OnInputEvent(self, e)
+function Abducted.InputEventFilter(self, e)
 	if (e.type == kI_KeyDown) then
 		if (e.data[1] == kKeyCode_P) then
 			World.PauseGame(not World.paused)
@@ -41,11 +41,20 @@ function Abducted.OnInputEvent(self, e)
 	if (self.eatInput) then
 		return true
 	end
-	if (Arm.active) then
-		return false
-	end
 	if (Cinematics.busy > 0) then
 		return true
+	end
+	
+	return false
+end
+
+function Abducted.InputGestureFilter(self, g)
+	return false
+end
+
+function Abducted.OnInputEvent(self, e)
+	if (Arm.active) then
+		return false
 	end
 	if (self.manipulate) then
 		return false

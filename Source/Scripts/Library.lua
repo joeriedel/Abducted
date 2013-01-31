@@ -4,6 +4,36 @@
 -- See Abducted/LICENSE for licensing terms
 
 --[[---------------------------------------------------------------------------
+	split string
+	http://lua-users.org/wiki/SplitJoin
+-----------------------------------------------------------------------------]]
+
+function string:split(delim, maxNb)
+    -- Eliminate bad cases...
+    if self:find(delim) == nil then
+        return { self }
+    end
+    if maxNb == nil or maxNb < 1 then
+        maxNb = 0    -- No limit
+    end
+    local result = {}
+    local pat = "(.-)" .. delim .. "()"
+    local nb = 0
+    local lastPos
+    for part, pos in self:gfind(pat) do
+        nb = nb + 1
+        result[nb] = part
+        lastPos = pos
+        if nb == maxNb then break end
+    end
+    -- Handle the last field
+    if nb ~= maxNb then
+        result[nb + 1] = self:sub(lastPos)
+    end
+    return result
+end
+
+--[[---------------------------------------------------------------------------
 	Tokenize a string
 -----------------------------------------------------------------------------]]
 
@@ -388,6 +418,10 @@ function StringTable.Get(name, useDefault, default)
 		end
 	elseif (not useDefault) then
 		x = "nil"
+	end
+	
+	if (x) then
+		x = x:gsub("\\n", "\n")
 	end
 	
 	return x

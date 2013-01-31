@@ -49,9 +49,27 @@ function UI.Spawn(self)
 	UI.screenHeight = uiScreen.height
 	UI.screenDiagonalSq = UI.screenWidth*UI.screenWidth + UI.screenHeight*UI.screenHeight
 	UI.screenDiagonal = math.sqrt(UI.screenDiagonalSq)
+	
 	UI.screenUIScale = {
 		uiScreen.width / UI.systemScreen.width,
 		uiScreen.height / UI.systemScreen.height
+	}
+	
+	UI.invScreenUIScale = {
+		UI.systemScreen.width / uiScreen.width,
+		UI.systemScreen.height / uiScreen.height
+	}
+	
+	-- text was authored at 720p
+	
+	UI.identityScale = {
+		uiScreen.width / 1280,
+		uiScreen.height / 720
+	}
+	
+	UI.invIdentityScale = {
+		1 / UI.identityScale[1],
+		1 / UI.identityScale[2]
 	}
 	
 	UI.gestureMode = false
@@ -478,5 +496,88 @@ function UI.MaterialSize(self, material, rect)
 	return rect
 end
 
+function UI.LineWrapCenterText(self, label, lineSpace, lines)
+
+	if (type(lines) == "string") then
+		lines = string.split(lines, "\n")
+	end
+	
+	lineSpace = lineSpace * UI.identityScale[2]
+	
+	local r = label:Rect()
+	local font = label:Typeface()
+	local advance = UI:FontAdvanceSize(font)
+	
+	local labelStrings = {}
+	local size = 0
+	
+	for k,line  in pairs(lines) do
+	
+		local strings = UI:WordWrap(font, line, r[3])
+		for k,v in pairs(strings) do
+		
+				if (next(labelStrings) ~= nil) then
+					size = size + lineSpace
+				end
+		
+				local w, h = UI:StringDimensions(font, v)
+				local x = (r[3] - w) / 2
+							
+				local string = {
+					x = x,
+					y = size,
+					text = v,
+					scaleX = UI.identityScale[1],
+					scaleY = UI.identityScale[2]
+				}
+				
+				label:SetText({string})
+				local ds = label:Dimensions()
+				local fx, fy = UI:StringDimensions(font, v)
+				
+				size = size + h
+				table.insert(labelStrings, string)
+		end
+	end
+	
+	local y = (r[4] - (size + advance)) / 2
+	
+	for k,v in pairs(labelStrings) do
+		v.y = v.y + y
+	end
+	
+	label:SetText(labelStrings)
+
+end
+
+--[[---------------------------------------------------------------------------
+	Fonts are unaware of our UI scaling
+-----------------------------------------------------------------------------]]
+
+function UI.StringDimensions(self, font, text)
+
+	local w,h = font:StringDimensions(text)
+	w = w * UI.identityScale[1]
+	h = h * UI.identityScale[2]
+	return w,h
+end
+
+function UI.FontAdvanceSize(self, font)
+	local a,d = font:AscenderDescender()
+	return (a+d)*UI.identityScale[2]
+end
+
+function UI.SplitStringAtSize(self, font, text, width)
+
+	-- width is in UI coordinates, font operates in absolute
+--	width = width * UI.invTextScale[1]
+	return font:SplitStringAtSize(text, width)
+
+end
+
+function UI.WordWrap(self, font, text, width)
+--	width = width * UI.invTextScale[1]
+	return font:WordWrap(text, width)
+end
 
 ui_code = UI

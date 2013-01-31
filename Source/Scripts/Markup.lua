@@ -15,6 +15,13 @@ Markup.ArgDelim = {Markup.Space, Markup.Equals, Markup.AngleClose}
 Markup.ValDelim = {Markup.Sapce, Markup.AngleClose}
 Markup.TagDelim = {Markup.Space}
 
+function Markup.ParseUI(script, options)
+
+	local document = Markup.Parse(script)
+	return Markup.CreateUI(document, options)
+
+end
+
 function Markup.CreateUI(document, options)
 	
 	local widgets = {}
@@ -61,12 +68,17 @@ end
 
 function Markup.EmitText(widgets, strings, x, elem, options)
 
+	local typeface = options.typefaces[elem.font]
+	if (typeface == nil) then
+		error("Markup typeface '%s' is not loaded", elem.font)
+	end
+	
 	if (#strings.array >= options.maxLinesPerModel) then
-		strings = Markup.EmitStrings(widgets, strings, elem.font)
+		strings = Markup.EmitStrings(widgets, strings, typeface)
 	end
 	
 	if (strings.typeface ~= typeface) then
-		strings = Markup.EmitStrings(widgets, strings, elem.font)
+		strings = Markup.EmitStrings(widgets, strings, typeface)
 	end
 	
 	local string = {
@@ -110,7 +122,9 @@ function Markup.EmitStrings(widgets, strings, typeface)
 		local string = {
 			x = v.rect[1],
 			y = v.rect[2],
-			text = v.text
+			text = v.text,
+			scaleX = UI.identityScale[1],
+			scaleY = UI.identityScale[2]
 		}
 		
 		table.insert(widgetStrings, string)
@@ -249,7 +263,7 @@ function Markup.AddTextElement(lines, curLine, tag, v, text, options)
 	while (second) do
 		if (first) then
 		
-			local w = font:StringDimensions(first)
+			local w = UI:StringDimensions(font, first)
 			
 			element = {
 				type = "text",
@@ -257,7 +271,7 @@ function Markup.AddTextElement(lines, curLine, tag, v, text, options)
 				lineWrap = true,
 				font = font,
 				w = w,
-				h = advance
+				h = advance,
 			}
 			
 			curLine = Markup.AddLineElement(lines, curLine, element, options)
@@ -271,7 +285,7 @@ function Markup.AddTextElement(lines, curLine, tag, v, text, options)
 	
 	if (first) then
 		
-		local w = font:StringDimensions(first)
+		local w = UI:StringDimensions(font, first)
 		
 		element = {
 			type = "text",
@@ -308,7 +322,7 @@ function Markup.AddLineElement(lines, curLine, element, options)
 		element.y = curLine.y
 		curLine.x = curLine.x + element.w
 		curLine.w = curLine.x
-		curLine.h = Max(curLine.h, element.h + options.lineSpace)
+		curLine.h = Max(curLine.h, element.h + (options.lineSpace*UI.identityScale[2]))
 		curLine.prevElement = element
 	end
 	
@@ -367,7 +381,7 @@ function Markup.FlushLine(lines, curLine, tag)
 	
 	curLine = {
 		x = 0,
-		y = curLine.y + curLine.h + options.lineSpace,
+		y = curLine.y + curLine.h + (options.lineSpace*UI.identityScale[2]),
 		w = 0,
 		h = 0,
 		elements = {},

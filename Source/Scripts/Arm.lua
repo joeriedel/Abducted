@@ -26,6 +26,8 @@ function Arm.SpawnShared(self)
 	self.widgets.Root:SetVisible(false)
 
 	self.gfx = {}
+	self.gfx.Button = World.Load("UI/arm_buttons_M")
+	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
 	self.gfx.Border = World.Load("UI/arm_screen1_M")
 	self.gfx.LineBorder1 = World.Load("UI/lineborder1_M")
 	self.gfx.LineBorder2 = World.Load("UI/lineborder2_M")
@@ -35,9 +37,18 @@ function Arm.SpawnShared(self)
 	self.gfx.Symbol = World.Load("UI/locked_symbol_M")
 	self.gfx.SymbolFlash = World.Load("UI/locked_symbol_flash_M")
 	
+	self.typefaces = {}
+	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
+	
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")
+	self.sfx.Button = World.Load("Audio/armbutton")
 	
+	Arm:SetupBackgroundAndWorkspaces()
+	Arm:CreateMenu()
+end
+
+function Arm.SetupBackgroundAndWorkspaces(self)
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
 	
@@ -112,9 +123,6 @@ function Arm.SpawnShared(self)
 	self.widgets.LineBorder1 = UI:CreateWidget("MatWidget", {rect=self.workspaceLeft, material=self.gfx.LineBorder1})
 	self.widgets.Root:AddChild(self.widgets.LineBorder1)
 	
-	self.widgets.LineBorder2 = UI:CreateWidget("MatWidget", {rect=self.workspaceRight, material=self.gfx.LineBorder2})
-	self.widgets.Root:AddChild(self.widgets.LineBorder2)
-	
 	local symbolSize = UI:MaterialSize(self.gfx.Symbol)
 	symbolSize[3] = UI.screenWidth * 0.40
 	symbolSize[4] = symbolSize[3]
@@ -122,9 +130,269 @@ function Arm.SpawnShared(self)
 	self.widgets.WorkspaceLeft = UI:CreateWidget("Widget", {rect=self.workspaceLeft})
 	self.widgets.Root:AddChild(self.widgets.WorkspaceLeft)
 	
-	self.widgets.Symbol = UI:CreateWidget("MatWidget", {rect=symbolSize, material=self.gfx.Symbol})
-	self.widgets.WorkspaceLeft:AddChild(self.widgets.Symbol)	
+	self.widgets.WorkspaceRight = UI:CreateWidget("Widget", {rect=self.workspaceRight})
+	self.widgets.Root:AddChild(self.widgets.WorkspaceRight)
 	
+	self.widgets.Symbol = UI:CreateWidget("MatWidget", {rect=symbolSize, material=self.gfx.Symbol})
+	self.widgets.WorkspaceLeft:AddChild(self.widgets.Symbol)
+end
+
+function Arm.CreateMenu(self)
+	self.widgets.LineBorder2 = UI:CreateWidget("MatWidget", {rect=self.workspaceRightSize, material=self.gfx.LineBorder2})
+	self.widgets.WorkspaceRight:AddChild(self.widgets.LineBorder2)
+	self.widgets.LineBorder3 = UI:CreateWidget("MatWidget", {rect=self.workspaceRightSize, material=self.gfx.LineBorder3})
+	self.widgets.WorkspaceRight:AddChild(self.widgets.LineBorder3)
+	
+	local size = self.gfx.LineBorder2:Dimensions()
+	local scale = {
+		self.workspaceRightSize[3] / size[1],
+		self.workspaceRightSize[4] / size[2]
+	}
+	
+	-- scale buttons accordingly:
+	size = self.gfx.Button:Dimensions()
+	
+	size[1] = size[1] * scale[1]
+	size[2] = size[2] * scale[2] * 0.95
+	
+	local x = 7 * scale[1]
+	local y = 0
+	
+	local shift = 15 * scale[1]
+	local space = 0 * UI.identityScale[2]
+	local lineSpace = 4
+	
+	local text
+	
+	self.widgets.Return = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			enabled = self.gfx.Button,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.ReturnPressed
+		},
+		{
+			highlight = {
+				on = {0.5,0.5,0.5,1},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	text = StringTable.Get("ARM_RETURN_TO_WORLD_BTN")
+	UI:LineWrapCenterText(self.widgets.Return.label, lineSpace, text)
+	
+	y = y + size[2] + space
+	
+	self.widgets.Database = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			enabled = self.gfx.Button,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.DatabasePressed
+		},
+		{
+			highlight = {
+				on = {0.5,0.5,0.5,1},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	text = StringTable.Get("ARM_DATABASE_BTN")
+	UI:LineWrapCenterText(self.widgets.Database.label, lineSpace, text)
+	
+	y = y + size[2] + space
+	
+	self.widgets.Talk = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			enabled = self.gfx.Button,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.TalkPressed
+		},
+		{
+			highlight = {
+				on = {0.5,0.5,0.5,1},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	self.widgets.Talk.skipIntro = true
+	text = StringTable.Get("ARM_TALK_BTN")
+	UI:LineWrapCenterText(self.widgets.Talk.label, lineSpace, text)
+	
+	self.widgets.Change = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.ChangePressed
+		},
+		{
+			highlight = {
+				on = {0,0,0,0},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	self.widgets.Change.skipIntro = true
+	text = StringTable.Get("ARM_CHANGE_CONVERSATION_BTN")
+	UI:LineWrapCenterText(self.widgets.Change.label, lineSpace, text)
+	
+	y = y + size[2] + space
+	
+	self.widgets.Powers = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			enabled = self.gfx.Button,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.PowersPressed
+		},
+		{
+			highlight = {
+				on = {0.5,0.5,0.5,1},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	text = StringTable.Get("ARM_POWERS_BTN")
+	UI:LineWrapCenterText(self.widgets.Powers.label, lineSpace, text)
+	
+	y = y + size[2] + space
+	
+	self.widgets.Quit = UIPushButton:Create(
+		{x, y, size[1], size[2]},
+		{
+			enabled = self.gfx.Button,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Button
+		},
+		{
+			pressed = Arm.QuitPressed
+		},
+		{
+			highlight = {
+				on = {0.5,0.5,0.5,1},
+				off = {0,0,0,0},
+				overbright = {1,1,1,1},
+				time = 0.1,
+				overbrightTime = 0.1
+			},
+			label = {
+				typeface = self.typefaces.StandardButton
+			}
+		},
+		self.widgets.WorkspaceRight
+	)
+	
+	text = StringTable.Get("ARM_SAVE_AND_QUIT_BTN")
+	UI:LineWrapCenterText(self.widgets.Quit.label, lineSpace, text)
+	
+	self.widgets.MenuButtons = {
+		self.widgets.Return,
+		self.widgets.Database,
+		self.widgets.Talk,
+		self.widgets.Change,
+		self.widgets.Powers,
+		self.widgets.Quit
+	}
+end
+
+function Arm.ReturnPressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.DatabasePressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.TalkPressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.ChangePressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.PowersPressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.QuitPressed(widget)
+	Arm:ClearButtonHighlights(widget)
+end
+
+function Arm.ClearButtonHighlights(self, except)
+	for k,v in pairs(self.widgets.MenuButtons) do
+		if (v ~= except) then
+			v.class:ResetHighlight(v)
+		end
+	end
 end
 
 function Arm.EatAllInput(self, e)
@@ -136,13 +404,25 @@ function Arm.ResetWidgets(self)
 	self.widgets.Symbol:BlendTo({0,0,0,0}, 0)
 	self.widgets.LineBorder1:BlendTo({0,0,0,0}, 0)
 	self.widgets.LineBorder2:BlendTo({0,0,0,0}, 0)
+	self.widgets.LineBorder3:BlendTo({0,0,0,0}, 0)
+	
+	for k,v in pairs(self.widgets.MenuButtons) do
+		v:BlendTo({0,0,0,0}, 0)
+	end
+	
+	Arm:ResetChat()
 end
 
 function Arm.Start(self, mode)
 	Abducted.entity.eatInput = true
-	Arm.active = true
+	self.active = true
+	self.intro = true
+	self.modeCleanup = nil
+	self.mode = nil
+	self.backToGame = false
+	self.talk = false
+	self.introMode = mode
 	
-	self.mode = mode
 	UI:BlendTo({1,1,1,1}, 0.2)
 	self:ResetWidgets()
 	
@@ -157,6 +437,72 @@ function Arm.Start(self, mode)
 	end
 	
 	World.globalTimers:Add(f, 0.2, true)
+end
+
+function Arm.SwitchToChat(self)
+
+	self.modeCleanup = function ()
+		Arm:EndChat()
+	end
+	
+	self:SwapToChange()
+	self:StartChat()
+end
+
+function Arm.SwapToTalk(self)
+	if (self.talk) then
+		return
+	end
+	
+	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, true, true)
+	self.widgets.Talk:FadeTo({1,1,1,1}, 0.2)
+	self.widgets.LineBorder2:FadeTo({0,0,0,0}, 0.5)
+	self.widgets.LineBorder3:FadeTo({1,1,1,1}, 0.5)
+end
+
+function Arm.SwapToChange(self)
+	if (not self.talk) then
+		return
+	end
+	
+	self.talk = false
+	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, false, false)
+	self.widgets.Talk:FadeTo({0,0,0,0}, 0.2)
+	self.widgets.LineBorder2:FadeTo({1,1,1,1}, 0.5)
+	self.widgets.LineBorder3:FadeTo({0,0,0,0}, 0.5)
+end
+
+function Arm.EnableChangeTopic(self, enable)
+	if (enable) then
+		self.widgets.Change.class:SetEnabled(self.widgets.Change, true, true)
+		self.widgets.Change:BlendTo({1,1,1,1}, 0.2)
+	else
+		self.widgets.Change.class:SetEnabled(self.widgets.Change, false, false)
+		self.widgets.Change:BlendTo({0,0,0,0}, 0.2)
+	end
+end
+
+function Arm.SwitchMode(self, mode)
+
+	if (self.mode == mode) then
+		return
+	end
+
+	if (self.modeCleanup) then
+		self.modeCleanup()
+		return
+	end
+	
+	self:NextMode(mode)
+	
+end
+
+function Arm.NextMode(self, mode)
+	self.mode = mode
+	
+	if (mode == "chat") then
+		self:SwitchToChat()
+	end
 end
 
 function Arm.Intro(self)
@@ -234,12 +580,6 @@ function Arm.TransitionChat(self)
 	)
 	
 	self.widgets.Symbol:BlendTo({0,0,0,0}, 0.5)
-	
-	local f = function()
-		Arm:StartChat()
-	end
-	
-	World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.ActivateSymbol(self, active, options)
@@ -277,14 +617,51 @@ function Arm.ButtonsIntro(self)
 	self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5)
 	
 	local f = function()
-		Arm:ListButtons()
+		Arm:ListButtons(1)
 	end
 	
 	World.globalTimers:Add(f, 1.5, true)
 end
 
 function Arm.ListButtons(self, num)
+	local didFade = false
+	local widget = self.widgets.MenuButtons[num]
+	if (widget) then
+		if (not widget.skipIntro) then
+			widget:BlendTo({1,1,1,1}, 0.3)
+			didFade = true
+		end
+	end
 	
+	local f
+	
+	if (self.widgets.MenuButtons[num+1]) then
+		f = function()
+			Arm:ListButtons(num+1)
+		end
+	else
+		f = function()
+			Arm:IntroComplete()
+		end
+	end
+	
+	if (didFade) then
+		World.globalTimers:Add(f, 0.3, true)
+	else
+		f()
+	end
+end
+
+function Arm.IntroComplete(self)
+	Abducted.entity.eatInput = false
+	self:SwitchMode(self.introMode)
+	self.introMode = nil
+end
+
+function Arm.EnableMenuButtons(self, enable)
+	for k,v in pairs(self.widgets.MenuButtons) do
+		v.class:SetEnabled(v, enable)
+	end
 end
 
 arm_ui = Arm

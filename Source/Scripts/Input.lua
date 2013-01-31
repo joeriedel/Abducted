@@ -3,6 +3,14 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
+function World.InputEventFilter(e)
+	return Game.entity:InputEventFilter(e)
+end
+
+function World.InputGestureFilter(g)
+	return Game.entity:InputGestureFilter(g)
+end
+
 function World.OnInputEvent(e)
 
 	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then

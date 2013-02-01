@@ -177,10 +177,10 @@ Arm.Chats.Roots.Genesis4 = {
 Arm.Chats.Available = {}
 
 function Arm.LoadCommonChats(self)
-	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis1)
-	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis2)
-	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis3)
-	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis4)
+	Arm.Chats.Available.Genesis1 = Arm.Chats.Roots.Genesis1
+	Arm.Chats.Available.Genesis2 = Arm.Chats.Roots.Genesis2
+	Arm.Chats.Available.Genesis3 = Arm.Chats.Roots.Genesis3
+	Arm.Chats.Available.Genesis4 = Arm.Chats.Roots.Genesis4
 end
 
 function Arm.LoadEp1Crushed(self)

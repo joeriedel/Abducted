@@ -377,7 +377,7 @@ function Arm.ReturnPressed(widget)
 		Arm.widgets.Root:SetVisible(false)
 		World.DrawUIOnly(false)
 		UI:BlendTo({0,0,0,0}, 0.2)
-		garbagecollect()
+		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.2, true)
 end

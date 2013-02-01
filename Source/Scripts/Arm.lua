@@ -368,6 +368,18 @@ end
 
 function Arm.ReturnPressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	Arm:ClearChat()
+	Abducted.entity.eatInput = true
+	UI:BlendTo({1,1,1,1}, 0.2)
+	local f = function()
+		Abducted.entity.eatInput = false
+		Arm.active = false
+		Arm.widgets.Root:SetVisible(false)
+		World.DrawUIOnly(false)
+		UI:BlendTo({0,0,0,0}, 0.2)
+		garbagecollect()
+	end
+	World.globalTimers:Add(f, 0.2, true)
 end
 
 function Arm.DatabasePressed(widget)

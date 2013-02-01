@@ -18,6 +18,7 @@ function Worldspawn.Spawn(self)
 	SaveGame:EnableCloudStorage(World.cloudEnabled)
 	
 	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
+	Arm:LoadChats(StringForString(self.keys.arm_chats, "Ep1Crushed"))
 end
 
 function Worldspawn.PostSpawn(self)

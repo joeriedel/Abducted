@@ -61,10 +61,10 @@ function DebugUI.Think(self)
 	
 	local counters = World.DrawCounters()
 	self.widgets.fps:SetText(string.format("%.3f fps", counters.fps))
-	local width = UI:SizeLabel(self.widgets.fps)
+	local width = UI:SizeLabelToContents(self.widgets.fps)
 	
 	self.widgets.portals:SetText(string.format("%d Area(s), %d/%d portal(s)", counters.drawnAreas, counters.drawnPortals, counters.testedPortals))
-	width = math.max(UI:SizeLabel(self.widgets.portals)[3])
+	width = math.max(UI:SizeLabelToContents(self.widgets.portals)[3])
 	
 	self.widgets.models:SetText(
 		string.format("%d/%d World, %d/%d/%d Entities", 
@@ -72,12 +72,12 @@ function DebugUI.Think(self)
 			counters.drawnEntityModels, counters.testedEntityModels, counters.drawnEntities
 		)
 	)
-	width = math.max(UI:SizeLabel(self.widgets.models)[3])
+	width = math.max(UI:SizeLabelToContents(self.widgets.models)[3])
 	
 	self.widgets.misc:SetText(string.format("%d Tri(s), %d Batch(s), %d Material(s)", 
 		counters.numTris, counters.numBatches, counters.numMaterials
 	))
-	width = math.max(UI:SizeLabel(self.widgets.misc)[3])
+	width = math.max(UI:SizeLabelToContents(self.widgets.misc)[3])
 	
 	local left = (UI.screenWidth - width) / 2
 	UI:MoveWidget(self.widgets.fps, left)

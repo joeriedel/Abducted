@@ -27,14 +27,14 @@ end
 
 
 function Game.Think(self)
-	local time = World.GameTime()
-	local sysTime = World.SysTime()
+	Game.time = World.GameTime()
+	Game.sysTime = World.SysTime()
 	
 	if (not World.paused) then
-		World.gameTimers:Tick(time)
+		World.gameTimers:Tick(Game.time)
 	end
 	
-	World.globalTimers:Tick(sysTime)
+	World.globalTimers:Tick(Game.sysTime)
 end
 
 function Game.PostSpawn(self)

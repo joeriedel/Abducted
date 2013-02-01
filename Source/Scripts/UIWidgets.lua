@@ -144,8 +144,14 @@ function UIPushButton.DoPressed(self, widget, e)
 		return true
 	end
 	
+	if (widget.state.timer) then
+		widget.state.timer:Clean()
+		widget.state.timer = nil
+	end
+	
 	widget.busy = e.touch
 	widget.state.pressed = true
+	widget.state.time = Game.sysTime
 	
 	widget.class:SetGfxState(widget)
 	
@@ -179,7 +185,17 @@ function UIPushButton.DoUnpressed(self, widget)
 	if (widget.highlight) then
 		local options = widget.options
 		if (options.highlight.overbright) then
-			widget.highlight:BlendTo(options.highlight.on, options.highlight.time)
+			local delta = Game.sysTime - widget.state.time
+			if (delta < options.highlight.overbrightTime) then
+				-- no chance to see overbright state use a timer to readjust
+				delta = options.highlight.overbrightTime - delta
+				local f = function()
+					widget.highlight:BlendTo(options.highlight.on, options.highlight.time)
+				end
+				widget.state.timer = World.globalTimers:Add(f, delta, true)
+			else
+				widget.highlight:BlendTo(options.highlight.on, options.highlight.time)
+			end
 		end
 	end
 	
@@ -202,9 +218,13 @@ function UIPushButton.ResetHighlight(self, widget, immediate)
 end
 
 function UIPushButton.SetGfxState(self, widget, immediate)
-	if (widget.timer) then
-		widget.timer:Clean()
-		widget.timer = nil
+	if (widget.state.timer) then
+		widget.state.timer:Clean()
+		widget.state.timer = nil
+	end
+	
+	if (widget.disableGfxChanges) then
+		return
 	end
 	
 	if (widget.state.pressed) then

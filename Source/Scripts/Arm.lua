@@ -5,6 +5,7 @@
 
 Arm = Class:New()
 Arm.active = false
+Arm.Chats = {}
 
 function Arm.Spawn(self)
 
@@ -39,6 +40,8 @@ function Arm.SpawnShared(self)
 	
 	self.typefaces = {}
 	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
+	self.typefaces.Chat = World.Load("UI/Chat_TF")
+	self.typefaces.ChatChoice = World.Load("UI/ChatChoice_TF")
 	
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")
@@ -153,7 +156,7 @@ function Arm.CreateMenu(self)
 	size = self.gfx.Button:Dimensions()
 	
 	size[1] = size[1] * scale[1]
-	size[2] = size[2] * scale[2] * 0.95
+	size[2] = size[2] * scale[2] * 0.92
 	
 	local x = 7 * scale[1]
 	local y = 0
@@ -192,12 +195,12 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_RETURN_TO_WORLD_BTN")
-	UI:LineWrapCenterText(self.widgets.Return.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Return.label, nil, nil, lineSpace, text)
 	
 	y = y + size[2] + space
 	
 	self.widgets.Database = UIPushButton:Create(
-		{x, y, size[1], size[2]},
+		{x+shift, y, size[1], size[2]},
 		{
 			enabled = self.gfx.Button,
 			highlight = self.gfx.ButtonOverbright
@@ -224,7 +227,7 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_DATABASE_BTN")
-	UI:LineWrapCenterText(self.widgets.Database.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Database.label, nil, nil, lineSpace, text)
 	
 	y = y + size[2] + space
 	
@@ -257,7 +260,7 @@ function Arm.CreateMenu(self)
 	
 	self.widgets.Talk.skipIntro = true
 	text = StringTable.Get("ARM_TALK_BTN")
-	UI:LineWrapCenterText(self.widgets.Talk.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Talk.label, nil, nil, lineSpace, text)
 	
 	self.widgets.Change = UIPushButton:Create(
 		{x, y, size[1], size[2]},
@@ -287,12 +290,12 @@ function Arm.CreateMenu(self)
 	
 	self.widgets.Change.skipIntro = true
 	text = StringTable.Get("ARM_CHANGE_CONVERSATION_BTN")
-	UI:LineWrapCenterText(self.widgets.Change.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Change.label, nil, nil, lineSpace, text)
 	
 	y = y + size[2] + space
 	
 	self.widgets.Powers = UIPushButton:Create(
-		{x, y, size[1], size[2]},
+		{x+shift, y, size[1], size[2]},
 		{
 			enabled = self.gfx.Button,
 			highlight = self.gfx.ButtonOverbright
@@ -319,7 +322,7 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_POWERS_BTN")
-	UI:LineWrapCenterText(self.widgets.Powers.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Powers.label, nil, nil, lineSpace, text)
 	
 	y = y + size[2] + space
 	
@@ -351,7 +354,7 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_SAVE_AND_QUIT_BTN")
-	UI:LineWrapCenterText(self.widgets.Quit.label, lineSpace, text)
+	UI:LineWrapCenterText(self.widgets.Quit.label, nil, nil, lineSpace, text)
 	
 	self.widgets.MenuButtons = {
 		self.widgets.Return,
@@ -662,6 +665,10 @@ function Arm.EnableMenuButtons(self, enable)
 	for k,v in pairs(self.widgets.MenuButtons) do
 		v.class:SetEnabled(v, enable)
 	end
+end
+
+function Arm.OnEvent(self, cmd, args)
+
 end
 
 arm_ui = Arm

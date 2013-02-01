@@ -347,6 +347,9 @@ end
 function UI.HCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
+	
 	local r = label:Rect()
 	
 	r[1] = rect[1] + ((rect[3]-d[1]) / 2)
@@ -357,9 +360,11 @@ function UI.HCenterLabel(self, label, rect)
 	return r
 end
 
-function UI.VCenterLabel(self, label, xf, yp)
+function UI.VCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = label:Rect()
 	
@@ -371,9 +376,11 @@ function UI.VCenterLabel(self, label, xf, yp)
 	return r
 end
 
-function UI.CenterLabel(self, label, xp, yp)
+function UI.CenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = {
 		rect[1] + ((rect[3]-d[1]) / 2),
@@ -389,6 +396,8 @@ end
 function UI.RAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -411,6 +420,8 @@ end
 function UI.VAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -432,6 +443,8 @@ end
 function UI.RVAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -453,9 +466,13 @@ end
 function UI.SizeLabelToContents(self, label, x, y)
 
 	local d = label:Dimensions()
+	d[1] = d[1] * UI.identityScale[1]
+	d[2] = d[2] * UI.identityScale[2]
+	
+	local r = label:Rect()
 	
 	if ((x == nil) or (y == nil)) then
-		local r = label:Rect()
+		
 		if (x == nil) then
 			x = r[1]
 		end
@@ -465,7 +482,11 @@ function UI.SizeLabelToContents(self, label, x, y)
 		end
 	end
 	
-	local r = {x, y, d[1], d[2]}
+	r[1] = x
+	r[2] = y
+	r[3] = d[1]
+	r[4] = d[2]
+	
 	label:SetRect(r)
 	return r
 
@@ -473,18 +494,6 @@ end
 
 function UI.EatInput(self, e)
 	return true
-end
-
-function UI.SizeLabel(self, label)
-
-	local d = label:Dimensions()
-	
-	local r = label:Rect()
-	r[3] = d[1]
-	r[4] = d[1]
-	label:SetRect(r)
-	return r
-	
 end
 
 function UI.MaterialSize(self, material, rect)
@@ -496,7 +505,7 @@ function UI.MaterialSize(self, material, rect)
 	return rect
 end
 
-function UI.LineWrapCenterText(self, label, lineSpace, lines)
+function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, lines)
 
 	if (type(lines) == "string") then
 		lines = string.split(lines, "\n")
@@ -506,14 +515,18 @@ function UI.LineWrapCenterText(self, label, lineSpace, lines)
 	
 	local r = label:Rect()
 	local font = label:Typeface()
-	local advance = UI:FontAdvanceSize(font)
+	
+	if (maxWidth == nil) then
+		maxWidth = r[3]
+	end
 	
 	local labelStrings = {}
 	local size = 0
+	local widestLine = 0
 	
 	for k,line  in pairs(lines) do
 	
-		local strings = UI:WordWrap(font, line, r[3])
+		local strings = UI:WordWrap(font, line, maxWidth)
 		for k,v in pairs(strings) do
 		
 				if (next(labelStrings) ~= nil) then
@@ -532,22 +545,36 @@ function UI.LineWrapCenterText(self, label, lineSpace, lines)
 				}
 				
 				label:SetText({string})
-				local ds = label:Dimensions()
-				local fx, fy = UI:StringDimensions(font, v)
+				local d = label:Dimensions()
 				
 				size = size + h
+				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
 		end
 	end
 	
-	local y = (r[4] - (size + advance)) / 2
+	if (autoSize) then
+		r[3] = widestLine
+		r[4] = size
+		label:SetRect(r)
+	end
+	
+--	local advance = UI:FontAdvanceSize(font)
+	local y = (r[4] - size) / 2
 	
 	for k,v in pairs(labelStrings) do
 		v.y = v.y + y
 	end
 	
 	label:SetText(labelStrings)
-
+	
+	if (not autoSize) then
+	-- return the size we would have been had we auto-sized
+		r[3] = widestLine
+		r[4] = size
+	end
+	
+	return r
 end
 
 --[[---------------------------------------------------------------------------
@@ -568,15 +595,12 @@ function UI.FontAdvanceSize(self, font)
 end
 
 function UI.SplitStringAtSize(self, font, text, width)
-
-	-- width is in UI coordinates, font operates in absolute
---	width = width * UI.invTextScale[1]
+	width = width * UI.invIdentityScale[1]
 	return font:SplitStringAtSize(text, width)
-
 end
 
 function UI.WordWrap(self, font, text, width)
---	width = width * UI.invTextScale[1]
+	width = width * UI.invIdentityScale[1]
 	return font:WordWrap(text, width)
 end
 

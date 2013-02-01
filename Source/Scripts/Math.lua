@@ -11,10 +11,6 @@
 		Utils
 -----------------------------------------------------------------------------]]
 
-function ExpandRect(r, w, h)
-	return { r[1]-w/2, r[2]-h/2, r[3]+w, r[4]+h }
-end
-
 function Lerp(a, b, t)
 	return  a + (b-a)*t
 end

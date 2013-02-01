@@ -11,6 +11,7 @@ Arm.ChatChoiceExtraSpaceAfterPrompt = 6
 Arm.ChatChoiceHorzSpace = 16
 Arm.ChatChoiceButtonPadd = { 16, 10 }
 Arm.ChatClipAdjust = { 0, 8, 0, -8 }
+Arm.MaxChangeConversationTimes = 4
 
 function Arm.SpawnChat(self)
 
@@ -38,24 +39,13 @@ end
 function Arm.StartChat(self)
 	Arm:SwapToChange()
 	self.widgets.chat.Root:SetVisible(true)
+	self.changeConversationCount = 0
 	Arm:StartConversation()
 end
 
 function Arm.EndChat(self)
 	self:SwapToTalk()
 	Arm:ClearChat()
-end
-
-function Arm.TestChatList(self)
-	self.widgets.chat.ChatList:SetVisible(true)
-	
-	for i=1,4 do
-		local w = UI:CreateWidget("MatWidget", {rect=UI:MaterialSize(self.gfx.Symbol), material=self.gfx.Symbol})
-		self.widgets.chat.ChatList:AddItem(w)
-	end
-	
-	self.widgets.chat.ChatList:DoVerticalLayout()
-	
 end
 
 function Arm.ClearChat(self)
@@ -96,8 +86,10 @@ function Arm.StartConversation(self)
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
 	
 	if (self.requiredTopic) then
+		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Root[self.requiredTopic]
 	else
+		self.changeConversationCount = self.changeConversationCount + 1
 		self.topic = self:SelectChatRoot()
 	end
 	
@@ -208,10 +200,12 @@ function Arm.TickPrompt(self)
 		if (self.promptState.line > #self.promptState.lines) then
 			self.chatTimer:Clean()
 			self.chatTimer = nil
-			local f = function()
-				Arm:EnableChangeTopic(true)
+			if (self.changeConversationCount <= Arm.MaxChangeConversationTimes) then
+				local f = function()
+					Arm:EnableChangeTopic(true)
+				end
+				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
 			end
-			self.chatTimer2 = World.globalTimers:Add(f, 2, true)
 			Arm:DisplayChoices()
 			collectgarbage()
 			return
@@ -359,6 +353,8 @@ end
 
 function Arm.ChoiceSelected(self, widget, choice)
 
+	self.changeConversationCount = 0
+	
 	-- disable all choices
 	for k,v in pairs(self.choiceWidgets) do
 	
@@ -382,6 +378,10 @@ function Arm.ChoiceSelected(self, widget, choice)
 end
 
 function Arm.SelectChatRoot(self)
+
+	if (self.changeConversationCount > Arm.MaxChangeConversationTimes) then
+		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}}
+	end
 
 	local roots = {}
 	local sum = 0

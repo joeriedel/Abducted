@@ -56,6 +56,10 @@ Arm.Chats.WhoAreYou = {
 	prompt = {{"ARM_CHAT_WHO_ARE_YOU"}}
 }
 
+Arm.Chats.WhatCanYouDo = {
+	prompt = {{"ARM_CHAT_WHAT_CAN_YOU_DO"}}
+}
+
 Arm.Chats.HowFarFromEarth = {
 	prompt = {{"ARM_CHAT_HOW_FAR_FROM_EARTH"}}
 }
@@ -70,6 +74,22 @@ Arm.Chats.WhoMadeIt = {
 
 Arm.Chats.HowOldIsIt = {
 	prompt = {{"ARM_CHAT_HOW_OLD_IS_IT"}}
+}
+
+Arm.Chats.IsThisAShip = {
+	prompt = {{"ARM_CHAT_IS_THIS_A_SHIP"}}
+}
+
+Arm.Chats.HowLongWasIAsleep = {
+	prompt = {{"ARM_CHAT_HOW_LONG_WAS_I_ASLEEP"}}
+}
+
+Arm.Chats.AmIAlone = {
+	prompt = {{"ARM_CHAT_AM_I_ALONE"}}
+}
+
+Arm.Chats.HowDidIGetHere = {
+	prompt = {{"ARM_CHAT_HOW_DID_I_GET_HERE"}}
 }
 
 --[[---------------------------------------------------------------------------
@@ -114,12 +134,39 @@ Root conversations, these are displayed as "Change Conversation" choices
 -----------------------------------------------------------------------------]]
 
 Arm.Chats.Roots = {}
-Arm.Chats.Roots.Genesis = {
+Arm.Chats.Roots.Genesis1 = {
 	reply = {{"ARM_CHAT_DEFAULT_PROMPT"}},
 	choices = {
 		{Arm.Chats.WhoAmI},
 		{Arm.Chats.WhatIsThisPlace},
 		{Arm.Chats.WhoAreYou}
+	}
+}
+
+Arm.Chats.Roots.Genesis2 = {
+	reply = {{"ARM_CHAT_DEFAULT_PROMPT"}},
+	choices = {
+		{Arm.Chats.WhoAreYou},
+		{Arm.Chats.IsThisAShip},
+		{Arm.Chats.WhatCanYouDo}
+	}
+}
+
+Arm.Chats.Roots.Genesis3 = {
+	reply = {{"ARM_CHAT_DEFAULT_PROMPT"}},
+	choices = {
+		{Arm.Chats.IsThisAShip},
+		{Arm.Chats.HowLongWasIAsleep},
+		{Arm.Chats.AmIAlone}
+	}
+}
+
+Arm.Chats.Roots.Genesis4 = {
+	reply = {{"ARM_CHAT_DEFAULT_PROMPT"}},
+	choices = {
+		{Arm.Chats.HowDidIGetHere},
+		{Arm.Chats.WhoAreYou},
+		{Arm.Chats.WhereAreWe}
 	}
 }
 
@@ -130,7 +177,10 @@ Arm.Chats.Roots.Genesis = {
 Arm.Chats.Available = {}
 
 function Arm.LoadCommonChats(self)
-	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis)
+	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis1)
+	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis2)
+	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis3)
+	table.insert(Arm.Chats.Available, Arm.Chats.Roots.Genesis4)
 end
 
 function Arm.LoadEp1Crushed(self)

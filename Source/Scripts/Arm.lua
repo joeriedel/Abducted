@@ -380,6 +380,8 @@ end
 
 function Arm.ChangePressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	Arm:ClearChat()
+	Arm:StartConversation()
 end
 
 function Arm.PowersPressed(widget)

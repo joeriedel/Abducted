@@ -16,8 +16,10 @@ function PlayerInput.Load(self)
 end
 
 function PlayerInput.OnInputEvent(self, e)
+	local action = false
+	
 	if (not self.Enabled) then
-		return false
+		return false, action
 	end
 	
 	e = UI:MapInputEvent(e)
@@ -26,8 +28,9 @@ function PlayerInput.OnInputEvent(self, e)
 		UI:ShowFinger(true, 0.25)
 		if (World.playerPawn:CheckTappedOn(e.original)) then
 			World.playerPawn:Stop()
+			action = true
 		else
-			self:TapWaypoint(e.original.data[1], e.original.data[2])
+			action = self:TapWaypoint(e.original.data[1], e.original.data[2])
 		end
 	elseif (Input.IsTouchEnd(e)) then
 		UI:ShowFinger(false, 0.5)
@@ -37,7 +40,7 @@ function PlayerInput.OnInputEvent(self, e)
 		UI:PlaceFinger(e.data[1], e.data[2])
 	end
 	
-	return false
+	return false, action
 end
 
 function PlayerInput.OnInputGesture(self, g)
@@ -60,7 +63,10 @@ function PlayerInput.TapWaypoint(self, x, y)
 	if (waypoint) then
 		if (World.playerPawn:MoveToWaypoint(waypoint)) then
 			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+			return true
 		end
 	end
+	
+	return false
 end
 

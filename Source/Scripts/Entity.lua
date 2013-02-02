@@ -11,6 +11,13 @@ kEntityClass_Player  = 2
 Entity = Class:New()
 
 function Entity.Spawn(self)
+
+	local angle = NumberForString(self.keys.angle, 0)
+	
+	local angleVertex = self:Angles()
+	angleVertex.pos = {0, 0, angle}
+	self:SetAngles(angleVertex)
+
 end
 
 function Entity.EnableFlags(self, flags, enable)

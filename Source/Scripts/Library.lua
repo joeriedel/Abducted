@@ -4,6 +4,32 @@
 -- See Abducted/LICENSE for licensing terms
 
 --[[---------------------------------------------------------------------------
+	Touch Radius Checks
+-----------------------------------------------------------------------------]]
+
+function CheckWorldTouch(pos, x, y, maxDistance)
+
+	local r, dd = WorldTouchDistance(pos, x, y)
+	return (r and (dd <= maxDistance)), dd
+
+end
+
+function WorldTouchDistance(pos, x, y)
+
+	local r, p = World.Project(pos)
+	local dd = 0
+	
+	if (r) then
+		local dx = p[1] - x
+		local dy = p[2] - y
+		dd = math.sqrt(dx*dx + dy*dy)
+	end
+	
+	return r, dd
+	
+end
+
+--[[---------------------------------------------------------------------------
 	Rect
 -----------------------------------------------------------------------------]]
 

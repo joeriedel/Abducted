@@ -9,6 +9,7 @@ ManipulatableObject.MaxManipulateDistancePct = 1/5 -- max distance to target cen
 
 function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
+	Entity.Spawn(self)
 	
 	self.model = LoadSkModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
@@ -18,12 +19,6 @@ function ManipulatableObject.Spawn(self)
 	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
-	
-	local angle = NumberForString(self.keys.angle, 0)
-	
-	local angleVertex = self:Angles()
-	angleVertex.pos = {0, 0, angle}
-	self:SetAngles(angleVertex)
 	
 	self.skillRequired = NumberForString(self.keys.required_skill, 0)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)

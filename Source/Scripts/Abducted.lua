@@ -13,6 +13,7 @@ function Abducted.Initialize(self)
 	HUD:Spawn()
 	Arm:Spawn()
 	PlayerSkills:Load()
+	TerminalScreen.StaticInit()
 	
 	self.think = Abducted.Think
 	self:SetNextThink(0)
@@ -59,13 +60,20 @@ function Abducted.OnInputEvent(self, e)
 	if (self.manipulate) then
 		return false
 	end
-	return PlayerInput:OnInputEvent(e)
+	if (TerminalScreen.Touch(e)) then
+		return true
+	end
+	
+	local handled, action = PlayerInput:OnInputEvent(e)
+	
+	if (action) then
+		TerminalScreen.CancelUI()
+	end
+	
+	return handled
 end
 
 function Abducted.OnInputGesture(self, g)
-	if (self.eatInput) then
-		return true
-	end
 	if (Arm.active) then
 		return false
 	end
@@ -78,6 +86,7 @@ function Abducted.OnInputGesture(self, g)
 		end
 		return true
 	end
+	
 	return PlayerInput:OnInputGesture(g)
 end
 
@@ -130,4 +139,6 @@ function Abducted.Think(self, dt)
 	if (Arm.think) then
 		Arm:think(dt)
 	end
+	
+	TerminalScreen.UpdateUI()
 end

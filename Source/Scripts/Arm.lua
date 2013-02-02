@@ -27,8 +27,6 @@ function Arm.SpawnShared(self)
 	self.widgets.Root:SetVisible(false)
 
 	self.gfx = {}
-	self.gfx.Button = World.Load("UI/arm_buttons_M")
-	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
 	self.gfx.Border = World.Load("UI/arm_screen1_M")
 	self.gfx.LineBorder1 = World.Load("UI/lineborder1_M")
 	self.gfx.LineBorder2 = World.Load("UI/lineborder2_M")
@@ -39,7 +37,7 @@ function Arm.SpawnShared(self)
 	self.gfx.SymbolFlash = World.Load("UI/locked_symbol_flash_M")
 	
 	self.typefaces = {}
-	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
+	
 	self.typefaces.Chat = World.Load("UI/Chat_TF")
 	self.typefaces.ChatChoice = World.Load("UI/ChatChoice_TF")
 	
@@ -153,7 +151,7 @@ function Arm.CreateMenu(self)
 	}
 	
 	-- scale buttons accordingly:
-	size = self.gfx.Button:Dimensions()
+	size = UI.gfx.Button:Dimensions()
 	
 	size[1] = size[1] * scale[1]
 	size[2] = size[2] * scale[2] * 0.92
@@ -167,62 +165,22 @@ function Arm.CreateMenu(self)
 	
 	local text
 	
-	self.widgets.Return = UIPushButton:Create(
+	self.widgets.Return = UI:CreateStylePushButton(
 		{x, y, size[1], size[2]},
-		{
-			enabled = self.gfx.Button,
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.ReturnPressed
-		},
-		{
-			highlight = {
-				on = {0.5,0.5,0.5,1},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.ReturnPressed, 
+		nil,
 		self.widgets.WorkspaceRight
 	)
-	
+		
 	text = StringTable.Get("ARM_RETURN_TO_WORLD_BTN")
 	UI:LineWrapCenterText(self.widgets.Return.label, nil, nil, lineSpace, text)
 	
 	y = y + size[2] + space
 	
-	self.widgets.Database = UIPushButton:Create(
+	self.widgets.Database = UI:CreateStylePushButton(
 		{x+shift, y, size[1], size[2]},
-		{
-			enabled = self.gfx.Button,
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.DatabasePressed
-		},
-		{
-			highlight = {
-				on = {0.5,0.5,0.5,1},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.DatabasePressed, 
+		{ pressed = self.sfx.Button },
 		self.widgets.WorkspaceRight
 	)
 	
@@ -231,30 +189,10 @@ function Arm.CreateMenu(self)
 	
 	y = y + size[2] + space
 	
-	self.widgets.Talk = UIPushButton:Create(
+	self.widgets.Talk = UI:CreateStylePushButton(
 		{x, y, size[1], size[2]},
-		{
-			enabled = self.gfx.Button,
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.TalkPressed
-		},
-		{
-			highlight = {
-				on = {0.5,0.5,0.5,1},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.TalkPressed, 
+		{ pressed = self.sfx.Button },
 		self.widgets.WorkspaceRight
 	)
 	
@@ -262,29 +200,10 @@ function Arm.CreateMenu(self)
 	text = StringTable.Get("ARM_TALK_BTN")
 	UI:LineWrapCenterText(self.widgets.Talk.label, nil, nil, lineSpace, text)
 	
-	self.widgets.Change = UIPushButton:Create(
+	self.widgets.Change = UI:CreateStylePushButton(
 		{x, y, size[1], size[2]},
-		{
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.ChangePressed
-		},
-		{
-			highlight = {
-				on = {0,0,0,0},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.ChangePressed, 
+		{ background = false, pressed = self.sfx.Button },
 		self.widgets.WorkspaceRight
 	)
 	
@@ -294,30 +213,10 @@ function Arm.CreateMenu(self)
 	
 	y = y + size[2] + space
 	
-	self.widgets.Powers = UIPushButton:Create(
+	self.widgets.Powers = UI:CreateStylePushButton(
 		{x+shift, y, size[1], size[2]},
-		{
-			enabled = self.gfx.Button,
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.PowersPressed
-		},
-		{
-			highlight = {
-				on = {0.5,0.5,0.5,1},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.PowersPressed, 
+		{ pressed = self.sfx.Button },
 		self.widgets.WorkspaceRight
 	)
 	
@@ -326,30 +225,10 @@ function Arm.CreateMenu(self)
 	
 	y = y + size[2] + space
 	
-	self.widgets.Quit = UIPushButton:Create(
+	self.widgets.Quit = UI:CreateStylePushButton(
 		{x, y, size[1], size[2]},
-		{
-			enabled = self.gfx.Button,
-			highlight = self.gfx.ButtonOverbright
-		},
-		{
-			pressed = self.sfx.Button
-		},
-		{
-			pressed = Arm.QuitPressed
-		},
-		{
-			highlight = {
-				on = {0.5,0.5,0.5,1},
-				off = {0,0,0,0},
-				overbright = {1,1,1,1},
-				time = 0.1,
-				overbrightTime = 0.1
-			},
-			label = {
-				typeface = self.typefaces.StandardButton
-			}
-		},
+		Arm.QuitPressed, 
+		{ pressed = self.sfx.Button },
 		self.widgets.WorkspaceRight
 	)
 	

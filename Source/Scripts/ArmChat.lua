@@ -286,29 +286,18 @@ function Arm.DisplayChoices(self)
 		local f = function(widget)
 			Arm:ChoiceSelected(widget, self.choices[k])
 		end
-						
-		local w = UIPushButton:Create(
+		
+		local w = UI:CreateStylePushButton(
 			r,
+			f,
 			{
-				highlight = self.gfx.ButtonOverbright
-			},
-			{
+				background = false,
+				highlight = { 
+					on = {0.75, 0.75, 0.75, 1}, 
+					time = 0.2 
+				}, 
+				typeface = self.typefaces.ChatChoice,
 				pressed = self.sfx.Button
-			},
-			{
-				pressed = f
-			},
-			{
-				highlight = {
-					on = {0.75,0.75,0.75,1},
-					off = {0,0,0,0},
-					overbright = {1,1,1,1},
-					time = 0.2,
-					overbrightTime = 0.1
-				},
-				label = {
-					typeface = self.typefaces.ChatChoice
-				}
 			}
 		)
 		

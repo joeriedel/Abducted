@@ -75,9 +75,12 @@ function UI.Spawn(self)
 	UI.gestureMode = false
 	
 	UI.gfx = {}
-	UI.widgets = {}
+	UI.sfx = {}
+	UI.typefaces = {}
 	
-	UI:LoadSharedMaterials()
+	UI.widgets = {}
+
+	UI:LoadShared()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
 		
@@ -95,9 +98,15 @@ end
 function UI.Think(self)
 end
 
-function UI.LoadSharedMaterials(self)
-	self.gfx.shared = {}
-	self.gfx.shared.Solid = World.Load("UI/Solid_M")
+function UI.LoadShared(self)
+	self.gfx.Solid = World.Load("UI/Solid_M")
+	self.gfx.Button = World.Load("UI/arm_buttons_M")
+	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
+	
+	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
+	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
+	
+	self.sfx.Command = World.Load("Audio/ui_command")
 end
 
 function UI.CreateFeedbackLayer(self)
@@ -116,7 +125,7 @@ end
 
 function UI.CreateFXLayer(self)
 	self.widgets.fx = {}
-	self.widgets.fx.Screen = self:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=self.gfx.shared.Solid})
+	self.widgets.fx.Screen = self:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=self.gfx.Solid})
 	World.SetRootWidget(UI.kLayer_FX, self.widgets.fx.Screen)
 	self.widgets.fx.Screen.color = { 0, 0, 0, 0 }
 	self.widgets.fx.Screen:BlendTo({0, 0, 0, 0}, 0) -- disable
@@ -191,6 +200,83 @@ function UI.CreateWidget(self, type, parms)
 	end
 	
 	return w
+end
+
+--[[---------------------------------------------------------------------------
+	Common Stylized Widgets
+-----------------------------------------------------------------------------]]
+
+function UI.CreateStylePushButton(self, rect, OnPressed, options, parent)
+
+	options = options or {}
+
+	local enabled = nil
+	
+	if ((options.background == nil) or (options.background)) then
+		options.background = true
+		enabled = self.gfx.Button
+	end
+	
+	local typeface
+	if (options.typeface) then
+		typeface = options.typeface
+	elseif ((options.fontSize ~= nil) and (options.fontSize == "small")) then
+		typeface = self.typefaces.StandardButtonSmall
+	else
+		typeface = self.typefaces.StandardButton
+	end
+	
+	local sound = options.pressed or self.sfx.Command
+	
+	local highlight = options.highlight or {}
+	
+	if (highlight.on == nil) then
+		if (options.background) then
+			highlight.on = {0.5, 0.5, 0.5, 1}
+		else
+			highlight.on = {0, 0, 0, 0}
+		end
+	end
+	
+	if (highlight.off == nil) then
+		highlight.off = {0,0,0,0}
+	end
+	
+	if (highlight.overbright == nil) then
+		highlight.overbright = {1,1,1,1}
+	end
+	
+	if (highlight.time == nil) then
+		highlight.time = 0.1
+	end
+	
+	if (highlight.overbrightTime == nil) then
+		highlight.overbrightTime = 0.1
+	end
+	
+	local w = UIPushButton:Create(
+		rect,
+		{
+			enabled = enabled,
+			highlight = self.gfx.ButtonOverbright
+		},
+		{
+			pressed = self.sfx.Command
+		},
+		{
+			pressed = OnPressed
+		},
+		{
+			highlight = highlight,
+			label = {
+				typeface = typeface
+			}
+		},
+		parent
+	)
+	
+	return w
+
 end
 
 --[[---------------------------------------------------------------------------

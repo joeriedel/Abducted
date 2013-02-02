@@ -136,7 +136,7 @@ function Arm.ChatPrompt(self)
 	
 	-- Create text controls
 	self.promptState.labels = {}
-	local promptLineSize = UI:FontAdvanceSize(self.typefaces.Chat)
+	local promptLineSize = UI:FontAdvanceSize(self.typefaces.Chat) + (Arm.ChatLineSpace * UI.identityScale[2])
 	local scrollPos = {0, self.chatPos[2]}
 	
 	for k,v in pairs(self.promptState.lines) do
@@ -145,7 +145,7 @@ function Arm.ChatPrompt(self)
 		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=self.typefaces.Chat})
 		self.widgets.chat.ChatList:AddItem(w)
 		table.insert(self.promptState.labels, w)
-		self.chatPos[2] = self.chatPos[2] + promptLineSize + (Arm.ChatLineSpace * UI.identityScale[2])
+		self.chatPos[2] = self.chatPos[2] + promptLineSize
 	end
 
 	self.widgets.chat.ChatList:RecalcLayout()

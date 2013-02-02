@@ -466,8 +466,7 @@ end
 function UI.SizeLabelToContents(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
+	-- NOTE: dimensions are real-size scale here.
 	
 	local r = label:Rect()
 	
@@ -544,9 +543,6 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 					scaleY = UI.identityScale[2]
 				}
 				
-				label:SetText({string})
-				local d = label:Dimensions()
-				
 				size = size + h
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
@@ -581,6 +577,20 @@ end
 	Fonts are unaware of our UI scaling
 -----------------------------------------------------------------------------]]
 
+function UI.SetLabelText(self, label, text)
+
+	local string = {
+		x = 0,
+		y = 0,
+		text = text,
+		scaleX = UI.identityScale[1],
+		scaleY = UI.identityScale[2]
+	}
+	
+	label:SetText({string})
+
+end
+
 function UI.StringDimensions(self, font, text)
 
 	local w,h = font:StringDimensions(text)
@@ -591,7 +601,7 @@ end
 
 function UI.FontAdvanceSize(self, font)
 	local a,d = font:AscenderDescender()
-	return (a+d)*UI.identityScale[2]
+	return a*UI.identityScale[2]
 end
 
 function UI.SplitStringAtSize(self, font, text, width)

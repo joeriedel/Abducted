@@ -3,14 +3,14 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
-Arm.ChatInset = { 12, 10 }
+Arm.ChatInset = { 0, 0 }
 Arm.ChatChoiceInset = { 16, 0 }
 Arm.ChatLineSpace = 4
 Arm.ChatChoiceSpace = 4
 Arm.ChatChoiceExtraSpaceAfterPrompt = 6
 Arm.ChatChoiceHorzSpace = 16
 Arm.ChatChoiceButtonPadd = { 16, 10 }
-Arm.ChatClipAdjust = { 0, 8, 0, -8 }
+Arm.ChatClipAdjust = { 0, 0, 0, 0 }
 Arm.MaxChangeConversationTimes = 4
 
 function Arm.SpawnChat(self)
@@ -19,16 +19,23 @@ function Arm.SpawnChat(self)
 	self.widgets.chat.Root = UI:CreateWidget("Widget", {rect=self.workspaceLeft})
 	self.widgets.chat.Root:SetVisible(false)
 	
-	self.widgets.chat.ChatList = UI:CreateWidget("VListWidget", {rect=self.workspaceLeftSize})
+	self.chatRect = {
+		12*UI.identityScale[1], 
+		10*UI.identityScale[2],
+		self.workspaceLeft[3] - (24*UI.identityScale[1]), 
+		self.workspaceLeft[4] - (20*UI.identityScale[2])
+	}
+	
+	self.widgets.chat.ChatList = UI:CreateWidget("VListWidget", {rect=self.chatRect})
 	self.widgets.chat.ChatList:SetClipRect({
-		Arm.ChatClipAdjust[1]*UI.identityScale[1], 
-		Arm.ChatClipAdjust[2]*UI.identityScale[1], 
-		self.workspaceLeftSize[3] - (Arm.ChatClipAdjust[1]*UI.identityScale[1]), 
-		self.workspaceLeftSize[4] - (Arm.ChatClipAdjust[2]*UI.identityScale[2])
+		self.chatRect[1] + (Arm.ChatClipAdjust[1]*UI.identityScale[1]), 
+		self.chatRect[2] + (Arm.ChatClipAdjust[2]*UI.identityScale[2]), 
+		self.chatRect[3] - (Arm.ChatClipAdjust[3]*UI.identityScale[1]), 
+		self.chatRect[4] - (Arm.ChatClipAdjust[4]*UI.identityScale[2])
 	})
 	
 	self.widgets.WorkspaceLeft:AddChild(self.widgets.chat.ChatList)
-	self.widgets.chat.ChatList:SetEndStops({0, self.workspaceLeftSize[4]*0.1})
+	self.widgets.chat.ChatList:SetEndStops({0, self.chatRect[4]*0.1})
 	
 end
 
@@ -124,17 +131,17 @@ function Arm.ChatPrompt(self)
 	self.promptState.lines = UI:WordWrap(
 		self.typefaces.Chat, 
 		self.promptText, 
-		self.workspaceLeftSize[3] - self.chatPos[1]
+		self.chatRect[3] - self.chatPos[1]
 	)
 	
 	-- Create text controls
 	self.promptState.labels = {}
 	local promptLineSize = UI:FontAdvanceSize(self.typefaces.Chat)
-	local scrollPos = {self.chatPos[1], self.chatPos[2]}
+	local scrollPos = {0, self.chatPos[2]}
 	
 	for k,v in pairs(self.promptState.lines) do
 		
-		local r = {self.chatPos[1], self.chatPos[2], self.workspaceLeftSize[3]-self.chatPos[1], promptLineSize}
+		local r = {self.chatPos[1], self.chatPos[2], self.chatRect[3]-self.chatPos[1], promptLineSize}
 		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=self.typefaces.Chat})
 		self.widgets.chat.ChatList:AddItem(w)
 		table.insert(self.promptState.labels, w)
@@ -142,7 +149,7 @@ function Arm.ChatPrompt(self)
 	end
 
 	self.widgets.chat.ChatList:RecalcLayout()
-	self.widgets.chat.ChatList:ScrollTo(scrollPos, 0.2)
+	self.widgets.chat.ChatList:ScrollTo(scrollPos, 0.4)
 	
 	local thinkTime
 	if (self.prompt.time == nil) then
@@ -157,7 +164,7 @@ function Arm.ChatPrompt(self)
 		Arm:FlashCursor()
 	end
 	
-	self.promptState.labels[1]:SetText(">");
+	UI:SetLabelText(self.promptState.labels[1], ">");
 	self.promptState.labels[1]:SetVisible(false)
 	self.chatTimer = World.globalTimers:Add(f, 0.2, false)
 	
@@ -216,7 +223,7 @@ function Arm.TickPrompt(self)
 	
 	local w = self.promptState.labels[self.promptState.line]
 	str = str:sub(1, self.promptState.char)
-	w:SetText(str)
+	UI:SetLabelText(w, str)
 end
 
 function Arm.DisplayChoices(self)
@@ -251,7 +258,7 @@ function Arm.DisplayChoices(self)
 	
 	-- did we exceed the maximum line width?
 	local inset = Arm.ChatChoiceInset[1] * UI.identityScale[1]
-	local maxWidth = self.workspaceLeftSize[3] - self.chatPos[1] - inset
+	local maxWidth = self.chatRect[3] - self.chatPos[1] - inset
 	local horzSpace = Arm.ChatChoiceHorzSpace * UI.identityScale[1]
 	if (lineWidth > maxWidth) then
 	
@@ -308,7 +315,7 @@ function Arm.DisplayChoices(self)
 		if (maxWidth and (size[1] > maxWidth)) then
 			r = UI:LineWrapCenterText(w.label, maxWidth, true, Arm.ChatChoiceSpace, text)
 		else
-			w.label:SetText(text)
+			UI:SetLabelText(w.label, text)
 			r = UI:SizeLabelToContents(w.label)
 		end
 		
@@ -336,7 +343,7 @@ function Arm.DisplayChoices(self)
 	end
 	
 	self.widgets.chat.ChatList:RecalcLayout()
-	self.widgets.chat.ChatList:ScrollTo({0, lastRect[2]}, 0.2)
+	self.widgets.chat.ChatList:ScrollTo({0, lastRect[2]}, 0.4)
 	
 	self.chatPos[2] = self.chatPos[2] + lineHeight + (Arm.ChatLineSpace*UI.identityScale[2])
 	

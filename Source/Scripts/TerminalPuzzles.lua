@@ -67,7 +67,7 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	level.name = "1x1"
 	
 	level.antivirusSpiderSpawnRate = 5
-	level.antivirusSpiderSpeed = 8
+	level.antivirusSpiderSpeed = 40
 	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
@@ -213,11 +213,11 @@ end
 
 function TerminalPuzzles.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = 40
+	self.REFLEX_CELL_SIZE = 60
 	self.REFLEX_BOARD_OFFSET = 80
 	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
-	self.PLAYER_SPEED = 60
+	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE

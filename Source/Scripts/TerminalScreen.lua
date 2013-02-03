@@ -232,21 +232,50 @@ function TerminalScreen.CheckActivate(playerPos)
 end
 
 function TerminalScreen.HackPressed()
-
+	Abducted.entity.eatInput = true -- during transition
+	UI:BlendTo({1,1,1,1}, 0.3)
+	TerminalPuzzles:InitGame("hack", 1, 1)
+	
+	local entity = TerminalScreen.PopupEntity
+	TerminalScreen.CancelUI()
+	
+	local f = function ()
+		UI:BlendTo({0,0,0,0}, 0.3)
+		TerminalPuzzles:ShowBoard(true)
+		
+		local f = function ()
+			local f = function(result)
+				TerminalScreen.GameComplete(entity, result)
+			end
+			Abducted.entity.eatInput = false
+			TerminalPuzzles:StartGame(f)
+		end
+		
+		World.globalTimers:Add(f, 0.3, true)
+	end
+	
+	World.globalTimers:Add(f, 0.3, true)
 end
 
 function TerminalScreen.SolvePressed()
 
 end
 
+function TerminalScreen.GameComplete(self, result)
+	Abducted.entity.eatInput = true
+	UI:BlendTo({1,1,1,1}, 0.3)
+	local f = function()
+		Abducted.entity.eatInput = false
+		UI:BlendTo({0,0,0,0}, 0.3)
+		TerminalPuzzles:ShowBoard(false)
+		TerminalPuzzles:ResetGame()
+		collectgarbage()
+	end
+	World.globalTimers:Add(f, 0.3, true)
+end
+
 function TerminalScreen.StaticInit()
 
---[[	local f = function()
-		TerminalScreen.CheckActivate(World.playerPawn:WorldPos())
-	end
-	
-	TerminalScreen.Timer = World.gameTimers:Add(f, 0.33)]]--
-	
 	-- Create buttons
 	local rect = {
 		0,

@@ -4,6 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 TerminalPuzzles = Class:New()
+TerminalPuzzles.active = false
 
 function TerminalPuzzles.Spawn(self)
 	TerminalPuzzles.entity = self
@@ -11,8 +12,53 @@ function TerminalPuzzles.Spawn(self)
 	self:LoadMaterials()
 	self:InitUI()
 	
+	-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
+
+end
+
+function TerminalPuzzles.ShowBoard(self, show)
+	self = TerminalPuzzles.entity
+	-- NOTE: show board is called *after* InitGame
+	-- InitGame should get the board ready to be seen
+	self.widgets.root:SetVisible(show)
+	World.DrawUIOnly(show) -- < disable/enable 3D rendering
+end
+
+function TerminalPuzzles.InitGame(self, gameType, playerSkill, terminalSkill)
+	self = TerminalPuzzles.entity
+	-- InitGame: prep the board to be shown with ShowBoard
+	-- but we should not start until StartGame is called.
+end
+
+function TerminalPuzzles.StartGame(self, gameCompleteCallback)
+	self = TerminalPuzzles.entity
+	
+	TerminalPuzzles.active = true
+	self.gameCompleteCallback = gameCompleteCallback
+	
 	self.think = TerminalPuzzles.Think
 	self:SetNextThink(0)
+	
+	World.SetEnabledGestures(kIG_Line)
+	World.FlushInput(true)
+end
+
+function TerminalPuzzles.EndGame(self, result)
+
+	
+	World.SetEnabledGestures(0)
+	World.FlushInput(true)
+	
+	self.think = nil
+	self.gameCompleteCallback(result);
+
+end
+
+function TerminalPuzzles.ResetGame(self)
+	self = TerminalPuzzles.entity
+	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
+	-- NOTE: the terminal puzzle UI is hidden right now
+	TerminalPuzzles.active = false
 end
 
 function TerminalPuzzles.CreateLevel1x1(self)
@@ -108,15 +154,9 @@ function TerminalPuzzles.CreateBoards(self)
 		}
 end
 
-function TerminalPuzzles.GameIsActive()
-	if (TerminalPuzzles.entity.state) then
-		return true
-	end
-	
-	return false
-end
-
 function TerminalPuzzles.OnInputEvent(self,e)
+	self = TerminalPuzzles.entity
+	
 	if (e.type == kI_KeyDown) then
 		--COutLine(kC_Debug,"key=%i",e.data[1])
 		if (e.data[1] == kKeyCode_I) then
@@ -142,6 +182,33 @@ function TerminalPuzzles.OnInputEvent(self,e)
 			return true
 		end						
 	end
+	
+	return false
+end
+
+function TerminalPuzzles.OnInputGesture(self,g)
+	self = TerminalPuzzles.entity
+	
+	if (g.id ~= kIG_Line) then
+		return true
+	end
+	
+	-- left?
+	if (g.args[1] > 0.707) then
+		self.state.heading.x = 1
+		self.state.heading.y = 0
+	elseif (g.args[1] < -707) then -- right?
+		self.state.heading.x = -1
+		self.state.heading.y = 0
+	elseif (g.args[2] > 0.707) then -- down
+		self.state.heading.x = 0
+		self.state.heading.y = 1
+	else -- up
+		self.state.heading.x = 0
+		self.state.heading.y = -1
+	end
+	
+	return true
 end
 
 function TerminalPuzzles.InitUI(self)
@@ -171,7 +238,7 @@ function TerminalPuzzles.InitUI(self)
 	self.state.lastHeading.y = 0
 	self.state.gameOver = false
 	self.state.currentMove = 1
-	self.state.gameOverTimer = 5	
+	self.state.gameOverTimer = 2	
 	self.state.victory = false
 	self.state.level = level
 	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
@@ -185,8 +252,11 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
 	self.widgets.grid = { }
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=UI.EatInput})
-	World.SetRootWidget(UI.kLayer_UI, self.widgets.root)
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=TerminalPuzzles.OnInputEvent, OnInputGesture=TerminalPuzzles.OnInputGesture})
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+	
+	self.widgets.root:SetVisible(false)
+	
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
 	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
 	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
@@ -234,49 +304,6 @@ function TerminalPuzzles.InitUI(self)
 end
 
 function TerminalPuzzles.LoadMaterials(self)
-
-	--[[
-		Asset loading:
-		
-			Restrictions: must be called from a THINK function. A think function
-			is the entities .think function member.
-			
-			Spawn, PostSpawn are THINK functions.
-			
-			NOTE: Load methods are blocking by default for the entity which called
-			them. Only the entity script which invoked the load is blocking waiting
-			for it to complete, other entities and rendering is unaffected.
-			
-		World.Precache(path, async)
-			path: path to resource to load
-			
-			async: optional paramter, false means function is blocking (as in
-			engine tick will stall until it returns, only use if resource must
-			be cached on that exact frame).
-			
-			Precaching does not return a usable resource, rather it returns
-			an opaque reference. Precaching is used to keep a resource loaded
-			that may be used (or loaded again) during gameplay. If the resource
-			was not in memory the game would hitch or otherwise stall.
-			
-			Example: projectiles fired from a weapon. The projectile models
-			would be precached so when they are fired their World.Load calls
-			return immediately.
-			
-		World.Load(path, numInstances, async)
-			path: path to resource to load
-			
-			numInstances: for sounds this determines how many instaces of the
-			sounds can be played simultaneously.
-			
-			async: optional paramter, false means function is blocking (as in
-			engine tick will stall until it returns, only use if resource must
-			be cached on that exact frame).
-	]]
-	
-	-- NOTE: materials used for UI widgets must have:
-	--		DepthTest: false
-	--		DepthWrite: false
 	
 	self.gfx = {}
 	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
@@ -302,10 +329,6 @@ function TerminalPuzzles.LoadMaterials(self)
 	
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
-end
-
-function TerminalPuzzles.StartGame(self, gameType, gameCompleteCallback)
-	self.gameCompleteCallback = gameCompleteCallback
 end
 
 function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
@@ -555,7 +578,7 @@ function TerminalPuzzles.Think(self,dt)
 		self.state.gameOverTimer = self.state.gameOverTimer - dt
 		if (self.state.gameOverTimer < 0) then
 			self.state.gameOverTimer = 0
-			--self.gameCompleteCallback();
+			self:EndGame("win")
 			return
 		end
 		
@@ -569,7 +592,7 @@ function TerminalPuzzles.Think(self,dt)
 		else
 			self.widgets.bigTextLabel:SetText("You Lose!")
 		end
-		UI:CenterLabel(self.widgets.bigTextLabel)
+		UI:CenterLabel(self.widgets.bigTextLabel, UI.fullscreenRect)
 				
 		-- game over never advances past here
 		return

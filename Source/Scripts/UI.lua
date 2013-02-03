@@ -496,7 +496,7 @@ function UI.CenterLabel(self, label, rect)
 		h
 	}
 	
-	label:SetRect(r)
+	label:SetRect(rect)
 	return r
 end
 

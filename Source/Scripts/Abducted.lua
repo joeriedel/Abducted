@@ -57,7 +57,13 @@ function Abducted.OnInputEvent(self, e)
 	if (Arm.active) then
 		return false
 	end
+	if (TerminalPuzzles.active) then
+		return false
+	end
 	if (self.manipulate) then
+		return false
+	end
+	if (TerminalPuzzles.active) then
 		return false
 	end
 	if (TerminalScreen.Touch(e)) then
@@ -70,6 +76,10 @@ end
 
 function Abducted.OnInputGesture(self, g)
 	if (Arm.active) then
+		return false
+	end
+	
+	if (TerminalPuzzles.active) then
 		return false
 	end
 	

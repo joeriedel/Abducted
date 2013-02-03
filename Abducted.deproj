@@ -97,6 +97,9 @@
     <filename>Source\Scripts\TerminalPuzzles.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\TerminalScreen.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Timers.lua</filename>
   </file>
   <file>

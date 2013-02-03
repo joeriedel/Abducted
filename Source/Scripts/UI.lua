@@ -8,14 +8,15 @@ UI.kLayer_Mask = 0
 UI.kLayer_UI = 1
 UI.kLayer_MainMenu = 2
 UI.kLayer_HUD = 2 -- not used at same time as main menu
-UI.kLayer_Arm = 3
-UI.kLayer_TerminalPuzzles = 4
-UI.kLayer_LB = 5
-UI.kLayer_Popups = 6
-UI.kLayer_Notifications = 7
-UI.kLayer_Feedback = 8
-UI.kLayer_FX = 9
-UI.kLayer_Debug = 10
+UI.kLayer_Interactive = 3
+UI.kLayer_Arm = 4
+UI.kLayer_TerminalPuzzles = 5
+UI.kLayer_LB = 6
+UI.kLayer_Popups = 7
+UI.kLayer_Notifications = 8
+UI.kLayer_Feedback = 9
+UI.kLayer_FX = 10
+UI.kLayer_Debug = 11
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -83,7 +84,8 @@ function UI.Spawn(self)
 	UI:LoadShared()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
-		
+	UI:CreateInteractiveLayer()
+	
 --	self.think = UI.Think
 --	self:SetNextThink(1/30)
 	
@@ -102,6 +104,10 @@ function UI.LoadShared(self)
 	self.gfx.Solid = World.Load("UI/Solid_M")
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
+	self.gfx.TerminalHack = World.Load("UI/terminal_hack_M")
+	self.gfx.TerminalHackPressed = World.Load("UI/terminal_hack_pressed_M")
+	self.gfx.TerminalSolve = World.Load("UI/terminal_solve_M")
+	self.gfx.TerminalSolvePressed = World.Load("UI/terminal_solve_pressed_M")
 	
 	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
@@ -117,10 +123,15 @@ function UI.CreateFeedbackLayer(self)
 	self.widgets.feedback.Root = UI:CreateRoot(UI.kLayer_Feedback)
 		
 	self.gfx.feedback.Finger = World.Load("UI/finger_shadow_M")
-	self.widgets.feedback.Finger = self:CreateWidget("MatWidget", {rect={0, 0, 128, 128}, material=self.gfx.feedback.Finger}) 
+	self.widgets.feedback.Finger = self:CreateWidget("MatWidget", {rect={0, 0, 128*UI.identityScale[1], 128*UI.identityScale[2]}, material=self.gfx.feedback.Finger}) 
 	self.widgets.feedback.Root:AddChild(self.widgets.feedback.Finger)
 	self.widgets.feedback.Finger:BlendTo({0, 0, 0, 0}, 0)
 	
+end
+
+function UI.CreateInteractiveLayer(self)
+	self.widgets.interactive = {}
+	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive)
 end
 
 function UI.CreateFXLayer(self)

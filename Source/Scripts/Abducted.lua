@@ -65,11 +65,6 @@ function Abducted.OnInputEvent(self, e)
 	end
 	
 	local handled, action = PlayerInput:OnInputEvent(e)
-	
-	if (action) then
-		TerminalScreen.CancelUI()
-	end
-	
 	return handled
 end
 

@@ -16,15 +16,16 @@ function PlayerInput.Load(self)
 end
 
 function PlayerInput.OnInputEvent(self, e)
-	local action = false
-	
 	if (not self.Enabled) then
-		return false, action
+		return false, false
 	end
+	
+	local action = false
 	
 	e = UI:MapInputEvent(e)
 	
-	if (Input.IsTouchBegin(e)) then
+	if (Input.IsTouchBegin(e) and (self.touch == nil)) then
+		self.touch = e.touch
 		UI:ShowFinger(true, 0.25)
 		if (World.playerPawn:CheckTappedOn(e.original)) then
 			World.playerPawn:Stop()
@@ -32,7 +33,10 @@ function PlayerInput.OnInputEvent(self, e)
 		else
 			action = self:TapWaypoint(e.original.data[1], e.original.data[2])
 		end
-	elseif (Input.IsTouchEnd(e)) then
+	elseif (self.touch ~= e.touch) then
+		return false, false
+	elseif (Input.IsTouchEnd(e, self.touch)) then
+		self.touch = nil
 		UI:ShowFinger(false, 0.5)
 	end
 	

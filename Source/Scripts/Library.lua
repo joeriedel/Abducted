@@ -16,7 +16,7 @@ end
 
 function WorldTouchDistance(pos, x, y)
 
-	local r, p = World.Project(pos)
+	local p, r = World.Project(pos)
 	local dd = 0
 	
 	if (r) then
@@ -55,6 +55,28 @@ function CenterChildRectInRect(outer, inner)
 		inner[4]
 	}
 	return r
+end
+
+function BoundRect(rect, bounds)
+	
+	if ((rect[1]+rect[3]) > bounds[3]) then
+		rect[1] = bounds[3] - rect[3]
+	end
+	
+	if ((rect[2]+rect[4]) > bounds[4]) then
+		rect[2] = bounds[4] - rect[4]
+	end
+
+	if (rect[1] < bounds[1]) then
+		rect[1] = 0
+	end
+	
+	if (rect[2] < bounds[2]) then
+		rect[2] = bounds[2]
+	end
+
+	return r
+	
 end
 
 --[[---------------------------------------------------------------------------

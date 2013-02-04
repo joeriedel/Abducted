@@ -1,17 +1,80 @@
+// Ep1 levels
 
-Ep1/level01
-
-Ep1/Handshake_contagion
+Ep1/ep1_crushed
+Ep1/testroom1_manipulate
 
 
 // Shared
 Characters/HumanFemale
-
+Characters/TentacleMedium1
+Shared/terminal1
 UI/Solid_M
 UI/loading_icon_M
 UI/finger_shadow_M
 UI/Globals
 UI/TerminalPuzzlesBigFont_TF
+UI/ChatChoice_TF
+UI/Chat_TF
+UI/StandardButtonSmall_TF
+UI/StandardButton_TF
+Shared/spellcasting_edgelines_M
+UI/lineborder1_M
+UI/lineborder2_M
+UI/lineborder3_M
+UI/shimmer1_M
+UI/shimmer1_flip_M
+UI/locked_symbol_M
+UI/locked_symbol_flash_M
+
+// Hack puzzle
+Reflex-Game/reflex-mark-current_M
+Reflex-Game/reflex-mark-start_M
+Reflex-Game/reflex-mark-end_M
+Reflex-Game/reflex-symbol-a_M
+Reflex-Game/reflex-symbol-b_M
+Reflex-Game/reflex-symbol-c_M
+Reflex-Game/reflex-symbol-d_M
+Reflex-Game/reflex-cell-a_M
+Reflex-Game/reflex-cell-b_M
+Reflex-Game/reflex-cell-c_M
+Reflex-Game/reflex-cell-d_M
+Reflex-Game/reflex-cell-green_M
+Reflex-Game/reflex-antivirus-spider_M
+Reflex-Game/reflex-board_M
+Reflex-Game/reflex-border_M
+
+// UI
+UI/terminal_hack_M
+UI/terminal_hack_pressed_M
+UI/terminal_solve_M
+UI/terminal_solve_pressed_M
+UI/manipulate_button_M
+UI/manipulate_button_disabled_M
+UI/manipulate_button_flashing_M
+UI/pulse_button_M
+UI/pulse_button_pressed_M
+UI/shield_button_M
+UI/shield_button_pressed_M
+
+UI/arm_buttons_M
+UI/arm_buttons_overbright_M
+UI/arm_button_M
+UI/arm_button_pressed_M
+UI/arm_button_signaled_M
+UI/arm_screen1_M
+
+// Sounds
+Audio/armbutton
+Audio/manipulate_start
+Audio/manipulate_end
+Audio/player_command
+Audio/ui_command
+Audio/armintro1
+Audio/shiphum1
+Audio/penrose1
+Audio/penrose2
+Audio/penrose3
+Ep1/Handshake_contagion
 
 // System (for DebugUI)
 

@@ -186,7 +186,7 @@ bool AbductedApp::RunAutoExec() {
 	RAD_VERIFY(it != skModel->states->end());
 	
 	ska::AnimationVariantsSource::Ref animSource = ska::AnimationVariantsSource::New(
-		it->second.variants,
+		it->second,
 		*skModel->ska.get(),
 		ska::Notify::Ref()
 	);
@@ -199,8 +199,7 @@ bool AbductedApp::RunAutoExec() {
 
 	boost::static_pointer_cast<ska::BlendToController>(skModel->ska->root.get())->BlendTo(target);
 	
-	ska::BoneTM unused;
-	skModel->ska->Tick(1.f, true, true, Mat4::Identity, ska::Ska::MT_None, unused);
+	skModel->ska->Tick(1.f, -1.f, true, true, Mat4::Identity);
 	
 	for (int i = 0; i < skModel->numMeshes; ++i) {
 		const ska::DMesh *m = skModel->DMesh(i);

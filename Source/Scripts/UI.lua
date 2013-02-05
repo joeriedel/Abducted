@@ -110,6 +110,7 @@ function UI.LoadShared(self)
 	self.gfx.TerminalSolvePressed = World.Load("UI/terminal_solve_pressed_M")
 	
 	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
+	self.typefaces.StandardButtonDark = World.Load("UI/StandardButtonDark_TF")
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
 	
 	self.sfx.Command = World.Load("Audio/ui_command")

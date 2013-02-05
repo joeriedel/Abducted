@@ -19,14 +19,26 @@ UI/ChatChoice_TF
 UI/Chat_TF
 UI/StandardButtonSmall_TF
 UI/StandardButton_TF
+UI/StandardButtonDark_TF
 Shared/spellcasting_edgelines_M
 UI/lineborder1_M
 UI/lineborder2_M
 UI/lineborder3_M
+UI/lineborder4_M
 UI/shimmer1_M
 UI/shimmer1_flip_M
 UI/locked_symbol_M
 UI/locked_symbol_flash_M
+UI/heartbeat1_M
+UI/heartbeat2_M
+UI/human_heart_M
+UI/tab-selection-character_M
+UI/tab-selection-character-pressed_M
+UI/tab-selection-discoveries_M
+UI/tab-selection-discoveries-pressed_M
+UI/tab-selection-log_M
+UI/tab-selection-log-pressed_M
+UI/character-profiletest1_M
 
 // Hack puzzle
 Reflex-Game/reflex-mark-current_M

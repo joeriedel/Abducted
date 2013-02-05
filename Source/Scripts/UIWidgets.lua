@@ -118,6 +118,9 @@ function UIPushButton.OnInputEvent(widget, e)
 			return true
 		end
 		if (UIPushButton:DoUnpressed(widget)) then
+			if (widget.sfx.pressed) then
+				widget.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
 			if (widget.events.pressed) then
 				widget.events.pressed(widget, e)
 			end
@@ -154,10 +157,6 @@ function UIPushButton.DoPressed(self, widget, e)
 	widget.state.time = Game.sysTime
 	
 	widget.class:SetGfxState(widget)
-	
-	if (widget.sfx.pressed) then
-		widget.sfx.pressed:Play(kSoundChannel_UI, 0)
-	end
 	
 	widget:SetCapture(true)
 	

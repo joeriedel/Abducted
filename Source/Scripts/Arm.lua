@@ -11,7 +11,8 @@ function Arm.Spawn(self)
 
 	self:SpawnShared()
 	self:SpawnChat()
-
+	self:SpawnDB()
+	
 end
 
 -- 0, 448
@@ -31,10 +32,21 @@ function Arm.SpawnShared(self)
 	self.gfx.LineBorder1 = World.Load("UI/lineborder1_M")
 	self.gfx.LineBorder2 = World.Load("UI/lineborder2_M")
 	self.gfx.LineBorder3 = World.Load("UI/lineborder3_M")
+	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
 	self.gfx.Shimmer = World.Load("UI/shimmer1_M")
 	self.gfx.ShimmerFlip = World.Load("UI/shimmer1_flip_M")
 	self.gfx.Symbol = World.Load("UI/locked_symbol_M")
 	self.gfx.SymbolFlash = World.Load("UI/locked_symbol_flash_M")
+	self.gfx.HeartBeat1 = World.Load("UI/heartbeat1_M")
+	self.gfx.HeartBeat2 = World.Load("UI/heartbeat2_M")
+	self.gfx.HumanHeart = World.Load("UI/human_heart_M")
+	self.gfx.CharTab = World.Load("UI/tab-selection-character_M")
+	self.gfx.CharTabPressed = World.Load("UI/tab-selection-character-pressed_M")
+	self.gfx.DiscoveriesTab = World.Load("UI/tab-selection-discoveries_M")
+	self.gfx.DiscoveriesTabPressed = World.Load("UI/tab-selection-discoveries-pressed_M")
+	self.gfx.LogTab = World.Load("UI/tab-selection-log_M")
+	self.gfx.LogTabPressed = World.Load("UI/tab-selection-log-pressed_M")
+	self.gfx.CharPortrait = World.Load(GameDB.portrait)
 	
 	self.typefaces = {}
 	
@@ -247,10 +259,11 @@ end
 
 function Arm.ReturnPressed(widget)
 	Arm:ClearButtonHighlights(widget)
-	Arm:ClearChat()
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.2)
 	local f = function()
+		Arm:HideChat()
+		Arm:DBHide()
 		Abducted.entity.eatInput = false
 		Arm.active = false
 		Arm.widgets.Root:SetVisible(false)
@@ -263,10 +276,12 @@ end
 
 function Arm.DatabasePressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	Arm:SwitchMode("db")
 end
 
 function Arm.TalkPressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	Arm:SwitchMode("chat")
 end
 
 function Arm.ChangePressed(widget)
@@ -307,6 +322,8 @@ function Arm.ResetWidgets(self)
 	end
 	
 	Arm:ResetChat()
+	Arm:DBResetAll()
+	
 end
 
 function Arm.Start(self, mode)
@@ -337,12 +354,43 @@ end
 
 function Arm.SwitchToChat(self)
 
-	self.modeCleanup = function ()
-		Arm:EndChat()
+	local cleanup = self.modeCleanup
+	
+	self.modeCleanup = function (callback)
+		Arm:EndChat(callback)
 	end
 	
-	self:SwapToChange()
-	self:StartChat()
+	if (cleanup) then
+		Abducted.entity.eatInput = true
+		local f = function()
+			Abducted.entity.eatInput = false
+			self:StartChat()
+		end
+		cleanup(f)
+	else
+		self:StartChat()
+	end
+	
+end
+
+function Arm.SwitchToDB(self)
+
+	local cleanup = self.modeCleanup
+	self.modeCleanup = function (callback)
+		Arm:EndDB(callback)
+	end
+	
+	if (cleanup) then
+		Abducted.entity.eatInput = true
+		local f = function()
+			Abducted.entity.eatInput = false
+			self:StartDB()
+		end
+		cleanup(f)
+	else
+		self:StartDB()
+	end
+
 end
 
 function Arm.SwapToTalk(self)
@@ -350,22 +398,34 @@ function Arm.SwapToTalk(self)
 		return
 	end
 	
-	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, true, true)
-	self.widgets.Talk:FadeTo({1,1,1,1}, 0.2)
-	self.widgets.LineBorder2:FadeTo({0,0,0,0}, 0.5)
-	self.widgets.LineBorder3:FadeTo({1,1,1,1}, 0.5)
+	self.talk = true
+	
+	if (not self.chatLockout) then
+		self.widgets.Talk.class:SetEnabled(self.widgets.Talk, true)
+		self.widgets.Talk:BlendTo({1,1,1,1}, 0.2)
+	end
+	
+	self.widgets.Change.class:SetEnabled(self.widgets.Change, false)
+	self.widgets.Change:BlendTo({0,0,0,0}, 0.1)
+	
+	self.widgets.LineBorder2:BlendTo({0,0,0,0}, 0.5)
+	self.widgets.LineBorder3:BlendTo({1,1,1,1}, 0.5)
 end
 
 function Arm.SwapToChange(self)
 	if (not self.talk) then
 		return
 	end
+	if (self.chatLockout) then
+		return
+	end
 	
 	self.talk = false
-	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, false, false)
-	self.widgets.Talk:FadeTo({0,0,0,0}, 0.2)
-	self.widgets.LineBorder2:FadeTo({1,1,1,1}, 0.5)
-	self.widgets.LineBorder3:FadeTo({0,0,0,0}, 0.5)
+	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, false)
+	self.widgets.Talk:BlendTo({0,0,0,0}, 0.2)
+	self.widgets.Change.class:SetEnabled(self.widgets.Change, true)
+	self.widgets.LineBorder2:BlendTo({1,1,1,1}, 0.5)
+	self.widgets.LineBorder3:BlendTo({0,0,0,0}, 0.5)
 end
 
 function Arm.EnableChangeTopic(self, enable)
@@ -383,22 +443,15 @@ function Arm.SwitchMode(self, mode)
 	if (self.mode == mode) then
 		return
 	end
-
-	if (self.modeCleanup) then
-		self.modeCleanup()
-		return
-	end
 	
-	self:NextMode(mode)
-	
-end
-
-function Arm.NextMode(self, mode)
 	self.mode = mode
-	
+
 	if (mode == "chat") then
 		self:SwitchToChat()
+	elseif (mode == "db") then
+		self:SwitchToDB()
 	end
+	
 end
 
 function Arm.Intro(self)
@@ -470,7 +523,7 @@ function Arm.TransitionChat(self)
 		true,
 		{
 			flashMin = 1,
-			flashMin = 1,
+			flashMax = 1,
 			singleShot = true
 		}
 	)
@@ -485,6 +538,27 @@ function Arm.ActivateSymbol(self, active, options)
 		self:ToggleSymbolFlash(true, options)
 	end
 
+end
+
+function Arm.ShowSymbol(self, show, time)
+	if (show) then
+		self.widgets.Symbol:BlendTo({1,1,1,1}, time)
+		self:ActivateSymbol(
+			true,
+			{
+				flashMin = 0.1,
+				flashMax = 0.5,
+				solidMin = 1.5,
+				solidMax = 2
+			}
+		)
+	else
+		self.widgets.Symbol:BlendTo({0,0,0,0}, time)
+		local f = function()
+			self:ActivateSymbol(false)
+		end
+		World.globalTimers:Add(f, time, true)
+	end
 end
 
 function Arm.ToggleSymbolFlash(self, flash, options)

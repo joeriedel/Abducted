@@ -10,10 +10,16 @@
     <filename>Source\Scripts\Arm.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ArmCharacterDB.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\ArmChat.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\ArmChatEp1.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\ArmDB.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\CVars.lua</filename>
@@ -34,10 +40,16 @@
     <filename>Source\Scripts\Entity.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\EventLog.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Floors.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\Game.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\GameDB.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\GameNetwork.lua</filename>

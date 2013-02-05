@@ -8,6 +8,7 @@ Abducted = Game:New()
 function Abducted.Initialize(self)
 	self.eatInput = false
 	
+	GameDB:Load()
 	self:Load()
 	PlayerInput:Spawn()
 	HUD:Spawn()
@@ -139,6 +140,7 @@ function Abducted.EndManipulate(self)
 end
 
 function Abducted.Think(self, dt)
+	GameDB:IncrementTime(dt)
 	Game.Think(self, dt)
 	
 	if (Arm.think) then

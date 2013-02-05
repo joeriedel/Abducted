@@ -16,8 +16,9 @@ Arm.MaxChangeConversationTimes = 4
 function Arm.SpawnChat(self)
 
 	self.widgets.chat = {}
-	self.widgets.chat.Root = UI:CreateWidget("Widget", {rect=self.workspaceLeft})
+	self.widgets.chat.Root = UI:CreateWidget("Widget", {rect=self.workspaceLeftSize})
 	self.widgets.chat.Root:SetVisible(false)
+	self.widgets.WorkspaceLeft:AddChild(self.widgets.chat.Root)
 	
 	self.chatRect = {
 		12*UI.identityScale[1], 
@@ -34,25 +35,44 @@ function Arm.SpawnChat(self)
 		self.chatRect[4] - (Arm.ChatClipAdjust[4]*UI.identityScale[2])
 	})
 	
-	self.widgets.WorkspaceLeft:AddChild(self.widgets.chat.ChatList)
+	self.widgets.chat.Root:AddChild(self.widgets.chat.ChatList)
 	self.widgets.chat.ChatList:SetEndStops({0, self.chatRect[4]*0.1})
+	self.widgets.chat.ChatList:SetBlendWithParent(true)
 	
 end
 
 function Arm.ResetChat(self)
+	self.chatLockout = false
 	self.widgets.chat.Root:SetVisible(false)
+	self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
 end
 
 function Arm.StartChat(self)
-	Arm:SwapToChange()
-	self.widgets.chat.Root:SetVisible(true)
-	self.changeConversationCount = 0
-	Arm:StartConversation()
+	if (not self.chatLockout) then
+		Arm:SwapToChange()
+		self.widgets.chat.Root:SetVisible(true)
+		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
+		self.changeConversationCount = 0
+		Arm:StartConversation()
+	end
 end
 
-function Arm.EndChat(self)
-	self:SwapToTalk()
-	Arm:ClearChat()
+function Arm.EndChat(self, callback)
+	Arm:SwapToTalk()
+	
+	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.2)
+	
+	if (self.chatLockout) then
+		Arm:ShowSymbol(false, 0.2)
+	end
+	
+	local f = function()
+		Arm:ClearChat()
+		self.widgets.chat.Root:SetVisible(false)
+		callback()
+	end
+	
+	World.globalTimers:Add(f, 0.2, true)
 end
 
 function Arm.ClearChat(self)
@@ -72,6 +92,12 @@ function Arm.ClearChat(self)
 	self.choiceWidgets = nil
 	self.widgets.chat.ChatList:Clear()
 	collectgarbage()
+end
+
+function Arm.HideChat(self)
+
+	Arm:ClearChat()
+
 end
 
 function Arm.LoadChats(self, chats)
@@ -144,6 +170,8 @@ function Arm.ChatPrompt(self)
 		local r = {self.chatPos[1], self.chatPos[2], self.chatRect[3]-self.chatPos[1], promptLineSize}
 		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=self.typefaces.Chat})
 		self.widgets.chat.ChatList:AddItem(w)
+		w:SetBlendWithParent(true)
+		w:AllocateText(v)
 		table.insert(self.promptState.labels, w)
 		self.chatPos[2] = self.chatPos[2] + promptLineSize
 	end
@@ -212,6 +240,11 @@ function Arm.TickPrompt(self)
 					Arm:EnableChangeTopic(true)
 				end
 				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
+			else
+				local f = function()
+					Arm:ChatLockout(self)
+				end
+				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
 			end
 			Arm:DisplayChoices()
 			collectgarbage()
@@ -224,6 +257,15 @@ function Arm.TickPrompt(self)
 	local w = self.promptState.labels[self.promptState.line]
 	str = str:sub(1, self.promptState.char)
 	UI:SetLabelText(w, str)
+end
+
+function Arm.ChatLockout(self)
+	self.chatLockout = true
+	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.5)
+	local f = function()
+		self:ShowSymbol(true, 0.1)
+	end
+	World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.DisplayChoices(self)
@@ -317,6 +359,7 @@ function Arm.DisplayChoices(self)
 		}
 		
 		w:SetRect(buttonRect)
+		w:SetBlendWithParent(true)
 		w.highlight:SetRect({0, 0, buttonRect[3], buttonRect[4]})
 		r = CenterChildRectInRect(buttonRect, r)
 		w.label:SetRect(r)

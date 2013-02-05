@@ -294,6 +294,14 @@ end
 	Widget Positioning Utils
 -----------------------------------------------------------------------------]]
 
+function UI.MapToUI(self, p)
+	local x = {
+		p[1] * UI.screenUIScale[1],
+		p[2] * UI.screenUIScale[2]
+	}
+	return x
+end
+
 function UI.MapInputEvent(self, e)
 
 	if (e.type == kI_KeyDown) or (e.type == kI_KeyUp) then

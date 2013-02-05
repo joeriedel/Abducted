@@ -174,6 +174,7 @@ function TerminalScreen.UpdateUI()
 	if (TerminalScreen.PopupEntity) then
 		local worldPos = TerminalScreen.PopupEntity:WorldPos()
 		local p, r = World.Project(VecAdd(worldPos, TerminalScreen.TouchPosShift))
+		p = UI:MapToUI(p)
 		
 		local shiftX = TerminalScreen.ButtonPosShift[1] * UI.identityScale[1] * UI.screenWidth
 		local shiftY = TerminalScreen.ButtonPosShift[2] * UI.identityScale[2] * UI.screenHeight

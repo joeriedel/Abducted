@@ -197,7 +197,7 @@ function TerminalPuzzles.OnInputGesture(self,g)
 	if (g.args[1] > 0.707) then
 		self.state.heading.x = 1
 		self.state.heading.y = 0
-	elseif (g.args[1] < -707) then -- right?
+	elseif (g.args[1] < -0.707) then -- right?
 		self.state.heading.x = -1
 		self.state.heading.y = 0
 	elseif (g.args[2] > 0.707) then -- down

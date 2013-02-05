@@ -6,6 +6,8 @@
 Arm.CharDBInset = { 32, 16 }
 Arm.CharDBTextSpace = {12, 8}
 Arm.CharDBSectionHeight = 250
+Arm.CharDBPulsePctSize = 0.95
+Arm.CharDBPulseInset = 8
 
 function Arm.SpawnCharacterDB(self)
 
@@ -27,6 +29,10 @@ function Arm.SpawnCharacterDB(self)
 	self.widgets.db.CharRoot:SetBlendWithParent(true)
 	self.widgets.db.Root:AddChild(self.widgets.db.CharRoot)
 	
+	--[[---------------------------------------------------------------------------
+		Name & Portrait
+	-----------------------------------------------------------------------------]]
+
 	local y = 0
 	local advance = UI:FontAdvanceSize(UI.typefaces.StandardButtonDark)
 
@@ -128,4 +134,223 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.CharPortrait})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
+	
+	--[[---------------------------------------------------------------------------
+		Health Status
+	-----------------------------------------------------------------------------]]
+	
+	local sectionY = (Arm.CharDBSectionHeight + Arm.CharDBTextSpace[2]) * UI.identityScale[2]
+	y = sectionY
+	
+	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_HEALTH_STATUS"))
+	r = UI:SizeLabelToContents(w)
+	
+	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
+	
+	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GOOD"))
+	
+	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
+	
+	rect = UI:MaterialSize(self.gfx.HeartBeat1)
+	h = (((Arm.CharDBSectionHeight*2) - 4) * UI.identityScale[2]) - y
+	scale = h / rect[4]
+	rect[4] = h
+	rect[3] = rect[3] * scale
+	rect[1] = 0
+	rect[2] = y
+	
+	w = UI:CreateWidget("MatWidget", {rect=rect, material = self.gfx.HeartBeat1})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	
+	self.charDBHeartBeatRect = {
+		0,
+		0,
+		rect[3],
+		rect[4]
+	}
+	
+	rect = UI:MaterialSize(self.gfx.HeartBeat2)
+	h = self.charDBHeartBeatRect[4] * Arm.CharDBPulsePctSize
+	scale = h / rect[4]
+	rect[4] = h
+	rect[3] = rect[3] * scale
+	rect[2] = 4 * UI.identityScale[2]
+	
+	self.charDBPulseRect = rect
+	
+	self.widgets.db.CharPulse = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.HeartBeat2})
+	w:AddChild(self.widgets.db.CharPulse)
+	self.widgets.db.CharPulse:SetBlendWithParent(true)
+	
+	UI:VCenterWidget(self.widgets.db.CharPulse, self.charDBHeartBeatRect)
+	
+	rect = UI:MaterialSize(self.gfx.HumanHeart)
+	h = (((Arm.CharDBSectionHeight) - 8) * UI.identityScale[2])
+	scale = h / rect[4]
+	rect[4] = h
+	rect[3] = rect[3] * scale
+	rect[1] = self.charDBWorkspaceSize[3] - rect[3] - (self.charDBWorkspaceSize[3] * 0.15)
+	rect[2] = sectionY
+	
+	w = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.HumanHeart})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	
+	rect = {
+		0,
+		Arm.CharDBSectionHeight * UI.identityScale[2] * 2,
+		self.charDBWorkspaceSize[3],
+		1
+	}
+	
+	w = UI:CreateWidget("MatWidget", {rect=rect, material = self.gfx.LineBorder4})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	
+	--[[---------------------------------------------------------------------------
+		Time played
+	-----------------------------------------------------------------------------]]
+	
+	sectionY = ((Arm.CharDBSectionHeight*2) + Arm.CharDBTextSpace[2]) * UI.identityScale[2]
+	y = sectionY
+	
+	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_TIME_PLAYED"))
+	r = UI:SizeLabelToContents(w)
+	
+	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
+	
+	self.widgets.db.TimePlayed = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
+	self.widgets.db.CharRoot:AddChild(self.widgets.db.TimePlayed)
+	self.widgets.db.TimePlayed:SetBlendWithParent(true)
+	UI:SetLabelText(self.widgets.db.TimePlayed, "000-00-00-00")
+	
+	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
+	
+	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_DISCOVERIES"))
+	r = UI:SizeLabelToContents(w)
+	
+	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
+	
+	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
+	self.widgets.db.CharRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	UI:SetLabelText(w, tostring(GameDB.numDiscoveries))
+	
+end
+
+function Arm.EnterCharDB(self, enter, callback, time)
+	if (time == nil) then
+		time = 0
+	end
+	
+	if (enter) then
+		Arm:DBAnimateCharHeartbeat(true)
+		Arm:DBAnimateTimePlayed(true)
+		self.widgets.db.CharRoot:BlendTo({1,1,1,1}, time)
+	else
+		self.widgets.db.CharRoot:BlendTo({0,0,0,0}, time)
+	end
+	
+	local f = function()
+		if (not enter) then
+			Arm:DBAnimateCharHeartbeat(false)
+			Arm:DBAnimateTimePlayed(false)
+		end
+		if (callback) then
+			if (time > 0) then
+				self.dbTimer = World.globalTimers:Add(callback, time, true)
+			else
+				callback()
+			end
+		end
+	end
+	
+	if (time > 0) then
+		self.dbTimer = World.globalTimers:Add(f, time, true)
+	else
+		f()
+	end
+end
+
+function Arm.DBAnimateCharHeartbeat(self, animate)
+	if (not animate) then
+		self.sfx.HeartBeat:FadeOutAndStop(0.5)
+		if (self.pulseTimer) then
+			self.pulseTimer:Clean()
+			self.pulseTimer = nil
+		end
+		return
+	end
+	
+	
+	self.sfx.HeartBeat:FadeVolume(1, 0)
+	self.sfx.HeartBeat:Rewind()
+	self.sfx.HeartBeat:Play(kSoundChannel_UI, 0)
+	self:DBPulseStart()	
+
+end
+
+function Arm.DBAnimateTimePlayed(self, animate)
+
+	if (not animate) then
+		if (self.dbTimePlayedTimer) then
+			self.dbTimePlayedTimer:Clean()
+			self.dbTimePlayedTimer = nil
+		end
+		return
+	end
+	
+	local f = function()
+		local s = GameDB:TimePlayedString()
+		UI:SetLabelText(self.widgets.db.TimePlayed, s)
+	end
+
+	self.dbTimePlayedTimer = World.globalTimers:Add(f, 0)
+end
+
+Arm.DBPulseTimes = {0.75, 0.2, 0.4, 0.65}
+
+function Arm.DBPulseStart(self)
+	local x = self.charDBHeartBeatRect[3] - ((Arm.CharDBPulseInset+64) * UI.identityScale[1])
+	
+	self.widgets.db.CharPulse:ScaleTo({1,0}, {0,0})
+	self.widgets.db.CharPulse:MoveTo({x, self.charDBPulseRect[2]}, {0,0})
+	
+	x = (Arm.CharDBPulseInset - 64) * UI.identityScale[1]
+	self.widgets.db.CharPulse:MoveTo({x, self.charDBPulseRect[2]}, {Arm.DBPulseTimes[1], 0})
+	
+	local f = function()
+		Arm:DBPulseBeat()
+	end
+	
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[2], true)
+end
+
+function Arm.DBPulseBeat(self)
+	self.widgets.db.CharPulse:ScaleTo({1,1}, {0, 0.1})
+	local f = function()
+		Arm:DBPulseBeat2()
+	end
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[3], true)
+end
+
+function Arm.DBPulseBeat2(self)
+	self.widgets.db.CharPulse:ScaleTo({1,0}, {0, 0.1})
+	local f = function()
+		Arm:DBPulseStart()
+	end
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[4], true)
 end

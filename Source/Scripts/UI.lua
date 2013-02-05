@@ -612,7 +612,7 @@ function UI.EatInput(self, e)
 end
 
 function UI.MaterialSize(self, material, rect)
-	rect = rect or {}
+	rect = rect or {0, 0, 0, 0}
 	local d = material:Dimensions()
 	rect[3] = d[1]
 	rect[4] = d[2]

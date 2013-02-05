@@ -49,12 +49,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 FLOAT4 TCScale(HALF4 wave, FLOAT4 tc) {
-	return tc*wave.xyxy;
+	return ((tc.xyxy-HALF4(0.5, 0.5, 0.0, 0.0))*wave.xyxy) + HALF4(0.5, 0.5, 0, 0);
 }
 
 FLOAT4 TCRotate(HALF4 sincos, FLOAT4 tc) {
 	HALF4 t = (tc.xyxy-HALF4(0.5, 0.5, 0.5, 0.5))*sincos;
-	return HALF4(t.z-t.y, t.w+t.x, tc.z, tc.w) + HALF4(0.5, 0.5, 0, 0);
+	return HALF4(t.z-t.y, t.w+t.x, tc.z, tc.w) + HALF4(0.5, 0.5, 0.0, 0.0);
 }
 
 FLOAT4 TCShift(FLOAT4 wave, FLOAT4 tc) {

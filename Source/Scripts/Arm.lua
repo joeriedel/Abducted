@@ -56,6 +56,9 @@ function Arm.SpawnShared(self)
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")
 	self.sfx.Button = World.Load("Audio/armbutton")
+	self.sfx.HeartBeat = World.Load("Audio/heartbeat1")
+	
+	self.sfx.HeartBeat:SetLoop(true)
 	
 	Arm:SetupBackgroundAndWorkspaces()
 	Arm:CreateMenu()

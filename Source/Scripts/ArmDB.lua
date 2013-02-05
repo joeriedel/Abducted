@@ -90,6 +90,10 @@ function Arm.EndDB(self, callback)
 	
 	local f = function()
 		self.widgets.db.Root:SetVisible(false)
+		if (self.dbActive) then
+			self.dbActive(self, false)
+			self.dbActive = nil
+		end
 		callback()
 	end
 	
@@ -98,6 +102,16 @@ function Arm.EndDB(self, callback)
 end
 
 function Arm.DBHide(self)
+	if (self.dbTimer) then
+		self.dbTimer:Clean()
+		self.dbTimer = nil
+	end
+	
+	if (self.dbActive) then
+		self.dbActive(self, false)
+		self.dbActive = nil
+	end
+	
 	self.widgets.db.Root:SetVisible(false)
 end
 
@@ -107,8 +121,6 @@ function Arm.DBResetAll(self)
 	self.widgets.db.Root:SetVisible(true)
 	self.widgets.db.CharRoot:BlendTo({0,0,0,0}, 0)
 	self.widgets.db.Tab:BlendTo({0,0,0,0}, 0)
-
-	self.dbActivePanel = nil
 	
 end
 
@@ -127,25 +139,19 @@ end
 
 function Arm.DBShowPanel(self, show, mode, callback)
 	if (show) then
-		if (self.dbActivePanel) then
+		if (self.dbActive) then
 			local f = function()
 				Arm:DBShowPanel(true, mode)
 			end
 			Arm:DBShowPanel(false, f)
 		else
 			if (mode == "char") then
-				self.dbActivePanel = self.widgets.db.CharRoot
+				self.dbActive = Arm.EnterCharDB
 			end
-			self.dbActivePanel:BlendTo({1,1,1,1}, 0.2)
-			if (callback) then
-				self.dbTimer = World.globalTimers:Add(callback, 0.2, true)
-			end
+			self.dbActive(self, true, callback, 0.2)
 		end
 	else
-		self.dbActivePanel:BlendTo({0,0,0,0}, 0.2)
-		self.dbActivePanel = nil
-		if (callback) then
-			self.dbTimer = World.globalTimers:Add(callback, 0.2, true)
-		end
+		self.dbActive(self, false, callback, 0.2)
+		self.dbActive = nil
 	end
 end

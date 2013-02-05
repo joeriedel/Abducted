@@ -15,6 +15,8 @@ function GameDB.Load(self)
 
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
 	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/character-profiletest1_M")
+	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
+	
 	self:LoadTime()
 	EventLog:Load()
 	
@@ -48,6 +50,18 @@ end
 
 function GameDB.CurrentTimeString(self)
 	return string.format("%03d-%02d:%02d:%02d", self.days, self.hours, self.minutes, self.seconds)
+end
+
+function GameDB.TimePlayedString(self)
+	local seconds = self.realSecondsPlayed
+	
+	local hours = math.floor(seconds / GameDB.SecondsPerHour)
+	local seconds = seconds - (hours * GameDB.SecondsPerHour)
+	local minutes = math.floor(seconds / GameDB.SecondsPerMinute)
+	seconds = seconds - (minutes * GameDB.SecondsPerMinute)
+	
+	return string.format("%02d:%02d:%02d", hours, minutes, seconds)
+	
 end
 
 

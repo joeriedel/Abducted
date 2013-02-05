@@ -14,7 +14,7 @@ function TimerList.Create(self)
 		self.time = time
 		local x = LL_Head(self.list)
 		local dt
-		while (x) do
+		while (x and (LL_List(x) == self.list)) do
 			local next = LL_Next(x)
 			dt = time - x.time
 			if (dt >= x.freq) then

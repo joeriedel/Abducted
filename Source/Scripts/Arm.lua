@@ -403,7 +403,7 @@ function Arm.SwapToTalk(self)
 	
 	self.talk = true
 	
-	if (not self.chatLockout) then
+	if (not GameDB.chatLockout) then
 		self.widgets.Talk.class:SetEnabled(self.widgets.Talk, true)
 		self.widgets.Talk:BlendTo({1,1,1,1}, 0.2)
 	end
@@ -419,7 +419,7 @@ function Arm.SwapToChange(self)
 	if (not self.talk) then
 		return
 	end
-	if (self.chatLockout) then
+	if (GameDB.chatLockout) then
 		return
 	end
 	
@@ -587,7 +587,11 @@ function Arm.ToggleSymbolFlash(self, flash, options)
 end
 
 function Arm.ButtonsIntro(self)
-	self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5)
+	if (GameDB.chatLockout) then
+		self.widgets.LineBorder3:BlendTo({1,1,1,1}, 1.5)
+	else
+		self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5)
+	end
 	
 	local f = function()
 		Arm:ListButtons(1)

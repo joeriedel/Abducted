@@ -41,7 +41,8 @@ Arm.Chats.CMonTellMe = {
 
 Arm.Chats.IDontLikeSecrets = {
 	prompt = {{"ARM_CHAT_I_DONT_LIKE_SECRETS"}},
-	reply = {{"ARM_CHAT_I_THINK_WE_ARE_DONE"}}
+	reply = {{"ARM_CHAT_I_THINK_WE_ARE_DONE"}},
+	action = "lock"
 }
 
 Arm.Chats.HowPowerful = {

@@ -29,6 +29,11 @@ function Persistence.MakePath(key, args)
 
 end
 
+function Persistence.DeleteKey(storage, key, ...)
+	local s = Persistence.MakePath(key, arg)
+	storage.keys[s] = nil
+end
+
 function Persistence.ReadString(storage, key, default, ...)
 
 	local s = Persistence.MakePath(key, arg)

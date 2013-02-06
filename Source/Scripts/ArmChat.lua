@@ -42,18 +42,20 @@ function Arm.SpawnChat(self)
 end
 
 function Arm.ResetChat(self)
-	self.chatLockout = false
+	GameDB:CheckChatLockout()
 	self.widgets.chat.Root:SetVisible(false)
 	self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
 end
 
 function Arm.StartChat(self)
-	if (not self.chatLockout) then
+	if (not GameDB.chatLockout) then
 		Arm:SwapToChange()
 		self.widgets.chat.Root:SetVisible(true)
 		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
 		self.changeConversationCount = 0
 		Arm:StartConversation()
+	else
+		Arm:DisplayChatLockout()
 	end
 end
 
@@ -62,7 +64,7 @@ function Arm.EndChat(self, callback)
 	
 	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.2)
 	
-	if (self.chatLockout) then
+	if (GameDB.chatLockout) then
 		Arm:ShowSymbol(false, 0.2)
 	end
 	
@@ -150,6 +152,17 @@ function Arm.ChatPrompt(self)
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
 	self.promptText = "> "..StringTable.Get(self.prompt[1])
 	
+	if (self.prompt[1] ~= "ARM_CHAT_DEFAULT_PROMPT") then
+		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_REPLY "..self.prompt[1])
+	end
+	
+	if (self.topic.action) then
+		if (self.topic.action == "lock") then
+			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+			Arm:ChatLockout() -- until a trigger.
+		end
+	end
+	
 	-- how many lines?
 	self.promptState = {}
 	self.promptState.line = 1
@@ -235,14 +248,14 @@ function Arm.TickPrompt(self)
 		if (self.promptState.line > #self.promptState.lines) then
 			self.chatTimer:Clean()
 			self.chatTimer = nil
-			if (self.changeConversationCount <= Arm.MaxChangeConversationTimes) then
+			if (GameDB.chatLockout) then
 				local f = function()
-					Arm:EnableChangeTopic(true)
+					Arm:DisplayChatLockout()
 				end
-				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
+				self.chatTimer2 = World.globalTimers:Add(f, 3, true)
 			else
 				local f = function()
-					Arm:ChatLockout(self)
+					Arm:EnableChangeTopic(true)
 				end
 				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
 			end
@@ -259,13 +272,29 @@ function Arm.TickPrompt(self)
 	UI:SetLabelText(w, str)
 end
 
-function Arm.ChatLockout(self)
-	self.chatLockout = true
+function Arm.DisplayChatLockout(self)
 	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.5)
+		
 	local f = function()
+		Abducted.entity.eatInput = false
 		self:ShowSymbol(true, 0.1)
 	end
+	
+	Abducted.entity.eatInput = true
 	World.globalTimers:Add(f, 0.5, true)
+end
+
+function Arm.ChatLockout(self, time)
+	GameDB:LockoutChat(time)
+	Arm:SwapToTalk()	
+end
+
+function Arm.CheckLockout(self)
+	GameDB:CheckChatLockout()
+end
+
+function Arm.ClearLockout(self)
+	GameDB:ClearChatLockout()
 end
 
 function Arm.DisplayChoices(self)
@@ -326,7 +355,7 @@ function Arm.DisplayChoices(self)
 		
 		local r = {0, 0, size[1], size[2]}
 		local f = function(widget)
-			Arm:ChoiceSelected(widget, self.choices[k])
+			Arm:ChoiceSelected(widget, self.choices[k], prompt)
 		end
 		
 		local w = UI:CreateStylePushButton(
@@ -390,9 +419,12 @@ function Arm.DisplayChoices(self)
 	self.chatTimer = World.globalTimers:Add(f, 1, true)
 end
 
-function Arm.ChoiceSelected(self, widget, choice)
+function Arm.ChoiceSelected(self, widget, choice, prompt)
 
 	self.changeConversationCount = 0
+	
+	-- add event
+	EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_ASK "..prompt[1])
 	
 	-- disable all choices
 	for k,v in pairs(self.choiceWidgets) do
@@ -419,6 +451,8 @@ end
 function Arm.SelectChatRoot(self)
 
 	if (self.changeConversationCount > Arm.MaxChangeConversationTimes) then
+		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		Arm:ChatLockout(FloatRand(35, 95))
 		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}}
 	end
 
@@ -437,7 +471,7 @@ function Arm.SelectChatRoot(self)
 			end
 			v.n = FloatRand(p[1], p[2])
 			sum = sum + v.n
-			table.insert(roots, v)
+			roots[k] = v
 		end
 	
 	end
@@ -451,7 +485,7 @@ function Arm.SelectChatRoot(self)
 			end
 			v.n = FloatRand(p[1], p[2])
 			sum = sum + v.n
-			table.insert(roots, v)
+			roots[k] = v
 		end
 	end
 	

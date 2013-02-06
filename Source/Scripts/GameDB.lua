@@ -18,27 +18,78 @@ function GameDB.Load(self)
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	
 	self:LoadTime()
+	self:LoadChatLockouts()
 	EventLog:Load()
 	
 end
 
 function GameDB.LoadTime(self)
 
-	self.realSecondsPlayed = Persistence.ReadNumber(SaveGame, "secondsPlayed", 0)
+	self.realTime = Persistence.ReadNumber(SaveGame, "secondsPlayed", 0)
 	self:UpdateTimes()
 	
 end
 
+function GameDB.LoadChatLockouts(self)
+
+	self.chatLockout = Persistence.ReadBool(SaveGame, "chatLockout", false)
+	self.chatLockoutTime = Persistence.ReadNumber(SaveGame, "chatLockoutTime")
+
+end
+
+function GameDB.SaveChatLockouts(self)
+	Persistence.WriteBool(SaveGame, "chatLockout", self.chatLockout)
+	
+	if (self.chatLockoutTime) then
+		Persistence.WriteNumber(SaveGame, "chatLockoutTime", self.chatLockoutTime)
+	else
+		Persistence.DeleteKey(SaveGame, "chatLockoutTime")
+	end
+	
+	SaveGame:Save()
+end
+
+function GameDB.LockoutChat(self, time)
+
+	self.chatLockout = true
+	self.chatLockoutTime = nil
+	
+	if (time) then
+		self.chatLockoutTime = self.realTime + time
+	end
+	
+	self:SaveChatLockouts()
+	
+end
+
+function GameDB.CheckChatLockout(self)
+
+	if (self.chatLockout and self.chatLockoutTime) then
+		if (self.realTime >= self.chatLockoutTime) then
+			self.chatLockoutTime = nil
+			self.chatLockout = false
+			self:SaveChatLockouts()
+		end
+	end
+
+end
+
+function GameDB.ClearChatLockout(self)
+	self.chatLockout = false
+	self.chatLockoutTime = nil
+	self:SaveChatLockouts()
+end
+
 function GameDB.IncrementTime(self, dt)
-	self.realSecondsPlayed = self.realSecondsPlayed + dt
-	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realSecondsPlayed)
+	self.realTime = self.realTime + dt
+	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	self:UpdateTimes()
 end
 
 function GameDB.UpdateTimes(self)
-	self.secondsPlayed = self.realSecondsPlayed * GameDB.GameSecondsPerSecond
+	self.time = self.realTime * GameDB.GameSecondsPerSecond
 	
-	self.seconds = self.secondsPlayed
+	self.seconds = self.time
 	self.days = math.floor(self.seconds / GameDB.SecondsPerDay)
 	self.seconds = self.seconds - (self.days * GameDB.SecondsPerDay)
 	self.hours = math.floor(self.seconds / GameDB.SecondsPerHour)
@@ -53,7 +104,7 @@ function GameDB.CurrentTimeString(self)
 end
 
 function GameDB.TimePlayedString(self)
-	local seconds = self.realSecondsPlayed
+	local seconds = self.realTime
 	
 	local hours = math.floor(seconds / GameDB.SecondsPerHour)
 	local seconds = seconds - (hours * GameDB.SecondsPerHour)

@@ -359,7 +359,7 @@ function CurrentDateAndTimeString()
 	end
 	
 	return string.format(
-		"%d/%d/%d - %d:%02d:%02d %s", 
+		"%d/%d/%d - %02d:%02d:%02d %s", 
 		td.month, 
 		td.day, 
 		td.year, 

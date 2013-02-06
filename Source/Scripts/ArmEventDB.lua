@@ -29,11 +29,7 @@ function Arm.SpawnEventDB(self)
 	self.widgets.db.EventLog:SetClipRect(self.eventDBWorkspace)
 	self.widgets.db.EventLog:SetEndStops({0, self.eventDBWorkspace[4]*0.1})
 	
-	self.logTime = 0
-	
-	self.typefaces.LogEvent = World.Load("UI/LogEvent_TF")
-	self.typefaces.LogDiscovery = World.Load("UI/LogDiscovery_TF")
-	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
+	self.logTime = -1
 	
 end
 
@@ -155,6 +151,6 @@ function Arm.LoadLog(self)
 end
 
 function Arm.ClearLog(self)
-	self.logTime = 0
+	self.logTime = -1
 	self.widgets.db.EventLog:Clear()
 end

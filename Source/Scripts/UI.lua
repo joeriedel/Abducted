@@ -638,6 +638,7 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 	local labelStrings = {}
 	local size = 0
 	local widestLine = 0
+	local lastY = 0
 	
 	for k,line  in pairs(lines) do
 	
@@ -659,6 +660,7 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 					scaleY = UI.identityScale[2]
 				}
 				
+				lasyY = size
 				size = size + h
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
@@ -686,7 +688,78 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 		r[4] = size
 	end
 	
-	return r
+	return r, lastY
+end
+
+function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines)
+
+	if (type(lines) == "string") then
+		lines = string.split(lines, "\n")
+	end
+	
+	lineSpace = lineSpace * UI.identityScale[2]
+	
+	local r = label:Rect()
+	local font = label:Typeface()
+	
+	if (maxWidth == nil) then
+		maxWidth = r[3]
+	end
+	
+	local labelStrings = {}
+	local size = 0
+	local widestLine = 0
+	local lastY = 0
+	
+	for k,line  in pairs(lines) do
+	
+		local strings = UI:WordWrap(font, line, maxWidth)
+		for k,v in pairs(strings) do
+		
+				if (next(labelStrings) ~= nil) then
+					size = size + lineSpace
+				end
+		
+				local w, h = UI:StringDimensions(font, v)
+				local x = 0
+							
+				local string = {
+					x = x,
+					y = size,
+					text = v,
+					scaleX = UI.identityScale[1],
+					scaleY = UI.identityScale[2]
+				}
+				
+				lastY = size
+				size = size + h
+				widestLine = Max(widestLine, w)
+				table.insert(labelStrings, string)
+		end
+	end
+	
+	if (autoSize) then
+		r[3] = widestLine
+		r[4] = size
+		label:SetRect(r)
+	end
+	
+--	local advance = UI:FontAdvanceSize(font)
+	local y = (r[4] - size) / 2
+	
+	for k,v in pairs(labelStrings) do
+		v.y = v.y + y
+	end
+	
+	label:SetText(labelStrings)
+	
+	if (not autoSize) then
+	-- return the size we would have been had we auto-sized
+		r[3] = widestLine
+		r[4] = size
+	end
+	
+	return r, lastY
 end
 
 --[[---------------------------------------------------------------------------

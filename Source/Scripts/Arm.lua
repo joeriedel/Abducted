@@ -47,12 +47,16 @@ function Arm.SpawnShared(self)
 	self.gfx.LogTab = World.Load("UI/tab-selection-log_M")
 	self.gfx.LogTabPressed = World.Load("UI/tab-selection-log-pressed_M")
 	self.gfx.CharPortrait = World.Load(GameDB.portrait)
+	self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
 	
 	self.typefaces = {}
 	
 	self.typefaces.Chat = World.Load("UI/Chat_TF")
 	self.typefaces.ChatLocked = World.Load("UI/ChatLocked_TF")
 	self.typefaces.ChatChoice = World.Load("UI/ChatChoice_TF")
+	self.typefaces.LogEvent = World.Load("UI/LogEvent_TF")
+	self.typefaces.LogDiscovery = World.Load("UI/LogDiscovery_TF")
+	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
 	
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")

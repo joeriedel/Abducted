@@ -16,6 +16,7 @@ function GameDB.Load(self)
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
 	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/character-profiletest1_M")
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
+	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	
 	self:LoadTime()
 	self:LoadChatLockouts()
@@ -28,6 +29,28 @@ function GameDB.LoadTime(self)
 	self.realTime = Persistence.ReadNumber(SaveGame, "secondsPlayed", 0)
 	self:UpdateTimes()
 	
+end
+
+function GameDB.Discover(self, name)
+
+	local discovered = self:CheckDiscovery(name)
+	if (discovered) then
+		return
+	end
+
+	self.numDiscoveries = self.numDiscoveries + 1
+	Persistence.WriteNumber(SaveGame, "numDiscoveries", self.numDiscoveries)
+	Persistence.WriteBool(SaveGame, "discovery", true, name)
+	
+	self.discoveryTime = self.realTime
+	Persistence.WriteNumber(SaveGame, "lastDiscoveryTime", self.discoveryTime)
+	
+	SaveGame:Save()
+
+end
+
+function GameDB.CheckDiscovery(self, name)
+	return true --Persistence.ReadBool(SaveGame, "discovery", false, name)
 end
 
 function GameDB.LoadChatLockouts(self)

@@ -5,11 +5,16 @@
 
 Arm.CharDBInset = { 32, 16 }
 Arm.CharDBTextSpace = {12, 8}
-Arm.CharDBSectionHeight = 250
+Arm.CharDBSectionHeightPct = 0.42
 Arm.CharDBPulsePctSize = 0.95
 Arm.CharDBPulseInset = 8
 
 function Arm.SpawnCharacterDB(self)
+
+	if (UI.systemScreen.aspect == "4x3") then
+		Arm.CharDBInset[2] = 0
+		Arm.CharDBSectionHeightPct = 0.41
+	end
 
 	self.charDBWorkspace = {
 		self.dbWorkspace[1] + (Arm.CharDBInset[1] * UI.identityScale[1]),
@@ -28,6 +33,8 @@ function Arm.SpawnCharacterDB(self)
 	self.widgets.db.CharRoot = UI:CreateWidget("Widget", {rect=self.charDBWorkspace})
 	self.widgets.db.CharRoot:SetBlendWithParent(true)
 	self.widgets.db.Root:AddChild(self.widgets.db.CharRoot)
+	
+	local charDBSectionHeight = Arm.CharDBSectionHeightPct * self.charDBWorkspaceSize[4]
 	
 	--[[---------------------------------------------------------------------------
 		Name & Portrait
@@ -113,9 +120,9 @@ function Arm.SpawnCharacterDB(self)
 	
 	local rect = {
 		0,
-		Arm.CharDBSectionHeight * UI.identityScale[2],
+		charDBSectionHeight,
 		self.charDBWorkspaceSize[3],
-		1
+		7
 	}
 	
 	w = UI:CreateWidget("MatWidget", {rect=rect, material = self.gfx.LineBorder4})
@@ -123,7 +130,7 @@ function Arm.SpawnCharacterDB(self)
 	w:SetBlendWithParent(true)
 	
 	rect = UI:MaterialSize(self.gfx.CharPortrait)
-	local h = ((Arm.CharDBSectionHeight - 4) * UI.identityScale[2])
+	local h = charDBSectionHeight - (4 * UI.identityScale[2])
 	local scale =  h / rect[4]
 	rect[4] = h
 	rect[3] = rect[3] * scale
@@ -139,7 +146,7 @@ function Arm.SpawnCharacterDB(self)
 		Health Status
 	-----------------------------------------------------------------------------]]
 	
-	local sectionY = (Arm.CharDBSectionHeight + Arm.CharDBTextSpace[2]) * UI.identityScale[2]
+	local sectionY = charDBSectionHeight + (Arm.CharDBTextSpace[2]) * UI.identityScale[2]
 	y = sectionY
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
@@ -158,7 +165,7 @@ function Arm.SpawnCharacterDB(self)
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	rect = UI:MaterialSize(self.gfx.HeartBeat1)
-	h = (((Arm.CharDBSectionHeight*2) - 4) * UI.identityScale[2]) - y
+	h = (charDBSectionHeight*2) - (4 * UI.identityScale[2]) - y
 	scale = h / rect[4]
 	rect[4] = h
 	rect[3] = rect[3] * scale
@@ -192,7 +199,7 @@ function Arm.SpawnCharacterDB(self)
 	UI:VCenterWidget(self.widgets.db.CharPulse, self.charDBHeartBeatRect)
 	
 	rect = UI:MaterialSize(self.gfx.HumanHeart)
-	h = (((Arm.CharDBSectionHeight) - 8) * UI.identityScale[2])
+	h = charDBSectionHeight - (8 * UI.identityScale[2])
 	scale = h / rect[4]
 	rect[4] = h
 	rect[3] = rect[3] * scale
@@ -205,9 +212,9 @@ function Arm.SpawnCharacterDB(self)
 	
 	rect = {
 		0,
-		Arm.CharDBSectionHeight * UI.identityScale[2] * 2,
+		charDBSectionHeight * 2,
 		self.charDBWorkspaceSize[3],
-		1
+		7
 	}
 	
 	w = UI:CreateWidget("MatWidget", {rect=rect, material = self.gfx.LineBorder4})
@@ -218,7 +225,7 @@ function Arm.SpawnCharacterDB(self)
 		Time played
 	-----------------------------------------------------------------------------]]
 	
-	sectionY = ((Arm.CharDBSectionHeight*2) + Arm.CharDBTextSpace[2]) * UI.identityScale[2]
+	sectionY = (charDBSectionHeight*2) + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	y = sectionY
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})

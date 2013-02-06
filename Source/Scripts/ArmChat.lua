@@ -102,6 +102,7 @@ function Arm.ClearChat(self)
 	
 	self.promptState = nil
 	self.choiceWidgets = nil
+	self.requestedTopic = nil
 	self.choices = nil
 	self.widgets.chat.ChatList:Clear()
 	collectgarbage()
@@ -133,7 +134,11 @@ function Arm.StartConversation(self)
 	
 	if (self.requiredTopic) then
 		self.changeConversationCount = 0
-		self.topic = Arm.Chats.Root[self.requiredTopic]
+		self.topic = Arm.Chats.Roots[self.requiredTopic]
+	elseif (self.requestedTopic) then
+		self.changeConversationCount = 0
+		self.topic = Arm.Chats.Roots[self.requestedTopic]
+		self.requestedTopic = nil
 	else
 		self.changeConversationCount = self.changeConversationCount + 1
 		self.topic = self:SelectChatRoot()

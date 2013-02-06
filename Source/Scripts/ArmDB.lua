@@ -72,6 +72,7 @@ function Arm.SpawnDB(self)
 	
 	Arm:SpawnCharacterDB()
 	Arm:SpawnEventDB()
+	Arm:SpawnDiscoveriesDB()
 end
 
 function Arm.StartDB(self)
@@ -108,6 +109,8 @@ function Arm.DBTabPressed(self)
 	if (self.dbMode == "char") then
 		self.dbMode = "log"
 	elseif (self.dbMode == "log") then
+		self.dbMode = "discoveries"
+	elseif (self.dbMode == "discoveries") then
 		self.dbMode = "char"
 	end
 	
@@ -130,6 +133,7 @@ function Arm.DBHide(self)
 	end
 	
 	Arm:ClearLog()
+	Arm:ClearDiscoveries()
 	self.widgets.db.Root:SetVisible(false)
 end
 
@@ -139,6 +143,7 @@ function Arm.DBResetAll(self)
 	self.widgets.db.Root:SetVisible(true)
 	self.widgets.db.CharRoot:BlendTo({0,0,0,0}, 0)
 	self.widgets.db.EventLog:BlendTo({0,0,0,0}, 0)
+	self.widgets.db.DiscoveriesRoot:BlendTo({0,0,0,0}, 0)
 	self.widgets.db.Tab:BlendTo({0,0,0,0}, 0)
 	
 end
@@ -174,6 +179,10 @@ function Arm.DBShowPanel(self, show, mode, callback, animateTab)
 				self.dbActive = Arm.EnterLogDB
 				enabled = self.gfx.LogTab
 				pressed = self.gfx.LogTabPressed
+			elseif (mode == "discoveries") then
+				self.dbActive = Arm.EnterDiscoveriesDB
+				enabled = self.gfx.DiscoveriesTab
+				pressed = self.gfx.DiscoveriesTabPressed
 			end
 			if (animateTab) then
 				self.widgets.db.Tab.class:ChangeGfx(self.widgets.db.Tab, {enabled=enabled, pressed=pressed})

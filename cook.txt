@@ -43,6 +43,10 @@ UI/tab-selection-discoveries-pressed_M
 UI/tab-selection-log_M
 UI/tab-selection-log-pressed_M
 UI/character-profiletest1_M
+UI/discovery_bugs_M
+UI/discovery_pod_M
+UI/discovery_terminals_M
+UI/discovery_tentacles_M
 
 // Hack puzzle
 Reflex-Game/reflex-mark-current_M
@@ -92,6 +96,7 @@ Audio/shiphum1
 Audio/penrose1
 Audio/penrose2
 Audio/penrose3
+Audio/heartbeat1
 Ep1/Handshake_contagion
 
 // System (for DebugUI)

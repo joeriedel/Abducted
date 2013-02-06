@@ -47,6 +47,7 @@ UI/discovery_bugs_M
 UI/discovery_pod_M
 UI/discovery_terminals_M
 UI/discovery_tentacles_M
+UI/alphabet_scrollbar_M
 
 // Hack puzzle
 Reflex-Game/reflex-mark-current_M

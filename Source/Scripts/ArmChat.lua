@@ -88,10 +88,21 @@ function Arm.ClearChat(self)
 		self.chatTimer2 = nil
 	end
 	
-	self.promptState = nil
+	if (self.promptState and self.promptState.labels) then
+		for k,v in pairs(self.promptState.labels) do
+			v:Unmap() -- mark for gc
+		end
+	end
 	
-	self.choices = nil
+	if (self.choiceWidgets) then
+		for k,v in pairs(self.choiceWidgets) do
+			v:Unmap() -- mark for gc
+		end
+	end
+	
+	self.promptState = nil
 	self.choiceWidgets = nil
+	self.choices = nil
 	self.widgets.chat.ChatList:Clear()
 	collectgarbage()
 end
@@ -152,15 +163,24 @@ function Arm.ChatPrompt(self)
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
 	self.promptText = "> "..StringTable.Get(self.prompt[1])
 	
-	if (self.prompt[1] ~= "ARM_CHAT_DEFAULT_PROMPT") then
-		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_REPLY "..self.prompt[1])
-	end
+	local lock = false
 	
 	if (self.topic.action) then
 		if (self.topic.action == "lock") then
-			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
-			Arm:ChatLockout() -- until a trigger.
+			lock = true
 		end
+	end
+	if (self.prompt[1] ~= "ARM_CHAT_DEFAULT_PROMPT") then
+		if (lock) then
+			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED_REPLY "..self.prompt[1])
+		else
+			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_REPLY "..self.prompt[1])
+		end
+	end
+	
+	if (lock) then
+		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		Arm:ChatLockout() -- until a trigger.
 	end
 	
 	-- how many lines?
@@ -178,10 +198,15 @@ function Arm.ChatPrompt(self)
 	local promptLineSize = UI:FontAdvanceSize(self.typefaces.Chat) + (Arm.ChatLineSpace * UI.identityScale[2])
 	local scrollPos = {0, self.chatPos[2]}
 	
+	local typeface = self.typefaces.Chat
+	if (GameDB.chatLockout) then
+		typeface = self.typefaces.ChatLocked
+	end
+	
 	for k,v in pairs(self.promptState.lines) do
 		
 		local r = {self.chatPos[1], self.chatPos[2], self.chatRect[3]-self.chatPos[1], promptLineSize}
-		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=self.typefaces.Chat})
+		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=typeface})
 		self.widgets.chat.ChatList:AddItem(w)
 		w:SetBlendWithParent(true)
 		w:AllocateText(v)
@@ -237,10 +262,14 @@ end
 
 function Arm.TickPrompt(self)
 	local str = self.promptState.lines[self.promptState.line]
+	local w = self.promptState.labels[self.promptState.line]
 	
 	self.promptState.char = self.promptState.char + 1
-	
+		
 	if (self.promptState.char > str:len()) then
+		w:Unmap() -- mark for gc
+		self.promptState.labels[self.promptState.line] = nil
+		
 		-- next line
 		self.promptState.char = 1
 		self.promptState.line = self.promptState.line + 1
@@ -267,7 +296,6 @@ function Arm.TickPrompt(self)
 		str = self.promptState.lines[self.promptState.line]
 	end
 	
-	local w = self.promptState.labels[self.promptState.line]
 	str = str:sub(1, self.promptState.char)
 	UI:SetLabelText(w, str)
 end
@@ -435,9 +463,12 @@ function Arm.ChoiceSelected(self, widget, choice, prompt)
 		if (v ~= widget) then
 			v:BlendTo({0.5, 0.5, 0.5, 1}, 0.3)
 		end
+		
+		v:Unmap() -- allow gc to collect this
 	
 	end
 	
+	self.choiceWidgets = nil
 	self.topic = choice
 	
 	local f = function()

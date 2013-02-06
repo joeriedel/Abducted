@@ -270,11 +270,7 @@ function Arm.EnterCharDB(self, enter, callback, time)
 			Arm:DBAnimateTimePlayed(false)
 		end
 		if (callback) then
-			if (time > 0) then
-				self.dbTimer = World.globalTimers:Add(callback, time, true)
-			else
-				callback()
-			end
+			callback()
 		end
 	end
 	

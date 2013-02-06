@@ -51,6 +51,7 @@ function Arm.SpawnShared(self)
 	self.typefaces = {}
 	
 	self.typefaces.Chat = World.Load("UI/Chat_TF")
+	self.typefaces.ChatLocked = World.Load("UI/ChatLocked_TF")
 	self.typefaces.ChatChoice = World.Load("UI/ChatChoice_TF")
 	
 	self.sfx = {}

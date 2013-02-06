@@ -17,6 +17,10 @@ UI/Globals
 UI/TerminalPuzzlesBigFont_TF
 UI/ChatChoice_TF
 UI/Chat_TF
+UI/ChatLocked_TF
+UI/LogEvent_TF
+UI/LogDiscovery_TF
+UI/LogArmAsk_TF
 UI/StandardButtonSmall_TF
 UI/StandardButton_TF
 UI/StandardButtonDark_TF

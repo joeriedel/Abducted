@@ -29,3 +29,17 @@ function Entity.EnableFlags(self, flags, enable)
 	end
 	self:SetFlags(curFlags)
 end
+
+function Entity.GetSpawnFloorPosition(self)
+
+	if (self.keys.floorNum == nil) then
+		return nil
+	end
+	
+	local pos = Vec3ForString(self.keys.origin)
+	local floorNum = NumberForString(self.keys.floorNum)
+	local triNum = NumberForString(self.keys.floorTriNum)
+	
+	return World.CreateFloorPosition(pos, floorNum, triNum)
+
+end

@@ -22,6 +22,9 @@
     <filename>Source\Scripts\ArmDB.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ArmDiscoveriesDB.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\ArmEventDB.lua</filename>
   </file>
   <file>

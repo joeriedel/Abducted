@@ -36,6 +36,8 @@ function Entity.SpawnFloorPosition(self)
 		self.validFloorPosition = true
 		self:SetFloorPosition(fp)
 	end
+	
+	return fp
 end
 
 function Entity.LoadFloorPosition(self)

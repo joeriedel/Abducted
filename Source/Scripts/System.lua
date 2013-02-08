@@ -282,7 +282,7 @@ function World.Spawn(keys)
 	local entity = World.coroutine_entity
 	
 	if (entity == nil) then
-		COutLine(kC_Error, "ERROR: World.Spawn() was not called from an entity coroutine!", path)
+		COutLine(kC_Error, "ERROR: World.Spawn() was not called from an entity coroutine!")
 		return nil
 	end
 
@@ -314,7 +314,7 @@ function World.TempSpawn(keys)
 	local entity = World.coroutine_entity
 	
 	if (entity == nil) then
-		COutLine(kC_Error, "ERROR: World.TempSpawn() was not called from an entity coroutine!", path)
+		COutLine(kC_Error, "ERROR: World.TempSpawn() was not called from an entity coroutine!")
 		return nil
 	end
 	

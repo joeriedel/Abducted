@@ -205,8 +205,10 @@ CLinkedList<CObjProp>* CWaypoint::GetPropList( CTreadDoc* doc ) {
 
 int CWaypoint::AddSelectedConnectionProps(CMapObject* pObject, void* p, void* p2) {
 	CWaypoint *waypoint = dynamic_cast<CWaypoint*>(pObject);
-	CTreadDoc *doc = (CTreadDoc*)p;
-	waypoint->AddSelectedConnectionProps(doc);
+	if (waypoint) {
+		CTreadDoc *doc = (CTreadDoc*)p;
+		waypoint->AddSelectedConnectionProps(doc);
+	}
 	return 0;
 }
 

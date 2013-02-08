@@ -78,6 +78,10 @@ function Game.OnEvent(self, cmd, args)
 		Floors:SetWaypointUserIdState(args, kWaypointState_Enabled)
 	elseif (cmd == "disablewaypointuserid") then
 		Floors:SetWaypointUserIdState(args, nil, bit.bnot(kWaypointState_Enabled))
+	elseif (cmd == "enablefloor") then
+		Floors:SetFloorState(args, kFloorState_Enabled)
+	elseif (cmd == "disablefloor") then
+		Floors:SetFloorState(args, nil, bit.bnot(kFloorState_Enabled))
 	elseif (cmd == "play") then
 		Cinematics:Play(args)
 	end

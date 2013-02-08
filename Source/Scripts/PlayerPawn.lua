@@ -53,16 +53,7 @@ function PlayerPawn.Spawn(self)
 	self:SetClassBits(kEntityClass_Player)
 	self:SetOccupantType(kOccupantType_BBox)
 	
-	if (self.keys.start_waypoint) then
-		local waypoints = World.WaypointsForUserId(self.keys.start_waypoint)
-		if (waypoints == nil) then
-			error("PlayerPawn: unable to find starting waypoint named "..self.keys.start_waypoint)
-		end
-		
-		local floorPosition = World.WaypointFloorPosition(waypoints[1])
-		self.floorPositionInit = true
-		self:SetFloorPosition(floorPosition) -- for moves, also sets origin
-	end
+	self:SpawnFloorPosition()
 	
 	World.playerPawn = self
 	World.SetPlayerPawn(self)
@@ -92,12 +83,11 @@ function PlayerPawn.TickPhysics(self)
 	end
 end
 
-function PlayerPawn.MoveToWaypoint(self, waypointNum)
-	if (not self.floorPositionInit) then
+function PlayerPawn.MoveToFloorPosition(self, targetFloorPos)
+	if (not self.validFloorPosition) then
 		return false
 	end
 	
-	local targetFloorPos = World.WaypointFloorPosition(waypointNum)
 	local moveCommand = World.CreateFloorMove(self:FloorPosition(), targetFloorPos)
 	if (moveCommand == nil) then
 		return false

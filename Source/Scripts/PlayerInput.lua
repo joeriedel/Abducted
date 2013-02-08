@@ -31,7 +31,7 @@ function PlayerInput.OnInputEvent(self, e)
 			World.playerPawn:Stop()
 			action = true
 		else
-			action = self:TapWaypoint(e.original.data[1], e.original.data[2])
+			action = self:TapMove(e.original.data[1], e.original.data[2])
 		end
 	elseif (self.touch ~= e.touch) then
 		return false, false
@@ -55,6 +55,29 @@ function PlayerInput.OnInputGesture(self, g)
 	return false
 end
 
+function PlayerInput.TapMove(self, x, y)
+
+	if (self:TapFloor(x, y)) then
+		return true
+	end
+
+	return self:TapWaypoint(x, y)
+end
+
+function PlayerInput.TapFloor(self, x, y)
+	local a = World.Unproject({x, y, 0})
+	local b = World.Unproject({x, y, 1})
+	local targetFloorPos = World.ClipToFloor(a, b)
+	if (targetFloorPos) then
+		if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+			return true
+		end
+	end
+	
+	return false
+end
+
 function PlayerInput.TapWaypoint(self, x, y)
 	-- PickWaypoint(x, y, radiusOnScreen, dropDistance)
 	-- dropDistance: all points that are within radiusOnScreen are
@@ -65,9 +88,12 @@ function PlayerInput.TapWaypoint(self, x, y)
 	-- ZERO means no points are ever dropped.
 	local waypoint = World.PickWaypoint(x, y,  350, 0)
 	if (waypoint) then
-		if (World.playerPawn:MoveToWaypoint(waypoint)) then
-			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
-			return true
+		local targetFloorPos = World.WaypointFloorPosition(waypoint)
+		if (targetFloorPos) then
+			if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+				self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+				return true
+			end
 		end
 	end
 	

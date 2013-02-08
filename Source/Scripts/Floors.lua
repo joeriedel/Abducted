@@ -36,3 +36,22 @@ function Floors.SetWaypointUserIdState(self, name, _or, _and)
 		end
 	end
 end
+
+function Floors.SetFloorState(self, name, _or, _and)
+
+	local floorNum = World.FindFloor(name)
+	if (floorNum < 0) then
+		return
+	end
+	
+	local state = World.FloorState(floorNum)
+	if (_or ~= nil) then
+		state = bit.bor(state, _or)
+	end
+	if (_and ~= nil) then
+		state = bit.band(state, _and)
+	end
+	
+	World.SetFloorState(floorNum, state)
+
+end

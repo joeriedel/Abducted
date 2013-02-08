@@ -30,7 +30,23 @@ function Entity.EnableFlags(self, flags, enable)
 	self:SetFlags(curFlags)
 end
 
-function Entity.GetSpawnFloorPosition(self)
+function Entity.SpawnFloorPosition(self)
+	local fp = self:LoadFloorPosition()
+	if (fp) then
+		self.validFloorPosition = true
+		self:SetFloorPosition(fp)
+	end
+end
+
+function Entity.LoadFloorPosition(self)
+
+	if (self.keys.waypoint) then
+		local waypoints = World.WaypointsForUserId(self.keys.start_waypoint)
+		if (waypoints == nil) then
+			error("'"..self.keys.classname.."' unable to find starting waypoint named "..self.keys.waypoint)
+		end
+		return World.WaypointFloorPosition(waypoints[1])
+	end
 
 	if (self.keys.floorNum == nil) then
 		return nil
@@ -38,7 +54,7 @@ function Entity.GetSpawnFloorPosition(self)
 	
 	local pos = Vec3ForString(self.keys.origin)
 	local floorNum = NumberForString(self.keys.floorNum)
-	local triNum = NumberForString(self.keys.floorTriNum)
+	local triNum = NumberForString(self.keys.floorTri)
 	
 	return World.CreateFloorPosition(pos, floorNum, triNum)
 

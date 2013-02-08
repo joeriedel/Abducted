@@ -41,6 +41,16 @@ kOccupantType_Volume = 2
 -- ClassBits
 kEntityClassBits_Any = 0
 
+-- BSP contents
+
+kContentsFlag_Areaportal = 1
+kContentsFlag_Solid = 2
+kContentsFlag_Clip = 4
+kContentsFlag_Fog = 8
+kContentsFlag_Water = 16
+kContentsFlag_Detail = 32
+kContentsFlag_Floor = 64
+
 -- Physics Flags
 kPhysicsFlag_OnGround = 1
 kPhysicsFlag_AutoFace = 2
@@ -81,6 +91,10 @@ kAT_Typeface = 7
 -- Waypoints
 
 kWaypointState_Enabled = 1
+
+-- Floors
+
+kFloorState_Enabled = 1
 
 -- Input
 kI_KeyDown = 0

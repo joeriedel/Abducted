@@ -22,11 +22,11 @@ function PlayerPawn.Spawn(self)
 	self.model.dm:SetScale({0.4, 0.4, 0.4}) -- temp art
 	self.model.dm:SetMotionScale(2.5) -- temp art
 --	self.model.dm:SetAngles({0, -90, 180})
---	self.model.dm:SetPos({0, 0, 60})
+	self.model.dm:SetPos({0, 0, -48}) -- on floor
 	self:SetMins({-24, -24, -48})
 	self:SetMaxs({ 24,  24,  48})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self:SetCameraShift({0, 0, 50}) -- camera looks here
+--	self:SetCameraShift({0, 0, 50}) -- camera looks here
 	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.

@@ -28,6 +28,9 @@
     <filename>Source\Scripts\ArmEventDB.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Bugs.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\CVars.lua</filename>
   </file>
   <file>

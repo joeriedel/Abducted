@@ -31,7 +31,8 @@ enum
 class GSAbductedLoadMap : public GSLoadMap {
 public:
 	GSAbductedLoadMap(int mapId, int slot, bool play, bool loadScreen) : 
-	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true) {
+	  GSLoadMap(mapId, slot, play, loadScreen), m_elapsed(0.f), m_time(0.f), m_first(true),
+	  m_parser(0), m_loader(0) {
 	}
 
 	virtual void Draw(Game &game, float dt) {
@@ -221,8 +222,8 @@ private:
 	float m_time;
 	bool m_first;
 	pkg::Asset::Ref m_mat;
-	asset::MaterialParser::Ref m_parser;
-	asset::MaterialLoader::Ref m_loader;
+	asset::MaterialParser *m_parser;
+	asset::MaterialLoader *m_loader;
 	r::GLVertexBuffer::Ref m_rectVB;
 	r::GLVertexBuffer::Ref m_rectIB;
 };

@@ -54,6 +54,7 @@ function BugSpawner.Think(self)
 	keys.floorTri = tostring(fp.tri)
 	keys.origin = Vec3ToString(fp.pos)
 	keys.bug_waypoint = self.keys.bug_waypoint
+	keys.group = tostring(math.random() < self.probability)
 	
 	World.TempSpawn(keys)
 	
@@ -131,19 +132,35 @@ info_bug_spawner = BugSpawner
 -----------------------------------------------------------------------------]]
 
 Bug = Entity:New()
+Bug.kMoveSpeed = 250
+Bug.kAccel = 200
+Bug.kFriction = 300
+Bug.kZigZagSize = {25, 55}
+Bug.kZigZagDist = {100, 50} -- (min, min+d)
 
 function Bug.Spawn(self)
 
 	COutLine(kC_Debug, "Bug:Spawn")
 	Entity.Spawn(self)
 	
-	self.model = World.Load("Characters/Bugtestmesh1")
+	if (BoolForString(self.keys.group, false)) then
+		self.model = LoadModel("Characters/Buggroup12")
+	else
+		self.model = LoadModel("Characters/Bugtestmesh1")
+	end
+	
 	self.model.dm = self:AttachDrawModel(self.model)
 	self:SetMins({-24, -24, -24})
 	self:SetMaxs({ 24,  24,  24})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
+		
+	if (self.model.BlendToState) then
+		self.model:BlendToState("crawling")
+	else
+		self.model.dm:SetAngles({0,0,180})
+	end
 	
-	self:SetSnapTurnAngles({360, 360, 60})
+	self:SetSnapTurnAngles({360, 360, 50})
 	
 	local angle = NumberForString(self.keys.angle, 0)
 	local angleVertex = self:Angles()
@@ -160,8 +177,164 @@ function Bug.Spawn(self)
 	
 	self:SetClassBits(kEntityClass_Monster)
 	self:SetOccupantType(kOccupantType_BBox)
+	self:EnableFlags(kPhysicsFlag_Friction, true)
+	self:SetMoveType(kMoveType_Floor)
 	
-	self:Link()
+	self:SetMaxGroundSpeed(Bug.kMoveSpeed)
+	self:SetAccel({Bug.kAccel, 0, 0}) -- <-- How fast the player accelerates (units per second).
+	self:SetGroundFriction(Bug.kFriction)
+	
+	self:SpawnFloorPosition()
+	
+	if (self.keys.bug_waypoint) then
+		self.curWaypoint = 0
+		self.waypoints = World.FindEntityTargets(self.keys.bug_waypoint)
+	end
+	
+	self.think = Bug.Wander
+	self:SetNextThink(0.1)
+	
+end
+
+function Bug.Wander(self)
+
+	self:SelectNode()
+	self.think = nil
+	
+end
+
+function Bug.SelectNode(self)
+
+	if (not self.validFloorPosition) then
+		return
+	end
+	
+	if (self.waypoints == nil) then
+		return
+	end
+	
+	local x = self.curWaypoint
+	while (x == self.curWaypoint) do
+	
+		local size = #self.waypoints
+		if (size < 2) then
+			return -- not cool
+		end
+		
+		x = IntRand(1, size)
+	
+	end
+	
+	self.curWaypoint = x
+	
+	self:ZigZagToTarget(self.waypoints[self.curWaypoint].floorPosition)
+	self:ZigZag()
+	
+end
+
+function Bug.ZigZag(self)
+
+	if (self.curZigZag >= #self.zigZags) then
+		self:SelectNode()
+		return
+	end
+	
+	self.curZigZag = self.curZigZag + 1
+	self:ExecuteMove(self.zigZags[self.curZigZag])
+	
+end
+
+function Bug.ZigZagToTarget(self, targetPos)
+	local pos = self:FloorPosition()
+	local seekVec = VecSub(targetPos.pos, pos.pos)
+	local seekDist = nil
+	
+	local vecScale = VecScale
+	local vecAdd = VecAdd
+	local rand = FloatRand
+	local min = Min
+	local zigZagDist = Bug.kZigZagDist
+	local zigZagSize = Bug.kZigZagSize
+	local clipToFloor = World.ClipToFloor
+	
+	seekVec, seekDist = VecNorm(seekVec)
+	local crossVec = VecCross(seekVec, kZAxis)
+	
+	self.zigZags = {}
+	
+	local minDist = zigZagDist[1] * 1.5
+	local ofs = 0
+	local flip = nil
+	
+	while (seekDist > minDist) do
+		local maxDist = Min(zigZagDist[2], seekDist-zigZagDist[1])
+		local d = rand(0, maxDist) + zigZagDist[1]
+		local zag = rand(zigZagSize[1], zigZagSize[2])
+		
+		if (flip == nil) then
+			flip = math.random() < 0.5
+		end
+		
+		if (flip) then
+			zag = -zag
+			flip = false
+		else
+			flip = true
+		end
+		
+		seekDist = seekDist - d
+				
+		local fwd = vecScale(seekVec, d+ofs)
+		ofs = ofs + d
+		
+		fwd = vecAdd(pos.pos, fwd)
+		zag = vecScale(crossVec, zag)
+		fwd = vecAdd(fwd, zag)
+		
+		local target = clipToFloor(
+			pos.floor,
+			{fwd[1], fwd[2], fwd[3]+512},
+			{fwd[1], fwd[2], fwd[3]-512}
+		)
+		
+		if (target == nil) then
+			-- don't zig zag anymore
+			break
+		end
+		
+		table.insert(self.zigZags, target)
+	end
+	
+	self.curZigZag = 0
+	table.insert(self.zigZags, targetPos)
+end
+
+function Bug.ExecuteMove(self, targetPos)
+	local moveCommand = World.CreateFloorMove(self:FloorPosition(), targetPos)
+	if (moveCommand == nil) then
+		return false
+	end
+	
+	self:SetDesiredMove(moveCommand)
+	self:EnableFlags(kPhysicsFlag_Friction, false)
+	return true
+end
+
+function Bug.OnFloorMoveComplete(self)
+	self:ZigZag()
 end
 
 info_bug = Bug
+
+--[[---------------------------------------------------------------------------
+	Bug Waypoint
+-----------------------------------------------------------------------------]]
+
+BugWaypoint = Entity:New()
+
+function BugWaypoint.Spawn(self)
+	Entity.Spawn(self)
+	self.floorPosition = self:SpawnFloorPosition()
+end
+
+info_bug_waypoint = BugWaypoint

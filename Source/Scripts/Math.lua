@@ -256,17 +256,9 @@ end
 		Vectors
 -----------------------------------------------------------------------------]]
 
-function XAxis()
-	return { 1, 0, 0 }
-end
-
-function YAxis()
-	return { 0, 1, 0 }
-end
-
-function ZAxis()
-	return { 0, 0, 1 }
-end
+kXAxis = { 1, 0, 0 }
+kYAxis = { 0, 1, 0 }
+kZAxis = { 0, 0, 1 }
 
 function VecInit(x, y, z)
 	return { x, y, z }
@@ -274,6 +266,10 @@ end
 
 function VecZero()
 	return { 0, 0, 0 }
+end
+
+function VecCopy(v)
+	return {v[1], v[2], v[3]}
 end
 
 function VecEq(x, y, ep)

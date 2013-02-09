@@ -132,11 +132,11 @@ info_bug_spawner = BugSpawner
 -----------------------------------------------------------------------------]]
 
 Bug = Entity:New()
-Bug.kMoveSpeed = 250
-Bug.kAccel = 200
+Bug.kMoveSpeed = 70
+Bug.kAccel = 50
 Bug.kFriction = 300
-Bug.kZigZagSize = {25, 55}
-Bug.kZigZagDist = {100, 50} -- (min, min+d)
+Bug.kZigZagSize = {0, 10}
+Bug.kZigZagDist = {50, 100} -- (min, min+d)
 
 function Bug.Spawn(self)
 

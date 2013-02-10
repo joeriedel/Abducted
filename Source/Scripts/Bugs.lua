@@ -228,19 +228,6 @@ function Bug.SelectNode(self)
 	self.curWaypoint = x
 	
 	self:ZigZagToTarget(self.waypoints[self.curWaypoint].floorPosition)
-	self:ZigZag()
-	
-end
-
-function Bug.ZigZag(self)
-
-	if (self.curZigZag >= #self.zigZags) then
-		self:SelectNode()
-		return
-	end
-	
-	self.curZigZag = self.curZigZag + 1
-	self:ExecuteMove(self.zigZags[self.curZigZag])
 	
 end
 
@@ -260,7 +247,7 @@ function Bug.ZigZagToTarget(self, targetPos)
 	seekVec, seekDist = VecNorm(seekVec)
 	local crossVec = VecCross(seekVec, kZAxis)
 	
-	self.zigZags = {}
+	local zigZags = { pos }
 	
 	local minDist = zigZagDist[1] * 1.5
 	local ofs = 0
@@ -302,15 +289,22 @@ function Bug.ZigZagToTarget(self, targetPos)
 			break
 		end
 		
-		table.insert(self.zigZags, target)
+		table.insert(zigZags, target)
 	end
 	
-	self.curZigZag = 0
-	table.insert(self.zigZags, targetPos)
+	table.insert(zigZags, targetPos)
+	self:ExecuteMove(zigZags)
 end
 
 function Bug.ExecuteMove(self, targetPos)
-	local moveCommand = World.CreateFloorMove(self:FloorPosition(), targetPos)
+	local moveCommand
+	
+	if (type(targetPos) == "table") then
+		moveCommand = World.CreateFloorMoveSeq(targetPos)
+	else
+		moveCommand = World.CreateFloorMove(self:FloorPosition(), targetPos)
+	end
+	
 	if (moveCommand == nil) then
 		return false
 	end
@@ -321,7 +315,7 @@ function Bug.ExecuteMove(self, targetPos)
 end
 
 function Bug.OnFloorMoveComplete(self)
-	self:ZigZag()
+	self:SelectNode()
 end
 
 info_bug = Bug

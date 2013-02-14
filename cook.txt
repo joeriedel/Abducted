@@ -1,7 +1,10 @@
 // Ep1 levels
 
+Ep1/ep1_falling
 Ep1/ep1_crushed
+Ep1/ep1_eaten
 Ep1/testroom1_manipulate
+Ep1/testroom2_bugtest
 
 
 // Shared

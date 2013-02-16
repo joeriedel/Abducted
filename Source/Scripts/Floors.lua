@@ -39,9 +39,12 @@ end
 
 function Floors.SetFloorState(self, name, _or, _and)
 
-	local floorNum = World.FindFloor(name)
-	if (floorNum < 0) then
-		return
+	local floorNum = name
+	if (type(name) == "string") then
+		floorNum = World.FindFloor(name)
+		if (floorNum < 0) then
+			return
+		end
 	end
 	
 	local state = World.FloorState(floorNum)

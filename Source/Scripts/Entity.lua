@@ -43,7 +43,7 @@ end
 function Entity.LoadFloorPosition(self)
 
 	if (self.keys.waypoint) then
-		local waypoints = World.WaypointsForUserId(self.keys.start_waypoint)
+		local waypoints = World.WaypointsForUserId(self.keys.waypoint)
 		if (waypoints == nil) then
 			error("'"..self.keys.classname.."' unable to find starting waypoint named "..self.keys.waypoint)
 		end

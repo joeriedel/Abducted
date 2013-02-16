@@ -55,6 +55,11 @@ function PlayerPawn.Spawn(self)
 	
 	self:SpawnFloorPosition()
 	
+	if (self.validFloorPosition and (self.keys.floorNum)) then
+	-- enable our starting floor by default
+		Floors:SetFloorState(NumberForString(self.keys.floorNum), kFloorState_Enabled, nil)
+	end
+	
 	World.playerPawn = self
 	World.SetPlayerPawn(self)
 	

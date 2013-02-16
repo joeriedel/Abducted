@@ -57,21 +57,52 @@ end
 
 function PlayerInput.TapMove(self, x, y)
 
-	if (self:TapFloor(x, y)) then
-		return true
-	end
-
-	return self:TapWaypoint(x, y)
-end
-
-function PlayerInput.TapFloor(self, x, y)
 	local a = World.Unproject({x, y, 0})
 	local b = World.Unproject({x, y, 1})
+	
+	local trace = {
+		start = a,
+		_end = b,
+		contents = bit.bor(kContentsFlag_Solid, kContentsFlag_Clip)
+	}
+	
+	trace = World.LineTrace(trace)
+		
+	local dist = nil
+	if (trace and not (trace.startSolid)) then
+		dist = VecMag(VecSub(trace.traceEnd, World.CameraPos()))
+	end
+
+	if (self:TapFloor(a, b, dist)) then
+		return true
+	end
+	
+	if (trace) then
+		-- see if we can cast downward and hit a floor
+		a = VecAdd(trace.traceEnd, VecScale(trace.normal, 32))
+		b = VecAdd(a, {0, 0, -512})
+		
+		local targetFloorPos = World.ClipToFloor(a, b)
+		if (targetFloorPos) then
+			if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+				self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+				return true
+			end
+		end
+	end
+
+	return self:TapWaypoint(x, y, dist)
+end
+
+function PlayerInput.TapFloor(self, a, b, dist)
 	local targetFloorPos = World.ClipToFloor(a, b)
 	if (targetFloorPos) then
-		if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
-			self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
-			return true
+		local dd = VecMag(VecSub(targetFloorPos.pos, World.CameraPos()))
+		if ((dist == nil) or (dd < dist)) then
+			if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+				self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+				return true
+			end
 		end
 	end
 	
@@ -86,7 +117,7 @@ function PlayerInput.TapWaypoint(self, x, y)
 	-- closest candidate waypoint are removed from consideration.
 	--
 	-- ZERO means no points are ever dropped.
-	local waypoint = World.PickWaypoint(x, y,  350, 0)
+	local waypoint = World.PickWaypoint(x, y,  350, 0) -- NOTE: does per-waypoint waypoint->camera line trace
 	if (waypoint) then
 		local targetFloorPos = World.WaypointFloorPosition(waypoint)
 		if (targetFloorPos) then

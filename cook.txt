@@ -75,7 +75,7 @@ UI/terminal_hack_pressed_M
 UI/terminal_solve_M
 UI/terminal_solve_pressed_M
 UI/manipulate_button_M
-UI/manipulate_button_disabled_M
+UI/manipulate_button_charging_M
 UI/manipulate_button_flashing_M
 UI/pulse_button_M
 UI/pulse_button_pressed_M
@@ -88,6 +88,8 @@ UI/arm_button_M
 UI/arm_button_pressed_M
 UI/arm_button_signaled_M
 UI/arm_screen1_M
+
+UI/ability_recharge_shimmer_M
 
 // Sounds
 Audio/armbutton

@@ -115,9 +115,9 @@ function HUD.Layout(self)
 	local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
 	self.widgets.ManipulateCharging:SetRect(r)
 	self.widgets.ManipulateShimmer:SetRect(r)
-	y = y + r[4] + (62 * UI.identityScale[2])
+	y = y + r[4] + (24 * UI.identityScale[2])
 	r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
-	y = y + r[4] + (62 * UI.identityScale[2])
+	y = y + r[4] + (24 * UI.identityScale[2])
 	r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
 end
 

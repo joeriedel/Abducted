@@ -73,6 +73,22 @@ function UI.Spawn(self)
 		1 / UI.identityScale[2]
 	}
 	
+	if (System.Platform() == kPlatIPhone) then
+		-- make the text larger on the phones
+		UI.fontScale = {1, 1}
+		UI.invFontScale = {1, 1}
+	else
+		UI.fontScale = {
+			UI.identityScale[1],
+			UI.identityScale[2]
+		}
+		
+		UI.invFontScale = {
+			UI.invIdentityScale[1],
+			UI.invIdentityScale[2]
+		}
+	end
+	
 	UI.gestureMode = false
 	
 	UI.gfx = {}
@@ -626,7 +642,7 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 		lines = string.split(lines, "\n")
 	end
 	
-	lineSpace = lineSpace * UI.identityScale[2]
+	lineSpace = lineSpace * UI.fontScale[2]
 	
 	local r = label:Rect()
 	local font = label:Typeface()
@@ -656,8 +672,8 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 					x = x,
 					y = size,
 					text = v,
-					scaleX = UI.identityScale[1],
-					scaleY = UI.identityScale[2]
+					scaleX = UI.fontScale[1],
+					scaleY = UI.fontScale[2]
 				}
 				
 				lasyY = size
@@ -697,7 +713,7 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 		lines = string.split(lines, "\n")
 	end
 	
-	lineSpace = lineSpace * UI.identityScale[2]
+	lineSpace = lineSpace * UI.fontScale[2]
 	
 	local r = label:Rect()
 	local font = label:Typeface()
@@ -727,8 +743,8 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 					x = x,
 					y = size,
 					text = v,
-					scaleX = UI.identityScale[1],
-					scaleY = UI.identityScale[2]
+					scaleX = UI.fontScale[1],
+					scaleY = UI.fontScale[2]
 				}
 				
 				lastY = size
@@ -772,8 +788,8 @@ function UI.SetLabelText(self, label, text)
 		x = 0,
 		y = 0,
 		text = text,
-		scaleX = UI.identityScale[1],
-		scaleY = UI.identityScale[2]
+		scaleX = UI.fontScale[1],
+		scaleY = UI.fontScale[2]
 	}
 	
 	label:SetText({string})
@@ -783,23 +799,23 @@ end
 function UI.StringDimensions(self, font, text)
 
 	local w,h = font:StringDimensions(text)
-	w = w * UI.identityScale[1]
-	h = h * UI.identityScale[2]
+	w = w * UI.fontScale[1]
+	h = h * UI.fontScale[2]
 	return w,h
 end
 
 function UI.FontAdvanceSize(self, font)
 	local a,d = font:AscenderDescender()
-	return a*UI.identityScale[2]
+	return a*UI.fontScale[2]
 end
 
 function UI.SplitStringAtSize(self, font, text, width)
-	width = width * UI.invIdentityScale[1]
+	width = width * UI.invFontScale[1]
 	return font:SplitStringAtSize(text, width)
 end
 
 function UI.WordWrap(self, font, text, width)
-	width = width * UI.invIdentityScale[1]
+	width = width * UI.invFontScale[1]
 	return font:WordWrap(text, width)
 end
 

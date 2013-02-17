@@ -8,11 +8,7 @@ HUD = Class:New()
 function HUD.Spawn(self)
 	
 	HUD:Load()
-	if (UI.wideScreen) then
-		HUD:LayoutWide()
-	else
-		HUD:Layout4x3()
-	end
+	HUD:Layout()
 	
 	World.globalTimers:Add(
 		function () HUD:Think() end,
@@ -31,9 +27,10 @@ function HUD.Load(self)
 	self.gfx = {
 		Arm = "UI/arm_button_M",
 		ArmPressed = "UI/arm_button_pressed_M",
---		ManipulateDisabled = "UI/manipulate_button_disabled_M",
+		ManipulateDisabled = "UI/manipulate_button_charging_M",
 		ManipulateEnabled = "UI/manipulate_button_M",
 		ManipulateFlashing = "UI/manipulate_button_flashing_M",
+		RechargeShimmer = "UI/ability_recharge_shimmer_M",
 		Pulse = "UI/pulse_button_M",
 		PulsePressed = "UI/pulse_button_pressed_M",
 		Shield = "UI/shield_button_M",
@@ -55,13 +52,23 @@ function HUD.Load(self)
 		UI:MaterialSize(self.gfx.ManipulateEnabled, {0, 0}),
 		{ -- we go to disabled state when manipulate gets activated
 			pressed = self.gfx.ManipulateEnabled, 
-			enabled = self.gfx.ManipulateEnabled
+			enabled = self.gfx.ManipulateEnabled,
+			disabled = self.gfx.ManipulateDisabled
 		},
 		nil,
 		{pressed=function (widget) HUD:ManipulatePressed(widget) end},
 		nil,
 		self.widgets.Root
 	)
+	
+	self.widgets.ManipulateCharging = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.ManipulateEnabled})
+	self.widgets.Root:AddChild(self.widgets.ManipulateCharging)
+	self.widgets.ManipulateCharging:SetDrawMode(kMaterialWidgetDrawMode_Circle)
+	self.widgets.ManipulateCharging:SetVisible(false)
+	
+	self.widgets.ManipulateShimmer = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.RechargeShimmer})
+	self.widgets.Root:AddChild(self.widgets.ManipulateShimmer)
+	self.widgets.ManipulateShimmer:SetVisible(false)
 	
 	self.widgets.Manipulate.flashing = false
 --	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
@@ -103,14 +110,15 @@ function HUD.PulsePressed(self, widget)
 	COutLine(kC_Debug, "Pulse Pressed!")
 end
 
-function HUD.Layout4x3(self)
-	self:LayoutWide()
-end
-
-function HUD.LayoutWide(self)
-	UI:MoveWidget(self.widgets.Manipulate, 1133, 42)
-	UI:MoveWidget(self.widgets.Shield, 1133, 187)
-	UI:MoveWidget(self.widgets.Pulse, 1133, 331)
+function HUD.Layout(self)
+	local y = 42
+	local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
+	self.widgets.ManipulateCharging:SetRect(r)
+	self.widgets.ManipulateShimmer:SetRect(r)
+	y = y + r[4] + (62 * UI.identityScale[2])
+	r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+	y = y + r[4] + (62 * UI.identityScale[2])
+	r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
 end
 
 function HUD.Think(self)
@@ -128,8 +136,39 @@ function HUD.UpdateManipulateButton(self)
 		else
 			gfx.pressed = self.gfx.ManipulateEnabled
 			gfx.enabled = self.gfx.ManipulateEnabled
+			gfx.disabled = self.gfx.ManipulateDisabled
 		end
 		
 		self.widgets.Manipulate.class:ChangeGfx(self.widgets.Manipulate, gfx)
 	end
+end
+
+function HUD.RechargeManipulate(self)
+	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	self.widgets.ManipulateCharging:SetVisible(true)
+	
+	local rechargeTime = PlayerSkills:ManipulateRechargeTime()
+	
+	self.widgets.ManipulateCharging:FillCircleTo(0, 0)
+	self.widgets.ManipulateCharging:FillCircleTo(1, rechargeTime)
+	
+	local f = function ()
+		self.widgets.ManipulateCharging:SetVisible(false)
+		self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, true)
+		HUD:Shimmer(self.widgets.ManipulateShimmer)
+	end
+	
+	World.gameTimers:Add(f, rechargeTime, true)
+end
+
+function HUD.Shimmer(self, widget)
+	widget:SetVisible(true)
+	widget:BlendTo({0,0,0,0}, 0)
+	widget:BlendTo({1,1,1,1}, 0.2)
+	
+	local f = function()
+		widget:BlendTo({0,0,0,0}, 0.2)
+	end
+	
+	World.gameTimers:Add(f, 0.2, true)
 end

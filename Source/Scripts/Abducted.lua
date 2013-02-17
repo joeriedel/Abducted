@@ -88,6 +88,7 @@ function Abducted.OnInputGesture(self, g)
 		if (g.id == kIG_Line) then
 			if (ManipulatableObject.ManipulateGesture(g)) then
 				self:EndManipulate()
+				HUD:RechargeManipulate()
 			end
 		end
 		return true
@@ -140,8 +141,16 @@ function Abducted.EndManipulate(self)
 end
 
 function Abducted.Think(self, dt)
-	GameDB:IncrementTime(dt)
 	Game.Think(self, dt)
+	
+	if (self.lastSysTime == nil) then
+		self.lastSysTime = self.sysTime
+	end
+	
+	dt = self.sysTime - self.lastSysTime
+	self.lastSysTime = self.sysTime
+	
+	GameDB:IncrementTime(dt)
 	
 	if (Arm.think) then
 		Arm:think(dt)

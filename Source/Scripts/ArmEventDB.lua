@@ -65,7 +65,7 @@ function Arm.LoadLog(self)
 	local y = 0
 	local advance = UI:FontAdvanceSize(self.typefaces.Chat)
 	local textMargin = UI:StringDimensions(self.typefaces.Chat, "000-00:00:00")
-	textMargin = textMargin + (Arm.EventDBTextSpace[1] + UI.identityScale[1])
+	textMargin = textMargin + (Arm.EventDBTextSpace[1] + UI.fontScale[1])
 	local marginSpace = self.eventDBWorkspaceSize[3] - textMargin
 	
 	local kEventLogArm = StringTable.Get("EVENT_LOG_ARM")
@@ -111,8 +111,8 @@ function Arm.LoadLog(self)
 			x = 0,
 			y = 0,
 			text = time,
-			scaleX = UI.identityScale[1],
-			scaleY = UI.identityScale[2]
+			scaleX = UI.fontScale[1],
+			scaleY = UI.fontScale[2]
 		}
 		
 		text = UI:WordWrap(typeface, text, marginSpace)
@@ -125,8 +125,8 @@ function Arm.LoadLog(self)
 				x = textMargin,
 				y = yOfs,
 				text = v,
-				scaleX = UI.identityScale[1],
-				scaleY = UI.identityScale[2]
+				scaleX = UI.fontScale[1],
+				scaleY = UI.fontScale[2]
 			}
 			
 			yOfs = yOfs + advance
@@ -141,7 +141,7 @@ function Arm.LoadLog(self)
 		w:SetText(modelStrings)
 		w:Unmap() -- mark for gc
 		
-		y = y + yOfs + (Arm.EventDBTextSpace[2] * UI.identityScale[2])
+		y = y + yOfs + (Arm.EventDBTextSpace[2] * UI.fontScale[2])
 	end
 	
 	self.widgets.db.EventLog:RecalcLayout()

@@ -42,7 +42,6 @@ kOccupantType_Volume = 2
 kEntityClassBits_Any = 0
 
 -- BSP contents
-
 kContentsFlag_Areaportal = 1
 kContentsFlag_Solid = 2
 kContentsFlag_Fog = 4
@@ -139,6 +138,10 @@ kCinematicFlag_Loop = 4
 -- Material Timing Modes
 kMaterialTimingMode_Absolute = 0
 kMaterialTimingMode_TM_Relative = 1
+
+-- Material Widget Draw Modes
+kMaterialWidgetDrawMode_Rect = 0
+kMaterialWidgetDrawMode_Circle = 1
 
 -- String table languages
 kLangId_EN = 0

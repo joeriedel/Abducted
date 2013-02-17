@@ -261,8 +261,8 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 					x = 0,
 					y = textY,
 					text = a,
-					scaleX = UI.identityScale[1],
-					scaleY = UI.identityScale[2]
+					scaleX = UI.fontScale[1],
+					scaleY = UI.fontScale[2]
 				}
 				
 				table.insert(modelStrings, string)
@@ -283,8 +283,8 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 						x = 0,
 						y = textY,
 						text = v,
-						scaleX = UI.identityScale[1],
-						scaleY = UI.identityScale[2]
+						scaleX = UI.fontScale[1],
+						scaleY = UI.fontScale[2]
 					}
 					
 					table.insert(modelStrings, string)

@@ -123,8 +123,8 @@ function Markup.EmitStrings(widgets, strings, typeface)
 			x = v.rect[1],
 			y = v.rect[2],
 			text = v.text,
-			scaleX = UI.identityScale[1],
-			scaleY = UI.identityScale[2]
+			scaleX = UI.fontScale[1],
+			scaleY = UI.fontScale[2]
 		}
 		
 		table.insert(widgetStrings, string)

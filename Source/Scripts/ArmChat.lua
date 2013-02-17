@@ -310,7 +310,8 @@ function Arm.DisplayChatLockout(self)
 		
 	local f = function()
 		Abducted.entity.eatInput = false
-		self:ShowSymbol(true, 0.1)
+		Arm:ShowSymbol(true, 0.1)
+		Arm:ClearChat()
 	end
 	
 	Abducted.entity.eatInput = true

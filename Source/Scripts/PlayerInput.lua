@@ -20,6 +20,10 @@ function PlayerInput.OnInputEvent(self, e)
 		return false, false
 	end
 	
+	if (World.playerPawn.dead) then
+		return false, false
+	end
+	
 	local action = false
 	
 	e = UI:MapInputEvent(e)
@@ -27,11 +31,15 @@ function PlayerInput.OnInputEvent(self, e)
 	if (Input.IsTouchBegin(e) and (self.touch == nil)) then
 		self.touch = e.touch
 		UI:ShowFinger(true, 0.25)
-		if (World.playerPawn:CheckTappedOn(e.original)) then
-			World.playerPawn:Stop()
-			action = true
+		if (Game.entity.pulse) then
+			action = self:TapPulse(e.original.data[1], e.original.data[2])
 		else
-			action = self:TapMove(e.original.data[1], e.original.data[2])
+			if (World.playerPawn:CheckTappedOn(e.original)) then
+				World.playerPawn:Stop()
+				action = true
+			else
+				action = self:TapMove(e.original.data[1], e.original.data[2])
+			end
 		end
 	elseif (self.touch ~= e.touch) then
 		return false, false
@@ -53,6 +61,24 @@ function PlayerInput.OnInputGesture(self, g)
 	end
 	
 	return false
+end
+
+function PlayerInput.TapPulse(self, x, y)
+
+	local a = World.Unproject({x, y, 0})
+	local b = World.Unproject({x, y, 1})
+	
+	local trace = {
+		start = a,
+		_end = b,
+		contents = bit.bor(kContentsFlag_Solid, kContentsFlag_Clip)
+	}
+	
+	trace = World.LineTrace(trace)
+	if (trace and not (trace.startSolid)) then
+		Game.entity:FirePulse(trace.traceEnd)
+	end
+	
 end
 
 function PlayerInput.TapMove(self, x, y)

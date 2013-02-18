@@ -153,6 +153,15 @@ function CapsuleDistance(p, line)
 
 end
 
+function WorldToLocal(worldPos, worldOrigin, worldAngles)
+
+	local localPos = VecSub(worldPos, worldOrigin)
+	local q = QuatFromAngles(worldAngles)
+	q = QuatInverse(q)
+	return QuatRotateVec(q, localPos)
+	
+end
+
 function QuatFrameFromAngles(angles)
 	local f = QuatFromAxis
 	local qx = f({1,0,0}, angles[1])

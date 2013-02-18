@@ -140,6 +140,53 @@ function Abducted.EndManipulate(self)
 	self.setGameSpeedTimer:Clean()
 end
 
+function Abducted.BeginPulse(self)
+	if (self.pulse) then
+		self:EndPulse()
+		return
+	end
+	
+	self.pulse = true
+	World.playerPawn:BeginPulse(self)
+	
+	local f = function()
+		self:DischargePulse()
+	end
+	
+	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.PulseExplodeTime[1], PlayerSkills.PulseExplodeTime[2]), true)
+	
+end
+
+function Abducted.EndPulse(self)
+	if (self.pulseTimer) then
+		self.pulseTimer:Clean()
+		self.pulseTimer = nil
+	end
+	
+	World.playerPawn:EndPulse()
+	self.pulse = false
+end
+
+function Abducted.DischargePulse(self)
+	World.playerPawn:DischargePulse()
+	self.pulse = false
+end
+
+function Abducted.FirePulse(self, target)
+	if (self.pulseTimer) then
+		self.pulseTimer:Clean()
+		self.pulseTimer = nil
+	end
+	
+	World.playerPawn:FirePulse(target)
+	
+	self.pulse = false
+end
+
+function Abducted.PlayerDied(self)
+	HUD:PlayerDied()
+end
+
 function Abducted.Think(self, dt)
 	Game.Think(self, dt)
 	

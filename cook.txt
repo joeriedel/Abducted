@@ -13,6 +13,9 @@ Characters/TentacleMedium1
 Characters/tentacleskin1_M_manipulate
 Characters/tentaclewings1_M_manipulate
 FX/shield1mesh
+FX/pulsecone1mesh
+FX/pulsebeam1mesh
+FX/pulseimpact1mesh
 Shared/terminal1
 UI/Solid_M
 UI/loading_icon_M

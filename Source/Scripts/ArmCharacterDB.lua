@@ -41,12 +41,12 @@ function Arm.SpawnCharacterDB(self)
 	-----------------------------------------------------------------------------]]
 
 	local y = 0
-	local advance = UI:FontAdvanceSize(UI.typefaces.StandardButtonDark)
+	local advance = UI:FontAdvanceSize(UI.typefaces.StandardButtonDark, UI.identityScale)
 
 	local w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_NAME"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_NAME"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -54,14 +54,14 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, GameDB.playerName)
+	UI:SetLabelText(w, GameDB.playerName, UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_SPECIES"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_SPECIES"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -69,14 +69,14 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_HUMAN"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_HUMAN"), UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GENDER"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GENDER"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -84,14 +84,14 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_FEMALE"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_FEMALE"), UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_AGE"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_AGE"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -99,14 +99,14 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_UNKNOWN"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_UNKNOWN"), UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_BIRTHPLACE"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_BIRTHPLACE"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -114,7 +114,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_UNKNOWN"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_UNKNOWN"), UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
@@ -152,7 +152,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_HEALTH_STATUS"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_HEALTH_STATUS"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -160,7 +160,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GOOD"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GOOD"), UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
@@ -231,7 +231,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_TIME_PLAYED"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_TIME_PLAYED"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -239,14 +239,14 @@ function Arm.SpawnCharacterDB(self)
 	self.widgets.db.TimePlayed = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(self.widgets.db.TimePlayed)
 	self.widgets.db.TimePlayed:SetBlendWithParent(true)
-	UI:SetLabelText(self.widgets.db.TimePlayed, "000-00-00-00")
+	UI:SetLabelText(self.widgets.db.TimePlayed, "000-00-00-00", UI.identityScale)
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_DISCOVERIES"))
+	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_DISCOVERIES"), UI.identityScale)
 	r = UI:SizeLabelToContents(w)
 	
 	r[1] = r[1] + r[3] + (Arm.CharDBTextSpace[1] * UI.identityScale[1])
@@ -254,7 +254,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, tostring(GameDB.numDiscoveries))
+	UI:SetLabelText(w, tostring(GameDB.numDiscoveries), UI.identityScale)
 	
 end
 
@@ -318,7 +318,7 @@ function Arm.DBAnimateTimePlayed(self, animate)
 	
 	local f = function()
 		local s = GameDB:TimePlayedString()
-		UI:SetLabelText(self.widgets.db.TimePlayed, s)
+		UI:SetLabelText(self.widgets.db.TimePlayed, s, UI.identityScale)
 	end
 
 	self.dbTimePlayedTimer = World.globalTimers:Add(f, 0)

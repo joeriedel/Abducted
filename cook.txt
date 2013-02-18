@@ -12,6 +12,7 @@ Characters/HumanFemale
 Characters/TentacleMedium1
 Characters/tentacleskin1_M_manipulate
 Characters/tentaclewings1_M_manipulate
+FX/shield1mesh
 Shared/terminal1
 UI/Solid_M
 UI/loading_icon_M

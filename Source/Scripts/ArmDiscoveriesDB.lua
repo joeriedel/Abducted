@@ -169,14 +169,12 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 		self.widgets.db.Discoveries:AddItem(w)
 		
 		local sw,sh = UI:StringDimensions(state.titleTypeface, title)
-		local lastY
 		
 		if (sw > self.discoveriesDBArea[3]) then
-			rect, lastY = UI:LineWrapLJustifyText(w.label, self.discoveriesDBArea[3], true, state.advance, title)
+			rect = UI:LineWrapLJustifyText(w.label, self.discoveriesDBArea[3], true, 0, title)
 		else
 			UI:SetLabelText(w.label, title)
 			rect = UI:SizeLabelToContents(w.label)
-			lastY = 0
 		end
 		
 		-- expand the button around the label
@@ -194,20 +192,18 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 		w.label:SetRect(rect)
 		
 		-- put an underline under the title
-		underlineY = y + state.y + lastY + rect[2] + state.titleUnderline
-		
+		underlineY = y + rect[2] + rect[4]-- + state.titleUnderline
 		section.button = w
 	else
 		-- just make a plain text label
-		local lastY
 		w = UI:CreateWidget("TextLabel", {rect=rect, typeface=state.titleTypeface})
-		rect, lastY = UI:LineWrapLJustifyText(w, self.discoveriesDBArea[3], true, state.advance, title)
+		rect = UI:LineWrapLJustifyText(w, self.discoveriesDBArea[3], true, 0, title)
 		self.widgets.db.Discoveries:AddItem(w)
 		w:SetBlendWithParent(true)
 		w:Unmap() -- mark gc
 			
 		-- put an underline under the title
-		underlineY = y + state.y + lastY + state.titleUnderline
+		underlineY = y + rect[4]-- + state.titleUnderline
 		
 	end
 	
@@ -217,7 +213,7 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 	
 	-- put in the picture
 	
-	y = y + state.titleAdvance + state.titleSpace
+	y = underlineY + state.titleSpace
 	
 	rect = {
 		self.discoveriesDBArea[3] - (4*UI.identityScale[1]) - discovery.pictureSize[3],
@@ -308,14 +304,14 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 	self.widgets.db.Discoveries:AddItem(w)
 	w:Unmap() -- mark gc
 	
-	state.y = state.y + y + textY + state.discoverySpace
-	
 	-- underline last
 	
-	w = UI:CreateWidget("MatWidget", {rect={0,underlineY, underlineWidth, 7}, material=self.gfx.LineBorder4})
+	w = UI:CreateWidget("MatWidget", {rect={0,underlineY+state.y, underlineWidth, 7}, material=self.gfx.LineBorder4})
 	w:SetBlendWithParent(true)
 	self.widgets.db.Discoveries:AddItem(w)
 	w:Unmap() -- mark gc
+	
+	state.y = state.y + y + textY + state.discoverySpace
 	
 end
 
@@ -347,9 +343,9 @@ function Arm.LoadDiscoveries(self)
 		y = 0,
 		titleSpace = 8*UI.identityScale[2],
 		advance = UI:FontAdvanceSize(self.typefaces.Chat),
-		titleAdvance = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (12 * UI.identityScale[2]),
+--		titleAdvance = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (12 * UI.identityScale[2]),
 		titleTypeface = self.typefaces.LogArmAsk,
-		titleUnderline = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (6 * UI.identityScale[2]),
+--		titleUnderline = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (6 * UI.identityScale[2]),
 		typeface = self.typefaces.Chat,
 		sound = self.sfx.Button,
 		discoverySpace = 32 * UI.identityScale[2]

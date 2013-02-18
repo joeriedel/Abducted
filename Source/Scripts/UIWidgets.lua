@@ -33,6 +33,10 @@ UIPushButton = UIWidget:New()
 		manualUnpress
 			-- Call widget.class:Reset(widget) to unpressed widget (not done when user
 			lifts finger)
+		highlight
+			-- button has highlight pressed state
+		label
+			-- button has a label
 	}
 -----------------------------------------------------------------------------]]
 function UIPushButton.Create(self, size, gfx, sfx, events, options, parent)

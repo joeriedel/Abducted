@@ -33,6 +33,10 @@ UIPushButton = UIWidget:New()
 		manualUnpress
 			-- Call widget.class:Reset(widget) to unpressed widget (not done when user
 			lifts finger)
+		highlight
+			-- button has highlight pressed state
+		label
+			-- button has a label
 	}
 -----------------------------------------------------------------------------]]
 function UIPushButton.Create(self, size, gfx, sfx, events, options, parent)
@@ -260,11 +264,10 @@ function UIPushButton.SetGfxState(self, widget, immediate)
 end
 
 function UIPushButton.ChangeGfx(self, widget, gfx)
-	widget.gfx = gfx or {}
+	gfx.disabled = gfx.disabled or gfx.enabled
+	gfx.pressed  = gfx.pressed or gfx.enabled
 	
-	if (gfx.disabled == nil) then
-		gfx.disabled = gfx.enabled
-	end
-	
+	widget.gfx = gfx
+		
 	self:SetGfxState(widget)
 end

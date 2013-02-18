@@ -15,12 +15,11 @@ kC_Error = 3
 kC_ErrMsgBox = 4
 
 -- Platform Types
-kPlatMac = 0
-kPlatWin = 1
-kPlatIPad = 2
-kPlatIPhone = 3
-kPlatXBox360 = 4
-kPlatPS3 = 5
+kPlatPC = 0
+kPlatIPad = 1
+kPlatIPhone = 2
+kPlatXBox360 = 3
+kPlatPS3 = 4
 
 -- MoveTypes
 kMoveType_None = 0

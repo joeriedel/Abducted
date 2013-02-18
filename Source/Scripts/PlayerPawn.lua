@@ -19,14 +19,19 @@ function PlayerPawn.Spawn(self)
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
-	self.model.dm:SetScale({0.4, 0.4, 0.4}) -- temp art
+	self.model.dm:ScaleTo({0.4, 0.4, 0.4}, 0) -- temp art
 	self.model.dm:SetMotionScale(2.5) -- temp art
---	self.model.dm:SetAngles({0, -90, 180})
 	self.model.dm:SetPos({0, 0, -48}) -- on floor
 	self:SetMins({-24, -24, -48})
 	self:SetMaxs({ 24,  24,  48})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
---	self:SetCameraShift({0, 0, 50}) -- camera looks here
+	
+	-- shield mesh
+	self.shield = World.Load("FX/shield1mesh")
+	self.shield.dm = self:AttachDrawModel(self.shield)
+	self.shield.dm:SetPos({0, 0, -48}) -- on floor
+	self.shield.dm:BlendTo({0,0,0,0}, 0)
+	self.shield.dm:ScaleTo({0,0,0}, 0)
 	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.
@@ -131,6 +136,39 @@ end
 function PlayerPawn.EndManipulate(self)
 	self.manipulateDir = nil
 	self.disableAnimTick = false
+end
+
+function PlayerPawn.BeginShield(self)
+
+	self.shieldActive = true
+	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.2)
+	
+	local f = function()
+		self.shield.dm:ScaleTo({1,1,1,1}, 0.1)
+	end
+	
+	World.gameTimers:Add(f, 0.2, true)
+	
+	f = function ()
+		self.shield.dm:BlendTo({1,1,1,1}, 1.5)
+	end
+	
+	World.gameTimers:Add(f, 0.1, true)
+
+end
+
+function PlayerPawn.EndShield(self)
+
+	self.shieldActive = false
+	self.shield.dm:BlendTo({0,0,0,0}, 0.15)
+	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
+	
+	local f = function()
+		self.shield.dm:ScaleTo({0,0,0,0}, 0.2)
+	end
+	
+	World.gameTimers:Add(f, 0.1, true)
+	
 end
 
 function PlayerPawn.Stop(self)

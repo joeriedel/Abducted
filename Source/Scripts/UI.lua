@@ -73,10 +73,24 @@ function UI.Spawn(self)
 		1 / UI.identityScale[2]
 	}
 	
+	local upscaleFonts = false
 	if (System.Platform() == kPlatIPhone) then
+		upscaleFonts = true
+	elseif (DebugUI.Enabled and (System.Platform() == kPlatPC)) then
+	-- iPhone emulation
+		if (((UI.systemScreen.width == 960) and (UI.systemScreen.height == 640)) or
+		    ((UI.systemScreen.width == 1136) and (UI.systemScreen.height == 640))) then
+			upscaleFonts = true
+		end
+	end
+	
+	if (upscaleFonts) then
 		-- make the text larger on the phones
-		UI.fontScale = {1, 1}
-		UI.invFontScale = {1, 1}
+		UI.fontScale = {1.25, 1.25}
+		UI.invFontScale = {
+			1 / UI.fontScale[1], 
+			1 / UI.fontScale[2]
+		}
 	else
 		UI.fontScale = {
 			UI.identityScale[1],
@@ -636,13 +650,25 @@ function UI.MaterialSize(self, material, rect)
 	return rect
 end
 
-function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, lines)
+function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, lines, fontScale, invFontScale)
 
 	if (type(lines) == "string") then
 		lines = string.split(lines, "\n")
 	end
 	
-	lineSpace = lineSpace * UI.fontScale[2]
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
+	
+	if (invFontScale == nil) then
+		invFontScale = UI.invFontScale
+	end
+	
+	if (lineSpace < 0) then
+		lineSpace = -lineSpace -- absolute
+	else
+		lineSpace = lineSpace * fontScale[2]
+	end
 	
 	local r = label:Rect()
 	local font = label:Typeface()
@@ -651,69 +677,77 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 		maxWidth = r[3]
 	end
 	
+	lineSpace = lineSpace + UI:FontAdvanceSize(font, fontScale)
+	
 	local labelStrings = {}
 	local size = 0
 	local widestLine = 0
-	local lastY = 0
 	
 	for k,line  in pairs(lines) do
 	
-		local strings = UI:WordWrap(font, line, maxWidth)
+		local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
 		for k,v in pairs(strings) do
 		
-				if (next(labelStrings) ~= nil) then
-					size = size + lineSpace
-				end
-		
-				local w, h = UI:StringDimensions(font, v)
-				local x = (r[3] - w) / 2
-							
+				local w, h = UI:StringDimensions(font, v, fontScale)
+											
 				local string = {
-					x = x,
+					x = 0,
 					y = size,
 					text = v,
-					scaleX = UI.fontScale[1],
-					scaleY = UI.fontScale[2]
+					scaleX = fontScale[1],
+					scaleY = fontScale[2],
+					w = w
 				}
 				
-				lasyY = size
-				size = size + h
+				size = size + lineSpace
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
 		end
 	end
 	
-	if (autoSize) then
-		r[3] = widestLine
+	if (sizeToFit) then
+		r[3] = maxWidth
 		r[4] = size
 		label:SetRect(r)
 	end
 	
---	local advance = UI:FontAdvanceSize(font)
 	local y = (r[4] - size) / 2
 	
 	for k,v in pairs(labelStrings) do
 		v.y = v.y + y
+		v.x = (r[3] - v.w) / 2
 	end
 	
 	label:SetText(labelStrings)
 	
-	if (not autoSize) then
+	if (not sizeToFit) then
 	-- return the size we would have been had we auto-sized
-		r[3] = widestLine
+		r[3] = maxWidth
 		r[4] = size
 	end
 	
-	return r, lastY
+	return r
 end
 
-function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines)
+function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines, fontScale, invFontScale)
 
 	if (type(lines) == "string") then
 		lines = string.split(lines, "\n")
 	end
 	
-	lineSpace = lineSpace * UI.fontScale[2]
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
+	
+	if (invFontScale == nil) then
+		invFontScale = UI.invFontScale
+	end
+	
+	if (lineSpace < 0) then
+		lineSpace = -lineSpace -- absolute
+	else
+		lineSpace = lineSpace * fontScale[2]
+	end
 	
 	local r = label:Rect()
 	local font = label:Typeface()
@@ -722,100 +756,109 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 		maxWidth = r[3]
 	end
 	
+	lineSpace = lineSpace + UI:FontAdvanceSize(font, fontScale)
+	
 	local labelStrings = {}
 	local size = 0
 	local widestLine = 0
-	local lastY = 0
-	
+		
 	for k,line  in pairs(lines) do
 	
-		local strings = UI:WordWrap(font, line, maxWidth)
+		local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
 		for k,v in pairs(strings) do
-		
-				if (next(labelStrings) ~= nil) then
-					size = size + lineSpace
-				end
-		
-				local w, h = UI:StringDimensions(font, v)
-				local x = 0
-							
+				
+				local w, h = UI:StringDimensions(font, v, fontScale)
+								
 				local string = {
-					x = x,
+					x = 0,
 					y = size,
 					text = v,
-					scaleX = UI.fontScale[1],
-					scaleY = UI.fontScale[2]
+					scaleX = fontScale[1],
+					scaleY = fontScale[2]
 				}
 				
-				lastY = size
-				size = size + h
+				size = size + lineSpace
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
 		end
 	end
 	
-	if (autoSize) then
+	if (sizeToFit) then
 		r[3] = widestLine
 		r[4] = size
 		label:SetRect(r)
 	end
 	
---	local advance = UI:FontAdvanceSize(font)
 	local y = (r[4] - size) / 2
-	
+		
 	for k,v in pairs(labelStrings) do
 		v.y = v.y + y
 	end
 	
 	label:SetText(labelStrings)
 	
-	if (not autoSize) then
+	if (not sizeToFit) then
 	-- return the size we would have been had we auto-sized
 		r[3] = widestLine
 		r[4] = size
 	end
 	
-	return r, lastY
+	return r
 end
 
 --[[---------------------------------------------------------------------------
 	Fonts are unaware of our UI scaling
 -----------------------------------------------------------------------------]]
 
-function UI.SetLabelText(self, label, text)
-
+function UI.SetLabelText(self, label, text, fontScale)
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
+	
 	local string = {
 		x = 0,
 		y = 0,
 		text = text,
-		scaleX = UI.fontScale[1],
-		scaleY = UI.fontScale[2]
+		scaleX = fontScale[1],
+		scaleY = fontScale[2]
 	}
 	
 	label:SetText({string})
 
 end
 
-function UI.StringDimensions(self, font, text)
-
+function UI.StringDimensions(self, font, text, fontScale)
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
+	
 	local w,h = font:StringDimensions(text)
-	w = w * UI.fontScale[1]
-	h = h * UI.fontScale[2]
+	w = w * fontScale[1]
+	h = h * fontScale[2]
 	return w,h
 end
 
-function UI.FontAdvanceSize(self, font)
+function UI.FontAdvanceSize(self, font, fontScale)
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
 	local a,d = font:AscenderDescender()
-	return a*UI.fontScale[2]
+	return a*fontScale[2]
 end
 
-function UI.SplitStringAtSize(self, font, text, width)
-	width = width * UI.invFontScale[1]
+function UI.SplitStringAtSize(self, font, text, width, invFontScale)
+	if (invFontScale == nil) then
+		invFontScale = UI.invFontScale
+	end
+	width = width * invFontScale[1]
 	return font:SplitStringAtSize(text, width)
 end
 
-function UI.WordWrap(self, font, text, width)
-	width = width * UI.invFontScale[1]
+function UI.WordWrap(self, font, text, width, invFontScale)
+	if (invFontScale == nil) then
+		invFontScale = UI.invFontScale
+	end
+	width = width * invFontScale[1]
 	return font:WordWrap(text, width)
 end
 

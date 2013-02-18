@@ -381,10 +381,10 @@ function Tentacle.Spawn(self)
 	
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
-	self.model.dm:SetScale({0.4, 0.4, 0.4})
+	self.model.dm:ScaleTo({0.4, 0.4, 0.4}, 0)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
-	self.model.vision:SetScale({0.4, 0.4, 0.4})
+	self.model.vision:ScaleTo({0.4, 0.4, 0.4}, 0)
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	
 	self:Link() -- kMoveType_None

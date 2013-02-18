@@ -181,7 +181,6 @@ function Arm.CreateMenu(self)
 	
 	local shift = 15 * scale[1]
 	local space = 0 * UI.identityScale[2]
-	local lineSpace = 4
 	
 	local text
 	
@@ -193,7 +192,15 @@ function Arm.CreateMenu(self)
 	)
 		
 	text = StringTable.Get("ARM_RETURN_TO_WORLD_BTN")
-	UI:LineWrapCenterText(self.widgets.Return.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Return.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	y = y + size[2] + space
 	
@@ -205,7 +212,15 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_DATABASE_BTN")
-	UI:LineWrapCenterText(self.widgets.Database.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Database.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	y = y + size[2] + space
 	
@@ -218,7 +233,15 @@ function Arm.CreateMenu(self)
 	
 	self.widgets.Talk.skipIntro = true
 	text = StringTable.Get("ARM_TALK_BTN")
-	UI:LineWrapCenterText(self.widgets.Talk.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Talk.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	self.widgets.Change = UI:CreateStylePushButton(
 		{x, y, size[1], size[2]},
@@ -229,7 +252,15 @@ function Arm.CreateMenu(self)
 	
 	self.widgets.Change.skipIntro = true
 	text = StringTable.Get("ARM_CHANGE_CONVERSATION_BTN")
-	UI:LineWrapCenterText(self.widgets.Change.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Change.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	y = y + size[2] + space
 	
@@ -241,7 +272,15 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_POWERS_BTN")
-	UI:LineWrapCenterText(self.widgets.Powers.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Powers.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	y = y + size[2] + space
 	
@@ -253,7 +292,15 @@ function Arm.CreateMenu(self)
 	)
 	
 	text = StringTable.Get("ARM_SAVE_AND_QUIT_BTN")
-	UI:LineWrapCenterText(self.widgets.Quit.label, nil, nil, lineSpace, text)
+	UI:LineWrapCenterText(
+		self.widgets.Quit.label, 
+		nil, 
+		nil, 
+		0, 
+		text, 
+		UI.identityScale,
+		UI.invIdentityScale
+	)
 	
 	self.widgets.MenuButtons = {
 		self.widgets.Return,

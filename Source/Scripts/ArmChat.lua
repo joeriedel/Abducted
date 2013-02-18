@@ -299,6 +299,7 @@ function Arm.TickPrompt(self)
 		end
 		
 		str = self.promptState.lines[self.promptState.line]
+		w = self.promptState.labels[self.promptState.line]
 	end
 	
 	str = str:sub(1, self.promptState.char)
@@ -366,9 +367,8 @@ function Arm.DisplayChoices(self)
 	local maxWidth = self.chatRect[3] - self.chatPos[1] - inset
 	local horzSpace = Arm.ChatChoiceHorzSpace * UI.identityScale[1]
 	if (lineWidth > maxWidth) then
-	
 		-- we have to do word-wrap to make this all fit
-		local totalHorzSpacing = horzSpace
+		local totalHorzSpacing = horzSpace * #prompts + inset
 		local spaceForControls = maxWidth - totalHorzSpacing
 		maxWidth = spaceForControls / #prompts -- max space per prompt
 		

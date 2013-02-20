@@ -451,14 +451,6 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Radiance\Source\VSProjects\VS10\lua.vcxproj">
-      <Project>{e5863817-54c5-4d87-adea-0481db3ff2ee}</Project>
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Radiance\Source\VSProjects\VS10\Main.vcxproj">
       <Project>{00d2851d-0669-4c3c-bec1-6ce295b17a28}</Project>
       <Private>false</Private>

@@ -172,13 +172,13 @@ function Abducted.DischargePulse(self)
 	self.pulse = false
 end
 
-function Abducted.FirePulse(self, target)
+function Abducted.FirePulse(self, target, normal)
 	if (self.pulseTimer) then
 		self.pulseTimer:Clean()
 		self.pulseTimer = nil
 	end
 	
-	World.playerPawn:FirePulse(target)
+	World.playerPawn:FirePulse(target, normal)
 	
 	self.pulse = false
 end

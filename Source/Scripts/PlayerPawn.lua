@@ -40,6 +40,22 @@ function PlayerPawn.Spawn(self)
 	self.shield.dm:SetPos({0, 0, -48}) -- on floor
 	self.shield.dm:BlendTo({0,0,0,0}, 0)
 	self.shield.dm:ScaleTo({0,0,0}, 0)
+	self.shield.dm:SetBounds(self:Mins(), self:Maxs())
+	self.shieldSprite = World.CreateSpriteBatch(1, 1)
+	self.shieldSprite.material = World.Load("FX/shieldsprite1_M")
+	self.shieldSprite.dm = self:AttachDrawModel(self.shieldSprite, self.shieldSprite.material)
+	self.shieldSprite.dm:SetBounds(self:Mins(), self:Maxs())
+	self.shieldSprite.sprite = self.shieldSprite.dm:AllocateSprite()
+	self.shieldSprite.dm:SetSpriteData(
+		self.shieldSprite.sprite,
+		{
+			pos = {0, 0, 18}, -- relative to drawmodel
+			size = {148, 158},
+			rgba = {1, 1, 1, 1},
+			rot = 0
+		}
+	)
+	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	
 	-- pulse shot
 	self.pulse = {
@@ -166,19 +182,20 @@ end
 function PlayerPawn.BeginShield(self)
 
 	self.shieldActive = true
-	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.2)
-	
+	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
+		
 	local f = function()
 		self.shield.dm:ScaleTo({1,1,1,1}, 0.1)
 	end
 	
-	World.gameTimers:Add(f, 0.2, true)
+	World.gameTimers:Add(f, 0.15, true)
 	
 	f = function ()
-		self.shield.dm:BlendTo({1,1,1,1}, 1.5)
+		self.shield.dm:BlendTo({1,1,1,1}, 1)
+		self.shieldSprite.dm:BlendTo({1,1,1,1}, 0.7)
 	end
 	
-	World.gameTimers:Add(f, 0.1, true)
+	World.gameTimers:Add(f, 0.05, true)
 
 end
 
@@ -187,6 +204,7 @@ function PlayerPawn.EndShield(self)
 	self.shieldActive = false
 	self.shield.dm:BlendTo({0,0,0,0}, 0.15)
 	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
+	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0.15)
 	
 	local f = function()
 		self.shield.dm:ScaleTo({0,0,0,0}, 0.2)
@@ -211,7 +229,7 @@ function PlayerPawn.EndPulse(self)
 	self.disableAnimTick = false
 end
 
-function PlayerPawn.FirePulse(self, target)
+function PlayerPawn.FirePulse(self, target, normal)
 
 	local localPos = self.model.dm:BonePos(self.model.handBone)
 	local start = self.model.dm:WorldBonePos(self.model.handBone)
@@ -228,9 +246,11 @@ function PlayerPawn.FirePulse(self, target)
 	self.pulse.cone:SetPos(localPos)
 	self.pulse.cone:SetAngles(fwd)
 	
+	normal = WorldToLocal(VecNeg(normal), VecZero(), {0, 0, angles[3]})
+	local impactAngles = LookAngles(normal)
 	self.pulse.impact:BlendTo({1,1,1,1}, 0.1)
 	self.pulse.impact:SetPos(localTarget)
-	self.pulse.impact:SetAngles(fwd)
+	self.pulse.impact:SetAngles(impactAngles)
 	
 	self.pulse.beam:BlendTo({1,1,1,1}, 0.1)
 	self.pulse.beam:SetPos(localPos)

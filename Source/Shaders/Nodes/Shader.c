@@ -22,11 +22,11 @@ BEGIN_UNIFORMS
 #endif
 #if defined(SKIN_SPRITE)
 	// port this to HLSL
-	const vec2 UDECL(SpriteVerts)[4] = vec2[4](
-		vec2(-0.5, -0.5),
+	uniform vec2 UDECL(SpriteVerts)[4] = vec2[](
 		vec2(-0.5,  0.5),
-		vec2( 0.5,  0.5),
-		vec2( 0.5, -0.5)
+		vec2(-0.5, -0.5),
+		vec2( 0.5, -0.5),
+		vec2( 0.5,  0.5)
 	);
 #endif
 	UTXREGS
@@ -135,9 +135,9 @@ MAIN
 	OUT(bitan0) = v_bitan0;
 #endif
 #if defined(SKIN_SPRITE)
-	int idx = int(IN(spriteSkin).z);
+	int idx = int(IN(spriteSkin).w);
 	FLOAT2 sprite_vertex = UNIFORM(SpriteVerts)[idx];
-	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).w), cos(IN(spriteSkin).w));
+	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
 	FLOAT4 rotate = sprite_vertex.xxyy * sincos.xyxy;
 	sprite_vertex.x = rotate.y - rotate.z;
 	sprite_vertex.y = rotate.w + rotate.x;

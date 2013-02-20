@@ -76,7 +76,7 @@ function PlayerInput.TapPulse(self, x, y)
 	
 	trace = World.LineTrace(trace)
 	if (trace and not (trace.startSolid)) then
-		Game.entity:FirePulse(trace.traceEnd)
+		Game.entity:FirePulse(trace.traceEnd, trace.normal)
 	end
 	
 end

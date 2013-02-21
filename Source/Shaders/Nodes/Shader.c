@@ -8,7 +8,10 @@
 // Uniform/Varying/Attributes mean what they mean in GLSL
 
 BEGIN_UNIFORMS
-#if defined(_GLES)
+#if defined(SKIN_SPRITE)
+	GLSL(uniform) FLOAT4X4 UDECL(mv);
+	GLSL(uniform) FLOAT4X4 UDECL(pr);
+#elif defined(_GLES)
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);
 #endif
 #if defined(_GLES) || defined(_HLSL)
@@ -16,6 +19,15 @@ BEGIN_UNIFORMS
 #endif
 #if defined(GENREFLECT)
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
+#endif
+#if defined(SKIN_SPRITE)
+	// port this to HLSL
+	uniform vec2 UDECL(SpriteVerts)[4] = vec2[](
+		vec2(-0.5,  0.5),
+		vec2(-0.5, -0.5),
+		vec2( 0.5, -0.5),
+		vec2( 0.5,  0.5)
+	);
 #endif
 	UTXREGS
 	UTCMODREGS
@@ -26,6 +38,12 @@ END_UNIFORMS
 BEGIN_ATTRIBUTES
 // -> Per vertex attributes (used only by VertexShader)
 	GLSL(attribute) FLOAT4 IN(position) HLSL(:POSITION);
+#if defined(VERTEX_COLOR)
+	GLSL(attribute) FIXED4 IN(vertexColor) HLSL(:POSITION1);
+#endif
+#if defined(SKIN_SPRITE)
+	GLSL(attribute) FLOAT4 IN(spriteSkin) HLSL(:POSITION2);
+#endif
 	IN_TCREGS
 	IN_NMREGS
 	IN_TANREGS
@@ -36,6 +54,9 @@ BEGIN_VARYING
 // -> FShader
 #if defined(SHADER_VERTEX)
 	GLSL(varying) FLOAT4 OUT(position) HLSL(:POSITON);
+#endif
+#if defined(VERTEX_COLOR)
+	GLSL(varying) FIXED4 OUT(vertexColor) HLSL(:POSITION1);
 #endif
 #if defined(_GLES)
 	varying FIXED4 frag_color;
@@ -91,6 +112,10 @@ MAIN
 #endif
 #endif
 
+#if defined(VERTEX_COLOR)
+	OUT(vertexColor) = IN(vertexColor);
+#endif
+
 #if defined(_GLES)
 	frag_color = DCOLOR0;
 #elif defined(_GLSL)
@@ -109,7 +134,20 @@ MAIN
 #if defined(NUM_SHADER_BITANGENTS)
 	OUT(bitan0) = v_bitan0;
 #endif
+#if defined(SKIN_SPRITE)
+	int idx = int(IN(spriteSkin).w);
+	FLOAT2 sprite_vertex = UNIFORM(SpriteVerts)[idx];
+	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
+	FLOAT4 rotate = sprite_vertex.xxyy * sincos.xyxy;
+	sprite_vertex.x = rotate.y - rotate.z;
+	sprite_vertex.y = rotate.w + rotate.x;
+	sprite_vertex *= IN(spriteSkin).xy;
+	FLOAT4 mvpos = mul(UNIFORM(mv), IN(position));
+	mvpos.xy += sprite_vertex.xy;
+	gl_Position = mul(UNIFORM(pr), mvpos);
+#else
 	gl_Position = mul(MVP, IN(position));
+#endif
 #else // !defined(VERTEX)
 
 	M m = _Material(P_GLOBALS);

@@ -9,6 +9,7 @@ function HUD.Spawn(self)
 	
 	HUD:Load()
 	HUD:Layout()
+	HUD.enabled = true
 	
 	World.globalTimers:Add(
 		function () HUD:Think() end,
@@ -108,19 +109,35 @@ function HUD.Load(self)
 		self.widgets.Root
 	)
 	
+	self.widgets.PulseCharging = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.PulseEnabled})
+	self.widgets.Root:AddChild(self.widgets.PulseCharging)
+	self.widgets.PulseCharging:SetDrawMode(kMaterialWidgetDrawMode_Circle)
+	self.widgets.PulseCharging:SetVisible(false)
+	
+	self.widgets.PulseShimmer = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.RechargeShimmer})
+	self.widgets.Root:AddChild(self.widgets.PulseShimmer)
+	self.widgets.PulseShimmer:SetVisible(false)
+	
+	self.widgets.Pulse.flashing = false
+	
 end
 
 function HUD.ArmPressed(self, widget)
 	COutLine(kC_Debug, "Arm Pressed!")
+	if (Game.entity.manipulate or Game.entity.pulse) then
+		return
+	end
 	Arm:Start("chat")
 end
 
 function HUD.ManipulatePressed(self, widget)
+	if (Game.entity.pulse) then
+		return
+	end
 	Game.entity:BeginManipulate()
 end
 
 function HUD.ShieldPressed(self, widget)
-	
 	if (World.playerPawn.shieldActive) then
 		if (self.shieldExpiryTimer) then
 			self.shieldExpiryTimer:Clean()
@@ -160,6 +177,44 @@ end
 
 function HUD.PulsePressed(self, widget)
 	COutLine(kC_Debug, "Pulse Pressed!")
+	if (Game.entity.manipulate) then
+		return
+	end
+	Game.entity:BeginPulse()
+end
+
+function HUD.RechargePulse(self)
+	-- pulse was fired
+	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, false)
+		
+	local rechargeTime = PlayerSkills:PulseRechargeTime()
+	
+	self.widgets.PulseCharging:SetVisible(true)
+	self.widgets.PulseCharging:FillCircleTo(0, 0)
+		
+	local f = function ()
+		if (not HUD.enabled) then
+			return
+		end
+		if (self.pulseTimer) then
+			self.pulseTimer:Clean()
+			self.pulseTimer = nil
+		end
+		self.widgets.PulseCharging:SetVisible(false)
+		self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, true)
+		HUD:Shimmer(self.widgets.PulseShimmer)
+	end
+	
+	World.gameTimers:Add(f, rechargeTime, true)
+	
+	self.pulseStart = Game.time
+	
+	f = function ()
+		local dd = Game.time - self.pulseStart
+		self.widgets.PulseCharging:FillCircleTo(dd / rechargeTime, 0)
+	end
+	
+	self.pulseTimer = World.gameTimers:Add(f, 0)
 end
 
 function HUD.Layout(self)
@@ -173,10 +228,15 @@ function HUD.Layout(self)
 	self.widgets.ShieldShimmer:SetRect(r)
 	y = y + r[4] + (24 * UI.identityScale[2])
 	r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+	self.widgets.PulseCharging:SetRect(r)
+	self.widgets.PulseShimmer:SetRect(r)
 end
 
 function HUD.Think(self)
-	self:UpdateManipulateButton()
+	if (HUD.enabled) then
+		self:UpdateManipulateButton()
+		self:UpdatePulseButton()
+	end
 end
 
 function HUD.UpdateManipulateButton(self)
@@ -196,6 +256,23 @@ function HUD.UpdateManipulateButton(self)
 	end
 end
 
+function HUD.UpdatePulseButton(self)
+	local flashing = Game.entity.pulse
+	if (flashing ~= self.widgets.Pulse.flashing) then
+		self.widgets.Pulse.flashing = flashing
+		local gfx = {}
+		if (flashing) then
+			gfx.enabled = self.gfx.PulseFlashing
+		else
+			gfx.enabled = self.gfx.PulseEnabled
+			gfx.disabled = self.gfx.PulseDisabled
+			gfx.pressed = self.gfx.PulseDisabled
+		end
+		
+		self.widgets.Pulse.class:ChangeGfx(self.widgets.Pulse, gfx)
+	end
+end
+
 function HUD.RechargeManipulate(self)
 	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
 		
@@ -205,6 +282,9 @@ function HUD.RechargeManipulate(self)
 	self.widgets.ManipulateCharging:FillCircleTo(0, 0)
 		
 	local f = function ()
+		if (not HUD.enabled) then
+			return
+		end
 		if (self.manipulateTimer) then
 			self.manipulateTimer:Clean()
 			self.manipulateTimer = nil
@@ -246,6 +326,9 @@ function HUD.ExpireShield(self)
 	self.shieldRechargeFrac = (PlayerSkills.MaxShieldTime - timeUsed) / PlayerSkills.MaxShieldTime
 	
 	local f = function ()
+		if (not HUD.enabled) then
+			return
+		end
 		if (self.shieldTimer) then
 			self.shieldTimer:Clean()
 			self.shieldTimer = nil
@@ -280,5 +363,58 @@ function HUD.Shimmer(self, widget)
 	end
 	
 	World.gameTimers:Add(f, 0.2, true)
+end
+
+function HUD.PlayerDied(self)
+	self:Disable()
+end
+
+function HUD.Disable(self)
+-- disable the HUD
+	HUD.enabled = false
+
+	if (self.shieldExpiryTimer) then
+		self.shieldExpiryTimer:Clean()
+		self.shieldExpiryTimer = nil
+	end
+	if (self.shieldTimer) then
+		self.shieldTimer:Clean()
+		self.shieldTimer = nil
+	end
+	if (self.manipulateTimer) then
+		self.manipulateTimer:Clean()
+		self.manipulateTimer = nil
+	end
+	if (self.pulseTimer) then
+		self.pulseTimer:Clean()
+		self.pulseTimer = nil
+	end
+	
+	local gfx = {}
+	
+	gfx.enabled = self.gfx.ManipulateEnabled
+	gfx.disabled = self.gfx.ManipulateDisabled
+	gfx.pressed = self.gfx.ManipulateDisabled
+	
+	self.widgets.ManipulateCharging:SetVisible(false)
+	self.widgets.Manipulate.class:ChangeGfx(self.widgets.Manipulate, gfx)
+	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	
+	gfx.enabled = self.gfx.ShieldEnabled
+	gfx.disabled = self.gfx.ShieldDisabled
+	gfx.pressed = self.gfx.ShieldDisabled
+	
+	self.widgets.ShieldCharging:SetVisible(false)
+	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
+	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
+	
+	gfx.enabled = self.gfx.PulseEnabled
+	gfx.disabled = self.gfx.PulseDisabled
+	gfx.pressed = self.gfx.PulseDisabled
+	
+	self.widgets.PulseCharging:SetVisible(false)
+	self.widgets.Pulse.class:ChangeGfx(self.widgets.Pulse, gfx)
+	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, false)
+	
 end
 

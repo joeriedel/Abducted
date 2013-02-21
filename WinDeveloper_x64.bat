@@ -1,1 +1,1 @@
-".\Bin\Golden - Release - x64\Abducted.exe"
+".\Bin\Dev - Release - x64\Abducted.exe"

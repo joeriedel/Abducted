@@ -51,20 +51,20 @@ end
 
 function Persistence.ReadNumber(storage, key, default, ...)
 
-	return NumberForString(Persistence.ReadString(storage, key, nil, unpack(arg)), default)
+	return NumberForString(Persistence.ReadString(storage, key, nil, unpack(arg or {})), default)
 
 end
 
 function Persistence.WriteNumber(storage, key, value, ...)
 
-	Persistence.WriteString(storage, key, tostring(value), unpack(arg))
+	Persistence.WriteString(storage, key, tostring(value), unpack(arg or {}))
 
 end
 
 function Persistence.ReadVec3(storage, key, default, ...)
 
 	return Vec3ForString(
-		Persistence.ReadString(storage, key, nil, unpack(arg)),
+		Persistence.ReadString(storage, key, nil, unpack(arg or {})),
 		default
 	)
 
@@ -76,7 +76,7 @@ function Persistence.WriteVec3(storage, key, value, ...)
 		storage,
 		key,
 		string.format("%d %d %d", value[1], value[2], value[3]),
-		unpack(arg)
+		unpack(arg or {})
 	)
 
 end
@@ -87,7 +87,7 @@ function Persistence.ReadColor4(storage, key, default, ...)
 		storage,
 		key,
 		nil,
-		unpack(arg)
+		unpack(arg or {})
 	)
 	
 	return Color4ForString(s, default)
@@ -100,7 +100,7 @@ function Persistence.WriteColor4(storage, key, value, ...)
 		storage,
 		key,
 		Color4ToString(value),
-		unpack(arg)
+		unpack(arg or {})
 	)
 
 end
@@ -108,7 +108,7 @@ end
 function Persistence.ReadBool(storage, key, default, ...)
 
 	return BoolForString(
-		Persistence.ReadString(storage, key, nil, unpack(arg)),
+		Persistence.ReadString(storage, key, nil, unpack(arg or {})),
 		default
 	)		
 
@@ -116,6 +116,6 @@ end
 
 function Persistence.WriteBool(storage, key, value, ...)
 	
-	Persistence.WriteString(storage, key, value, unpack(arg))
+	Persistence.WriteString(storage, key, value, unpack(arg or {}))
 
 end

@@ -40,7 +40,6 @@
 		33EC06361626772900F8C9FF /* libliboggOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05E6162667EF00F8C9FF /* libliboggOSX.a */; };
 		33EC06371626772900F8C9FF /* liblibpngOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05EC162667EF00F8C9FF /* liblibpngOSX.a */; };
 		33EC06381626772900F8C9FF /* liblibvorbisOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05F2162667EF00F8C9FF /* liblibvorbisOSX.a */; };
-		33EC06391626772900F8C9FF /* libluaOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05F8162667EF00F8C9FF /* libluaOSX.a */; };
 		33EC063C1626772900F8C9FF /* libzlibOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC0616162667EF00F8C9FF /* libzlibOSX.a */; };
 		33EC06401626773A00F8C9FF /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC063D1626773A00F8C9FF /* QtCore.framework */; };
 		33EC06411626773A00F8C9FF /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC063E1626773A00F8C9FF /* QtGui.framework */; };
@@ -53,6 +52,7 @@
 		33F8F41216BFA7DB009646B1 /* Default-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */; };
 		33F8F41316BFA7DB009646B1 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40E16BFA7AB009646B1 /* Default-Landscape@2x~ipad.png */; };
 		33F8F41416BFA7DB009646B1 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40F16BFA7AB009646B1 /* Default-Landscape~ipad.png */; };
+		33F8F4FD16D6F4E9009646B1 /* libluajitOSX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */; };
 		33FA81511633D9FA002603A5 /* libRadianceDeveloper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81331633CBC5002603A5 /* libRadianceDeveloper.a */; };
 		33FA81521633DA07002603A5 /* libMainDeveloper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA812C1633CBC5002603A5 /* libMainDeveloper.a */; };
 		33FA81571633DE33002603A5 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81541633DE2F002603A5 /* OpenAL.framework */; };
@@ -369,6 +369,10 @@
 		33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x.png"; path = "iOS/Default-Landscape@2x.png"; sourceTree = "<group>"; };
 		33F8F40E16BFA7AB009646B1 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "iOS/Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		33F8F40F16BFA7AB009646B1 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "iOS/Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		33F8F4FA16D6F48B009646B1 /* libluajitOSX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitOSX.dylib; path = "../../Extern/luajit-2.0.1/libluajitOSX.dylib"; sourceTree = "<group>"; };
+		33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitOSX.dylib; path = "../../Extern/luaJIT-2.0.1/libluajitOSX.dylib"; sourceTree = "<group>"; };
+		33F8F4FE16D6F8BC009646B1 /* AppBuildiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildiOS.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildiOS.xcconfig; sourceTree = "<group>"; };
+		33F8F4FF16D6F8BC009646B1 /* AppBuildOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildOSX.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildOSX.xcconfig; sourceTree = "<group>"; };
 		33FA814B1633D2BA002603A5 /* Developer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Developer-Info.plist"; path = "OSX/Developer-Info.plist"; sourceTree = "<group>"; };
 		33FA814C1633D2C3002603A5 /* iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "iOS-Info.plist"; path = "iOS/iOS-Info.plist"; sourceTree = "<group>"; };
 		33FA81541633DE2F002603A5 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
@@ -447,6 +451,7 @@
 			files = (
 				33EC06461626776200F8C9FF /* libPVRTexLib.a in Frameworks */,
 				33EC06481626777400F8C9FF /* libopenal.1.14.0.dylib in Frameworks */,
+				33F8F4FD16D6F4E9009646B1 /* libluajitOSX.dylib in Frameworks */,
 				33EC06321626772900F8C9FF /* libboostOSX.a in Frameworks */,
 				33EC06331626772900F8C9FF /* libfreetypeOSX.a in Frameworks */,
 				33EC06341626772900F8C9FF /* libglsl-optimizer.a in Frameworks */,
@@ -454,7 +459,6 @@
 				33EC06361626772900F8C9FF /* libliboggOSX.a in Frameworks */,
 				33EC06371626772900F8C9FF /* liblibpngOSX.a in Frameworks */,
 				33EC06381626772900F8C9FF /* liblibvorbisOSX.a in Frameworks */,
-				33EC06391626772900F8C9FF /* libluaOSX.a in Frameworks */,
 				33EC063C1626772900F8C9FF /* libzlibOSX.a in Frameworks */,
 				33FA81511633D9FA002603A5 /* libRadianceDeveloper.a in Frameworks */,
 				33FA81521633DA07002603A5 /* libMainDeveloper.a in Frameworks */,
@@ -474,6 +478,8 @@
 		33EC04E1162663FC00F8C9FF = {
 			isa = PBXGroup;
 			children = (
+				33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */,
+				33F8F4FA16D6F48B009646B1 /* libluajitOSX.dylib */,
 				33EC058C162667ED00F8C9FF /* boost.xcodeproj */,
 				33EC058F162667ED00F8C9FF /* freetype.xcodeproj */,
 				33EC0592162667ED00F8C9FF /* glsl-optimizer.xcodeproj */,
@@ -546,6 +552,8 @@
 			isa = PBXGroup;
 			children = (
 				33EC057D1626678A00F8C9FF /* AppBuild.xcconfig */,
+				33F8F4FE16D6F8BC009646B1 /* AppBuildiOS.xcconfig */,
+				33F8F4FF16D6F8BC009646B1 /* AppBuildOSX.xcconfig */,
 				33EC057E1626678A00F8C9FF /* AppDebugiOS.xcconfig */,
 				33EC057F1626678A00F8C9FF /* AppDebugOSX.xcconfig */,
 				33EC05801626678A00F8C9FF /* AppDeveloperDebugOSX.xcconfig */,
@@ -1117,7 +1125,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
+			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/luaJIT-2.0.1/libluajitOSX.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
 		};
 		33DB15271627DA6900963A33 /* Qt Moc */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1316,6 +1324,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/PVRTexLib-4.04/MacOS_x86\"",
 					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
+					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -1336,6 +1345,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/PVRTexLib-4.04/MacOS_x86\"",
 					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
+					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

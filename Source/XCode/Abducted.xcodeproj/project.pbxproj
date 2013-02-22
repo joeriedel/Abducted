@@ -52,7 +52,9 @@
 		33F8F41216BFA7DB009646B1 /* Default-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */; };
 		33F8F41316BFA7DB009646B1 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40E16BFA7AB009646B1 /* Default-Landscape@2x~ipad.png */; };
 		33F8F41416BFA7DB009646B1 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40F16BFA7AB009646B1 /* Default-Landscape~ipad.png */; };
-		33F8F4FD16D6F4E9009646B1 /* libluajitOSX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */; };
+		33F8F50516D6FF4B009646B1 /* libluajitOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50416D6FF4B009646B1 /* libluajitOSX.a */; };
+		33F8F50716D6FF89009646B1 /* libluajitiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50616D6FF88009646B1 /* libluajitiOS.a */; };
+		33F8F50816D6FF95009646B1 /* libluajitiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50616D6FF88009646B1 /* libluajitiOS.a */; };
 		33FA81511633D9FA002603A5 /* libRadianceDeveloper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81331633CBC5002603A5 /* libRadianceDeveloper.a */; };
 		33FA81521633DA07002603A5 /* libMainDeveloper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA812C1633CBC5002603A5 /* libMainDeveloper.a */; };
 		33FA81571633DE33002603A5 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81541633DE2F002603A5 /* OpenAL.framework */; };
@@ -66,7 +68,6 @@
 		33FA81631634814B002603A5 /* libfreetypeiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05D9162667EF00F8C9FF /* libfreetypeiOS.a */; };
 		33FA81641634814B002603A5 /* libliboggiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05E8162667EF00F8C9FF /* libliboggiOS.a */; };
 		33FA81651634814B002603A5 /* liblibvorbisiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05F4162667EF00F8C9FF /* liblibvorbisiOS.a */; };
-		33FA81661634814B002603A5 /* libluaiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05FA162667EF00F8C9FF /* libluaiOS.a */; };
 		33FA81671634814B002603A5 /* libMainShipiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33BF3F721633382E006DEAAE /* libMainShipiOS.a */; };
 		33FA81681634814B002603A5 /* libRadianceShipiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81351633CBC5002603A5 /* libRadianceShipiOS.a */; };
 		33FA81691634814B002603A5 /* libzlibiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC0618162667EF00F8C9FF /* libzlibiOS.a */; };
@@ -80,7 +81,6 @@
 		33FA81711634819D002603A5 /* libfreetypeiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05D9162667EF00F8C9FF /* libfreetypeiOS.a */; };
 		33FA81721634819D002603A5 /* libliboggiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05E8162667EF00F8C9FF /* libliboggiOS.a */; };
 		33FA81731634819D002603A5 /* liblibvorbisiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05F4162667EF00F8C9FF /* liblibvorbisiOS.a */; };
-		33FA81741634819D002603A5 /* libluaiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05FA162667EF00F8C9FF /* libluaiOS.a */; };
 		33FA81751634819D002603A5 /* libMainGoldeniOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33BF3F741633382E006DEAAE /* libMainGoldeniOS.a */; };
 		33FA81761634819D002603A5 /* libRadianceGoldeniOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33BF3FEC16333882006DEAAE /* libRadianceGoldeniOS.a */; };
 		33FA81771634819D002603A5 /* libzlibiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC0618162667EF00F8C9FF /* libzlibiOS.a */; };
@@ -214,20 +214,6 @@
 			remoteGlobalIDString = 334B548F15B89AE100EEFC92;
 			remoteInfo = libvorbisiOS;
 		};
-		33EC05F7162667EF00F8C9FF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33EC05A1162667ED00F8C9FF /* lua.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 334B55A415B8A78F00EEFC92;
-			remoteInfo = luaOSX;
-		};
-		33EC05F9162667EF00F8C9FF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33EC05A1162667ED00F8C9FF /* lua.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 334B55A515B8A78F00EEFC92;
-			remoteInfo = luaiOS;
-		};
 		33EC0615162667EF00F8C9FF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33EC05AA162667ED00F8C9FF /* zlib.xcodeproj */;
@@ -340,7 +326,6 @@
 		33EC0598162667ED00F8C9FF /* libogg.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libogg.xcodeproj; path = ../../Radiance/Source/XCode/libogg.xcodeproj; sourceTree = "<group>"; };
 		33EC059B162667ED00F8C9FF /* libpng.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libpng.xcodeproj; path = ../../Radiance/Source/XCode/libpng.xcodeproj; sourceTree = "<group>"; };
 		33EC059E162667ED00F8C9FF /* libvorbis.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = libvorbis.xcodeproj; path = ../../Radiance/Source/XCode/libvorbis.xcodeproj; sourceTree = "<group>"; };
-		33EC05A1162667ED00F8C9FF /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lua.xcodeproj; path = ../../Radiance/Source/XCode/lua.xcodeproj; sourceTree = "<group>"; };
 		33EC05A4162667ED00F8C9FF /* Main.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Main.xcodeproj; path = ../../Radiance/Source/XCode/Main.xcodeproj; sourceTree = "<group>"; };
 		33EC05A7162667ED00F8C9FF /* Radiance.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Radiance.xcodeproj; path = ../../Radiance/Source/XCode/Radiance.xcodeproj; sourceTree = "<group>"; };
 		33EC05AA162667ED00F8C9FF /* zlib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = zlib.xcodeproj; path = ../../Radiance/Source/XCode/zlib.xcodeproj; sourceTree = "<group>"; };
@@ -373,6 +358,9 @@
 		33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitOSX.dylib; path = "../../Extern/luaJIT-2.0.1/libluajitOSX.dylib"; sourceTree = "<group>"; };
 		33F8F4FE16D6F8BC009646B1 /* AppBuildiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildiOS.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildiOS.xcconfig; sourceTree = "<group>"; };
 		33F8F4FF16D6F8BC009646B1 /* AppBuildOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildOSX.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildOSX.xcconfig; sourceTree = "<group>"; };
+		33F8F50216D6FDF3009646B1 /* libluajitiOS.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitiOS.dylib; path = "../../Extern/luaJIT-2.0.1/libluajitiOS.dylib"; sourceTree = "<group>"; };
+		33F8F50416D6FF4B009646B1 /* libluajitOSX.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libluajitOSX.a; path = "../../Extern/luaJIT-2.0.1/libluajitOSX.a"; sourceTree = "<group>"; };
+		33F8F50616D6FF88009646B1 /* libluajitiOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libluajitiOS.a; path = "../../Extern/luaJIT-2.0.1/libluajitiOS.a"; sourceTree = "<group>"; };
 		33FA814B1633D2BA002603A5 /* Developer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Developer-Info.plist"; path = "OSX/Developer-Info.plist"; sourceTree = "<group>"; };
 		33FA814C1633D2C3002603A5 /* iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "iOS-Info.plist"; path = "iOS/iOS-Info.plist"; sourceTree = "<group>"; };
 		33FA81541633DE2F002603A5 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.0.sdk/System/Library/Frameworks/OpenAL.framework; sourceTree = DEVELOPER_DIR; };
@@ -408,10 +396,10 @@
 				33FA81631634814B002603A5 /* libfreetypeiOS.a in Frameworks */,
 				33FA81641634814B002603A5 /* libliboggiOS.a in Frameworks */,
 				33FA81651634814B002603A5 /* liblibvorbisiOS.a in Frameworks */,
-				33FA81661634814B002603A5 /* libluaiOS.a in Frameworks */,
 				33FA81671634814B002603A5 /* libMainShipiOS.a in Frameworks */,
 				33FA81681634814B002603A5 /* libRadianceShipiOS.a in Frameworks */,
 				33FA81691634814B002603A5 /* libzlibiOS.a in Frameworks */,
+				33F8F50816D6FF95009646B1 /* libluajitiOS.a in Frameworks */,
 				33FA8161163480F8002603A5 /* Foundation.framework in Frameworks */,
 				33FA815F163480DA002603A5 /* QuartzCore.framework in Frameworks */,
 				33FA815D1634779A002603A5 /* AudioToolbox.framework in Frameworks */,
@@ -427,11 +415,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				33FA817A163518A4002603A5 /* libFlurryAnalytics.a in Frameworks */,
+				33F8F50716D6FF89009646B1 /* libluajitiOS.a in Frameworks */,
 				33FA81701634819D002603A5 /* libboostiOS.a in Frameworks */,
 				33FA81711634819D002603A5 /* libfreetypeiOS.a in Frameworks */,
 				33FA81721634819D002603A5 /* libliboggiOS.a in Frameworks */,
 				33FA81731634819D002603A5 /* liblibvorbisiOS.a in Frameworks */,
-				33FA81741634819D002603A5 /* libluaiOS.a in Frameworks */,
 				33FA81751634819D002603A5 /* libMainGoldeniOS.a in Frameworks */,
 				33FA81761634819D002603A5 /* libRadianceGoldeniOS.a in Frameworks */,
 				33FA81771634819D002603A5 /* libzlibiOS.a in Frameworks */,
@@ -449,9 +437,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33F8F50516D6FF4B009646B1 /* libluajitOSX.a in Frameworks */,
 				33EC06461626776200F8C9FF /* libPVRTexLib.a in Frameworks */,
 				33EC06481626777400F8C9FF /* libopenal.1.14.0.dylib in Frameworks */,
-				33F8F4FD16D6F4E9009646B1 /* libluajitOSX.dylib in Frameworks */,
 				33EC06321626772900F8C9FF /* libboostOSX.a in Frameworks */,
 				33EC06331626772900F8C9FF /* libfreetypeOSX.a in Frameworks */,
 				33EC06341626772900F8C9FF /* libglsl-optimizer.a in Frameworks */,
@@ -478,6 +466,9 @@
 		33EC04E1162663FC00F8C9FF = {
 			isa = PBXGroup;
 			children = (
+				33F8F50616D6FF88009646B1 /* libluajitiOS.a */,
+				33F8F50416D6FF4B009646B1 /* libluajitOSX.a */,
+				33F8F50216D6FDF3009646B1 /* libluajitiOS.dylib */,
 				33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */,
 				33F8F4FA16D6F48B009646B1 /* libluajitOSX.dylib */,
 				33EC058C162667ED00F8C9FF /* boost.xcodeproj */,
@@ -487,7 +478,6 @@
 				33EC0598162667ED00F8C9FF /* libogg.xcodeproj */,
 				33EC059B162667ED00F8C9FF /* libpng.xcodeproj */,
 				33EC059E162667ED00F8C9FF /* libvorbis.xcodeproj */,
-				33EC05A1162667ED00F8C9FF /* lua.xcodeproj */,
 				33EC05A4162667ED00F8C9FF /* Main.xcodeproj */,
 				33EC05A7162667ED00F8C9FF /* Radiance.xcodeproj */,
 				33EC05AA162667ED00F8C9FF /* zlib.xcodeproj */,
@@ -630,15 +620,6 @@
 			children = (
 				33EC05F2162667EF00F8C9FF /* liblibvorbisOSX.a */,
 				33EC05F4162667EF00F8C9FF /* liblibvorbisiOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		33EC05A2162667ED00F8C9FF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				33EC05F8162667EF00F8C9FF /* libluaOSX.a */,
-				33EC05FA162667EF00F8C9FF /* libluaiOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -853,10 +834,6 @@
 					ProjectRef = 33EC059E162667ED00F8C9FF /* libvorbis.xcodeproj */;
 				},
 				{
-					ProductGroup = 33EC05A2162667ED00F8C9FF /* Products */;
-					ProjectRef = 33EC05A1162667ED00F8C9FF /* lua.xcodeproj */;
-				},
-				{
 					ProductGroup = 33EC05A5162667ED00F8C9FF /* Products */;
 					ProjectRef = 33EC05A4162667ED00F8C9FF /* Main.xcodeproj */;
 				},
@@ -991,20 +968,6 @@
 			remoteRef = 33EC05F3162667EF00F8C9FF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		33EC05F8162667EF00F8C9FF /* libluaOSX.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libluaOSX.a;
-			remoteRef = 33EC05F7162667EF00F8C9FF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		33EC05FA162667EF00F8C9FF /* libluaiOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libluaiOS.a;
-			remoteRef = 33EC05F9162667EF00F8C9FF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		33EC0616162667EF00F8C9FF /* libzlibOSX.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1125,7 +1088,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/luaJIT-2.0.1/libluajitOSX.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
+			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
 		};
 		33DB15271627DA6900963A33 /* Qt Moc */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1201,6 +1164,10 @@
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/iOS-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
+				);
 				PRODUCT_NAME = Abducted;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1216,6 +1183,10 @@
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/iOS-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
+				);
 				PRODUCT_NAME = Abducted;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1234,6 +1205,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/Flurry iPhone SDK v3.0.9/FlurryAnalytics\"",
+					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -1253,6 +1225,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/Flurry iPhone SDK v3.0.9/FlurryAnalytics\"",
+					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

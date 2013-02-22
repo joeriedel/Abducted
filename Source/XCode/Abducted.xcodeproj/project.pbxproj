@@ -354,11 +354,8 @@
 		33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x.png"; path = "iOS/Default-Landscape@2x.png"; sourceTree = "<group>"; };
 		33F8F40E16BFA7AB009646B1 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "iOS/Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
 		33F8F40F16BFA7AB009646B1 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape~ipad.png"; path = "iOS/Default-Landscape~ipad.png"; sourceTree = "<group>"; };
-		33F8F4FA16D6F48B009646B1 /* libluajitOSX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitOSX.dylib; path = "../../Extern/luajit-2.0.1/libluajitOSX.dylib"; sourceTree = "<group>"; };
-		33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitOSX.dylib; path = "../../Extern/luaJIT-2.0.1/libluajitOSX.dylib"; sourceTree = "<group>"; };
 		33F8F4FE16D6F8BC009646B1 /* AppBuildiOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildiOS.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildiOS.xcconfig; sourceTree = "<group>"; };
 		33F8F4FF16D6F8BC009646B1 /* AppBuildOSX.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = AppBuildOSX.xcconfig; path = ../../Radiance/Source/XCode/XCConfig/AppBuildOSX.xcconfig; sourceTree = "<group>"; };
-		33F8F50216D6FDF3009646B1 /* libluajitiOS.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libluajitiOS.dylib; path = "../../Extern/luaJIT-2.0.1/libluajitiOS.dylib"; sourceTree = "<group>"; };
 		33F8F50416D6FF4B009646B1 /* libluajitOSX.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libluajitOSX.a; path = "../../Extern/luaJIT-2.0.1/libluajitOSX.a"; sourceTree = "<group>"; };
 		33F8F50616D6FF88009646B1 /* libluajitiOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libluajitiOS.a; path = "../../Extern/luaJIT-2.0.1/libluajitiOS.a"; sourceTree = "<group>"; };
 		33FA814B1633D2BA002603A5 /* Developer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Developer-Info.plist"; path = "OSX/Developer-Info.plist"; sourceTree = "<group>"; };
@@ -468,9 +465,6 @@
 			children = (
 				33F8F50616D6FF88009646B1 /* libluajitiOS.a */,
 				33F8F50416D6FF4B009646B1 /* libluajitOSX.a */,
-				33F8F50216D6FDF3009646B1 /* libluajitiOS.dylib */,
-				33F8F4FC16D6F4E8009646B1 /* libluajitOSX.dylib */,
-				33F8F4FA16D6F48B009646B1 /* libluajitOSX.dylib */,
 				33EC058C162667ED00F8C9FF /* boost.xcodeproj */,
 				33EC058F162667ED00F8C9FF /* freetype.xcodeproj */,
 				33EC0592162667ED00F8C9FF /* glsl-optimizer.xcodeproj */,

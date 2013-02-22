@@ -57,6 +57,7 @@ Extern/*
 TODO.txt
 autoexec.txt
 editor.user.ini
+Source/Scripts/CompiledScripts.cpp
 Source/XCode/build/*
 Source/XCode/Abducted.xcworkspace/xcshareddata
 AbductedDeveloper.app/*

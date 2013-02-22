@@ -19,8 +19,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\Radiance
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis", "..\..\..\Radiance\Source\VSProjects\VS10\libvorbis.vcxproj", "{004C9C42-7DF8-4253-AC0D-89B25BD72814}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "..\..\..\Radiance\Source\VSProjects\VS10\lua.vcxproj", "{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\..\Radiance\Source\VSProjects\VS10\zlib.vcxproj", "{43A36CEE-8B02-4E3C-AF67-5C24A7ECDA9A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Main", "..\..\..\Radiance\Source\VSProjects\VS10\Main.vcxproj", "{00D2851D-0669-4C3C-BEC1-6CE295B17A28}"
@@ -240,30 +238,6 @@ Global
 		{004C9C42-7DF8-4253-AC0D-89B25BD72814}.Ship - Release|Win32.Build.0 = Ship - Release|Win32
 		{004C9C42-7DF8-4253-AC0D-89B25BD72814}.Ship - Release|x64.ActiveCfg = Ship - Release|x64
 		{004C9C42-7DF8-4253-AC0D-89B25BD72814}.Ship - Release|x64.Build.0 = Ship - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Debug|Win32.ActiveCfg = Dev - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Debug|Win32.Build.0 = Dev - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Debug|x64.ActiveCfg = Dev - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Debug|x64.Build.0 = Dev - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Release|Win32.ActiveCfg = Dev - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Release|Win32.Build.0 = Dev - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Release|x64.ActiveCfg = Dev - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Dev - Release|x64.Build.0 = Dev - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Debug|Win32.ActiveCfg = Golden - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Debug|Win32.Build.0 = Golden - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Debug|x64.ActiveCfg = Golden - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Debug|x64.Build.0 = Golden - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Release|Win32.ActiveCfg = Golden - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Release|Win32.Build.0 = Golden - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Release|x64.ActiveCfg = Golden - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Golden - Release|x64.Build.0 = Golden - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Debug|Win32.ActiveCfg = Ship - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Debug|Win32.Build.0 = Ship - Debug|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Debug|x64.ActiveCfg = Ship - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Debug|x64.Build.0 = Ship - Debug|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Release|Win32.ActiveCfg = Ship - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Release|Win32.Build.0 = Ship - Release|Win32
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Release|x64.ActiveCfg = Ship - Release|x64
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE}.Ship - Release|x64.Build.0 = Ship - Release|x64
 		{43A36CEE-8B02-4E3C-AF67-5C24A7ECDA9A}.Dev - Debug|Win32.ActiveCfg = Dev - Debug|Win32
 		{43A36CEE-8B02-4E3C-AF67-5C24A7ECDA9A}.Dev - Debug|Win32.Build.0 = Dev - Debug|Win32
 		{43A36CEE-8B02-4E3C-AF67-5C24A7ECDA9A}.Dev - Debug|x64.ActiveCfg = Dev - Debug|x64
@@ -390,7 +364,6 @@ Global
 		{9A2777CA-F97D-4F72-9106-6D2E702AF8D0} = {D84B581C-C61B-4655-8845-50353F7182C3}
 		{6DD41636-8E8E-4D99-BF8A-48F79D73700E} = {D84B581C-C61B-4655-8845-50353F7182C3}
 		{004C9C42-7DF8-4253-AC0D-89B25BD72814} = {D84B581C-C61B-4655-8845-50353F7182C3}
-		{E5863817-54C5-4D87-ADEA-0481DB3FF2EE} = {D84B581C-C61B-4655-8845-50353F7182C3}
 		{43A36CEE-8B02-4E3C-AF67-5C24A7ECDA9A} = {D84B581C-C61B-4655-8845-50353F7182C3}
 	EndGlobalSection
 EndGlobal

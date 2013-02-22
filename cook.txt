@@ -4,6 +4,7 @@ Ep1/ep1_falling
 Ep1/ep1_crushed
 Ep1/ep1_eaten
 Ep1/testroom1_manipulate
+Ep1/testroom2_manipulate
 Ep1/testroom2_bugtest
 
 
@@ -16,6 +17,7 @@ FX/shield1mesh
 FX/pulsecone1mesh
 FX/pulsebeam1mesh
 FX/pulseimpact1mesh
+FX/shieldsprite1_M
 Shared/terminal1
 UI/Solid_M
 UI/loading_icon_M

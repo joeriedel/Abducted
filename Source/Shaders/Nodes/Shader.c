@@ -21,13 +21,7 @@ BEGIN_UNIFORMS
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
 #endif
 #if defined(SKIN_SPRITE)
-	// port this to HLSL
-	uniform vec2 UDECL(SpriteVerts)[4] = vec2[](
-		vec2(-0.5,  0.5),
-		vec2(-0.5, -0.5),
-		vec2( 0.5, -0.5),
-		vec2( 0.5,  0.5)
-	);
+	GLSL(uniform) FLOAT2 UDECL(spriteVerts)[4];
 #endif
 	UTXREGS
 	UTCMODREGS
@@ -136,7 +130,7 @@ MAIN
 #endif
 #if defined(SKIN_SPRITE)
 	int idx = int(IN(spriteSkin).w);
-	FLOAT2 sprite_vertex = UNIFORM(SpriteVerts)[idx];
+	FLOAT2 sprite_vertex = UNIFORM(spriteVerts)[idx];
 	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
 	FLOAT4 rotate = sprite_vertex.xxyy * sincos.xyxy;
 	sprite_vertex.x = rotate.y - rotate.z;

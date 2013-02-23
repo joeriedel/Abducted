@@ -43,12 +43,8 @@ end
 
 function Game.OnEvent(self, cmd, args)
 
-	if (args) then
-		COutLine(kC_Debug, "Game.OnEvent(%s, %s)", cmd, args)
-	else
-		COutLine(kC_Debug, "Game.OnEvent(%s)", cmd)
-	end
-
+	COutLineEvent("Game", cmd, args)
+	
 	if cmd == "fadein" then
 		UI:FadeIn(tonumber(args))
 		return true

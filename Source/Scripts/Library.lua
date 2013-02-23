@@ -4,6 +4,18 @@
 -- See Abducted/LICENSE for licensing terms
 
 --[[---------------------------------------------------------------------------
+	Print
+-----------------------------------------------------------------------------]]
+
+function COutLineEvent(class, cmd, args)
+	if (args) then
+		COutLine(kC_Debug, "%s.OnEvent(%s, %s)", class, cmd, args)
+	else
+		COutLine(kC_Debug, "%s.OnEvent(%s)", class, cmd)
+	end
+end
+
+--[[---------------------------------------------------------------------------
 	Touch Radius Checks
 -----------------------------------------------------------------------------]]
 

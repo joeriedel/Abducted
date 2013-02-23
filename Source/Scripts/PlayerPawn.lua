@@ -8,6 +8,8 @@ PlayerPawn.kWalkSpeed = 100
 PlayerPawn.kAutoDecelDistance = 10
 PlayerPawn.kFriction = 300
 PlayerPawn.kRunSpeed = 200
+PlayerPawn.kShieldMoveSpeed = 0.5
+PlayerPawn.kShieldAccelSpeed = 0.5
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "right_hand"
 PlayerPawn.PulseBeamScale = 1/120
@@ -228,6 +230,9 @@ function PlayerPawn.BeginShield(self)
 	end
 	
 	World.gameTimers:Add(f, 0.05, true)
+	
+	self:SetMaxGroundSpeed(PlayerPawn.kWalkSpeed*PlayerPawn.kShieldMoveSpeed)
+	self:SetAccel({PlayerPawn.kAccel*PlayerPawn.kShieldAccelSpeed, 0, 0})
 
 end
 
@@ -243,6 +248,9 @@ function PlayerPawn.EndShield(self)
 	end
 	
 	World.gameTimers:Add(f, 0.1, true)
+	
+	self:SetMaxGroundSpeed(PlayerPawn.kWalkSpeed)
+	self:SetAccel({PlayerPawn.kAccel, 0, 0})
 	
 end
 
@@ -367,11 +375,7 @@ function PlayerPawn.CheckTappedOn(self, e)
 end
 
 function PlayerPawn.OnEvent(self, cmd, args)
-	if (args) then
-		COutLine(kC_Debug, "PlayerPawn.OnEvent(%s, %s)", cmd, args)
-	else
-		COutLine(kC_Debug, "PlayerPawn.OnEvent(%s)", cmd)
-	end
+	COutLineEvent("PlayerPawn", cmd, args)
 	
 	if (cmd == "animstate") then
 		if (args == nil) then

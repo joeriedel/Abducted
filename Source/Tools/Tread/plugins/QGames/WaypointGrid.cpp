@@ -14,7 +14,7 @@
 #include "r_gl.h"
 
 enum {
-	kWaypointSaveVersion = 4
+	kWaypointSaveVersion = 5
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -126,6 +126,8 @@ bool CWaypoint::WriteToFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 		MAP_WriteString(pFile, c->props[Connection::kProp_FwdEnd].GetString());
 		MAP_WriteString(pFile, c->props[Connection::kProp_BackStart].GetString());
 		MAP_WriteString(pFile, c->props[Connection::kProp_BackEnd].GetString());
+		MAP_WriteString(pFile, c->props[Connection::kProp_FwdAnim].GetString());
+		MAP_WriteString(pFile, c->props[Connection::kProp_BackAnim].GetString());
 		MAP_WriteInt(pFile, c->props[Connection::kProp_Flags].GetInt());
 	}
 
@@ -169,7 +171,13 @@ bool CWaypoint::ReadFromFile( CFile* pFile, CTreadDoc* pDoc, int nVersion ) {
 			c->props[Connection::kProp_BackStart].SetString(MAP_ReadString(pFile));
 			c->props[Connection::kProp_BackEnd].SetString(MAP_ReadString(pFile));
 
+			if (version >= 5) {
+				c->props[Connection::kProp_FwdAnim].SetString(MAP_ReadString(pFile));
+				c->props[Connection::kProp_BackAnim].SetString(MAP_ReadString(pFile));
+			}
+			
 			int flags = MAP_ReadInt(pFile);
+
 			if (version < 4)
 				flags |= (1 << Connection::kFlag_Interruptible);
 
@@ -639,18 +647,6 @@ void CWaypoint::PopupMenu_OnConnectWaypoints(CMapView *view) {
 	}
 
 	view->GetDocument()->GetSelectedObjectList()->WalkList(CWaypoint::AddSelectedConnectionProps, view->GetDocument(), 0);
-
-	/*for (CMapObject *x = selection->ResetPos(); x; x = xNext) {
-		selection->SetPosition(x);
-		xNext = selection->GetNextItem();
-
-		CWaypoint *src = dynamic_cast<CWaypoint*>(x);
-		if (!src)
-			continue;
-
-		src->AddSelectedConnectionProps(view->GetDocument());
-	}*/
-	
 	view->GetDocument()->Prop_UpdateSelection();
 	Sys_RedrawWindows();
 }
@@ -755,7 +751,9 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 		fs << "\"connection_fwd_end " << i << "\" \"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
 		fs << "\"connection_back_start " << i << "\" \"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
 		fs << "\"connection_back_end " << i << "\" \"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
-
+		fs << "\"connection_fwd_anim " << i << "\" \"" << c->props[Connection::kProp_FwdAnim].GetString() << "\"\n";
+		fs << "\"connection_back_anim " << i << "\" \"" << c->props[Connection::kProp_BackAnim].GetString() << "\"\n";
+		
 		++i;
 	}
 
@@ -1004,12 +1002,21 @@ void CWaypoint::Connection::InitProps() {
 	props[kProp_BackEnd].SetType(CObjProp::script);
 	props[kProp_BackEnd].SetSubType(FALSE);
 
+	props[kProp_FwdAnim].SetName("fwdanim");
+	props[kProp_FwdAnim].SetDisplayName("*A -> B (Custom Animation)");
+	props[kProp_FwdAnim].SetType(CObjProp::string);
+	props[kProp_FwdAnim].SetSubType(FALSE);
+
+	props[kProp_BackAnim].SetName("backanim");
+	props[kProp_BackAnim].SetDisplayName("*B -> A (Custom Animation)");
+	props[kProp_BackAnim].SetType(CObjProp::string);
+	props[kProp_BackAnim].SetSubType(FALSE);
+
 	props[kProp_Flags].SetName("c_flags");
 	props[kProp_Flags].SetDisplayName("Connection Flags");
 	props[kProp_Flags].SetType(CObjProp::integer);
 	props[kProp_Flags].SetSubType(FALSE);
 	
-
 	flags[kFlag_AtoB].SetName("AtoB");
 	flags[kFlag_AtoB].SetDisplayName("Enable A -> B");
 	flags[kFlag_AtoB].SetType(CObjProp::integer);

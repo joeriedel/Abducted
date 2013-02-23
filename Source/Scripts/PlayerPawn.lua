@@ -11,6 +11,11 @@ PlayerPawn.kRunSpeed = 200
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "right_hand"
 PlayerPawn.PulseBeamScale = 1/120
+PlayerPawn.ScaleFixHack = 2.5
+
+PlayerPawn.AnimationStates = {
+	
+}
 
 function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
@@ -18,17 +23,23 @@ function PlayerPawn.Spawn(self)
 	
 	MakeAnimatable(self)
 	
+	self.animState = "default"
+	self.visible = true
+	
 	self.model = World.Load("Characters/HumanFemale")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
-	self.model.dm:ScaleTo({0.4, 0.4, 0.4}, 0) -- temp art
-	self.model.dm:SetMotionScale(2.5) -- temp art
+	self.model.dm:ScaleTo({1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack}, 0) -- temp art
+	self.model.dm:SetMotionScale(PlayerPawn.ScaleFixHack) -- temp art
 	self.model.dm:SetPos({0, 0, -48}) -- on floor
 	self.model.handBone = self.model.dm:FindBone(PlayerPawn.HandBone)
 	
 	if (self.model.handBone == -1) then
 		error("PlayerPawn: can't find bone named %s", PlayerPawn.HandBone)
 	end
+	
+	self:SetMotionSka(self.model)
+	self:SetMotionScale(1/PlayerPawn.ScaleFixHack)
 	
 	self:SetMins({-24, -24, -48})
 	self:SetMaxs({ 24,  24,  48})
@@ -104,12 +115,30 @@ function PlayerPawn.Spawn(self)
 	if (self.validFloorPosition and (self.keys.floorNum)) then
 	-- enable our starting floor by default
 		Floors:SetFloorState(NumberForString(self.keys.floorNum), kFloorState_Enabled, nil)
+	elseif (not self.validFloorPosition) then
+		error("PlayerPawn must have a valid floor position (no valid starting waypoint or floor was found).")
 	end
 	
 	World.playerPawn = self
 	World.SetPlayerPawn(self)
 	
 	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
+end
+
+function PlayerPawn.LookupAnimation(self, name, animState)
+	if (animState == nil) then
+		animState = self.animState
+	end
+	
+	local state = PlayerPawn.AnimationStates[animState]
+	if ((state == nil) or (state[name] == nil)) then
+		if (animState == "default") then
+			return name
+		end
+		return self:LookupAnimation(self, name, "default")
+	end
+	
+	return state[name]
 end
 
 function PlayerPawn.TickPhysics(self)
@@ -130,7 +159,10 @@ function PlayerPawn.TickPhysics(self)
 	
 	if (self.state ~= reqState) then
 		self.state = reqState
-		self:PlayAnim(reqState, self.model)
+		local anim = self:LookupAnimation(reqState)
+		if (anim) then
+			self:PlayAnim(anim, self.model)
+		end
 	end
 end
 
@@ -332,6 +364,90 @@ function PlayerPawn.CheckTappedOn(self, e)
 	end
 	
 	return false
+end
+
+function PlayerPawn.OnEvent(self, cmd, args)
+	if (args) then
+		COutLine(kC_Debug, "PlayerPawn.OnEvent(%s, %s)", cmd, args)
+	else
+		COutLine(kC_Debug, "PlayerPawn.OnEvent(%s)", cmd)
+	end
+	
+	if (cmd == "animstate") then
+		if (args == nil) then
+			COutLine(kC_Debug, "Error, animstate command requires an argument")
+		else
+			if (self.animState ~= args) then
+				self.animState = args
+				self.state = nil
+			end
+		end
+		return true
+	elseif (cmd == "resetanim") then
+		if (self.animState ~= "default") then
+			self.animState = "default"
+			self.state = nil
+		end
+		return true
+	elseif (cmd == "show") then
+		self:Show(true)
+		return true
+	elseif (cmd == "hide") then
+		self:Hide(true)
+		return true
+	end
+	
+	return false
+end
+
+function PlayerPawn.Show(self, show)
+
+	if (show == self.visible) then
+		return
+	end
+	
+	self.visible = show
+	self.model.dm:SetVisible(show)
+	
+	self:ShowShield(show)
+
+end
+
+function PlayerPawn.ShowShield(self, show)
+	if (show and self.shieldActive) then
+		self.shield.dm:SetVisbile(show)
+		self.shieldSprite.dm:SetVisible(show)
+	elseif (not show) then
+		self.shield.dm:SetVisible(false)
+		self.shieldSprite.dm:SetVisible(false)
+	end
+end
+
+function PlayerPawn.CustomAnimMove(self, name)
+
+	local f = function()
+		self.disableAnimTick = false
+		self.customMove = false
+		self:TickPhysics() -- get us a new state immediately
+		if (self.CustomMoveComplete) then
+			self:CustomMoveComplete()
+		end
+	end
+	
+	local anim = self:LookupAnimation(name)
+	if (anim) then
+		self.disableAnimTick = true
+		self.customMove = true
+		self.state = nil
+		self:EnableFlags(kPhysicsFlag_Friction, true)
+		local blend = self:PlayAnim(anim, self.model)
+		if (blend) then
+			blend.Seq(f)
+		else
+			f()
+		end
+	end
+
 end
 
 info_player_start = PlayerPawn

@@ -31,14 +31,16 @@ function PlayerInput.OnInputEvent(self, e)
 	if (Input.IsTouchBegin(e) and (self.touch == nil)) then
 		self.touch = e.touch
 		UI:ShowFinger(true, 0.25)
-		if (Game.entity.pulse) then
-			action = self:TapPulse(e.original.data[1], e.original.data[2])
-		else
-			if (World.playerPawn:CheckTappedOn(e.original)) then
-				World.playerPawn:Stop()
-				action = true
+		if (not World.playerPawn.customMove) then
+			if (Game.entity.pulse) then
+				action = self:TapPulse(e.original.data[1], e.original.data[2])
 			else
-				action = self:TapMove(e.original.data[1], e.original.data[2])
+				if (World.playerPawn:CheckTappedOn(e.original)) then
+					World.playerPawn:Stop()
+					action = true
+				else
+					action = self:TapMove(e.original.data[1], e.original.data[2])
+				end
 			end
 		end
 	elseif (self.touch ~= e.touch) then

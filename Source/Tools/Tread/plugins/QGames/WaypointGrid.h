@@ -133,6 +133,8 @@ private:
 			kProp_FwdEnd,
 			kProp_BackStart,
 			kProp_BackEnd,
+			kProp_FwdAnim,
+			kProp_BackAnim,
 			kProp_Flags,
 			kProp_Num
 		};

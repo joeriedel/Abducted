@@ -13,7 +13,7 @@ function Persistence.MakePath(key, args)
 		for k,v in pairs(args) do
 			if (type(k) == "number") then
 				if s ~= nil then
-					s = s.."_"..tostring(v)
+					s = s.."/"..tostring(v)
 				else
 					s = tostring(v)
 				end
@@ -22,31 +22,57 @@ function Persistence.MakePath(key, args)
 	end
 	
 	if s ~= nil then
-		return s.."_"..tostring(key)
+		return s.."/"..tostring(key)
 	end
 	
 	return tostring(key)
 
 end
 
+function Persistence.TablePath(tab, path)
+
+	path = string.split(path, "/")
+	
+	for i = 1, (#path-1) do
+		local n = tab[path[i]]
+		if (n == nil) then
+			n = {}
+			tab[path[i]] = n
+		end
+		tab = n
+	end
+		
+	return tab, path[#path]
+
+end
+
 function Persistence.DeleteKey(storage, key, ...)
-	local s = Persistence.MakePath(key, arg)
-	storage.keys[s] = nil
+	local path = Persistence.MakePath(key, arg)
+
+	local tab
+	tab, key = Persistence.TablePath(storage.keys, path)
+	
+	tab[key] = nil
 end
 
 function Persistence.ReadString(storage, key, default, ...)
+	local path = Persistence.MakePath(key, arg)
 
-	local s = Persistence.MakePath(key, arg)
-	return StringForString(storage.keys[s], default)
+	local tab
+	tab, key = Persistence.TablePath(storage.keys, path)
+		
+	return StringForString(tab[key], default)
 
 end
 
 
 function Persistence.WriteString(storage, key, value, ...)
+	local path = Persistence.MakePath(key, arg)
 
-	local s = Persistence.MakePath(key, arg)
-	storage.keys[s] = tostring(value)
-
+	local tab
+	tab, key = Persistence.TablePath(storage.keys, path)
+	
+	tab[key] = tostring(value)
 end
 
 function Persistence.ReadNumber(storage, key, default, ...)

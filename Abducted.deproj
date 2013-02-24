@@ -112,6 +112,9 @@
     <filename>Source\Scripts\SoundEmitter.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Sprite.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\System.lua</filename>
   </file>
   <file>

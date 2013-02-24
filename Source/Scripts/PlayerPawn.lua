@@ -5,13 +5,13 @@
 
 PlayerPawn = Entity:New()
 PlayerPawn.kWalkSpeed = 100
-PlayerPawn.kAutoDecelDistance = 10
+PlayerPawn.kAutoDecelDistance = 20
 PlayerPawn.kFriction = 300
 PlayerPawn.kRunSpeed = 200
 PlayerPawn.kAccel = 200
-PlayerPawn.HandBone = "right_hand"
+PlayerPawn.HandBone = "Hand_right"
 PlayerPawn.PulseBeamScale = 1/120
-PlayerPawn.ScaleFixHack = 2.5
+PlayerPawn.ScaleFixHack = 1
 
 PlayerPawn.AnimationStates = {
 	
@@ -26,7 +26,7 @@ function PlayerPawn.Spawn(self)
 	self.animState = "default"
 	self.visible = true
 	
-	self.model = World.Load("Characters/HumanFemale")
+	self.model = World.Load("Characters/Eve")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.dm:ScaleTo({1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack}, 0) -- temp art

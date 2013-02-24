@@ -300,8 +300,7 @@ function PlayerPawn.BeginShield(self)
 	
 	World.gameTimers:Add(f, 0.05, true)
 	
-	self:SetMaxGroundSpeed(PlayerPawn.kWalkSpeed*PlayerPawn.kShieldMoveSpeed)
-	self:SetAccel({PlayerPawn.kAccel*PlayerPawn.kShieldAccelSpeed, 0, 0})
+	self:SetSpeeds()
 
 end
 
@@ -318,8 +317,7 @@ function PlayerPawn.EndShield(self)
 	
 	World.gameTimers:Add(f, 0.1, true)
 	
-	self:SetMaxGroundSpeed(PlayerPawn.kWalkSpeed)
-	self:SetAccel({PlayerPawn.kAccel, 0, 0})
+	self:SetSpeeds()
 	
 end
 

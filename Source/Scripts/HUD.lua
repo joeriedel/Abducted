@@ -120,6 +120,15 @@ function HUD.Load(self)
 	
 	self.widgets.Pulse.flashing = false
 	
+	self.armEnabled = false
+	self.manipulateEnabled = false
+	self.shieldEnabled = false
+	self.pulseEnabled = false
+	
+	self.widgets.Arm.class:SetEnabled(self.widgets.Arm, false)
+	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
+	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, false)
 end
 
 function HUD.ArmPressed(self, widget)
@@ -218,18 +227,119 @@ function HUD.RechargePulse(self)
 end
 
 function HUD.Layout(self)
+
+	if (not PlayerSkills:ArmUnlocked()) then
+		self.widgets.Arm:SetVisible(false)
+	end
+
 	local y = 42
-	local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
-	self.widgets.ManipulateCharging:SetRect(r)
-	self.widgets.ManipulateShimmer:SetRect(r)
-	y = y + r[4] + (24 * UI.identityScale[2])
-	r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
-	self.widgets.ShieldCharging:SetRect(r)
-	self.widgets.ShieldShimmer:SetRect(r)
-	y = y + r[4] + (24 * UI.identityScale[2])
-	r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
-	self.widgets.PulseCharging:SetRect(r)
-	self.widgets.PulseShimmer:SetRect(r)
+	if (PlayerSkills:ManipulateUnlocked()) then
+		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
+		self.widgets.ManipulateCharging:SetRect(r)
+		self.widgets.ManipulateShimmer:SetRect(r)
+		y = y + r[4] + (24 * UI.identityScale[2])
+	else
+		self.widgets.Manipulate:SetVisible(false)
+	end
+	if (PlayerSkills:ShieldUnlocked()) then
+		local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+		self.widgets.ShieldCharging:SetRect(r)
+		self.widgets.ShieldShimmer:SetRect(r)
+		y = y + r[4] + (24 * UI.identityScale[2])
+	else
+		self.widgets.Shield:SetVisible(false)
+	end
+	if (PlayerSkills:PulseUnlocked()) then
+		local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+		self.widgets.PulseCharging:SetRect(r)
+		self.widgets.PulseShimmer:SetRect(r)
+	else
+		self.widgets.Pulse:SetVisible(false)
+	end
+end
+
+function HUD.AnimateUnlock(self, items)
+
+	if (PlayerSkills:ArmUnlocked()) then
+		if (items["arm"]) then
+			local r = self.widgets.Arm:Rect()
+			self.widgets.Arm:SetRect({r[1]-r[3], r[2], r[3], r[4]})
+			self.widgets.Arm:MoveTo({r[1], r[2]}, {0.3, 0})
+			self.armEnabled = true
+			self.widgets.Arm.class:SetEnabled(self.widgets.Arm, true)
+		end
+	end
+
+	local y = 42
+	if (PlayerSkills:ManipulateUnlocked()) then
+		local unlock = items["manipulate"]
+		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
+		self.widgets.ManipulateCharging:SetRect(r)
+		self.widgets.ManipulateShimmer:SetRect(r)
+		y = y + r[4] + (24 * UI.identityScale[2])
+		self.widgets.Manipulate:SetVisible(true)
+		if (unlock) then
+			self.widgets.Manipulate:ScaleTo({0,0}, {0,0})
+			self.widgets.Manipulate:ScaleTo({1,1}, {0.3, 0.3})
+			if (self.manipulateEnabled) then
+				local f = function()
+					HUD:Shimmer(self.widgets.ManipulateShimmer)
+				end
+				World.gameTimers:Add(f, 0.3, true)
+			end
+		end
+	end
+	
+	if (PlayerSkills:ShieldUnlocked()) then
+		local unlock = items["shield"]
+		if (unlock) then
+			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+			self.widgets.ShieldCharging:SetRect(r)
+			self.widgets.ShieldShimmer:SetRect(r)
+			y = y + r[4] + (24 * UI.identityScale[2])
+			self.widgets.Shield:ScaleTo({0,0}, {0,0})
+			self.widgets.Shield:ScaleTo({1,1}, {0.3, 0.3})
+			if (self.shieldEnabled) then
+				local f = function()
+					HUD:Shimmer(self.widgets.ShieldShimmer)
+				end
+				World.gameTimers:Add(f, 0.3, true)
+			end
+		else
+			local oldRect = self.widgets.Shield:Rect()
+			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+			self.widgets.Shield:SetRect(oldRect)
+			self.widgets.Shield:MoveTo({r[1], r[2]}, {0.3, 0.3})
+			self.widgets.ShieldCharging:MoveTo({r[1], r[2]}, {0.3, 0.3})
+			self.widgets.ShieldShimmer:MoveTo({r[1], r[2]}, {0.3, 0.3})
+			y = y + r[4] + (24 * UI.identityScale[2])
+		end
+	end
+	
+	if (PlayerSkills:PulseUnlocked()) then
+		local unlock = items["pulse"]
+		if (unlock) then
+			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+			self.widgets.PulseCharging:SetRect(r)
+			self.widgets.PulseShimmer:SetRect(r)
+			self.widgets.Pulse:ScaleTo({0,0}, {0,0})
+			self.widgets.Pulse:ScaleTo({1,1}, {0.3, 0.3})
+			if (self.pulseEnabled) then
+				local f = function()
+					HUD:Shimmer(self.widgets.PulseShimmer)
+				end
+				World.gameTimers:Add(f, 0.3, true)
+			end
+		else
+			local oldRect = self.widgets.Pulse:Rect()
+			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+			self.widgets.Pulse:SetRect(oldRect)
+			self.widgets.Pulse:MoveTo({r[1], r[2]}, {0.3, 0.3})
+			self.widgets.PulseCharging:MoveTo({r[1], r[2]}, {0.3, 0.3})
+			self.widgets.PulseShimmer:MoveTo({r[1], r[2]}, {0.3, 0.3})
+		end
+	end
+
 end
 
 function HUD.Think(self)
@@ -366,28 +476,52 @@ function HUD.Shimmer(self, widget)
 end
 
 function HUD.PlayerDied(self)
-	self:Disable()
+	HUD:Disable()
 end
 
-function HUD.Disable(self)
--- disable the HUD
-	HUD.enabled = false
+function HUD.EnableAll(self)
+	HUD:Enable({"arm", "manipulate", "shield", "pulse"})
+end
 
-	if (self.shieldExpiryTimer) then
-		self.shieldExpiryTimer:Clean()
-		self.shieldExpiryTimer = nil
+function HUD.Enable(self, items)
+
+	local state = {
+		arm = false,
+		manipulate = false,
+		shield = false,
+		pulse = false
+	}
+	
+	for k,v in pairs(items) do
+		state[v] = true
 	end
-	if (self.shieldTimer) then
-		self.shieldTimer:Clean()
-		self.shieldTimer = nil
+	
+	HUD:EnableArm(state["arm"] == true)
+	HUD:EnableManipulate(state["manipulate"] == true)
+	HUD:EnableShield(state["shield"] == true)
+	HUD:EnablePulse(state["pulse"] == true)
+
+end
+
+function HUD.EnableArm(self, enable)
+	if (self.armEnabled == enable) then
+		return
 	end
+	
+	self.armEnabled = enable
+	self.widgets.Arm.class:SetEnabled(self.widgets.Arm, enable)
+end
+
+function HUD.EnableManipulate(self, enable)
+	if (self.manipulateEnabled == enable) then
+		return
+	end
+	
+	self.manipulateEnabled = enable
+	
 	if (self.manipulateTimer) then
 		self.manipulateTimer:Clean()
 		self.manipulateTimer = nil
-	end
-	if (self.pulseTimer) then
-		self.pulseTimer:Clean()
-		self.pulseTimer = nil
 	end
 	
 	local gfx = {}
@@ -398,15 +532,48 @@ function HUD.Disable(self)
 	
 	self.widgets.ManipulateCharging:SetVisible(false)
 	self.widgets.Manipulate.class:ChangeGfx(self.widgets.Manipulate, gfx)
-	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, enable)
+end
+
+function HUD.EnableShield(self, enable)
+	if (self.shieldEnabled == enable) then
+		return
+	end
 	
+	self.shieldEnabled = enable
+	
+	if (self.shieldExpiryTimer) then
+		self.shieldExpiryTimer:Clean()
+		self.shieldExpiryTimer = nil
+	end
+	if (self.shieldTimer) then
+		self.shieldTimer:Clean()
+		self.shieldTimer = nil
+	end
+		
+	local gfx = {}
 	gfx.enabled = self.gfx.ShieldEnabled
 	gfx.disabled = self.gfx.ShieldDisabled
 	gfx.pressed = self.gfx.ShieldDisabled
 	
 	self.widgets.ShieldCharging:SetVisible(false)
 	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
-	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
+	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, enable)
+end
+
+function HUD.EnablePulse(self, enable)
+	if (self.pulseEnabled == enable) then
+		return
+	end
+	
+	self.pulseEnabled = enable
+	
+	if (self.pulseTimer) then
+		self.pulseTimer:Clean()
+		self.pulseTimer = nil
+	end
+	
+	local gfx = {}
 	
 	gfx.enabled = self.gfx.PulseEnabled
 	gfx.disabled = self.gfx.PulseDisabled
@@ -414,7 +581,17 @@ function HUD.Disable(self)
 	
 	self.widgets.PulseCharging:SetVisible(false)
 	self.widgets.Pulse.class:ChangeGfx(self.widgets.Pulse, gfx)
-	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, false)
+	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, enable)
+end
+
+function HUD.Disable(self)
+-- disable the HUD
+	HUD.enabled = false
+
+	HUD:EnableArm(false)
+	HUD:EnableManipulate(false)
+	HUD:EnableShield(false)
+	HUD:EnablePulse(false)
 	
 end
 

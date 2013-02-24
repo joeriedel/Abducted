@@ -10,7 +10,6 @@ GameDB.MinutesPerHour = 60
 GameDB.HoursPerDay = 24
 GameDB.SecondsPerHour = 60*60
 GameDB.SecondsPerDay = 60*60*24
-GameDB.DebugAllAbilitiesEnabled = true
 
 function GameDB.Load(self)
 
@@ -18,11 +17,7 @@ function GameDB.Load(self)
 	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/character-profiletest1_M")
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
-	self.armUnlocked = Persistence.ReadBool(SaveGame, "armUnlocked", false)
-	self.manipulateUnlocked = Persistence.ReadBool(SaveGame, "manipulateUnlocked", false)
-	self.shieldUnlocked = Persistence.ReadBool(SaveGame, "shieldUnlocked", false)
-	self.pulseUnlocked = Persistence.ReadBool(SaveGame, "pulseUnlocked", false)
-	
+		
 	self:LoadTime()
 	self:LoadChatLockouts()
 	EventLog:Load()
@@ -106,46 +101,6 @@ function GameDB.ClearChatLockout(self)
 	self.chatLockout = false
 	self.chatLockoutTime = nil
 	self:SaveChatLockouts()
-end
-
-function GameDB.ArmUnlocked(self)
-	return self.armUnlocked
-end
-
-function GameDB.UnlockArm(self)
-	self.armUnlocked = true
-	Persistence.WriteBool(SaveGame, "armUnlocked", true)
-	SaveGame:Save()
-end
-
-function GameDB.ManipulateUnlocked(self)
-	return self.manipulateUnlocked
-end
-
-function GameDB.UnlockManipulate(self)
-	self.manipulateUnlocked = true
-	Persistence.WriteBool(SaveGame, "manipulateUnlocked", true)
-	SaveGame:Save()
-end
-
-function GameDB.ShieldUnlocked(self)
-	return self.shieldUnlocked
-end
-
-function GameDB.UnlockShield(self)
-	self.shieldUnlocked = true
-	Persistence.WriteBool(SaveGame, "shieldUnlocked", true)
-	SaveGame:Save()
-end
-
-function GameDB.PulseUnlocked(self)
-	return self.pulseUnlocked
-end
-
-function GameDB.UnlockPulse(self)
-	self.pulseUnlocked = true
-	Persistence.WriteBool(SaveGame, "pulseUnlocked", true)
-	SaveGame:Save()
 end
 
 function GameDB.IncrementTime(self, dt)

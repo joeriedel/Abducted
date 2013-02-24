@@ -5,18 +5,38 @@
 
 PlayerPawn = Entity:New()
 PlayerPawn.kWalkSpeed = 100
-PlayerPawn.kAutoDecelDistance = 20
+PlayerPawn.kAutoDecelDistance = 10
 PlayerPawn.kFriction = 300
 PlayerPawn.kRunSpeed = 200
-PlayerPawn.kShieldMoveSpeed = 0.5
-PlayerPawn.kShieldAccelSpeed = 0.5
+PlayerPawn.kShieldSpeed = 0.5
+PlayerPawn.kShieldAccel = 0.5
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "Hand_right"
 PlayerPawn.PulseBeamScale = 1/120
-PlayerPawn.ScaleFixHack = 1
 
 PlayerPawn.AnimationStates = {
-	
+	default = {
+	-- any animations *not* listed here will pass-through unaltered
+	-- example, idle isn't listed here, so "idle" will just become "idle"
+		OnSelect = function()
+			HUD:EnableAll()
+		end
+	},
+	limp = {
+		idle = "limpidle",
+		walk = "limpcrawl",
+		death = "limpdeath",
+		manipulate_idle = "limpmanidle",
+		maniplate_left = "limpmanleft",
+		manipulate_right = "limpmanright",
+		manipulate_up = "limpmanup",
+		manipulate_down = "limpmandown",
+		speedScale = 0.5,
+		canRun = false,
+		OnSelect = function()
+			HUD:Enable({"arm", "shield", "manipulate"})
+		end
+	}
 }
 
 function PlayerPawn.Spawn(self)
@@ -25,23 +45,20 @@ function PlayerPawn.Spawn(self)
 	
 	MakeAnimatable(self)
 	
-	self.animState = "default"
+	self.animState = StringForString(self.keys.initial_state, "default")
 	self.visible = true
 	
 	self.model = World.Load("Characters/Eve")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
-	self.model.dm:ScaleTo({1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack, 1/PlayerPawn.ScaleFixHack}, 0) -- temp art
-	self.model.dm:SetMotionScale(PlayerPawn.ScaleFixHack) -- temp art
 	self.model.dm:SetPos({0, 0, -48}) -- on floor
 	self.model.handBone = self.model.dm:FindBone(PlayerPawn.HandBone)
 	
 	if (self.model.handBone == -1) then
-		error("PlayerPawn: can't find bone named %s", PlayerPawn.HandBone)
+		error("PlayerPawn: can't find bone named "..PlayerPawn.HandBone)
 	end
 	
 	self:SetMotionSka(self.model)
-	self:SetMotionScale(1/PlayerPawn.ScaleFixHack)
 	
 	self:SetMins({-24, -24, -48})
 	self:SetMaxs({ 24,  24,  48})
@@ -103,8 +120,6 @@ function PlayerPawn.Spawn(self)
 	local spring = self:AngleSpring()
 	spring.elasticity = 160 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
-	self:SetMaxGroundSpeed(PlayerPawn.kWalkSpeed)
-	self:SetAccel({PlayerPawn.kAccel, 0, 0}) -- <-- How fast the player accelerates (units per second).
 	self:SetGroundFriction(PlayerPawn.kFriction)
 	self:SetAutoDecelDistance(PlayerPawn.kAutoDecelDistance)
 	self:EnableFlags(kPhysicsFlag_Friction, true)
@@ -127,6 +142,58 @@ function PlayerPawn.Spawn(self)
 	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
 end
 
+function PlayerPawn.PostSpawn(self)
+
+	local state = self.animState
+	self.animState = nil
+	self:SelectAnimState(state)	
+
+end
+
+function PlayerPawn.SelectAnimState(self, state)
+
+	if (state ~= self.animState) then
+		if (self.animState) then
+			local set = PlayerPawn.AnimationStates[self.animState]
+			if (set and set.OnDeselect) then
+				set:OnDeselect(self)
+			end
+		end
+		self.animState = state
+		local set = PlayerPawn.AnimationStates[state]
+		if (set and set.OnSelect) then
+			set.OnSelect(self)
+		end
+		self:SetSpeeds()
+		self.state = nil -- force change
+	end
+
+end
+
+function PlayerPawn.SetSpeeds(self)
+
+	local speed
+	local accel
+	
+	if (self.shieldActive) then
+		speed = PlayerPawn.kWalkSpeed * PlayerPawn.kShieldSpeed
+		accel = PlayerPawn.kAccel * PlayerPawn.kShieldAccel
+	else
+		speed = PlayerPawn.kWalkSpeed
+		accel = PlayerPawn.kAccel
+	end
+	
+	local set = PlayerPawn.AnimationStates[self.animState]
+	if (set and set.speedScale) then
+		speed = speed * set.speedScale
+	--	accel = accel * set.speedScale
+	end
+
+	self:SetMaxGroundSpeed(speed)
+	self:SetAccel({accel, 0, 0}) -- <-- How fast the player accelerates (units per second).
+
+end
+
 function PlayerPawn.LookupAnimation(self, name, animState)
 	if (animState == nil) then
 		animState = self.animState
@@ -137,7 +204,7 @@ function PlayerPawn.LookupAnimation(self, name, animState)
 		if (animState == "default") then
 			return name
 		end
-		return self:LookupAnimation(self, name, "default")
+		return self:LookupAnimation(name, "default")
 	end
 	
 	return state[name]
@@ -188,7 +255,8 @@ function PlayerPawn.NotifyManipulate(self, enabled)
 	if (enabled) then
 		self.disableAnimTick = true
 		self.state = nil
-		self:PlayAnim("manipulate_idle", self.model)
+		local anim = self:LookupAnimation("manipulate_idle")
+		self:PlayAnim(anim, self.model)
 		self:Stop()
 	else 
 		if (self.manipulateDir == nil) then
@@ -204,7 +272,8 @@ function PlayerPawn.ManipulateDir(self, dir)
 		self:EndManipulate()
 	end
 	
-	self:PlayAnim("manipulate_"..dir, self.model).Seq(f)
+	local anim = self:LookupAnimation("manipulate_"..dir)
+	self:PlayAnim(anim, self.model).Seq(f)
 	
 end
 
@@ -261,7 +330,8 @@ end
 function PlayerPawn.BeginPulse(self)
 	self.disableAnimTick = true
 	self.state = nil
-	self:PlayAnim("pulse_idle", self.model)
+	local anim = self:LookupAnimation("pulse_idle")
+	self:PlayAnim(anim, self.model)
 	self:Stop()
 end
 
@@ -309,7 +379,8 @@ function PlayerPawn.FirePulse(self, target, normal)
 		self:EndPulse()
 	end
 	
-	self:PlayAnim("pulse_fire", self.model).Seq(f)
+	local anim = self:LookupAnimation("pulse_fire")
+	self:PlayAnim(anim , self.model).Seq(f)
 	HUD:RechargePulse()
 	
 end
@@ -381,21 +452,15 @@ end
 function PlayerPawn.OnEvent(self, cmd, args)
 	COutLineEvent("PlayerPawn", cmd, args)
 	
-	if (cmd == "animstate") then
+	if (cmd == "state") then
 		if (args == nil) then
 			COutLine(kC_Debug, "Error, animstate command requires an argument")
 		else
-			if (self.animState ~= args) then
-				self.animState = args
-				self.state = nil
-			end
+			self:SelectAnimState(args)
 		end
 		return true
-	elseif (cmd == "resetanim") then
-		if (self.animState ~= "default") then
-			self.animState = "default"
-			self.state = nil
-		end
+	elseif (cmd == "resetstate") then
+		self:SelectAnimState("default")
 		return true
 	elseif (cmd == "show") then
 		self:Show(true)

@@ -9,11 +9,11 @@ function Abducted.Initialize(self)
 	self.eatInput = false
 	
 	GameDB:Load()
-	self:Load()
+	PlayerSkills:Load()
+	Abducted:Load()
 	PlayerInput:Spawn()
 	HUD:Spawn()
 	Arm:Spawn()
-	PlayerSkills:Load()
 	TerminalScreen.StaticInit()
 	
 	self.think = Abducted.Think

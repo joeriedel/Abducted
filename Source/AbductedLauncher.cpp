@@ -238,7 +238,7 @@ void AbductedLauncher::GraphicsSettings() {
 
 void AbductedLauncher::LoadSettings() {
 	m_defaults = Persistence::Load(0);
-	m_defaults->keys->pairs[String("fullscreen")] = String("true");
+	(*m_defaults->keys.get())[String("fullscreen")].sVal = String("true");
 	
 	DisplayDevice::Ref primaryDisplay = App::Get()->primaryDisplay;
 	
@@ -273,17 +273,17 @@ void AbductedLauncher::LoadSettings() {
 	String s;
 	s.Printf("%dx%d", mode.w, mode.h);
 
-	m_defaults->keys->pairs[String("vidMode")] = s;
+	(*m_defaults->keys.get())[String("vidMode")].sVal = s;
 
 	m_settings = Persistence::Load("settings.prefs");
-	int version = m_settings->keys->IntForKey("version", 0);
+	int version = m_settings->IntForKey("version", 0);
 	
-	if (m_settings->keys->pairs.empty() || (version != kSettingsVersion)) {
+	if (m_settings->keys->empty() || (version != kSettingsVersion)) {
 		m_settings = m_defaults->Clone();
 		
 		s.Printf("%d", kSettingsVersion);
 		
-		m_settings->keys->pairs[String("version")] = s;
+		(*m_settings->keys.get())[String("version")].sVal = s;
 		m_settings->Save("settings.prefs");
 	}
 }
@@ -369,13 +369,13 @@ AbductedGraphicsSettings::AbductedGraphicsSettings(
 
 	const r::VidMode *defMode = dd->defVidMode;
 
-	const char *vidModeString = settings->keys->StringForKey("vidMode");
+	const char *vidModeString = settings->StringForKey("vidMode");
 	r::VidMode selectMode;
 	selectMode.bpp = 32;
 
 	sscanf(vidModeString, "%dx%d", &selectMode.w, &selectMode.h);
 
-	vidModeString = defaults->keys->StringForKey("vidMode");
+	vidModeString = defaults->StringForKey("vidMode");
 	r::VidMode defaultMode;
 	defaultMode.bpp = 32;
 
@@ -425,8 +425,8 @@ AbductedGraphicsSettings::AbductedGraphicsSettings(
 	g->setLayout(il);
 	l->addWidget(g);
 
-	m_defaultFullscreen = m_settings->keys->BoolForKey("fullscreen");
-	m_savedFullscreen = m_settings->keys->BoolForKey("fullscreen");
+	m_defaultFullscreen = m_settings->BoolForKey("fullscreen");
+	m_savedFullscreen = m_settings->BoolForKey("fullscreen");
 	m_fullscreen = new QCheckBox("Fullscreen");
 	m_fullscreen->setChecked(m_savedFullscreen);
 	RAD_VERIFY(connect(m_fullscreen, SIGNAL(stateChanged(int)), SLOT(UpdateEnabledState())));
@@ -461,7 +461,7 @@ void AbductedGraphicsSettings::done(int r) {
 
 		String s;
 		s.Printf("%dx%d", w, h);
-		m_settings->keys->pairs[String("vidMode")] = s;
+		(*m_settings->keys.get())[String("vidMode")].sVal = s;
 
 		if (m_fullscreen->checkState() == Qt::Checked) {
 			s = String("true");
@@ -469,7 +469,7 @@ void AbductedGraphicsSettings::done(int r) {
 			s = String("false");
 		}
 
-		m_settings->keys->pairs[String("fullscreen")] = s;
+		(*m_settings->keys.get())[String("fullscreen")].sVal = s;
 		m_settings->Save();
 	}
 	QDialog::done(r);

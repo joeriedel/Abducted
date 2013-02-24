@@ -344,6 +344,10 @@ function PlayerPawn.DischargePulse(self)
 end
 
 function PlayerPawn.PulseExplode(self)
+	self:Kill()
+end
+
+function PlayerPawn.Kill(self)
 	self.dead = true
 	self:PlayAnim("death", self.model)
 	Game.entity:PlayerDied()
@@ -398,6 +402,9 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "hide") then
 		self:Hide(true)
+		return true
+	elseif (cmd == "kill") then
+		self:Kill()
 		return true
 	end
 	

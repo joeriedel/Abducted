@@ -23,6 +23,7 @@ function BugSpawner.Spawn(self)
 	self.probability = NumberForString(self.keys.probability, 0)
 	self.enabled = self.enabled
 	self.active = 0
+	self.targetLink = LL_Append(Abducted.PulseTargets, {entity=self})
 
 	self:Go()
 
@@ -150,10 +151,11 @@ function Bug.Spawn(self)
 	end
 	
 	self.model.dm = self:AttachDrawModel(self.model)
-	self:SetMins({-24, -24, -24})
-	self:SetMaxs({ 24,  24,  24})
+	self:SetMins({-24, -24, -16})
+	self:SetMaxs({ 24,  24,  16})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-		
+	self.model.dm:SetPos({0, 0, -16}) -- on floor
+	
 	if (self.model.BlendToState) then
 		self.model:BlendToState("crawling")
 	else
@@ -316,6 +318,16 @@ end
 
 function Bug.OnFloorMoveComplete(self)
 	self:SelectNode()
+end
+
+function Bug.Stop(self)
+	self:EnableFlags(kPhysicsFlag_Friction, true)
+end
+
+function Bug.Kill(self, instigator)
+	self:SetMoveType(kMoveType_None)
+	self.model.dm:SetVisible(false)
+	self.think = nil
 end
 
 info_bug = Bug

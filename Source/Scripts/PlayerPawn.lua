@@ -273,8 +273,14 @@ function PlayerPawn.ManipulateDir(self, dir)
 	end
 	
 	local anim = self:LookupAnimation("manipulate_"..dir)
-	self:PlayAnim(anim, self.model).Seq(f)
-	
+	if (anim) then
+		local blend = self:PlayAnim(anim, self.model)
+		if (blend) then
+			blend.Seq(f)
+		else
+			f()
+		end
+	end
 end
 
 function PlayerPawn.EndManipulate(self)
@@ -422,12 +428,6 @@ function PlayerPawn.Kill(self)
 	Game.entity:PlayerDied()
 end
 
-function PlayerPawn.SetFacing(self, zAngle)
-	local angleVertex = self:Angles()
-	angleVertex.pos = {0, 0,  zAngle}
-	self:SetAngles(angleVertex)
-end
-
 function PlayerPawn.CheckTappedOn(self, e)
 
 	local pos = self:WorldPos()
@@ -469,9 +469,45 @@ function PlayerPawn.OnEvent(self, cmd, args)
 	elseif (cmd == "kill") then
 		self:Kill()
 		return true
+	elseif (cmd == "teleport") then
+		local target = World.FindEntityTargets(args)
+		if (target) then
+			target = target[1]
+		end
+		if (target and target.validFloorPosition) then
+			self:Stop()
+			self:SetFloorPosition(target:FloorPosition())
+		end
+		return true
+	elseif (cmd == "play") then
+		self:PlayCinematicAnim(args)
+		return true
 	end
 	
 	return false
+end
+
+function PlayerPawn.PlayCinematicAnim(self, anim)
+	local anim = self:LookupAnimation(anim)
+	if (anim) then
+		local f = function()
+			self:SetMoveType(kMoveType_Floor)
+			self.disableAnimTick = false
+			self.customMove = false
+			self:TickPhysics() -- get us a new state immediately
+		end
+		self:SetMoveType(kMoveType_Ska)
+		self.disableAnimTick = true
+		self.customMove = true
+		self.state = nil
+		self:EnableFlags(kPhysicsFlag_Friction, true)
+		local blend = self:PlayAnim(anim, self.model)
+		if (blend) then
+			blend.Seq(f)
+		else
+			f()
+		end
+	end
 end
 
 function PlayerPawn.Show(self, show)

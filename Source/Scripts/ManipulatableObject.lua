@@ -16,19 +16,73 @@ function ManipulatableObject.Spawn(self)
 	self.model.vision = self.model.dm:CreateInstance()
 	self:AttachDrawModel(self.model.vision) -- manipulate vision model
 	self.model.vision:BlendTo({1,1,1,0}, 0)
+	self:SetFacing(NumberForString(self.keys.angle, 0))
 	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
 	
 	self.skillRequired = NumberForString(self.keys.required_skill, 0)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
+	self.manipulateDamage = BoolForString(self.keys.manipulate_damage, false)
 	
 	self.enabled = false
 	self.swipePos = {0, 0, 0}
 	
+	if (not self.left) then
+		self.left = {0, 1, 0}
+	end
+	
+	if (not self.lookScale) then
+		self.lookScale = 20
+	end
+	
+	if (not self.manipulateOffset) then
+		self.manipulateOffset = {0,0,0}
+	end
+	
 	self:LoadAndSwapManipulateMaterials()
 	self:LoadSounds()
-	self:Dormant()
+	
+	if (BoolForString(self.keys.enabled, false)) then
+		self:Idle()
+	else
+		self:Dormant()
+	end
+end
+
+function ManipulatableObject.PostSpawn(self)
+
+	if (self.keys.damage_base_name) then
+		if (self.manipulateDamage) then
+			self.manipulateBrushes = {
+				up = World.FindEntityTargets(self.keys.damage_base_name.."_up"),
+				down = World.FindEntityTargets(self.keys.damage_base_name.."_down"),
+				left = World.FindEntityTargets(self.keys.damage_base_name.."_left"),
+				right = World.FindEntityTargets(self.keys.damage_base_name.."_right")
+			}
+			for k,v in pairs(self.manipulateBrushes) do
+				local x = self.manipulateBrushes[k]
+				if (x) then
+					self.manipulateBrushes[k] = x[1]
+				end
+			end
+		end
+		if (self.keys.attack_anims) then
+			self.attackBrushes = {}
+			local anims = string.split(self.keys.attack_anims, ";")
+			for k,v in pairs(anims) do
+				local z = World.FindEntityTargets(self.keys.damage_base_name.."_"..v)
+				if (z) then
+					self.attackBrushes[v] = z[1]
+				end
+			end
+			
+			if (next(self.attackBrushes) == nil) then
+				self.attackBrushes = nil
+			end
+		end
+	end
+
 end
 
 function ManipulatableObject.LoadAndSwapManipulateMaterials(self)
@@ -100,12 +154,17 @@ function ManipulatableObject.Dormant(self)
 end
 
 function ManipulatableObject.Awaken(self)
-	self:PlayAnim("awaken", self.model).Seq(ManipulatableObject.Idle)
+	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeVolume(0, 1)
 	end
-	if (self.sounds.Awaken) then
-		self.sounds.Awaken:Play(kSoundChannel_FX, 0)
+	if (blend) then
+		blend.Seq(ManipulatableObject.Idle)
+		if (self.sounds.Awaken) then
+			self.sounds.Awaken:Play(kSoundChannel_FX, 0)
+		end
+	else
+		self:Idle()
 	end
 end
 
@@ -195,7 +254,7 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 	while (x) do
 	
-		local world = x.entity:WorldPos()
+		local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
 		local screen,r = World.Project(world)
 		local dx, dy, dd
 		
@@ -342,8 +401,15 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 		return false -- this model has no manipulate in that direction
 	end
 	
+	local f = function()
+		if (self.shakeCamera) then
+			self:ShakeCamera()
+		end
+		self:DoManipulateDamage(objDir)
+	end
+	
 	self.manipulate = objDir
-	self:PlayAnim(state, self.model).Seq(idle)
+	self:PlayAnim(state, self.model).Seq(f)
 	
 	-- no longer manipulatable
 	if (self.listItem) then
@@ -353,7 +419,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	end
 	
 	-- how long do we sit here?
-	if (self.skillRequired > PlayerSkills.Manipulate) then
+	if (self.keys.reset or (self.skillRequired > PlayerSkills.Manipulate)) then
 		local f = function ()
 			self.manipulate = nil
 			self:PlayAnim(ret, self.model).Seq("idle")
@@ -366,8 +432,73 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	-- tell the player they moved us
 	World.playerPawn:ManipulateDir(playerDir)
 	
+	self:LookInDir(objDir)
 	return true
 
+end
+
+function ManipulatableObject.ShakeCamera(self)
+	World.viewController:SetCameraSway(
+		0.1,
+		0.1,
+		0.1,
+		-4,
+		4,
+		0.1,
+		0.25,
+		{1, 1}
+	)
+end
+
+function ManipulatableObject.LookInDir(self, dir)
+	local vec
+	if (dir == "up") then
+		vec = {0, 0, 1}
+	elseif (dir == "down") then
+		vec = {0, 0, -1}
+	elseif (dir == "left") then
+		vec = VecCopy(self.left)
+	else
+		vec = VecNeg(self.left)
+	end
+	
+	local q = QuatFromAngles(self:Angles().pos)
+	QuatRotateVec(q, vec)
+	
+	vec = VecScale(vec, self.lookScale)
+	
+	local cameraTarget = World.playerPawn:CameraPos()
+	local target = VecSub(self:WorldPos(), cameraTarget)
+	target[2] = 0
+	target = VecAdd(cameraTarget, target) -- our position, equal to camera height
+	target = VecAdd(target, vec)
+	
+	World.viewController:BlendToLookTarget(
+		target, -- target position to "look" at
+		0.4, -- in time
+		1, -- out time
+		0, -- hold time
+		1,  -- max weight (how much towards the target we look, 1 = all the way)
+		1, -- smooth factor for in time, these serve to "tighten" or "loosen" the motion
+		1 -- smooth factor for out time
+	)
+	
+end
+
+function ManipulatableObject.DoManipulateDamage(self, dir)
+	if (self.manipulateBrushes) then
+		local t = self.manipulateBrushes[dir]
+		if (t) then
+			local ents = t:GetTouching()
+			if (ents) then
+				for k,v in pairs(ents) do
+					if (v.Kill) then
+						v:Kill(self) -- crush!
+					end
+				end
+			end
+		end
+	end
 end
 
 --[[---------------------------------------------------------------------------
@@ -387,7 +518,30 @@ function Tentacle.Spawn(self)
 	self.model.vision:ScaleTo({0.4, 0.4, 0.4}, 0)
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	
+	self.manipulateShift = {0,0,64}
+	
 	self:Link() -- kMoveType_None
 end
 
 info_tentacle = Tentacle
+
+--[[---------------------------------------------------------------------------
+	Pylon
+-----------------------------------------------------------------------------]]
+
+Pylon = ManipulatableObject:New()
+
+function Pylon.Spawn(self)
+	ManipulatableObject.Spawn(self)
+	
+	self:SetMins({-24, -24, -48+64})
+	self:SetMaxs({ 24,  24,  48+64})
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
+	self.model.vision:SetBounds(self:Mins(), self:Maxs())
+	self.manipulateShift = {0,0,64}
+	self.shakeCamera = true
+	
+	self:Link() -- kMoveType_None
+end
+
+info_pylon = Pylon

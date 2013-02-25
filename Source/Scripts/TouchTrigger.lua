@@ -12,7 +12,7 @@ function TouchTrigger.Spawn(self)
 	
 	local triggerTypes = StringForString(self.keys.types, "all")
 	if (triggerTypes == "all") then
-		self:SetTouchClassBits(kEntityClassBits_All)
+		self:SetTouchClassBits(kEntityClass_Any)
 	elseif (triggerTypes == "player") then
 		self:SetTouchClassBits(kEntityClass_Player)
 	else

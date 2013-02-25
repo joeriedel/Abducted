@@ -41,11 +41,12 @@ function Animation.Play(entity, state, model)
 		local next = LL_Pop(self.animationStates.chain)
 		if (next) then
 			assert(next.seq)
+			local head = self.animationStates.chain
 			next.seq(entity)
-			
-			next = LL_Head(self.animationStates.chain)
+						
+			next = LL_Head(head)
 			while (next and next._and) do
-				next = LL_Pop(self.animationStates.chain)
+				next = LL_Pop(head)
 				assert(next._and)
 				next._and(entity)
 				next = LL_Head(self.animationStates.chain)

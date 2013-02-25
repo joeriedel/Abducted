@@ -4,6 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 Abducted = Game:New()
+Abducted.PulseTargets = LL_New()
 
 function Abducted.Initialize(self)
 	self.eatInput = false

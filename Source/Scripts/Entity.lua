@@ -30,6 +30,13 @@ function Entity.EnableFlags(self, flags, enable)
 	self:SetFlags(curFlags)
 end
 
+
+function Entity.SetFacing(self, zAngle)
+	local angleVertex = self:Angles()
+	angleVertex.pos = {0, 0,  zAngle}
+	self:SetAngles(angleVertex)
+end
+
 function Entity.SpawnFloorPosition(self)
 	local fp = self:LoadFloorPosition()
 	if (fp) then

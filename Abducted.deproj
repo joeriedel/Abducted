@@ -70,6 +70,9 @@
     <filename>Source\Scripts\Imports.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\InfoNull.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Input.lua</filename>
   </file>
   <file>

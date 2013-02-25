@@ -26,6 +26,7 @@ kMoveType_None = 0
 kMoveType_Fly = 1
 kMoveType_Spline = 2
 kMoveType_Floor = 3
+kMoveType_Ska = 4
 
 -- SolidTypes
 kSolidType_None = 0
@@ -38,7 +39,7 @@ kOccupantType_BBox = 1
 kOccupantType_Volume = 2
 
 -- ClassBits
-kEntityClassBits_Any = 0
+kEntityClass_Any = 0
 
 -- BSP contents
 kContentsFlag_Areaportal = 1

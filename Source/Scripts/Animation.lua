@@ -88,7 +88,7 @@ end
 function Animation.Cancel(entity)
 	if (entity.animationStates) then
 		if (entity.animationStates.notify) then
-			entity.animationStates.notify:SetMasked(kSkaNotifyMaskFlag_All)
+			entity.animationStates.notify:Release()
 		end
 	end
 	entity.animationStates = nil

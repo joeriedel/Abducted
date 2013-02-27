@@ -9,7 +9,9 @@ Ep1/testroom2_bugtest
 
 
 // Shared
-Characters/HumanFemale
+Characters/Eve
+Characters/Buggroup12
+Characters/Bugtestmesh1
 Characters/TentacleMedium1
 Characters/tentacleskin1_M_manipulate
 Characters/tentaclewings1_M_manipulate

@@ -1,125 +1,129 @@
-// Ep1 levels
+pak0 {
 
-Ep1/ep1_falling
-Ep1/ep1_crushed
-Ep1/ep1_eaten
-Ep1/testroom1_manipulate
-Ep1/testroom2_manipulate
-Ep1/testroom2_bugtest
+	// Ep1 levels
+
+	Ep1/ep1_falling
+	Ep1/ep1_crushed
+	Ep1/ep1_eaten
+	Ep1/testroom1_manipulate
+	Ep1/testroom2_manipulate
+	Ep1/testroom2_bugtest
 
 
-// Shared
-Characters/Eve
-Characters/Buggroup12
-Characters/Bugtestmesh1
-Characters/TentacleMedium1
-Characters/tentacleskin1_M_manipulate
-Characters/tentaclewings1_M_manipulate
-FX/shield1mesh
-FX/pulsecone1mesh
-FX/pulsebeam1mesh
-FX/pulseimpact1mesh
-FX/shieldsprite1_M
-Shared/terminal1
-UI/Solid_M
-UI/loading_icon_M
-UI/finger_shadow_M
-UI/Globals
-UI/TerminalPuzzlesBigFont_TF
-UI/ChatChoice_TF
-UI/Chat_TF
-UI/ChatLocked_TF
-UI/LogEvent_TF
-UI/LogDiscovery_TF
-UI/LogArmAsk_TF
-UI/StandardButtonSmall_TF
-UI/StandardButton_TF
-UI/StandardButtonDark_TF
-Shared/spellcasting_edgelines_M
-UI/lineborder1_M
-UI/lineborder2_M
-UI/lineborder3_M
-UI/lineborder4_M
-UI/shimmer1_M
-UI/shimmer1_flip_M
-UI/locked_symbol_M
-UI/locked_symbol_flash_M
-UI/heartbeat1_M
-UI/heartbeat2_M
-UI/human_heart_M
-UI/tab-selection-character_M
-UI/tab-selection-character-pressed_M
-UI/tab-selection-discoveries_M
-UI/tab-selection-discoveries-pressed_M
-UI/tab-selection-log_M
-UI/tab-selection-log-pressed_M
-UI/character-profiletest1_M
-UI/discovery_bugs_M
-UI/discovery_pod_M
-UI/discovery_terminals_M
-UI/discovery_tentacles_M
-UI/alphabet_scrollbar_M
+	// Shared
+	Characters/Eve
+	Characters/Buggroup12
+	Characters/Bugtestmesh1
+	Characters/TentacleMedium1
+	Characters/tentacleskin1_M_manipulate
+	Characters/tentaclewings1_M_manipulate
+	FX/shield1mesh
+	FX/pulsecone1mesh
+	FX/pulsebeam1mesh
+	FX/pulseimpact1mesh
+	FX/shieldsprite1_M
+	Shared/terminal1
+	UI/Solid_M
+	UI/loading_icon_M
+	UI/finger_shadow_M
+	UI/Globals
+	UI/TerminalPuzzlesBigFont_TF
+	UI/ChatChoice_TF
+	UI/Chat_TF
+	UI/ChatLocked_TF
+	UI/LogEvent_TF
+	UI/LogDiscovery_TF
+	UI/LogArmAsk_TF
+	UI/StandardButtonSmall_TF
+	UI/StandardButton_TF
+	UI/StandardButtonDark_TF
+	Shared/spellcasting_edgelines_M
+	UI/lineborder1_M
+	UI/lineborder2_M
+	UI/lineborder3_M
+	UI/lineborder4_M
+	UI/shimmer1_M
+	UI/shimmer1_flip_M
+	UI/locked_symbol_M
+	UI/locked_symbol_flash_M
+	UI/heartbeat1_M
+	UI/heartbeat2_M
+	UI/human_heart_M
+	UI/tab-selection-character_M
+	UI/tab-selection-character-pressed_M
+	UI/tab-selection-discoveries_M
+	UI/tab-selection-discoveries-pressed_M
+	UI/tab-selection-log_M
+	UI/tab-selection-log-pressed_M
+	UI/character-profiletest1_M
+	UI/discovery_bugs_M
+	UI/discovery_pod_M
+	UI/discovery_terminals_M
+	UI/discovery_tentacles_M
+	UI/alphabet_scrollbar_M
 
-// Hack puzzle
-Reflex-Game/reflex-mark-current_M
-Reflex-Game/reflex-mark-start_M
-Reflex-Game/reflex-mark-end_M
-Reflex-Game/reflex-symbol-a_M
-Reflex-Game/reflex-symbol-b_M
-Reflex-Game/reflex-symbol-c_M
-Reflex-Game/reflex-symbol-d_M
-Reflex-Game/reflex-cell-a_M
-Reflex-Game/reflex-cell-b_M
-Reflex-Game/reflex-cell-c_M
-Reflex-Game/reflex-cell-d_M
-Reflex-Game/reflex-cell-green_M
-Reflex-Game/reflex-antivirus-spider_M
-Reflex-Game/reflex-board_M
-Reflex-Game/reflex-border_M
+	// Hack puzzle
+	Reflex-Game/reflex-mark-current_M
+	Reflex-Game/reflex-mark-start_M
+	Reflex-Game/reflex-mark-end_M
+	Reflex-Game/reflex-symbol-a_M
+	Reflex-Game/reflex-symbol-b_M
+	Reflex-Game/reflex-symbol-c_M
+	Reflex-Game/reflex-symbol-d_M
+	Reflex-Game/reflex-cell-a_M
+	Reflex-Game/reflex-cell-b_M
+	Reflex-Game/reflex-cell-c_M
+	Reflex-Game/reflex-cell-d_M
+	Reflex-Game/reflex-cell-green_M
+	Reflex-Game/reflex-antivirus-spider_M
+	Reflex-Game/reflex-board_M
+	Reflex-Game/reflex-border_M
 
-// UI
-UI/terminal_hack_M
-UI/terminal_hack_pressed_M
-UI/terminal_solve_M
-UI/terminal_solve_pressed_M
-UI/manipulate_button_M
-UI/manipulate_button_charging_M
-UI/manipulate_button_flashing_M
-UI/pulse_button_M
-UI/pulse_button_charging_M
-UI/pulse_button_flashing_M
-UI/shield_button_M
-UI/shield_button_charging_M
+	// UI
+	UI/terminal_hack_M
+	UI/terminal_hack_pressed_M
+	UI/terminal_solve_M
+	UI/terminal_solve_pressed_M
+	UI/manipulate_button_M
+	UI/manipulate_button_charging_M
+	UI/manipulate_button_flashing_M
+	UI/pulse_button_M
+	UI/pulse_button_charging_M
+	UI/pulse_button_flashing_M
+	UI/shield_button_M
+	UI/shield_button_charging_M
 
-UI/arm_buttons_M
-UI/arm_buttons_overbright_M
-UI/arm_button_M
-UI/arm_button_pressed_M
-UI/arm_button_signaled_M
-UI/arm_screen1_M
+	UI/arm_buttons_M
+	UI/arm_buttons_overbright_M
+	UI/arm_button_M
+	UI/arm_button_pressed_M
+	UI/arm_button_signaled_M
+	UI/arm_screen1_M
 
-UI/ability_recharge_shimmer_M
+	UI/ability_recharge_shimmer_M
 
-// Sounds
-Audio/armbutton
-Audio/manipulate_start
-Audio/manipulate_end
-Audio/player_command
-Audio/ui_command
-Audio/armintro1
-Audio/shiphum1
-Audio/penrose1
-Audio/penrose2
-Audio/penrose3
-Audio/heartbeat1
-Ep1/Handshake_contagion
+	// Sounds
+	Audio/armbutton
+	Audio/manipulate_start
+	Audio/manipulate_end
+	Audio/player_command
+	Audio/ui_command
+	Audio/armintro1
+	Audio/shiphum1
+	Audio/penrose1
+	Audio/penrose2
+	Audio/penrose3
+	Audio/heartbeat1
+	Ep1/Handshake_contagion
 
-// System (for DebugUI)
+	// System (for DebugUI)
 
-Sys/Debug_TF
-Sys/DebugWireframe_M
-Sys/DebugPortal_M
-Sys/DebugPortalEdge_M
-Sys/DebugEntityBBox_M
-Sys/DebugWorldBBox_M
-Sys/DebugWaypoint_M
+	Sys/Debug_TF
+	Sys/DebugWireframe_M
+	Sys/DebugPortal_M
+	Sys/DebugPortalEdge_M
+	Sys/DebugEntityBBox_M
+	Sys/DebugWorldBBox_M
+	Sys/DebugWaypoint_M
+
+} // pak0

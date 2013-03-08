@@ -22,6 +22,8 @@ pak0 {
 	FX/pulsebeam1mesh
 	FX/pulseimpact1mesh
 	FX/shieldsprite1_M
+	FX/smokepuff1_M
+	FX/glyph01_M
 	Shared/terminal1
 	UI/Solid_M
 	UI/loading_icon_M

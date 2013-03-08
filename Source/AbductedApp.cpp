@@ -45,7 +45,14 @@ bool AbductedApp::PreInit() {
 		return false;
 #if defined(RAD_TARGET_GOLDEN)
 
-	file::PakFileRef pakFile = engine->sys->files->OpenPakFile("pak0.pak");
+	file::PakFileRef pakFile = engine->sys->files->OpenPakFile("manifest.pak");
+	if (!pakFile) {
+		COut(C_Error) << "Unable to open manifest.pak!" << std::endl;
+		return false;
+	}
+	engine->sys->files->AddPakFile(pakFile);
+	
+	pakFile = engine->sys->files->OpenPakFile("pak0.pak");
 	
 	if (!pakFile) {
 		COut(C_Error) << "Unable to open pak0.pak!" << std::endl;
@@ -173,7 +180,7 @@ bool AbductedApp::RunAutoExec() {
 // verification as to correctness.
 
 #if defined(VALIDATE_NEON_SKIN)
-	pkg::Asset::Ref asset = engine->sys->packages->Resolve("Characters/HumanFemale", pkg::Z_Engine);
+	pkg::Asset::Ref asset = engine->sys->packages->Resolve("Characters/Eve", pkg::Z_Engine);
 	RAD_VERIFY_MSG(asset, "Unable to load NEON skin test data!");
 	RAD_VERIFY(asset->type == asset::AT_SkModel);
 	

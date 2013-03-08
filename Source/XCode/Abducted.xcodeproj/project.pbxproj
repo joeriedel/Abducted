@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; };
+		3397727016E9AC9B0046535B /* libnvtt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3397726F16E9AC9B0046535B /* libnvtt.dylib */; };
+		3397728E16E9D2EF0046535B /* libluajitOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50416D6FF4B009646B1 /* libluajitOSX.a */; };
+		3397729116E9D61F0046535B /* manifest.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3397728F16E9D61F0046535B /* manifest.pak */; };
+		3397729216E9D61F0046535B /* pak0.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3397729016E9D61F0046535B /* pak0.pak */; };
 		33982E8C16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
 		33982E8D16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
 		33982E8E16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
@@ -52,7 +56,6 @@
 		33F8F41216BFA7DB009646B1 /* Default-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */; };
 		33F8F41316BFA7DB009646B1 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40E16BFA7AB009646B1 /* Default-Landscape@2x~ipad.png */; };
 		33F8F41416BFA7DB009646B1 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33F8F40F16BFA7AB009646B1 /* Default-Landscape~ipad.png */; };
-		33F8F50516D6FF4B009646B1 /* libluajitOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50416D6FF4B009646B1 /* libluajitOSX.a */; };
 		33F8F50716D6FF89009646B1 /* libluajitiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50616D6FF88009646B1 /* libluajitiOS.a */; };
 		33F8F50816D6FF95009646B1 /* libluajitiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50616D6FF88009646B1 /* libluajitiOS.a */; };
 		33FA81511633D9FA002603A5 /* libRadianceDeveloper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81331633CBC5002603A5 /* libRadianceDeveloper.a */; };
@@ -98,10 +101,23 @@
 		33FA82901635366F002603A5 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 33FA828F1635366F002603A5 /* Icon-72.png */; };
 		33FA829216353674002603A5 /* Icon-144.png in Resources */ = {isa = PBXBuildFile; fileRef = 33FA829116353674002603A5 /* Icon-144.png */; };
 		33FA82961635368B002603A5 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 33FA82951635368B002603A5 /* Default-Landscape@2x~ipad.png */; };
-		33FA82981635376E002603A5 /* pak0.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FA82971635376E002603A5 /* pak0.pak */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3397727D16E9B3F50046535B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3397727516E9B3F50046535B /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 334B55A415B8A78F00EEFC92;
+			remoteInfo = luaOSX;
+		};
+		3397727F16E9B3F50046535B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3397727516E9B3F50046535B /* lua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 334B55A515B8A78F00EEFC92;
+			remoteInfo = luaiOS;
+		};
 		33BF3F711633382E006DEAAE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33EC05A4162667ED00F8C9FF /* Main.xcodeproj */;
@@ -286,7 +302,8 @@
 			dstPath = Base;
 			dstSubfolderSpec = 6;
 			files = (
-				33FA82981635376E002603A5 /* pak0.pak in CopyFiles */,
+				3397729116E9D61F0046535B /* manifest.pak in CopyFiles */,
+				3397729216E9D61F0046535B /* pak0.pak in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +311,10 @@
 
 /* Begin PBXFileReference section */
 		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		3397726F16E9AC9B0046535B /* libnvtt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libnvtt.dylib; path = "../../Extern/nvtt-2.0.8-1/bin/libnvtt.dylib"; sourceTree = "<group>"; };
+		3397727516E9B3F50046535B /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lua.xcodeproj; path = ../../Radiance/Source/XCode/lua.xcodeproj; sourceTree = "<group>"; };
+		3397728F16E9D61F0046535B /* manifest.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = manifest.pak; path = ../../Cooked/iOS/Base/manifest.pak; sourceTree = "<group>"; };
+		3397729016E9D61F0046535B /* pak0.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = pak0.pak; path = ../../Cooked/iOS/Base/pak0.pak; sourceTree = "<group>"; };
 		33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_TouchTrigger.cpp; sourceTree = "<group>"; };
 		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
 		33BF3E6B1633255E006DEAAE /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -381,7 +402,6 @@
 		33FA828F1635366F002603A5 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-72.png"; path = "iOS/Icon-72.png"; sourceTree = "<group>"; };
 		33FA829116353674002603A5 /* Icon-144.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-144.png"; path = "iOS/Icon-144.png"; sourceTree = "<group>"; };
 		33FA82951635368B002603A5 /* Default-Landscape@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-Landscape@2x~ipad.png"; path = "iOS/Default-Landscape@2x~ipad.png"; sourceTree = "<group>"; };
-		33FA82971635376E002603A5 /* pak0.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = pak0.pak; path = ../../Cooked/Packages/Base/pak0.pak; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -434,7 +454,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33F8F50516D6FF4B009646B1 /* libluajitOSX.a in Frameworks */,
+				3397727016E9AC9B0046535B /* libnvtt.dylib in Frameworks */,
+				3397728E16E9D2EF0046535B /* libluajitOSX.a in Frameworks */,
 				33EC06461626776200F8C9FF /* libPVRTexLib.a in Frameworks */,
 				33EC06481626777400F8C9FF /* libopenal.1.14.0.dylib in Frameworks */,
 				33EC06321626772900F8C9FF /* libboostOSX.a in Frameworks */,
@@ -460,11 +481,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3397727616E9B3F50046535B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3397727E16E9B3F50046535B /* libluaOSX.a */,
+				3397728016E9B3F50046535B /* libluaiOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		33EC04E1162663FC00F8C9FF = {
 			isa = PBXGroup;
 			children = (
-				33F8F50616D6FF88009646B1 /* libluajitiOS.a */,
-				33F8F50416D6FF4B009646B1 /* libluajitOSX.a */,
+				3397728F16E9D61F0046535B /* manifest.pak */,
+				3397729016E9D61F0046535B /* pak0.pak */,
+				3397727516E9B3F50046535B /* lua.xcodeproj */,
 				33EC058C162667ED00F8C9FF /* boost.xcodeproj */,
 				33EC058F162667ED00F8C9FF /* freetype.xcodeproj */,
 				33EC0592162667ED00F8C9FF /* glsl-optimizer.xcodeproj */,
@@ -496,6 +527,9 @@
 		33EC04EF162663FC00F8C9FF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3397726F16E9AC9B0046535B /* libnvtt.dylib */,
+				33F8F50616D6FF88009646B1 /* libluajitiOS.a */,
+				33F8F50416D6FF4B009646B1 /* libluajitOSX.a */,
 				33EC06471626777400F8C9FF /* libopenal.1.14.0.dylib */,
 				33FA8179163518A4002603A5 /* libFlurryAnalytics.a */,
 				33EC06451626776200F8C9FF /* libPVRTexLib.a */,
@@ -694,7 +728,6 @@
 				33FA814B1633D2BA002603A5 /* Developer-Info.plist */,
 				33FA817F16351963002603A5 /* autoexec.txt */,
 				33FA818016351964002603A5 /* languages.txt */,
-				33FA82971635376E002603A5 /* pak0.pak */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -828,6 +861,10 @@
 					ProjectRef = 33EC059E162667ED00F8C9FF /* libvorbis.xcodeproj */;
 				},
 				{
+					ProductGroup = 3397727616E9B3F50046535B /* Products */;
+					ProjectRef = 3397727516E9B3F50046535B /* lua.xcodeproj */;
+				},
+				{
 					ProductGroup = 33EC05A5162667ED00F8C9FF /* Products */;
 					ProjectRef = 33EC05A4162667ED00F8C9FF /* Main.xcodeproj */;
 				},
@@ -850,6 +887,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		3397727E16E9B3F50046535B /* libluaOSX.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libluaOSX.a;
+			remoteRef = 3397727D16E9B3F50046535B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3397728016E9B3F50046535B /* libluaiOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libluaiOS.a;
+			remoteRef = 3397727F16E9B3F50046535B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		33BF3F721633382E006DEAAE /* libMainShipiOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1082,7 +1133,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
+			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtOpenGL.framework/Versions/4/QtOpenGL\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtOpenGL.framework\"\ncp \"${EXTERN_PATH}/Cg-3.1.0013/Cg.framework/Versions/1.0/Cg\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/Cg.framework\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/nvtt-2.0.8-1/bin/libnvcore.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/nvtt-2.0.8-1/bin/libnvimage.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/nvtt-2.0.8-1/bin/libnvmath.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"\ncp \"${EXTERN_PATH}/nvtt-2.0.8-1/bin/libnvtt.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
 		};
 		33DB15271627DA6900963A33 /* Qt Moc */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1292,6 +1343,7 @@
 					"\"$(SRCROOT)/../../Extern/PVRTexLib-4.04/MacOS_x86\"",
 					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
 					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
+					"\"$(SRCROOT)/../../Extern/nvtt-2.0.8-1/bin\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -1313,6 +1365,7 @@
 					"\"$(SRCROOT)/../../Extern/PVRTexLib-4.04/MacOS_x86\"",
 					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
 					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
+					"\"$(SRCROOT)/../../Extern/nvtt-2.0.8-1/bin\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

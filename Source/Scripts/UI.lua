@@ -21,6 +21,8 @@ UI.kLayer_Debug = 11
 function UI.Spawn(self)
 	UI.entity = self
 	
+	StringTable.Global = World.Load("UI/Globals")
+	
 	UI.systemScreen = System.ScreenSize()
 	COutLine(kC_Debug, "UI.Spawn: Viewport = %dx%d", UI.systemScreen.width, UI.systemScreen.height)
 		

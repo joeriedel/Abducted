@@ -82,13 +82,13 @@ function Arm.LoadLog(self)
 		local typeface = nil
 		
 		if (strings[2] == "!ARM_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(strings[3])
+			text = kEventLogArm.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
 			typeface = self.typefaces.Chat
 		elseif (strings[2] == "!ARM_LOCKED_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(strings[3])
+			text = kEventLogArm.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
 			typeface = self.typefaces.ChatLocked
 		elseif (strings[2] == "!ARM_ASK") then
-			text = kEventLogYou.." "..StringTable.Get(strings[3])
+			text = kEventLogYou.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
 			typeface = self.typefaces.LogArmAsk
 		elseif (strings[2] == "!ARM_LOCKED") then
 			text = kEventLogArmLocked

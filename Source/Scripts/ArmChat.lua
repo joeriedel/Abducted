@@ -116,14 +116,10 @@ end
 
 function Arm.LoadChats(self, chats)
 
-	if (chats == "Ep1Crushed") then
-		Arm:LoadEp1Crushed()
-	elseif (chats == "Ep1Eaten") then
-		Arm:LoadEp1Eaten()
-	elseif (chats == "Ep1Falling") then
-		Arm:LoadEp1Falling()
-	end
-
+    Arm:LoadChatData()
+    Arm:PopulateChats()
+    Arm:PopulateChats(chat)
+    
 end
 
 function Arm.StartConversation(self)
@@ -162,11 +158,11 @@ function Arm.ChatPrompt(self)
 	end
 	
 	if (self.topic.reply == nil) then
-		self.topic.reply = {{"ARM_CHAT_I_DONT_KNOW"}}
+		self.topic.reply = {{"I_DONT_KNOW"}}
 	end
 	
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
-	self.promptText = "> "..StringTable.Get(self.prompt[1])
+	self.promptText = "> "..StringTable.Get(self.prompt[1], Arm.Chats.Strings)
 	
 	local lock = false
 	
@@ -175,7 +171,7 @@ function Arm.ChatPrompt(self)
 			lock = true
 		end
 	end
-	if (self.prompt[1] ~= "ARM_CHAT_DEFAULT_PROMPT") then
+	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
 		if (lock) then
 			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED_REPLY "..self.prompt[1])
 		else
@@ -352,7 +348,7 @@ function Arm.DisplayChoices(self)
 		local prompt = self:ChooseChatPrompt(v.prompt)
 		prompts[k] = prompt
 		
-		local text = StringTable.Get(prompt[1])
+		local text = StringTable.Get(prompt[1], Arm.Chats.Strings)
 		promptText[k] = text
 		
 		local w,h = UI:StringDimensions(self.typefaces.ChatChoice, text)
@@ -598,7 +594,7 @@ function Arm.ChooseChatPrompt(self, root)
 		last = v
 	end
 
-	return v -- precision
+	return last -- precision
 end
 
 function Arm.ChatChoices(self, root)
@@ -612,10 +608,10 @@ function Arm.ChatChoices(self, root)
 		if (v.prob) then
 			local p = math.random()
 			if (p <= v.prob) then
-				table.insert(responses, v[1])
+				table.insert(responses, v)
 			end
 		else
-			table.insert(responses, v[1])
+			table.insert(responses, v)
 		end
 	end
 	

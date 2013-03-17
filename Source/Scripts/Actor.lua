@@ -42,9 +42,9 @@ function Actor.OnEvent(self, cmd, args)
 	COutLineEvent("Actor", cmd, args)
 	
 	if (cmd == "show") then
-		self.visible = false
+		self.visible = true
 		if (self.model) then
-			self.model.dm:SetVisible(false)
+			self.model.dm:SetVisible(true)
 		end
 		return true
 	elseif (cmd == "hide") then

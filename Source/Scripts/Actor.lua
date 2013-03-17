@@ -54,8 +54,8 @@ function Actor.OnEvent(self, cmd, args)
 		end
 		return true
 	elseif (cmd == "play") then
-		if (self.model.BlendTo) then
-			self.model:BlendTo(args)
+		if (self.model.BlendToState) then
+			self.model:BlendToState(args)
 		end
 		return true
 	end

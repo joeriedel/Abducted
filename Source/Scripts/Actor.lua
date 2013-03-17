@@ -38,7 +38,7 @@ function Actor.Spawn(self)
 
 end
 
-function Actor.OnEvent(cmd, args)
+function Actor.OnEvent(self, cmd, args)
 	COutLineEvent("Actor", cmd, args)
 	
 	if (cmd == "show") then
@@ -51,6 +51,11 @@ function Actor.OnEvent(cmd, args)
 		self.visible = false
 		if (self.model) then
 			self.model.dm:SetVisible(false)
+		end
+		return true
+	elseif (cmd == "play") then
+		if (self.model.BlendTo) then
+			self.model:BlendTo(args)
 		end
 		return true
 	end

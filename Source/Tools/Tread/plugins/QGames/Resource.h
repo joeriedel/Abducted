@@ -16,7 +16,6 @@
 #define IDC_LOCATE_TOOL                 1008
 #define IDR_RT_RCDATA2                  1008
 #define IDC_GAMEEXE                     1009
-#define IDD_DIALOG1                     1009
 #define IDD_QUAKE_BUILD_OPTIONS         1009
 #define IDC_LOCATE_GAME                 1010
 #define IDB_BITMAP1                     1010

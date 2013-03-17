@@ -4,6 +4,9 @@
     <filename>Source\Scripts\Abducted.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Actor.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Animation.lua</filename>
   </file>
   <file>

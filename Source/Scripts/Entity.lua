@@ -12,12 +12,19 @@ Entity = Class:New()
 
 function Entity.Spawn(self)
 
-	local angle = NumberForString(self.keys.angle, 0)
+	if (self.keys.angle) then
+		local angle = NumberForString(self.keys.angle, 0)
+		local angleVertex = self:Angles()
+		angleVertex.pos = {0, 0, angle}
+		self:SetAngles(angleVertex)
+	end
 	
-	local angleVertex = self:Angles()
-	angleVertex.pos = {0, 0, angle}
-	self:SetAngles(angleVertex)
+end
 
+function Entity.SetRotation(self, angles)
+	local angleVertex = self:Angles()
+	angleVertex.pos = angles
+	self:SetAngles(angleVertex)
 end
 
 function Entity.EnableFlags(self, flags, enable)

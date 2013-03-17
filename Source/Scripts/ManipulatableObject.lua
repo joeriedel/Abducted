@@ -141,6 +141,8 @@ function ManipulatableObject.LoadSounds(self)
 end
 
 function ManipulatableObject.OnEvent(self, cmd, args)
+	COutLineEvent("ManipulatableObject", cmd, args)
+	
 	if (cmd == "activate") then
 		self:Awaken()
 	end

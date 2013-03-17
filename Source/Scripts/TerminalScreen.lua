@@ -88,7 +88,8 @@ function TerminalScreen.Touched(self)
 end
 
 function TerminalScreen.OnEvent(self, cmd, args)
-
+	COutLineEvent("TerminalScreen", cmd, args)
+	
 	if (cmd == "activate") then
 		self:Activate(true)
 	elseif (cmd == "deactivate") then

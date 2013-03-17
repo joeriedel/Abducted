@@ -64,7 +64,8 @@ function SoundEmitter.Enable(self, enable) -- callback from native code
 end
 
 function SoundEmitter.OnEvent(self, cmd, args)
-
+	COutLineEvent("SoundEmitter", cmd, args)
+	
 	if cmd == "start" or cmd == "play" then
 		self.on = true
 		self.fadeTime = nil

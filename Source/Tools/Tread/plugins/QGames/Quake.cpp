@@ -408,6 +408,10 @@ bool CQuakeGame::WantsConfiguration()
 
 void CQuakeGame::Configure()
 {
+	HINSTANCE mainExe = AfxGetResourceHandle();
+	HINSTANCE dll = LoadLibrary("QGames.dll");
+	AfxSetResourceHandle(dll);
+
 	CString tempExePath = m_exePath;
 	CString tempGameDir = m_gameDir;
 	CString tempExeCmdLine = m_exeCmdLine;
@@ -437,6 +441,9 @@ void CQuakeGame::Configure()
 		Sys_RepaintAllShaders();
 		Sys_RedrawWindows(VIEW_FLAG_ALL);
 	}
+
+	AfxSetResourceHandle(mainExe);
+	FreeLibrary(dll);
 }
 
 CPluginFileExport *CQuakeGame::NativeMapExporter()

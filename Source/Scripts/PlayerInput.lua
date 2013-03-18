@@ -107,15 +107,21 @@ function PlayerInput.TapMove(self, x, y)
 	
 	if (trace) then
 		-- see if we can cast downward and hit a floor
-		a = VecAdd(trace.traceEnd, VecScale(trace.normal, 32))
-		b = VecAdd(a, {0, 0, -512})
-		
-		local targetFloorPos = World.ClipToFloor(a, b)
-		if (targetFloorPos) then
-			if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
-				self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
-				return true
+		local d = 16
+		while (d <= 224) do
+			a = VecAdd(trace.traceEnd, VecScale(trace.normal, d))
+			b = VecAdd(a, {0, 0, -512})
+			
+			local targetFloorPos = World.ClipToFloor(a, b)
+			if (targetFloorPos) then
+				if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+					self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+					return true
+				end
+				break
 			end
+			
+			d = d + 16
 		end
 	end
 

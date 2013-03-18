@@ -310,7 +310,7 @@ void R_glLockArrays( int start, int end )
 	{
 		if( locked_arrays && R_glEXT_UnlockArrays )
 			R_glEXT_UnlockArrays();
-		R_glEXT_LockArrays( start, end );
+		R_glEXT_LockArrays( start, (end-start)+1 );
 		locked_arrays = TRUE;
 		CHECK_GL_ERRORS();
 	}

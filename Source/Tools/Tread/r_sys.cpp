@@ -1179,6 +1179,7 @@ static void R_DrawMesh2D( CRenderMesh* mesh, int flags, int blend, unsigned int 
 		R_glLockArrays(0, mesh->num_pts-1);
 
 		CRenderMesh::poly_s* poly;
+
 		for( poly = mesh->polys.ResetPos(); poly; poly = mesh->polys.GetNextItem() )
 		{
 			R_OutputMeshPoly( poly );

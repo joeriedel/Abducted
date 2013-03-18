@@ -27,12 +27,14 @@ namespace
 		Id = RAD_FOURCC('R', 'S', 'C', 'N'),
 		Version2 = 2,
 		Version3 = 3,
-		Version = 4,
+		Version4 = 4,
+		Version = 5,
 		MaxUVChannels = 1,
 
 		HasMaterialFlag = 0x80000000,
 		HasMeshFlag = 0x00100000,
-		HasAnimsFlag = 0x00200000
+		HasAnimsFlag = 0x00200000,
+		kSetBBoxFlag = 0x00008000
 	};
 
 	struct Material
@@ -722,6 +724,10 @@ bool MaxScene::Load(const char *filename)
 				U32 idx;
 				fread(&idx, sizeof(U32), 1, fp);
 				m = &mats[idx];
+			}
+
+			if ((version > Version4) && (flags & kSetBBoxFlag)) { // bbox provided
+				ReadString(fp);
 			}
 
 			if (flags&(HasMeshFlag|HasAnimsFlag))

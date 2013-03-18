@@ -80,6 +80,11 @@ function Game.OnEvent(self, cmd, args)
 		Floors:SetFloorState(args, nil, bit.bnot(kFloorState_Enabled))
 	elseif (cmd == "play") then
 		Cinematics:Play(args)
+	elseif (cmd == "music") then
+		args = Tokenize(args)
+		cmd = args[1]
+		table.remove(args, 1)
+		Music.entity:Command(cmd, args)
 	end
 end
 
@@ -87,6 +92,7 @@ game_code = Game
 
 function World.BuiltIns()
 	return {
+		"imuse",
 		"ui_code",
 		"game_code",
 		"scexec_code",

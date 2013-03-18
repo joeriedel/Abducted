@@ -44,9 +44,9 @@ function ViewController.HandleCameraCmd(self, args)
 	local forceBehind = not FindArrayElement(x, "behind=false")
 	local angles = {0, 180, 180}
 	
-	local specifiedAngles, idx = FindArrayElement(x, "angles=")
-	if (specifiedAngles) then
-		angles = Vec3ForString(x[idx+1])
+	local fixedLook = FindArrayElement(x, "look=fixed")
+	if (fixedLook) then
+		angles = {0,0,0}
 	end
 	
 	local loose = FindArrayElement(x, "follow=loose")

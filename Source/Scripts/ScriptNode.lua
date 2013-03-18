@@ -183,11 +183,7 @@ end
 
 function ScriptNode.OnEvent(self, cmd, args)
 
-	if (cmd and args) then
-		COutLine(kC_Debug, "ScriptNode(%s).OnEvent(%s, %s)", self.name, cmd, args)
-	elseif (cmd) then
-		COutLine(kC_Debug, "ScriptNode(%s).OnEvent(%s)", self.name, cmd)
-	end
+	COutLineEvent("ScriptNode", cmd, args)
 
 	if cmd == "trigger" then
 		local input = 1

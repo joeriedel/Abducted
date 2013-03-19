@@ -126,10 +126,18 @@ function Abducted.BeginManipulate(self)
 	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7, true)
 end
 
-function Abducted.EndManipulate(self)
-	World.SetGameSpeed(1, 0.5)
-	self.overlays.Manipulate:FadeOut(0.5)
-	self.sfx.ManipulateBegin:FadeOutAndStop(0.5)
+function Abducted.EndManipulate(self, immediate)
+	
+	if (immediate) then
+		World.SetGameSpeed(1, 0)
+		self.overlays.Manipulate:FadeOut(0.5)
+		self.sfx.ManipulateBegin:FadeOutAndStop(0.5)
+	else
+		World.SetGameSpeed(1, 0.5)
+		self.overlays.Manipulate:FadeOut(0.5)
+		self.sfx.ManipulateBegin:FadeOutAndStop(0.5)
+	end
+	
 	self.sfx.ManipulateEnd:Play(kSoundChannel_UI, 0)
 	self.manipulate = false
 	ManipulatableObject.NotifyManipulate(false)
@@ -186,6 +194,12 @@ end
 
 function Abducted.PlayerDied(self)
 	HUD:PlayerDied()
+	if (self.manipulate) then
+		self:EndManipulate()
+	end
+	if (self.pulse) then
+		self:EndPulse()
+	end
 end
 
 function Abducted.Think(self, dt)

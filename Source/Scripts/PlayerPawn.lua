@@ -423,6 +423,9 @@ function PlayerPawn.PulseExplode(self)
 end
 
 function PlayerPawn.Kill(self)
+	if (self.dead) then
+		return
+	end
 	self.dead = true
 	self:SetMoveType(kMoveType_None)
 	self:PlayAnim("death", self.model)

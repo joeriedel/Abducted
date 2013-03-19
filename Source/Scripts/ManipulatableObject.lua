@@ -140,6 +140,9 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 		if (self.sounds.Hit) then
 			self.sounds.Hit:Play(kSoundChannel_FX, 0)
 		end
+		if (self.keys.attack_brush) then
+			World.PostEvent(self.keys.attack_brush.." disable")
+		end
 	end
 	
 	return false
@@ -455,7 +458,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	if (self.keys.reset or (self.skillRequired > PlayerSkills.Manipulate)) then
 		local f = function ()
 			self.manipulate = nil
-			self:PlayAnim(ret, self.model).Seq("idle")
+			self:PlayAnim(ret, self.model).Seq(ManipulatableObject.Idle)
 			-- manipulatable again
 			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		end

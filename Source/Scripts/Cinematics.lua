@@ -12,6 +12,7 @@ function Cinematics.Play(self, args)
 	local animateCamera = not FindArrayElement(args, "camera=no")
 	local looping = FindArrayElement(args, "loop=true")
 	local playForever = FindArrayElement(args, "forever=true")
+	local interactive = FindArrayElement(args, "interactive=true")
 	local flags = 0
 	
 	if (animateCamera) then
@@ -26,11 +27,15 @@ function Cinematics.Play(self, args)
 		flags = bit.bor(flags, kCinematicFlag_Loop)
 	end
 	
-	if (World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.Callbacks)) then
-		if (self.busy == 0) then
-			HUD:SetVisible(false)
+	if (interactive) then
+		World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.InteractiveCallbacks)
+	else
+		if (World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.Callbacks)) then
+			if (self.busy == 0) then
+				HUD:SetVisible(false)
+			end
+			self.busy = self.busy + 1
 		end
-		self.busy = self.busy + 1
 	end
 end
 
@@ -51,4 +56,10 @@ function Cinematics.Callbacks.OnComplete(self)
 	if (Cinematics.busy == 0) then
 		HUD:SetVisible(true)
 	end
+end
+
+Cinematics.InteractiveCallbacks = {}
+
+function Cinematics.InteractiveCallbacks.OnTag(self, tag)
+	World.PostEvent(tag)
 end

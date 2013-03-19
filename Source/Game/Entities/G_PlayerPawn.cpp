@@ -13,8 +13,8 @@ G_PlayerPawn::G_PlayerPawn() : E_CONSTRUCT_BASE {
 G_PlayerPawn::~G_PlayerPawn() {
 }
 
-void G_PlayerPawn::PostSpawn() {
-	E_PlayerPawn::PostSpawn();
+int G_PlayerPawn::PostSpawn() {
+	return E_PlayerPawn::PostSpawn();
 }
 
 } // world

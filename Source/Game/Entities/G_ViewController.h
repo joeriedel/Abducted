@@ -13,7 +13,7 @@ public:
 	G_ViewController();
 	virtual ~G_ViewController();
 
-	virtual void PostSpawn();
+	virtual int PostSpawn();
 };
 
 } // world

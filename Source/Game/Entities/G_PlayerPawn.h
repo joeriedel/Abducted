@@ -13,7 +13,7 @@ public:
 	G_PlayerPawn();
 	virtual ~G_PlayerPawn();
 
-	virtual void PostSpawn();
+	virtual int PostSpawn();
 };
 
 }

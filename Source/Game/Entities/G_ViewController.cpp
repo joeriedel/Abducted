@@ -13,9 +13,9 @@ G_ViewController::G_ViewController() : E_CONSTRUCT_BASE {
 G_ViewController::~G_ViewController() {
 }
 
-void G_ViewController::PostSpawn() {
+int G_ViewController::PostSpawn() {
 	target = world->playerPawn;
-	E_ViewController::PostSpawn();
+	return E_ViewController::PostSpawn();
 }
 
 } // world

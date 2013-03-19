@@ -211,7 +211,7 @@ function PlayerPawn.LookupAnimation(self, name, animState)
 end
 
 function PlayerPawn.TickPhysics(self)
-	if (self.disableAnimTick) then
+	if (self.disableAnimTick or self.dead) then
 		return -- other logic controls us right now
 	end
 	
@@ -424,6 +424,7 @@ end
 
 function PlayerPawn.Kill(self)
 	self.dead = true
+	self:SetMoveType(kMoveType_None)
 	self:PlayAnim("death", self.model)
 	Game.entity:PlayerDied()
 end

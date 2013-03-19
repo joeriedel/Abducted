@@ -26,6 +26,7 @@ function ManipulatableObject.Spawn(self)
 	self.manipulateDamage = BoolForString(self.keys.manipulate_damage, false)
 	
 	self.enabled = false
+	self.canAttack = false
 	self.swipePos = {0, 0, 0}
 	
 	if (not self.left) then
@@ -52,33 +53,19 @@ end
 
 function ManipulatableObject.PostSpawn(self)
 
-	if (self.keys.damage_base_name) then
+	if (self.keys.manipulate_damage_base_name) then
 		if (self.manipulateDamage) then
 			self.manipulateBrushes = {
-				up = World.FindEntityTargets(self.keys.damage_base_name.."_up"),
-				down = World.FindEntityTargets(self.keys.damage_base_name.."_down"),
-				left = World.FindEntityTargets(self.keys.damage_base_name.."_left"),
-				right = World.FindEntityTargets(self.keys.damage_base_name.."_right")
+				up = World.FindEntityTargets(self.keys.manipulate_damage_base_name.."_up"),
+				down = World.FindEntityTargets(self.keys.manipulate_damage_base_name.."_down"),
+				left = World.FindEntityTargets(self.keys.manipulate_damage_base_name.."_left"),
+				right = World.FindEntityTargets(self.keys.manipulate_damage_base_name.."_right")
 			}
 			for k,v in pairs(self.manipulateBrushes) do
 				local x = self.manipulateBrushes[k]
 				if (x) then
 					self.manipulateBrushes[k] = x[1]
 				end
-			end
-		end
-		if (self.keys.attack_anims) then
-			self.attackBrushes = {}
-			local anims = string.split(self.keys.attack_anims, ";")
-			for k,v in pairs(anims) do
-				local z = World.FindEntityTargets(self.keys.damage_base_name.."_"..v)
-				if (z) then
-					self.attackBrushes[v] = z[1]
-				end
-			end
-			
-			if (next(self.attackBrushes) == nil) then
-				self.attackBrushes = nil
 			end
 		end
 	end
@@ -145,10 +132,22 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 	
 	if (cmd == "activate") then
 		self:Awaken()
+		return true
+	elseif (cmd == "attack") then
+		self:Attack(args)
+		return true
+	elseif (cmd == "touch_trigger_touched") then
+		if (self.sounds.Hit) then
+			self.sounds.Hit:Play(kSoundChannel_FX, 0)
+		end
 	end
+	
+	return false
+	
 end
 
 function ManipulatableObject.Dormant(self)
+	COutLine(kC_Debug, "ManipulatableObject.Dormant")
 	self:PlayAnim("dormant", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:Play(kSoundChannel_FX, 0)
@@ -156,6 +155,7 @@ function ManipulatableObject.Dormant(self)
 end
 
 function ManipulatableObject.Awaken(self)
+	COutLine(kC_Debug, "ManipulatableObject.Awaken")
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeVolume(0, 1)
@@ -171,7 +171,9 @@ function ManipulatableObject.Awaken(self)
 end
 
 function ManipulatableObject.Idle(self)
+	COutLine(kC_Debug, "ManipulatableObject.Idle")
 	self:PlayAnim("idle", self.model)
+	self.canAttack = true
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end
@@ -183,6 +185,34 @@ function ManipulatableObject.Idle(self)
 			ManipulatableObject.NotifyManipulate(true)
 		end
 	end
+end
+
+function ManipulatableObject.Attack(self, args)
+	if (not self.canAttack) then
+		COutLine(kC_Debug, "ManipulatableObject.Attack(ignored): cannot attack right now.")
+		return
+	end
+	
+	COutLine(kC_Debug, "ManipulatableObject.Attack")
+	
+	self.canAttack = false
+	local blend = self:PlayAnim(args, self.model)
+	if (blend) then
+		blend.Seq(ManipulatableObject.AttackFinish)
+		if (self.sounds.Attack) then
+			self.sounds.Attack:Play(kSoundChannel_FX, 0)
+		end
+		if (self.keys.attack_brush) then
+			World.PostEvent(self.keys.attack_brush.." enable")
+		end
+	end
+end
+
+function ManipulatableObject.AttackFinish(self)
+	if (self.keys.attack_brush) then
+		World.PostEvent(self.keys.attack_brush.." disable")
+	end
+	self:Idle()
 end
 
 function ManipulatableObject.NotifyManipulate(enabled)
@@ -411,6 +441,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	end
 	
 	self.manipulate = objDir
+	self.canAttack = false
 	self:PlayAnim(state, self.model).Seq(f)
 	
 	-- no longer manipulatable

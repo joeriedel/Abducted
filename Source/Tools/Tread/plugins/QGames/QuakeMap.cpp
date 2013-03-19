@@ -233,22 +233,18 @@ void CQuakeMap::WriteEntity(std::fstream &file, CEntity *entity, CTreadDoc *doc)
 	CMapObject* obj;
 	int *objs = entity->GetOwnedObjectUIDs(&numobjs);
 
-	if (numobjs == 0)
+	vec3 pos = entity->GetObjectWorldPos();
+	file << "\"origin\" \"" << pos.x << " " << pos.y << " " << pos.z << "\"\n";
+	
+	
+	for(int i = 0; i < numobjs; ++i )
 	{
-		vec3 pos = entity->GetObjectWorldPos();
-		file << "\"origin\" \"" << pos.x << " " << pos.y << " " << pos.z << "\"\n";
-	}
-	else
-	{
-		for(int i = 0; i < numobjs; ++i )
+		obj = doc->ObjectForUID( objs[i] );
+		if( obj )
 		{
-			obj = doc->ObjectForUID( objs[i] );
-			if( obj )
-			{
-				CQBrush *b = dynamic_cast<CQBrush*>(obj);
-				if (b) { WriteBrush(file, b, doc); }
-				Sys_StepStatusBar();
-			}
+			CQBrush *b = dynamic_cast<CQBrush*>(obj);
+			if (b) { WriteBrush(file, b, doc); }
+			Sys_StepStatusBar();
 		}
 	}
 

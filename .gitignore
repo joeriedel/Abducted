@@ -11,6 +11,8 @@ xcuserdata
 .DS_Store
 *.cache
 *~
+*.idea
+*.iml
 BuildLog.htm
 *.idb
 *.res

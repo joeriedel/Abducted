@@ -29,6 +29,7 @@ pak0 {
 	UI/loading_icon_M
 	UI/finger_shadow_M
 	UI/Globals
+	UI/ArmChat
 	UI/TerminalPuzzlesBigFont_TF
 	UI/ChatChoice_TF
 	UI/Chat_TF
@@ -63,6 +64,11 @@ pak0 {
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
 	UI/alphabet_scrollbar_M
+
+	Audio/Amb01-Cine
+	Audio/Amb02-Cine1	Audio/Amb03-Cine2	Audio/Amb04-Cine4	Audio/Amb05-Cine5	Audio/Amb06-Cine6	Audio/Amb07-Junkyard	Audio/Amb08-Lochness	Audio/Amb09-Deep1	Audio/Amb10-Deep2	Audio/Amb11-Spooked
+	"Audio/Amb12-Low Flutter1"	"Audio/Amb13-Low Flutter2"	"Audio/Amb14-Low Growl"	"Audio/Amb15-Low & Breathy"	"Audio/Amb16-Breath Drone"	"Audio/Amb17-Ghostly Drone"	Audio/Amb18-Atmos1	Audio/Amb19-Atmos2	Audio/Amb20-Atmos3	Audio/Amb21-Atmos4	Audio/Amb22-Atmos5	Audio/Amb23-Atmos6	"Audio/Amb24-The Event"	Audio/Amb25-Sinister	Audio/Amb26-Somewhere	Audio/Amb27-Lurking	Audio/Amb28-Shifter	"Audio/Amb29-Dead of Night"	Audio/Amb30-Anxiety	Audio/Amb31-DarkNightmare	"Audio/Amb32-Not Alone"	Audio/Amb33-Andromeda
+	Audio/Amb34-Cryostasis	"Audio/Amb35-Bending Space"	Audio/Amb36-Future	"Audio/Amb37-Other World"	Audio/Amb38-CabinSpace	"Audio/Amb39-Sub Amb"	Audio/Amb40-Cyber
 
 	// Hack puzzle
 	Reflex-Game/reflex-mark-current_M

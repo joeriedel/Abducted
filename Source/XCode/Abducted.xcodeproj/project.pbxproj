@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; };
+		3321A96F16FA9DCA00E2102F /* libRadianceGoldenOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81391633CBC5002603A5 /* libRadianceGoldenOSX.a */; };
+		3321A97016FA9DD300E2102F /* libMainGoldenOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA812A1633CBC5002603A5 /* libMainGoldenOSX.a */; };
+		3321A97316FAA05500E2102F /* launcher2.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3321A97216FAA05500E2102F /* launcher2.png */; };
+		3321A97616FAABC700E2102F /* autoexec.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3321A97416FAAB9D00E2102F /* autoexec.txt */; };
 		3397727016E9AC9B0046535B /* libnvtt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3397726F16E9AC9B0046535B /* libnvtt.dylib */; };
 		3397728E16E9D2EF0046535B /* libluajitOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50416D6FF4B009646B1 /* libluajitOSX.a */; };
 		3397729116E9D61F0046535B /* manifest.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3397728F16E9D61F0046535B /* manifest.pak */; };
@@ -28,6 +31,34 @@
 		339BA57C163656D50017FD79 /* G_PlayerPawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06251626689800F8C9FF /* G_PlayerPawn.cpp */; };
 		339BA57D163656D50017FD79 /* G_ViewController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06271626689800F8C9FF /* G_ViewController.cpp */; };
 		339BA5811636F3180017FD79 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA815C1634779A002603A5 /* AudioToolbox.framework */; };
+		33BF6C9D16FA83EA0021C144 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		33BF6CD116FA89B50021C144 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
+		33BF6CD216FA89B50021C144 /* AbductedLauncher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC061B1626684B00F8C9FF /* AbductedLauncher.cpp */; };
+		33BF6CD316FA89B50021C144 /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
+		33BF6CD416FA89B50021C144 /* G_Exports.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06231626689800F8C9FF /* G_Exports.cpp */; };
+		33BF6CD516FA89B50021C144 /* G_PlayerPawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06251626689800F8C9FF /* G_PlayerPawn.cpp */; };
+		33BF6CD616FA89B50021C144 /* G_ViewController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06271626689800F8C9FF /* G_ViewController.cpp */; };
+		33BF6CD716FA89B50021C144 /* G_SkModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC062A1626689800F8C9FF /* G_SkModel.cpp */; };
+		33BF6CD816FA89B50021C144 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
+		33BF6CDB16FA89B50021C144 /* libluajitOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8F50416D6FF4B009646B1 /* libluajitOSX.a */; };
+		33BF6CDD16FA89B50021C144 /* libopenal.1.14.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC06471626777400F8C9FF /* libopenal.1.14.0.dylib */; };
+		33BF6CDE16FA89B50021C144 /* libboostOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05D1162667EF00F8C9FF /* libboostOSX.a */; };
+		33BF6CDF16FA89B50021C144 /* libfreetypeOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05D7162667EF00F8C9FF /* libfreetypeOSX.a */; };
+		33BF6CE216FA89B50021C144 /* libliboggOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05E6162667EF00F8C9FF /* libliboggOSX.a */; };
+		33BF6CE416FA89B50021C144 /* liblibvorbisOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC05F2162667EF00F8C9FF /* liblibvorbisOSX.a */; };
+		33BF6CE516FA89B50021C144 /* libzlibOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC0616162667EF00F8C9FF /* libzlibOSX.a */; };
+		33BF6CE816FA89B50021C144 /* QtCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC063D1626773A00F8C9FF /* QtCore.framework */; };
+		33BF6CE916FA89B50021C144 /* QtGui.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC063E1626773A00F8C9FF /* QtGui.framework */; };
+		33BF6CEA16FA89B50021C144 /* QtOpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC063F1626773A00F8C9FF /* QtOpenGL.framework */; };
+		33BF6CEB16FA89B50021C144 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC06431626774A00F8C9FF /* OpenGL.framework */; };
+		33BF6CED16FA89B50021C144 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC04F0162663FC00F8C9FF /* Cocoa.framework */; };
+		33BF6CEE16FA89B50021C144 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 338BD5081638DD4200468A4D /* GameKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		33BF6D4816FA8E650021C144 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33BF6D4A16FA8E650021C144 /* MainMenu.xib */; };
+		33BF6D4E16FA96E10021C144 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33BF6D4D16FA96E10021C144 /* icon.icns */; };
+		33BF6D5216FA97420021C144 /* manifest.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33BF6D5016FA97420021C144 /* manifest.pak */; };
+		33BF6D5316FA97420021C144 /* pak0.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33BF6D5116FA97420021C144 /* pak0.pak */; };
+		33BF6D5616FA986D0021C144 /* icon.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33BF6D5416FA986D0021C144 /* icon.png */; };
+		33BF6D5716FA986D0021C144 /* launcher1.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33BF6D5516FA986D0021C144 /* launcher1.png */; };
 		33DB15251627D97A00963A33 /* Cg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33DB15241627D97A00963A33 /* Cg.framework */; };
 		33EC05661626653900F8C9FF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33EC04F0162663FC00F8C9FF /* Cocoa.framework */; };
 		33EC061D1626687C00F8C9FF /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
@@ -296,6 +327,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		33BF6D4F16FA97200021C144 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Base;
+			dstSubfolderSpec = 7;
+			files = (
+				3321A97316FAA05500E2102F /* launcher2.png in CopyFiles */,
+				33BF6D5616FA986D0021C144 /* icon.png in CopyFiles */,
+				33BF6D5716FA986D0021C144 /* launcher1.png in CopyFiles */,
+				33BF6D5216FA97420021C144 /* manifest.pak in CopyFiles */,
+				33BF6D5316FA97420021C144 /* pak0.pak in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33FA818316351985002603A5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -310,6 +355,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3321A97216FAA05500E2102F /* launcher2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = launcher2.png; path = ../../Base/launcher2.png; sourceTree = "<group>"; };
+		3321A97416FAAB9D00E2102F /* autoexec.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = autoexec.txt; path = ../../autoexec.txt; sourceTree = "<group>"; };
 		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		3397726F16E9AC9B0046535B /* libnvtt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libnvtt.dylib; path = "../../Extern/nvtt-2.0.8-1/bin/libnvtt.dylib"; sourceTree = "<group>"; };
 		3397727516E9B3F50046535B /* lua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lua.xcodeproj; path = ../../Radiance/Source/XCode/lua.xcodeproj; sourceTree = "<group>"; };
@@ -319,6 +366,17 @@
 		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
 		33BF3E6B1633255E006DEAAE /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33BF6CA616FA89870021C144 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		33BF6CA716FA89870021C144 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		33BF6CA816FA89870021C144 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		33BF6CF416FA89B50021C144 /* AbductedGoldenOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldenOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33BF6CF816FA8A2C0021C144 /* OSX-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "OSX-Info.plist"; path = "OSX/OSX-Info.plist"; sourceTree = "<group>"; };
+		33BF6D4916FA8E650021C144 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		33BF6D4D16FA96E10021C144 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = OSX/icon.icns; sourceTree = "<group>"; };
+		33BF6D5016FA97420021C144 /* manifest.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = manifest.pak; path = ../../Cooked/PC/Base/manifest.pak; sourceTree = "<group>"; };
+		33BF6D5116FA97420021C144 /* pak0.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = pak0.pak; path = ../../Cooked/PC/Base/pak0.pak; sourceTree = "<group>"; };
+		33BF6D5416FA986D0021C144 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../../Base/icon.png; sourceTree = "<group>"; };
+		33BF6D5516FA986D0021C144 /* launcher1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = launcher1.png; path = ../../Base/launcher1.png; sourceTree = "<group>"; };
 		33DB15241627D97A00963A33 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = "../../Extern/Cg-3.1.0013/Cg.framework"; sourceTree = "<group>"; };
 		33EC04F0162663FC00F8C9FF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		33EC04F3162663FC00F8C9FF /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -450,6 +508,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33BF6CD916FA89B50021C144 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33BF6CDB16FA89B50021C144 /* libluajitOSX.a in Frameworks */,
+				33BF6CDD16FA89B50021C144 /* libopenal.1.14.0.dylib in Frameworks */,
+				33BF6CDE16FA89B50021C144 /* libboostOSX.a in Frameworks */,
+				33BF6CDF16FA89B50021C144 /* libfreetypeOSX.a in Frameworks */,
+				33BF6CE216FA89B50021C144 /* libliboggOSX.a in Frameworks */,
+				33BF6CE416FA89B50021C144 /* liblibvorbisOSX.a in Frameworks */,
+				33BF6CE516FA89B50021C144 /* libzlibOSX.a in Frameworks */,
+				3321A96F16FA9DCA00E2102F /* libRadianceGoldenOSX.a in Frameworks */,
+				3321A97016FA9DD300E2102F /* libMainGoldenOSX.a in Frameworks */,
+				33BF6CE816FA89B50021C144 /* QtCore.framework in Frameworks */,
+				33BF6CE916FA89B50021C144 /* QtGui.framework in Frameworks */,
+				33BF6CEA16FA89B50021C144 /* QtOpenGL.framework in Frameworks */,
+				33BF6CEB16FA89B50021C144 /* OpenGL.framework in Frameworks */,
+				33BF6CED16FA89B50021C144 /* Cocoa.framework in Frameworks */,
+				33BF6CEE16FA89B50021C144 /* GameKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33EC05611626653900F8C9FF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -474,7 +554,7 @@
 				33EC06441626774A00F8C9FF /* OpenGL.framework in Frameworks */,
 				33DB15251627D97A00963A33 /* Cg.framework in Frameworks */,
 				33EC05661626653900F8C9FF /* Cocoa.framework in Frameworks */,
-				338BD5091638DD4200468A4D /* GameKit.framework in Frameworks */,
+				33BF6C9D16FA83EA0021C144 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,11 +570,36 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		33BF6CA516FA89870021C144 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				33BF6CA616FA89870021C144 /* AppKit.framework */,
+				33BF6CA716FA89870021C144 /* CoreData.framework */,
+				33BF6CA816FA89870021C144 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		33BF6CF716FA89DF0021C144 /* OSX */ = {
+			isa = PBXGroup;
+			children = (
+				3321A97416FAAB9D00E2102F /* autoexec.txt */,
+				33BF6D5416FA986D0021C144 /* icon.png */,
+				3321A97216FAA05500E2102F /* launcher2.png */,
+				33BF6D5516FA986D0021C144 /* launcher1.png */,
+				33BF6D5016FA97420021C144 /* manifest.pak */,
+				33BF6D5116FA97420021C144 /* pak0.pak */,
+				33BF6D4A16FA8E650021C144 /* MainMenu.xib */,
+				33BF6D4D16FA96E10021C144 /* icon.icns */,
+				33BF6CF816FA8A2C0021C144 /* OSX-Info.plist */,
+				33FA814B1633D2BA002603A5 /* Developer-Info.plist */,
+			);
+			name = OSX;
+			sourceTree = "<group>";
+		};
 		33EC04E1162663FC00F8C9FF = {
 			isa = PBXGroup;
 			children = (
-				3397728F16E9D61F0046535B /* manifest.pak */,
-				3397729016E9D61F0046535B /* pak0.pak */,
 				3397727516E9B3F50046535B /* lua.xcodeproj */,
 				33EC058C162667ED00F8C9FF /* boost.xcodeproj */,
 				33EC058F162667ED00F8C9FF /* freetype.xcodeproj */,
@@ -520,6 +625,7 @@
 				33EC05641626653900F8C9FF /* AbductedDeveloper.app */,
 				33BF3E6B1633255E006DEAAE /* Abducted.app */,
 				33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */,
+				33BF6CF416FA89B50021C144 /* AbductedGoldenOSX.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -550,6 +656,7 @@
 				33EC04F4162663FC00F8C9FF /* CoreData.framework */,
 				33EC04F5162663FC00F8C9FF /* Foundation.framework */,
 				338BD5081638DD4200468A4D /* GameKit.framework */,
+				33BF6CA516FA89870021C144 /* Other Frameworks */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -724,8 +831,8 @@
 		33FA814A1633D2A7002603A5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				33BF6CF716FA89DF0021C144 /* OSX */,
 				33FA822416353382002603A5 /* iOS */,
-				33FA814B1633D2BA002603A5 /* Developer-Info.plist */,
 				33FA817F16351963002603A5 /* autoexec.txt */,
 				33FA818016351964002603A5 /* languages.txt */,
 			);
@@ -735,6 +842,8 @@
 		33FA822416353382002603A5 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				3397728F16E9D61F0046535B /* manifest.pak */,
+				3397729016E9D61F0046535B /* pak0.pak */,
 				33F8F40B16BFA7AB009646B1 /* Default-Landscape-568h@2x.png */,
 				33F8F40C16BFA7AB009646B1 /* Default-Landscape.png */,
 				33F8F40D16BFA7AB009646B1 /* Default-Landscape@2x.png */,
@@ -791,6 +900,26 @@
 			name = AbductedGoldeniOS;
 			productName = AbductedGoldeniOS;
 			productReference = 33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		33BF6CCE16FA89B50021C144 /* AbductedGoldenOSX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 33BF6CF116FA89B50021C144 /* Build configuration list for PBXNativeTarget "AbductedGoldenOSX" */;
+			buildPhases = (
+				33BF6CCF16FA89B50021C144 /* Qt Moc */,
+				33BF6CD016FA89B50021C144 /* Sources */,
+				33BF6CD916FA89B50021C144 /* Frameworks */,
+				33BF6CEF16FA89B50021C144 /* Resources */,
+				33BF6CF016FA89B50021C144 /* Install Dependancies */,
+				33BF6D4F16FA97200021C144 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AbductedGoldenOSX;
+			productName = AbductedDeveloper;
+			productReference = 33BF6CF416FA89B50021C144 /* AbductedGoldenOSX.app */;
 			productType = "com.apple.product-type.application";
 		};
 		33EC05631626653900F8C9FF /* AbductedDeveloper */ = {
@@ -882,6 +1011,7 @@
 				33EC05631626653900F8C9FF /* AbductedDeveloper */,
 				33BF3E6A1633255E006DEAAE /* AbductedShipiOS */,
 				33BF3EE91633263C006DEAAE /* AbductedGoldeniOS */,
+				33BF6CCE16FA89B50021C144 /* AbductedGoldenOSX */,
 			);
 		};
 /* End PBXProject section */
@@ -1111,6 +1241,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33BF6CEF16FA89B50021C144 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3321A97616FAABC700E2102F /* autoexec.txt in Resources */,
+				33BF6D4E16FA96E10021C144 /* icon.icns in Resources */,
+				33BF6D4816FA8E650021C144 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33EC05621626653900F8C9FF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1121,6 +1261,35 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		33BF6CCF16FA89B50021C144 /* Qt Moc */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)../AbductedLauncher.h",
+			);
+			name = "Qt Moc";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/mocfiles.sh";
+		};
+		33BF6CF016FA89B50021C144 /* Install Dependancies */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Install Dependancies";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "mkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\nmkdir -p \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtCore.framework/Versions/4/QtCore\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtCore.framework\"\ncp \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/QtGui\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks/QtGui.framework\"\ncp -R \"${EXTERN_PATH}/Qt-4.8.2/QtGui.framework/Versions/4/Resources/\" \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\ncp \"${EXTERN_PATH}/OpenALSoft-1.14/libs/libopenal.1.14.0.dylib\" \"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Frameworks\"";
+		};
 		33DB15261627DA3C00963A33 /* Install Dependancies */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1181,6 +1350,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33BF6CD016FA89B50021C144 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33BF6CD116FA89B50021C144 /* AbductedApp.cpp in Sources */,
+				33BF6CD216FA89B50021C144 /* AbductedLauncher.cpp in Sources */,
+				33BF6CD316FA89B50021C144 /* AbductedGame.cpp in Sources */,
+				33BF6CD416FA89B50021C144 /* G_Exports.cpp in Sources */,
+				33BF6CD516FA89B50021C144 /* G_PlayerPawn.cpp in Sources */,
+				33BF6CD616FA89B50021C144 /* G_ViewController.cpp in Sources */,
+				33BF6CD716FA89B50021C144 /* G_SkModel.cpp in Sources */,
+				33BF6CD816FA89B50021C144 /* G_TouchTrigger.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33EC05601626653900F8C9FF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1197,6 +1381,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		33BF6D4A16FA8E650021C144 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				33BF6D4916FA8E650021C144 /* en */,
+			);
+			name = MainMenu.xib;
+			path = OSX;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		33BF3E971633255E006DEAAE /* Debug */ = {
@@ -1271,6 +1467,44 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/Flurry iPhone SDK v3.0.9/FlurryAnalytics\"",
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		33BF6CF216FA89B50021C144 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33EC05831626678A00F8C9FF /* AppGoldenDebugOSX.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/Qt-4.8.2\"",
+				);
+				INFOPLIST_FILE = "OSX/OSX-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
+					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		33BF6CF316FA89B50021C144 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33EC05851626678A00F8C9FF /* AppGoldenReleaseOSX.xcconfig */;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/Qt-4.8.2\"",
+				);
+				INFOPLIST_FILE = "OSX/OSX-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../Extern/OpenALSoft-1.14/libs\"",
+					"\"$(SRCROOT)/../../Extern/luajit-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -1389,6 +1623,15 @@
 			buildConfigurations = (
 				33BF3F111633263C006DEAAE /* Debug */,
 				33BF3F121633263C006DEAAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33BF6CF116FA89B50021C144 /* Build configuration list for PBXNativeTarget "AbductedGoldenOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33BF6CF216FA89B50021C144 /* Debug */,
+				33BF6CF316FA89B50021C144 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

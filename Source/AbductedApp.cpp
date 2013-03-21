@@ -78,8 +78,8 @@ bool AbductedApp::InitWindow() {
 
 	const char *vidString = "1280x720";
 
-	vidString = settings->keys->StringForKey("vidMode", vidString);
-	mode.fullscreen = settings->keys->BoolForKey("fullscreen", false);
+	vidString = settings->StringForKey("vidMode", vidString);
+	mode.fullscreen = settings->BoolForKey("fullscreen", false);
 	
 	sscanf(vidString, "%dx%d", &mode.w, &mode.h);
 

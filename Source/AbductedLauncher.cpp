@@ -45,7 +45,7 @@ bool LoadPixmap(const char *filename, QPixmap &pixmap) {
 	int mask = App::Get()->engine->sys->files->globalMask;
 	App::Get()->engine->sys->files->globalMask = file::kFileMask_Base;
 	
-	file::MMapping::Ref mm = App::Get()->engine->sys->files->MapFile(filename, ZTools);
+	file::MMapping::Ref mm = App::Get()->engine->sys->files->MapFile(filename, ZEngine);
 	
 	App::Get()->engine->sys->files->globalMask = mask;
 	

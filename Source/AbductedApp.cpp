@@ -16,7 +16,7 @@
 #include <Engine/Persistence.h>
 #endif
 
-#if defined(RAD_OPT_IOS_DEVICE) && defined(RAD_TARGET_GOLDEN)
+#if defined(RAD_OPT_IOS_DEVICE) && defined(RAD_TARGET_GOLDEN) && !defined(RAD_OPT_SHIP)
 #define VALIDATE_NEON_SKIN
 #endif
 

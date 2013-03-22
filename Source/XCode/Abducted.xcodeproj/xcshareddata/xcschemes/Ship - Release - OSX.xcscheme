@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "33BF3EE91633263C006DEAAE"
-               BuildableName = "AbductedGoldeniOS.app"
-               BlueprintName = "AbductedGoldeniOS"
+               BlueprintIdentifier = "3321A97716FBB5C600E2102F"
+               BuildableName = "Abducted.app"
+               BlueprintName = "AbductedShipOSX"
                ReferencedContainer = "container:Abducted.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3E6A1633255E006DEAAE"
+            BlueprintIdentifier = "3321A97716FBB5C600E2102F"
             BuildableName = "Abducted.app"
-            BlueprintName = "AbductedShipiOS"
+            BlueprintName = "AbductedShipOSX"
             ReferencedContainer = "container:Abducted.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -48,15 +48,18 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <PathRunnable
+         FilePath = "/Users/joeriedel/Desktop/Abducted.app">
+      </PathRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3E6A1633255E006DEAAE"
+            BlueprintIdentifier = "3321A97716FBB5C600E2102F"
             BuildableName = "Abducted.app"
-            BlueprintName = "AbductedShipiOS"
+            BlueprintName = "AbductedShipOSX"
             ReferencedContainer = "container:Abducted.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -69,9 +72,9 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3EE91633263C006DEAAE"
-            BuildableName = "AbductedGoldeniOS.app"
-            BlueprintName = "AbductedGoldeniOS"
+            BlueprintIdentifier = "3321A97716FBB5C600E2102F"
+            BuildableName = "Abducted.app"
+            BlueprintName = "AbductedShipOSX"
             ReferencedContainer = "container:Abducted.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

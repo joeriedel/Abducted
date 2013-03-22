@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "33BF3EE91633263C006DEAAE"
-               BuildableName = "AbductedGoldeniOS.app"
-               BlueprintName = "AbductedGoldeniOS"
+               BlueprintIdentifier = "33956A7816FBD677008314CD"
+               BuildableName = "Abducted.app"
+               BlueprintName = "AbductedShipiOS"
                ReferencedContainer = "container:Abducted.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3E6A1633255E006DEAAE"
+            BlueprintIdentifier = "33956A7816FBD677008314CD"
             BuildableName = "Abducted.app"
             BlueprintName = "AbductedShipiOS"
             ReferencedContainer = "container:Abducted.xcodeproj">
@@ -51,7 +51,7 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3E6A1633255E006DEAAE"
+            BlueprintIdentifier = "33956A7816FBD677008314CD"
             BuildableName = "Abducted.app"
             BlueprintName = "AbductedShipiOS"
             ReferencedContainer = "container:Abducted.xcodeproj">
@@ -69,9 +69,9 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33BF3EE91633263C006DEAAE"
-            BuildableName = "AbductedGoldeniOS.app"
-            BlueprintName = "AbductedGoldeniOS"
+            BlueprintIdentifier = "33956A7816FBD677008314CD"
+            BuildableName = "Abducted.app"
+            BlueprintName = "AbductedShipiOS"
             ReferencedContainer = "container:Abducted.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

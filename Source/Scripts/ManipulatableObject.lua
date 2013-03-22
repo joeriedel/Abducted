@@ -18,6 +18,9 @@ function ManipulatableObject.Spawn(self)
 	self.model.vision:BlendTo({1,1,1,0}, 0)
 	self:SetFacing(NumberForString(self.keys.angle, 0))
 	
+	self.model.dm:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
+	self.model.vision:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
+	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
 	
@@ -548,10 +551,7 @@ function Tentacle.Spawn(self)
 	
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
-	self.model.dm:ScaleTo({1, 1, 1}, 0)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	
-	self.model.vision:ScaleTo({1, 1, 1}, 0)
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	
 	self.manipulateShift = {0,0,64}

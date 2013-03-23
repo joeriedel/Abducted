@@ -1,55 +1,55 @@
--- TerminalPuzzles.lua
+-- ReflexGame.lua
 -- Copyright (c) 2012 Sunside Inc., All Rights Reserved
 -- Author: Dave Reese
 -- See Abducted/LICENSE for licensing terms
 
-TerminalPuzzles = Class:New()
-TerminalPuzzles.active = false
+ReflexGame = Class:New()
+ReflexGame.active = false
 
-function TerminalPuzzles.DebugStart(self)
-    TerminalPuzzles:InitGame("memory-game: debug_start", 1, 1)
-    TerminalPuzzles:ShowBoard(true)
-    TerminalPuzzles:StartGame()
+function ReflexGame.DebugStart(self)
+    ReflexGame:InitGame("reflex-game: debug_start", 1, 1)
+    ReflexGame:ShowBoard(true)
+    ReflexGame:StartGame()
 end
 
-function TerminalPuzzles.Spawn(self)
-	TerminalPuzzles.entity = self
+function ReflexGame.Spawn(self)
+	ReflexGame.entity = self
 		
 	self:LoadMaterials()
 	self:InitUI()
 	
-	-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
+	-- Note: InitUI sets widgets.root to be invisible (hides the whole board)
 
 end
 
-function TerminalPuzzles.ShowBoard(self, show)
-	self = TerminalPuzzles.entity
+function ReflexGame.ShowBoard(self, show)
+	self = ReflexGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 	self.widgets.root:SetVisible(show)
 	World.DrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function TerminalPuzzles.InitGame(self, gameType, playerSkill, terminalSkill)
-	self = TerminalPuzzles.entity
+function ReflexGame.InitGame(self, gameType, playerSkill, terminalSkill)
+	self = ReflexGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 end
 
-function TerminalPuzzles.StartGame(self, gameCompleteCallback)
-	self = TerminalPuzzles.entity
+function ReflexGame.StartGame(self, gameCompleteCallback)
+	self = ReflexGame.entity
 	
-	TerminalPuzzles.active = true
+	ReflexGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
 	
-	self.think = TerminalPuzzles.Think
+	self.think = ReflexGame.Think
 	self:SetNextThink(0)
 	
 	World.SetEnabledGestures(kIG_Line)
 	World.FlushInput(true)
 end
 
-function TerminalPuzzles.EndGame(self, result)
+function ReflexGame.EndGame(self, result)
 
 	
 	World.SetEnabledGestures(0)
@@ -60,14 +60,14 @@ function TerminalPuzzles.EndGame(self, result)
 
 end
 
-function TerminalPuzzles.ResetGame(self)
-	self = TerminalPuzzles.entity
+function ReflexGame.ResetGame(self)
+	self = ReflexGame.entity
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
-	TerminalPuzzles.active = false
+	ReflexGame.active = false
 end
 
-function TerminalPuzzles.CreateLevel1x1(self)
+function ReflexGame.CreateLevel1x1(self)
 	local level = {}
 	
 	level.name = "1x1"
@@ -114,7 +114,7 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	return level
 end
 
-function TerminalPuzzles.CreateLevel1x2(self)
+function ReflexGame.CreateLevel1x2(self)
 	local level = {}
 	
 	level.name = "1x2"	
@@ -129,7 +129,7 @@ function TerminalPuzzles.CreateLevel1x2(self)
 	return level
 end
 
-function TerminalPuzzles.CreateLevel1x3(self)
+function ReflexGame.CreateLevel1x3(self)
 	local level = {}
 	
 	level.name = "1x3"	
@@ -144,7 +144,7 @@ function TerminalPuzzles.CreateLevel1x3(self)
 	return level
 end
 
-function TerminalPuzzles.CreateBoards(self)
+function ReflexGame.CreateBoards(self)
 	self.db = { }
 	self.db.levels = { }    
 	
@@ -160,8 +160,8 @@ function TerminalPuzzles.CreateBoards(self)
 		}
 end
 
-function TerminalPuzzles.OnInputEvent(self,e)
-	self = TerminalPuzzles.entity
+function ReflexGame.OnInputEvent(self,e)
+	self = ReflexGame.entity
 	
 	if (e.type == kI_KeyDown) then
 		--COutLine(kC_Debug,"key=%i",e.data[1])
@@ -192,8 +192,8 @@ function TerminalPuzzles.OnInputEvent(self,e)
 	return false
 end
 
-function TerminalPuzzles.OnInputGesture(self,g)
-	self = TerminalPuzzles.entity
+function ReflexGame.OnInputGesture(self,g)
+	self = ReflexGame.entity
 	
 	if (g.id ~= kIG_Line) then
 		return true
@@ -217,7 +217,7 @@ function TerminalPuzzles.OnInputGesture(self,g)
 	return true
 end
 
-function TerminalPuzzles.InitUI(self)
+function ReflexGame.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = 60
 	self.REFLEX_BOARD_OFFSET = 80
@@ -258,8 +258,8 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
 	self.widgets.grid = { }
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=TerminalPuzzles.OnInputEvent, OnInputGesture=TerminalPuzzles.OnInputGesture})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
+	World.SetRootWidget(UI.kLayer_ReflexGame, self.widgets.root)
 	
 	self.widgets.root:SetVisible(false)
 	
@@ -309,7 +309,7 @@ function TerminalPuzzles.InitUI(self)
 	COutLine(kC_Debug, "Board Completed")		
 end
 
-function TerminalPuzzles.LoadMaterials(self)
+function ReflexGame.LoadMaterials(self)
 	
 	self.gfx = {}
 	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
@@ -334,10 +334,10 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.gfx.symbol_d = World.Load("Reflex-Game/reflex-symbol-d_M")
 	
 	self.typefaces = {}
-	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
+	self.typefaces.BigText = World.Load("UI/ReflexGameBigFont_TF")				
 end
 
-function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
+function ReflexGame.SetPositionByGrid(self,w,x,y)
 	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
 	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
 
@@ -345,7 +345,7 @@ function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
-function TerminalPuzzles.Vec2Normal(self,x,y)
+function ReflexGame.Vec2Normal(self,x,y)
 	local n = math.sqrt(x * x + y * y)
 	--COutLine(kC_Debug,"Vec2Normal: x=%.02f, y=%.02f, n = %f",x,y,n)	
 	local vec2 = { }
@@ -358,7 +358,7 @@ function TerminalPuzzles.Vec2Normal(self,x,y)
 	return vec2
 end
 
-function TerminalPuzzles.LerpVec2(self,v,heading,dt,speed)	
+function ReflexGame.LerpVec2(self,v,heading,dt,speed)	
 	local dx = heading.x * dt * speed
 	local dy = heading.y * dt * speed
 	
@@ -372,7 +372,7 @@ function TerminalPuzzles.LerpVec2(self,v,heading,dt,speed)
 	return vec2	
 end
 
-function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)	
+function ReflexGame.LerpWidget(self,widget,heading,dt,speed)	
 	local r = widget:Rect()
 	
 	local width = r[3]
@@ -402,7 +402,7 @@ function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)
 	return o
 end
 
-function TerminalPuzzles.GetGridCellFromVec2(self,v)
+function ReflexGame.GetGridCellFromVec2(self,v)
 	local x = (v.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
 	local y = (v.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
 	local ix = math.floor(x)
@@ -415,7 +415,7 @@ function TerminalPuzzles.GetGridCellFromVec2(self,v)
 	return vec2
 end
 
-function TerminalPuzzles.GetGridCell(self,widget)
+function ReflexGame.GetGridCell(self,widget)
 	local pos = self:GetPosition(widget)
 
 	local x = (pos.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
@@ -430,7 +430,7 @@ function TerminalPuzzles.GetGridCell(self,widget)
 	return vec2
 end
 
-function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
+function ReflexGame.IsGridCellOnBoard(self,x,y)
 	if (x >= 0 and y >= 0 and x < self.INDEX_MAX_X and y < self.INDEX_MAX_Y) then
 		return true
 	end
@@ -438,11 +438,11 @@ function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
 	return false
 end
 
-function TerminalPuzzles.ConvertCoordToIndex(self,x,y)
+function ReflexGame.ConvertCoordToIndex(self,x,y)
 	return bit.bor(bit.lshift(y, 16), x)
 end
 
-function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
+function ReflexGame.ConstrainPointToBoard(self,x,y)
 	if (x < self.COORD_MIN_X) then
 		x = self.COORD_MIN_X
 	end
@@ -462,7 +462,7 @@ function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 	return vec2			
 end
 
-function TerminalPuzzles.GetPosition(self,w)
+function ReflexGame.GetPosition(self,w)
 	local r = w:Rect()
 	local vec2 = { } 
 	vec2.x = r[1] + r[3]/2
@@ -471,13 +471,13 @@ function TerminalPuzzles.GetPosition(self,w)
 end
 
 
-function TerminalPuzzles.CreateState(self,architype)
+function ReflexGame.CreateState(self,architype)
 	local state = { }
 	state.architype = architype
 	return state
 end
 
-function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
+function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	--COutLine(kC_Debug,"SetLineSegment start/end @ start=%i,%i, end=%i,%i",startPos.x,startPos.y,endPos.x,endPos.y)		
 
 	local x = startPos.x
@@ -516,7 +516,7 @@ function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
 	line:SetRect(r)
 end
 
-function TerminalPuzzles.CollideWithLine(self,x,y,ignore)
+function ReflexGame.CollideWithLine(self,x,y,ignore)
 	local count = #self.widgets.lines
 	if (ignore) then
 		count = count - 2
@@ -532,7 +532,7 @@ function TerminalPuzzles.CollideWithLine(self,x,y,ignore)
 	return false
 end
 
-function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
+function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
 	if (x < self.COORD_MIN_X) then
 		COutLine(kC_Debug,"CollideWihtBoard found min X @ x=%i, y=%i",x,y)		
 		return true
@@ -579,7 +579,7 @@ function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
 	return true
 end
 
-function TerminalPuzzles.Think(self,dt)
+function ReflexGame.Think(self,dt)
 	if (self.state.gameOver) then
 		self.state.gameOverTimer = self.state.gameOverTimer - dt
 		if (self.state.gameOverTimer < 0) then
@@ -717,4 +717,5 @@ function TerminalPuzzles.Think(self,dt)
 	end	
 end
 
-terminal_puzzles = TerminalPuzzles
+--terminal_puzzles = ReflexGame
+reflex_game = ReflexGame

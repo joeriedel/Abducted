@@ -6,6 +6,9 @@
 TerminalPuzzles = Class:New()
 TerminalPuzzles.active = false
 
+kMGPhase_DiscoverPattern = 0
+kMGPhase_MatchTiles = 1
+
 function TerminalPuzzles.DebugStart(self)
     TerminalPuzzles:InitGame("memory-game: debug_start", 1, 1)
     TerminalPuzzles:ShowBoard(true)
@@ -44,8 +47,8 @@ function TerminalPuzzles.StartGame(self, gameCompleteCallback)
 	
 	self.think = TerminalPuzzles.Think
 	self:SetNextThink(0)
-	
-	World.SetEnabledGestures(kIG_Line)
+
+    World.SetEnabledGestures(kIG_Line)
 	World.FlushInput(true)
 end
 
@@ -72,73 +75,18 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	
 	level.name = "1x1"
 	
-	level.antivirusSpiderSpawnRate = 5
-	level.antivirusSpiderSpeed = 40
+	level.state = kMGPhase_DiscoverPattern;
+	level.rows = 2
 	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
 	level.board = { 
 		-- row 0
-		-- row 1
-		{ x=0, y=1, img="mark_start" }				
-		, { x=3, y=1, img="cell_green" }
-		, { x=11, y=1, img="cell_green" }		
+-- keeping these here just for reference in case we want to statically construct
+--		{ x=0, y=0, img="symbol_a" }
+--		, { x=1, y=0, img="symbol_b" }
 		-- row 2
-		, { x=3, y=2, img="cell_green" }
-		, { x=4, y=2, img="cell_b" }
-		, { x=11, y=2, img="cell_green" }		
-		, { x=12, y=2, img="cell_green" }				
 		-- row 3
-		, { x=5, y=3, img="cell_green" }
-		-- row 4
-		, { x=12, y=4, img="cell_green" }
-		, { x=13, y=4, img="cell_d" }
-		-- row 5
-		, { x=6, y=5, img="cell_green" }
-		, { x=13, y=5, img="cell_c" }
-		-- row 6
-		, { x=2, y=6, img="cell_green" }
-		, { x=3, y=6, img="cell_green" }
-		-- row 7
-		, { x=3, y=7, img="cell_a" }		
-		, { x=14, y=1, img="mark_end" }				
-		-- row 8
-		-- row 9
-		-- row 10
-		-- row 11
-		-- row 12
-		-- row 13
-		-- row 14
-		}
-	
-	return level
-end
-
-function TerminalPuzzles.CreateLevel1x2(self)
-	local level = {}
-	
-	level.name = "1x2"	
-	
-	level.goal = { "symbol_d", "symbol_b", "symbol_a", "symbol_c" }
-
-	level.board = {  { x=0, y=0, img="cell_green" }
-		, { x=9, y=3, img="cell_green" }
-		, { x=7, y=5, img="cell_green" }
-		}
-	
-	return level
-end
-
-function TerminalPuzzles.CreateLevel1x3(self)
-	local level = {}
-	
-	level.name = "1x3"	
-	
-	level.goal = { "symbol_b", "symbol_a", "symbol_c", "symbol_d" }
-
-	level.board = {  { x=0, y=0, img="cell_green" }
-		, { x=6, y=3, img="cell_green" }
-		, { x=3, y=5, img="cell_green" }
 		}
 	
 	return level
@@ -147,72 +95,75 @@ end
 function TerminalPuzzles.CreateBoards(self)
 	self.db = { }
 	self.db.levels = { }    
-	
-	self.db.levels = {  { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }               
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }                               
+
+    -- djr, these are just using the same map system as reflex
+	self.db.levels = {  { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
+		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
 		}
 end
 
 function TerminalPuzzles.OnInputEvent(self,e)
 	self = TerminalPuzzles.entity
-	
-	if (e.type == kI_KeyDown) then
-		--COutLine(kC_Debug,"key=%i",e.data[1])
-		if (e.data[1] == kKeyCode_I) then
-			--COutLine(kC_Debug,"moving widget")
-			self.state.heading.x = 0
-			self.state.heading.y = -1
-			--UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
-			return true
-		end
-		if (e.data[1] == kKeyCode_K) then
-			self.state.heading.x = 0
-			self.state.heading.y = 1
-			return true
-		end		
-		if (e.data[1] == kKeyCode_J) then
-			self.state.heading.x = -1
-			self.state.heading.y = 0
-			return true
-		end				
-		if (e.data[1] == kKeyCode_L) then
-			self.state.heading.x = 1
-			self.state.heading.y = 0
-			return true
-		end						
-	end
+
+-- djr, disabling this for now
+--	if (e.type == kI_KeyDown) then
+--		--COutLine(kC_Debug,"key=%i",e.data[1])
+--		if (e.data[1] == kKeyCode_I) then
+--			--COutLine(kC_Debug,"moving widget")
+--			self.state.heading.x = 0
+--			self.state.heading.y = -1
+--			--UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
+--			return true
+--		end
+--		if (e.data[1] == kKeyCode_K) then
+--			self.state.heading.x = 0
+--			self.state.heading.y = 1
+--			return true
+--		end
+--		if (e.data[1] == kKeyCode_J) then
+--			self.state.heading.x = -1
+--			self.state.heading.y = 0
+--			return true
+--		end
+--		if (e.data[1] == kKeyCode_L) then
+--			self.state.heading.x = 1
+--			self.state.heading.y = 0
+--			return true
+--		end
+--	end
 	
 	return false
 end
 
 function TerminalPuzzles.OnInputGesture(self,g)
 	self = TerminalPuzzles.entity
-	
-	if (g.id ~= kIG_Line) then
-		return true
-	end
-	
-	-- left?
-	if (g.args[1] > 0.707) then
-		self.state.heading.x = 1
-		self.state.heading.y = 0
-	elseif (g.args[1] < -0.707) then -- right?
-		self.state.heading.x = -1
-		self.state.heading.y = 0
-	elseif (g.args[2] > 0.707) then -- down
-		self.state.heading.x = 0
-		self.state.heading.y = 1
-	else -- up
-		self.state.heading.x = 0
-		self.state.heading.y = -1
-	end
+
+--  djr, disabling this for now (joe added this i think)
+--	if (g.id ~= kIG_Line) then
+--		return true
+--	end
+--
+--	-- left?
+--	if (g.args[1] > 0.707) then
+--		self.state.heading.x = 1
+--		self.state.heading.y = 0
+--	elseif (g.args[1] < -0.707) then -- right?
+--		self.state.heading.x = -1
+--		self.state.heading.y = 0
+--	elseif (g.args[2] > 0.707) then -- down
+--		self.state.heading.x = 0
+--		self.state.heading.y = 1
+--	else -- up
+--		self.state.heading.x = 0
+--		self.state.heading.y = -1
+--	end
 	
 	return true
 end
@@ -220,10 +171,9 @@ end
 function TerminalPuzzles.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = 60
-	self.REFLEX_BOARD_OFFSET = 80
+	self.REFLEX_BOARD_OFFSET = 0
 	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
-	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
@@ -234,47 +184,40 @@ function TerminalPuzzles.InitUI(self)
 	-- define structure: self.state
 	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
 	self.state = { }	
-	self.state.heading = { }
-	self.state.lastHeading = { }
 	self.state.victory = { }
 	self.state.current = { }	
-	self.state.heading.x = 0
-	self.state.heading.y = 0
-	self.state.lastHeading.x = 0
-	self.state.lastHeading.y = 0
 	self.state.gameOver = false
 	self.state.currentMove = 1
 	self.state.gameOverTimer = 2	
 	self.state.victory = false
 	self.state.level = level
-	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
-	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
 	self.state.goalCounter = 1
 	
 	-- define structure self.widgets
 	self.widgets = {}
 	self.widgets.goals = { }
 	self.widgets.board = { }		
-	self.widgets.lines = { }
-	self.widgets.spiders = { }
 	self.widgets.grid = { }
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=TerminalPuzzles.OnInputEvent, OnInputGesture=TerminalPuzzles.OnInputGesture})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	
 	self.widgets.root:SetVisible(false)
-	
-	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
+
+-- djr, border might not be needed
+--	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
 	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
 	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
-	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
-	self.widgets.root:AddChild(self.widgets.border)	
+-- djr, border might not be needed
+--	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
+-- djr, border might not be needed
+--	self.widgets.root:AddChild(self.widgets.border)
 	self.widgets.root:AddChild(self.widgets.board)	
 		
-	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
+	COutLine(kC_Debug, "memory.level.name=" .. self.state.level.name)
 	for i,v in ipairs(self.state.level.goal) do 
 		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
 		local goal = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
-		goal.state = self:CreateState(string.gsub(v,"symbol_","cell_"))
+		goal.state = self:CreateState(v)
 		table.insert(self.widgets.goals,goal)
 		self.widgets.root:AddChild(goal)
 		UI:MoveWidgetByCenter(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
@@ -288,50 +231,37 @@ function TerminalPuzzles.InitUI(self)
 		self.widgets.root:AddChild(b)
 		self.widgets.grid[index] = b		
 		self:SetPositionByGrid(b,v.x,v.y)
-		if (v.img == "mark_start") then
-			local current = UI:CreateWidget("MatWidget", {rect={200,200,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_current})		
-			current.state = self:CreateState("mark_current")
-			self.widgets.current = current
-			self.widgets.root:AddChild(current)
-			self:SetPositionByGrid(current,v.x,v.y)	
-			current.state.startPos = self:GetPosition(current) 
-			current.state.endPos = current.state.startPos
-			table.insert(self.widgets.lines,current)
-			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
-			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)	
-		end
 	end
-	
-	if (self.widgets.current == nil) then
-		COutLine(kC_Debug,"mark_start NOT FOUND --> ERROR")	
-	end
-	
+
 	COutLine(kC_Debug, "Board Completed")		
 end
 
 function TerminalPuzzles.LoadMaterials(self)
 	
 	self.gfx = {}
-	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
-	self.gfx.board = World.Load("Reflex-Game/reflex-board_M")
-	self.gfx.border = World.Load("Reflex-Game/reflex-border_M")
+--	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
+	self.gfx.board = World.Load("Memory-Game/memory-board_M")
+-- djr, might not need the border seperate from the board
+--	self.gfx.border = World.Load("Memory-Game/memory-border_M")
 
-	self.gfx.cell_a = World.Load("Reflex-Game/reflex-cell-a_M")	
-	self.gfx.cell_b = World.Load("Reflex-Game/reflex-cell-b_M")	
-	self.gfx.cell_c = World.Load("Reflex-Game/reflex-cell-c_M")	
-	self.gfx.cell_d = World.Load("Reflex-Game/reflex-cell-d_M")			
+--	self.gfx.cell_a = World.Load("Reflex-Game/reflex-cell-a_M")
+--	self.gfx.cell_b = World.Load("Reflex-Game/reflex-cell-b_M")
+--	self.gfx.cell_c = World.Load("Reflex-Game/reflex-cell-c_M")
+--	self.gfx.cell_d = World.Load("Reflex-Game/reflex-cell-d_M")
+--
+--	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")
+--
+--	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
+--	self.gfx.mark_line_v = self.gfx.mark_current
+--	self.gfx.mark_line_h = self.gfx.mark_current
+--	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")
+--	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
 
-	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")				
-
-	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
-	self.gfx.mark_line_v = self.gfx.mark_current
-	self.gfx.mark_line_h = self.gfx.mark_current	
-	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")						
-	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")							
-	self.gfx.symbol_a = World.Load("Reflex-Game/reflex-symbol-a_M")
-	self.gfx.symbol_b = World.Load("Reflex-Game/reflex-symbol-b_M")
-	self.gfx.symbol_c = World.Load("Reflex-Game/reflex-symbol-c_M")
-	self.gfx.symbol_d = World.Load("Reflex-Game/reflex-symbol-d_M")
+-- djr, keeping these but they are off for the first test run
+--	self.gfx.symbol_a = World.Load("Memory-Game/memory-symbol-a_M")
+--	self.gfx.symbol_b = World.Load("Memory-Game/memory-symbol-b_M")
+--	self.gfx.symbol_c = World.Load("Memory-Game/memory-symbol-c_M")
+--	self.gfx.symbol_d = World.Load("Memory-Game/memory-symbol-d_M")
 	
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
@@ -560,20 +490,21 @@ function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
 	if (piece == nil) then
 		return false
 	end
-	
-	if (isPlayer) then
-		if (piece.state.architype == "mark_end" or piece.state.architype == "mark_start") then
-			return false
-		end
-		
-		if (piece.state.architype == "cell_a" 
-			or piece.state.architype == "cell_b" 
-			or piece.state.architype == "cell_c" 
-			or piece.state.architype == "cell_d" 
-		) then
-			return false
-		end
-	end
+
+--  djr, this isn't relevant
+--	if (isPlayer) then
+--		if (piece.state.architype == "mark_end" or piece.state.architype == "mark_start") then
+--			return false
+--		end
+--
+--		if (piece.state.architype == "cell_a"
+--			or piece.state.architype == "cell_b"
+--			or piece.state.architype == "cell_c"
+--			or piece.state.architype == "cell_d"
+--		) then
+--			return false
+--		end
+--	end
 	
 	COutLine(kC_Debug,"CollideWihtBoard found Piece @ x=%i, y=%i, type=%s",x,y,piece.state.architype)			
 	return true
@@ -604,117 +535,118 @@ function TerminalPuzzles.Think(self,dt)
 		return
 	end
 
-	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
-		-- NO HEADING: Game hasn't started		
-		return
-	end
-	
-	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
-		self.state.lastHeading.x = self.state.heading.x
-		self.state.lastHeading.y = self.state.heading.y
-	end
-	
-	if (self.widgets.current.heading == nil) then
-		self.widgets.current.heading = self.state.heading
-	end
-
-	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
-	if (self:CollideWithBoard(currentPos.x,currentPos.y,true)) then
-		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)			
-		self.state.gameOver = true
-		return
-	end
-	
-	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
-	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
-	self.widgets.current.state.endPos = currentPos
-	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
-	
-	-- detect change of direction
-	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
-		local oldR = self.widgets.current:Rect()
-		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])			
-		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
-		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
-		line.state = self:CreateState("mark_line_v")
-		table.insert(self.widgets.lines,line)
-		self.widgets.current = line
-		self.widgets.root:AddChild(line)		
-					
-		line.state.startPos = currentPos
-		line.state.endPos = line.state.startPos
-		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
-		
-		self.state.lastHeading.x = self.state.heading.x
-		self.state.lastHeading.y = self.state.heading.y
-	end
-	
-	local playerGridCell = self:GetGridCellFromVec2(currentPos)
-	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)	 
-	
-	local pieceAtPlayer = self.widgets.grid[playerIndex]	
-	if (pieceAtPlayer) then		
-		if (self.state.goalCounter < #self.widgets.goals) then
-			local goalPiece = self.widgets.goals[self.state.goalCounter]
-			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
-				COutLine(kC_Debug,"Goal accomplished: x=%s",goalPiece.state.architype)	
-				self.state.goalCounter = self.state.goalCounter + 1
-				-- TODO: -djr Question: How do they want to indicate that you activated a box, just
-				-- swap out the cell with another cell?				
-			end
-		end		
-		
-		if (pieceAtPlayer.state.architype == "mark_end" and self.state.goalCounter >= #self.widgets.goals) then
-			COutLine(kC_Debug,"Game Over Detected")
-			self.state.gameOver = true
-			self.state.victory = true
-			return
-		end		
-	end
-	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
-		COutLine(kC_Debug,"Game Over - collided with own line")
-		self.state.gameOver = true
-		return
-	end
-	
-	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
-	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
-	if (self.state.antivirusSpawnTimer < 0) then
-		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate		
-		local x = math.random(self.INDEX_MAX_X)-1
-		local y = math.random(self.INDEX_MAX_Y)-1		
-		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
-		self.widgets.root:AddChild(spider)	
-		table.insert(self.widgets.spiders,spider)
-		self:SetPositionByGrid(spider,x,y)		
-		spider.state = self:CreateState("antivirus_spider")
-		spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
-		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
-			spider.state.heading.x = 1
-		end
-		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
-	end	
-	
-	--COutLine(kC_Debug,"Spider move")
-	for i,k in pairs(self.widgets.spiders) do	
-		local pos = k:Rect()
-		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)			
-		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed)
-		if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
-			table.remove(self.widgets.spiders,i)
-			self.widgets.root:RemoveChild(k)
-			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)			
-		else
-			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)						
-			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
-			-- TODO: detect spider crossing a line segment
-			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
-				COutLine(kC_Debug,"Game Over - spider crossed player line")
-				self.state.gameOver = true
-				return
-			end
-		end	
-	end	
+--  djr, this isn't relevant
+--	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
+--		-- NO HEADING: Game hasn't started
+--		return
+--	end
+--
+--	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
+--		self.state.lastHeading.x = self.state.heading.x
+--		self.state.lastHeading.y = self.state.heading.y
+--	end
+--
+--	if (self.widgets.current.heading == nil) then
+--		self.widgets.current.heading = self.state.heading
+--	end
+--
+--	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
+--	if (self:CollideWithBoard(currentPos.x,currentPos.y,true)) then
+--		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)
+--		self.state.gameOver = true
+--		return
+--	end
+--
+--	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)
+--	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+--	self.widgets.current.state.endPos = currentPos
+--	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
+--
+--	-- detect change of direction
+--	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+--		local oldR = self.widgets.current:Rect()
+--		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])
+--		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
+--		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
+--		line.state = self:CreateState("mark_line_v")
+--		table.insert(self.widgets.lines,line)
+--		self.widgets.current = line
+--		self.widgets.root:AddChild(line)
+--
+--		line.state.startPos = currentPos
+--		line.state.endPos = line.state.startPos
+--		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
+--
+--		self.state.lastHeading.x = self.state.heading.x
+--		self.state.lastHeading.y = self.state.heading.y
+--	end
+--
+--	local playerGridCell = self:GetGridCellFromVec2(currentPos)
+--	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)
+--
+--	local pieceAtPlayer = self.widgets.grid[playerIndex]
+--	if (pieceAtPlayer) then
+--		if (self.state.goalCounter < #self.widgets.goals) then
+--			local goalPiece = self.widgets.goals[self.state.goalCounter]
+--			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
+--				COutLine(kC_Debug,"Goal accomplished: x=%s",goalPiece.state.architype)
+--				self.state.goalCounter = self.state.goalCounter + 1
+--				-- TODO: -djr Question: How do they want to indicate that you activated a box, just
+--				-- swap out the cell with another cell?
+--			end
+--		end
+--
+--		if (pieceAtPlayer.state.architype == "mark_end" and self.state.goalCounter >= #self.widgets.goals) then
+--			COutLine(kC_Debug,"Game Over Detected")
+--			self.state.gameOver = true
+--			self.state.victory = true
+--			return
+--		end
+--	end
+--	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
+--		COutLine(kC_Debug,"Game Over - collided with own line")
+--		self.state.gameOver = true
+--		return
+--	end
+--
+--	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
+--	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
+--	if (self.state.antivirusSpawnTimer < 0) then
+--		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate
+--		local x = math.random(self.INDEX_MAX_X)-1
+--		local y = math.random(self.INDEX_MAX_Y)-1
+--		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
+--		self.widgets.root:AddChild(spider)
+--		table.insert(self.widgets.spiders,spider)
+--		self:SetPositionByGrid(spider,x,y)
+--		spider.state = self:CreateState("antivirus_spider")
+--		spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
+--		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
+--			spider.state.heading.x = 1
+--		end
+--		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
+--	end
+--
+--	--COutLine(kC_Debug,"Spider move")
+--	for i,k in pairs(self.widgets.spiders) do
+--		local pos = k:Rect()
+--		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
+--		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed)
+--		if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
+--			table.remove(self.widgets.spiders,i)
+--			self.widgets.root:RemoveChild(k)
+--			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)
+--		else
+--			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
+--			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)
+--			-- TODO: detect spider crossing a line segment
+--			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
+--				COutLine(kC_Debug,"Game Over - spider crossed player line")
+--				self.state.gameOver = true
+--				return
+--			end
+--		end
+--	end
 end
 
 terminal_puzzles = TerminalPuzzles

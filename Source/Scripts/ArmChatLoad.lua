@@ -23,14 +23,17 @@ function Arm.LoadCommonChat(self)
     Arm.Chats.CommonDB = World.Load("UI/ArmChat")
     local strings = Arm.Chats.CommonDB:StringTable()
     Arm.Chats.CommonDB = Arm.Chats.CommonDB:Data()
-    Arm.Chats.CommonDB.StringTable = strings
     
-    for k,v in pairs(Arm.Chats.CommonDB) do
-		v.stringTable = strings
-        if ((v.group == nil) or (v.group == "Default")) then
-            Arm.Chats.Available[k] = v
-        end
-    end
+    if (Arm.Chats.CommonDB) then
+		Arm.Chats.CommonDB.StringTable = strings
+		
+		for k,v in pairs(Arm.Chats.CommonDB) do
+			v.stringTable = strings
+			if ((v.group == nil) or (v.group == "Default")) then
+				Arm.Chats.Available[k] = v
+			end
+		end
+	end
 end
 
 function Arm.LoadChatList(self, chats)
@@ -41,8 +44,10 @@ function Arm.LoadChatList(self, chats)
 		local strings = db:StringTable()
 		db = db:Data()
 		if (db) then
+			Arm.Chats[v] = db
+			db.StringTable = strings
 			for a,b in pairs(db) do
-				b.stringtable = strings
+				b.stringTable = strings
 				if ((b.group == nil) or (b.group == "Default")) then
 					Arm.Chats.Available[a] = b
 				end

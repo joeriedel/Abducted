@@ -117,8 +117,9 @@ end
 function Arm.LoadChats(self, chats)
 
     Arm:LoadCommonChat()
-    Arm:LoadChatList(chats)
-    
+    if (chats) then
+		Arm:LoadChatList(chats)
+    end
 end
 
 function Arm.StartConversation(self)

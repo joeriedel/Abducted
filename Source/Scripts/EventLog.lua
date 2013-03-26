@@ -17,14 +17,26 @@ function EventLog.ShiftLines(self, numLines)
 
 	for i = 1+numLines, self.numLines do
 	
-		local v = Peristence.ReadString(SaveGame, "logEvent", i)
-		Persistence.WriteString(SaveGame, "logEvent", v, i-numLines)
+		local src = "logEvent"..i
+		local dst = "logEvent"..(i-numLines)
 	
+		local v = Peristence.ReadString(SaveGame, src.."/time")
+		Persistence.WriteString(SaveGame, dst.."/time", v)
+		
+		local v = Peristence.ReadString(SaveGame, src.."/style")
+		Persistence.WriteString(SaveGame, dst.."/style", v)
+		
+		local v = Peristence.ReadString(SaveGame, src.."/text")
+		if (v) then
+			Persistence.WriteString(SaveGame, dst.."/text", v)
+		else
+			Persistence.DeleteKey(SaveGame, dst.."/text")
+		end
 	end
 
 end
 
-function EventLog.AddEvent(self, event)
+function EventLog.AddEvent(self, time, style, text)
 
 	if (self.numLines >= EventLog.MaxLines) then
 		EventLog:ShiftLines(1)
@@ -37,6 +49,17 @@ function EventLog.AddEvent(self, event)
 	Persistence.WriteNumber(SaveGame, "numLogEvents", self.numLines)
 	Persistence.WriteString(SaveGame, "logEvent", event, self.numLines)
 	Persistence.WriteNumber(SaveGame, "logTime", self.time)
+	
+	local dst = "logEvent"..self.numLines
+	Persistence.WriteString(SaveGame, dst.."/time", time)
+	Persistence.WriteString(SaveGame, dst.."/style", style)
+	
+	if (text) then
+		Persistence.WriteString(SaveGame, dst.."/text", text)
+	else
+		Persistence.DeleteKey(SaveGame, dst.."/text")
+	end
+	
 	SaveGame:Save()
 	
 end
@@ -47,9 +70,13 @@ function EventLog.LoadList(self)
 	
 	for i = 1, self.numLines do
 	
-		local s = Persistence.ReadString(SaveGame, "logEvent", nil, i)
-		if (s) then
-			table.insert(x, s)
+		local src = "logEvent"..i
+		local time = Persistence.ReadString(SaveGame, src.."/time")
+		local style = Persistence.ReadString(SaveGame, src.."/style")
+		local text = Persistence.ReadString(SaveGame, src.."/text")
+		
+		if (time and style) then
+			table.insert(x, {time=time, style=style, text=text})
 		end
 	
 	end

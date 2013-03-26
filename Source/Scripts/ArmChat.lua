@@ -116,9 +116,8 @@ end
 
 function Arm.LoadChats(self, chats)
 
-    Arm:LoadChatData()
-    Arm:PopulateChats()
-    Arm:PopulateChats(chats)
+    Arm:LoadCommonChat()
+    Arm:LoadChatList(chats)
     
 end
 
@@ -148,7 +147,7 @@ end
 
 function Arm.ChatPrompt(self)
 
-	-- create the necessaray chat controls and append them to the VList
+	-- create the necessary chat controls and append them to the VList
 	self.choiceWidgets = nil
 	
 	if (self.topic.choices) then
@@ -157,12 +156,18 @@ function Arm.ChatPrompt(self)
 		self.choices = nil
 	end
 	
-	if (self.topic.reply == nil) then
+	if (next(self.topic.reply) == nil) then
 		self.topic.reply = {{"I_DONT_KNOW"}}
 	end
 	
+	if (self.topic.stringTable) then
+		Arm.Chats.Strings = self.topic.stringTable
+	end
+	
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
-	self.promptText = "> "..StringTable.Get(self.prompt[1], Arm.Chats.Strings)
+		
+	local promptText = StringTable.Get(self.prompt[1], Arm.Chats.Strings)
+	self.promptText = "> "..promptText
 	
 	local lock = false
 	
@@ -173,14 +178,14 @@ function Arm.ChatPrompt(self)
 	end
 	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
 		if (lock) then
-			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED_REPLY "..self.prompt[1])
+			EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED_REPLY", promptText)
 		else
-			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_REPLY "..self.prompt[1])
+			EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_REPLY", promptText)
 		end
 	end
 	
 	if (lock) then
-		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED")
 		Arm:ChatLockout() -- until a trigger.
 	end
 	
@@ -385,7 +390,7 @@ function Arm.DisplayChoices(self)
 		
 		local r = {0, 0, size[1], size[2]}
 		local f = function(widget)
-			Arm:ChoiceSelected(widget, self.choices[k], prompt)
+			Arm:ChoiceSelected(widget, self.choices[k], prompt, text)
 		end
 		
 		local w = UI:CreateStylePushButton(
@@ -449,12 +454,12 @@ function Arm.DisplayChoices(self)
 	self.chatTimer = World.globalTimers:Add(f, 1, true)
 end
 
-function Arm.ChoiceSelected(self, widget, choice, prompt)
+function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 
 	self.changeConversationCount = 0
 	
 	-- add event
-	EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_ASK "..prompt[1])
+	EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_ASK", text)
 	
 	-- disable all choices
 	for k,v in pairs(self.choiceWidgets) do
@@ -484,9 +489,9 @@ end
 function Arm.SelectChatRoot(self)
 
 	if (self.changeConversationCount > Arm.MaxChangeConversationTimes) then
-		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED")
 		Arm:ChatLockout(FloatRand(35, 95))
-		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}}
+		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}, stringTable=Arm.Chats.CommonDB.StringTable}
 	end
 
 	local roots = {}

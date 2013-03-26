@@ -11,6 +11,7 @@ TerminalScreen.ButtonSize = {1/15, 1/15}
 TerminalScreen.PopupEntity = nil
 TerminalScreen.Objects = {}
 TerminalScreen.Widgets = {}
+TerminalScreen.Skip = true
 
 function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)
@@ -241,29 +242,40 @@ function TerminalScreen.HackPressed()
 	local entity = TerminalScreen.PopupEntity
 	TerminalScreen.CancelUI()
 	
-	local f = function ()
-		UI:BlendTo({0,0,0,0}, 0.3)
-		TerminalPuzzles:ShowBoard(true)
-		
+	if (TerminalScreen.Skip) then
+		TerminalScreen.GameComplete(entity, "hack", true)
+	else
 		local f = function ()
-			local f = function(result)
-				TerminalScreen.GameComplete(entity, result)
+			UI:BlendTo({0,0,0,0}, 0.3)
+			TerminalPuzzles:ShowBoard(true)
+			
+			local f = function ()
+				local f = function(result)
+					TerminalScreen.GameComplete(entity, "hack", result)
+				end
+				Abducted.entity.eatInput = false
+				TerminalPuzzles:StartGame(f)
 			end
-			Abducted.entity.eatInput = false
-			TerminalPuzzles:StartGame(f)
+			
+			World.globalTimers:Add(f, 0.3, true)
 		end
 		
 		World.globalTimers:Add(f, 0.3, true)
 	end
-	
-	World.globalTimers:Add(f, 0.3, true)
 end
 
 function TerminalScreen.SolvePressed()
-
+	Abducted.entity.eatInput = true -- during transition
+	UI:BlendTo({1,1,1,1}, 0.3)
+	TerminalPuzzles:InitGame("solve", 1, 1)
+	
+	local entity = TerminalScreen.PopupEntity
+	TerminalScreen.CancelUI()
+	
+	TerminalScreen.GameComplete(entity, "solve", true)
 end
 
-function TerminalScreen.GameComplete(self, result)
+function TerminalScreen.GameComplete(self, mode, result)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
 	local f = function()
@@ -274,6 +286,38 @@ function TerminalScreen.GameComplete(self, result)
 		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.3, true)
+	
+	if (mode == "hack") then
+		if (result) then
+			if (self.keys.hack_success) then
+				World.PostEvent(self.keys.hack_success)
+			end
+		else
+			if (self.keys.hack_fail) then
+				World.PostEvent(self.keys.hack_fail)
+			end
+		end
+	else
+		if (result) then
+			if (self.keys.solve_success) then
+				World.PostEvent(self.keys.solve_success)
+			end
+		else
+			if (self.keys.solve_fail) then
+				World.PostEvent(self.keys.solve_fail)
+			end
+		end
+	end
+	
+	if (result) then
+		if (self.keys.success) then
+			World.PostEvent(self.keys.success)
+		end
+	else
+		if (self.keys.fail) then
+			World.PostEvent(self.keys.fail)
+		end
+	end
 end
 
 function TerminalScreen.StaticInit()

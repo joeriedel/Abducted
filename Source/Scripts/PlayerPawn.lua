@@ -32,6 +32,7 @@ PlayerPawn.AnimationStates = {
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
 		speedScale = 0.5,
+		tapAdjust = -20, -- CheckTappedOn
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})
@@ -435,7 +436,14 @@ end
 function PlayerPawn.CheckTappedOn(self, e)
 
 	local pos = self:WorldPos()
-	pos = VecAdd(pos, {0, 0, 50})
+	
+	local set = PlayerPawn.AnimationStates[self.animState]
+	
+	if (set.tapAdjust) then
+		pos = VecAdd(pos, {0, 0, set.tapAdjust})
+	else
+		pos = VecAdd(pos, {0, 0, 50})
+	end
 	
 	local screen, r = World.Project(pos)
 	if (r) then

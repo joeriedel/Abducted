@@ -11,6 +11,18 @@ function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
 	Entity.Spawn(self)
 	
+	-- setup auto-face smoothing
+	local angleVertex = self:Angles()
+	angleVertex.mass = 5
+	angleVertex.drag[1] = 7
+	angleVertex.drag[2] = 7
+	angleVertex.friction = 0.5
+	self:SetAngles(angleVertex)
+	
+	local spring = self:AngleSpring()
+	spring.elasticity = 160
+	self:SetAngleSpring(spring)
+	
 	self.model = LoadSkModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.vision = self.model.dm:CreateInstance()
@@ -24,6 +36,23 @@ function ManipulatableObject.Spawn(self)
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
 	
+	if (self.keys.damage_bone) then
+		local boneIdx = self.model.dm:FindBone(self.keys.damage_bone)
+		if (boneIdx < 0) then
+			error("ManipulatableObject: bone named %s not found", self.keys.damage_bone)
+		end
+		local size = Vec3ForString(self.keys.dmage_bone_size, {16, 16, 16})
+		VecScale(size, 0.5)
+		self:SetTouchBone(self.model.dm, boneIdx)
+		self:SetTouchBoneBounds(VecNeg(size), size)
+		self:SetTouchClassBits(kEntityClass_Player)
+		self.canDamage = true
+	end
+	
+	self.keepAttacking = BoolForString(self.keys.keep_attacking, false)
+	self.cameraFocus = BoolForString(self.keys.camera_focus, false)
+	self.autoFace = BoolForString(self.keys.auto_face, false)
+	
 	self.skillRequired = NumberForString(self.keys.required_skill, 0)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
 	self.manipulateDamage = BoolForString(self.keys.manipulate_damage, false)
@@ -31,6 +60,10 @@ function ManipulatableObject.Spawn(self)
 	self.enabled = false
 	self.canAttack = false
 	self.swipePos = {0, 0, 0}
+	
+	if (not BoolForString(self.keys.visible, true)) then
+		self:Show(false)
+	end
 	
 	if (not self.left) then
 		self.left = {0, 1, 0}
@@ -99,6 +132,10 @@ function ManipulatableObject.LoadSounds(self)
 		self.sounds.Dormant:SetLoop(true)
 	end
 	
+	if (self.keys.sleep_sound) then
+		self.sounds.Sleep = World.LoadSound(self.keys.sleep_sound)
+	end
+	
 	if (self.keys.awaken_sound) then
 		self.sounds.Awaken = World.LoadSound(self.keys.awaken_sound)
 	end
@@ -130,38 +167,114 @@ function ManipulatableObject.LoadSounds(self)
 
 end
 
+function ManipulatableObject.Show(self, show)
+	self.model.dm:SetVisible(show)
+	self.model.vision:SetVisible(show)
+end
+
 function ManipulatableObject.OnEvent(self, cmd, args)
 	COutLineEvent("ManipulatableObject", cmd, args)
 	
 	if (cmd == "activate") then
 		self:Awaken()
 		return true
-	elseif (cmd == "attack") then
-		self:Attack(args)
+	elseif(cmd == "deactivate") then
+		self:Sleep()
 		return true
-	elseif (cmd == "touch_trigger_touched") then
-		if (self.sounds.Hit) then
-			self.sounds.Hit:Play(kSoundChannel_FX, 0)
+	elseif (cmd == "attack") then
+		self.attackArgs = args
+		self:Attack()
+		return true
+	elseif (cmd == "idle") then
+		if (self.enabled) then
+			self:Idle()
 		end
-		if (self.keys.attack_brush) then
-			World.PostEvent(self.keys.attack_brush.." disable")
-		end
+		return true
+	elseif (cmd == "show") then
+		self:Show(true)
+		return true
+	elseif (cmd == "hide") then
+		self:Show(false)
+		return true
 	end
 	
 	return false
 	
 end
 
+function ManipulatableObject.OnTouchEnter(self, instigator)
+
+	if (self.keys.on_player_attacked) then
+		World.PostEvent(self.keys.on_player_attacked)
+	end
+	
+	self.hitPlayer = true
+
+end
+
+function ManipulatableObject.OnTouchExit(self)
+
+end
+
 function ManipulatableObject.Dormant(self)
 	COutLine(kC_Debug, "ManipulatableObject.Dormant")
+	
+	self.awake = false
+	
+	self.think = nil
 	self:PlayAnim("dormant", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:Play(kSoundChannel_FX, 0)
 	end
 end
 
+function ManipulatableObject.Sleep(self)
+	COutLine(kC_Debug, "ManipulatableObject.Sleep")
+	
+	self.think = nil
+	
+	if (not self.awake) then
+		return
+	end
+	
+	self.awake = false
+	self.enabled = false
+	self.canAttack = false
+	
+	if (self.listItem) then
+		LL_Remove(ManipulatableObject.Objects, self.listItem)
+		self.listItem = nil
+	end
+	
+	self:SetAutoFace(nil)
+	World.viewController:RemoveLookTarget(self)
+	
+	local blend = self:PlayAnim("sleep", self.model)
+	if (self.sounds.Sleep) then
+		self.sounds.Sleep:Play(kSoundChannel_FX, 0)
+	end
+	
+	if (blend) then
+		blend.Seq(ManipulatableObject.Dormant)
+	else
+		self:Dormant()
+	end
+end
+
 function ManipulatableObject.Awaken(self)
 	COutLine(kC_Debug, "ManipulatableObject.Awaken")
+	self.think = nil
+	self.awake = true
+	if (self.autoFace) then
+		self:SetAutoFace(World.playerPawn)
+	end
+	if (self.cameraFocus) then
+		local fov = NumberForString(self.keys.camera_focus_fov, 10)
+		if (fov <= 0) then
+			fov = nil
+		end
+		World.viewController:AddLookTarget(self, fov)
+	end
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeVolume(0, 1)
@@ -178,6 +291,7 @@ end
 
 function ManipulatableObject.Idle(self)
 	COutLine(kC_Debug, "ManipulatableObject.Idle")
+	self.think = nil
 	self:PlayAnim("idle", self.model)
 	self.canAttack = true
 	if (self.sounds.Idle) then
@@ -193,32 +307,70 @@ function ManipulatableObject.Idle(self)
 	end
 end
 
-function ManipulatableObject.Attack(self, args)
-	if (not self.canAttack) then
+function ManipulatableObject.Attack(self)
+	if (not (self.canAttack and self.canDamage)) then
 		COutLine(kC_Debug, "ManipulatableObject.Attack(ignored): cannot attack right now.")
 		return
 	end
 	
 	COutLine(kC_Debug, "ManipulatableObject.Attack")
-	
+		
+	self.think = nil
+	self.hitPlayer = false
 	self.canAttack = false
-	local blend = self:PlayAnim(args, self.model)
+	local args = Tokenize(self.attackArgs)
+	
+	local blend = self:PlayAnim(args[1], self.model)
 	if (blend) then
 		blend.Seq(ManipulatableObject.AttackFinish)
 		if (self.sounds.Attack) then
 			self.sounds.Attack:Play(kSoundChannel_FX, 0)
 		end
-		if (self.keys.attack_brush) then
-			World.PostEvent(self.keys.attack_brush.." enable")
+		self:EnableTouch(true)
+		
+		if (self.keys.on_attack_begin) then
+			World.PostEvent(self.keys.on_attack_begin)
 		end
+		
+		local min = nil
+		local max = nil
+		
+		if (args[2]) then
+			min = tonumber(args[2])
+		end
+		
+		if (args[3]) then
+			max = tonumber(args[3])
+		end
+		
+		if (min) then
+			if (max) then
+				self.nextAttackTime = {min, max}
+			else
+				self.nextAttackTime = {min, min}
+			end
+		end
+		
 	end
 end
 
 function ManipulatableObject.AttackFinish(self)
-	if (self.keys.attack_brush) then
-		World.PostEvent(self.keys.attack_brush.." disable")
-	end
 	self:Idle()
+	self:EnableTouch(false)
+	
+	if (self.keys.on_attack_end) then
+		World.PostEvent(self.keys.on_attack_end)
+	end
+	
+	if (self.hitPlayer and (not self.keepAttacking)) then
+		self.nextAttackTime = nil
+	end
+	
+	if (self.nextAttackTime) then
+		self.think = ManipulatableObject.Attack
+		self:SetNextThink(FloatRand(self.nextAttackTime[1], self.nextAttackTime[2]))
+		self.nextAttackTime = nil
+	end
 end
 
 function ManipulatableObject.NotifyManipulate(enabled)
@@ -466,6 +618,9 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		end
 		World.gameTimers:Add(f, self.manipulateWindow, true)
+	else
+		-- object is not going to reset
+		World.viewController:RemoveLookTarget(self)
 	end
 	
 	-- tell the player they moved us

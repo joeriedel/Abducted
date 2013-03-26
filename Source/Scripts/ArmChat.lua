@@ -118,7 +118,7 @@ function Arm.LoadChats(self, chats)
 
     Arm:LoadChatData()
     Arm:PopulateChats()
-    Arm:PopulateChats(chat)
+    Arm:PopulateChats(chats)
     
 end
 

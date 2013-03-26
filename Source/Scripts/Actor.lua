@@ -45,6 +45,7 @@ function Actor.OnEvent(self, cmd, args)
 		self.visible = true
 		if (self.model) then
 			self.model.dm:SetVisible(true)
+			self.model.dm:BlendTo({1,1,1,1}, 0)
 		end
 		return true
 	elseif (cmd == "hide") then
@@ -58,6 +59,7 @@ function Actor.OnEvent(self, cmd, args)
 			self.visible = true
 			if (self.model) then
 				self.model.dm:BlendTo({1,1,1,0}, 0)
+				self.model.dm:SetVisible(true)
 			end
 		end
 		if (self.model) then

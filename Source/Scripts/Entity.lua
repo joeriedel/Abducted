@@ -54,6 +54,16 @@ function Entity.SpawnFloorPosition(self)
 	return fp
 end
 
+function Entity.FindFloor(self)
+
+	local a = self:WorldPos()
+	return World.ClipToFloor(
+		{a[1], a[2], a[3] - 32},
+		{a[1], a[2], a[3] + 32}
+	)
+	
+end
+
 function Entity.LoadFloorPosition(self)
 
 	if (self.keys.waypoint) then

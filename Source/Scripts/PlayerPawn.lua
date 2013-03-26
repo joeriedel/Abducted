@@ -483,18 +483,7 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "teleport") then
 		args = Tokenize(args)
-		local target = World.FindEntityTargets(args[1])
-		if (target) then
-			target = target[1]
-		end
-		if (target and target.validFloorPosition) then
-			self:Stop()
-			self:SetFloorPosition(target:FloorPosition())
-			
-			if (args[2]) then
-				self:SetFacing(tonumber(args[2]))
-			end
-		end
+		self:Teleport(args[1], args[2])
 		return true
 	elseif (cmd == "set_facing") then
 		self:SetFacing(tonumber(args[2]))
@@ -507,20 +496,50 @@ function PlayerPawn.OnEvent(self, cmd, args)
 	return false
 end
 
-function PlayerPawn.PlayCinematicAnim(self, anim)
-	local anim = self:LookupAnimation(anim)
+function PlayerPawn.Teleport(self, targetName, facing)
+	local target = World.FindEntityTargets(targetName)
+	if (target) then
+		target = target[1]
+	end
+	if (target and target.validFloorPosition) then
+		self:Stop()
+		self:SetFloorPosition(target:FloorPosition())
+		
+		if (facing) then
+			self:SetFacing(facing)
+		end
+	end
+end
+
+function PlayerPawn.PlayCinematicAnim(self, args)
+	args = Tokenize(args)
+	local anim = self:LookupAnimation(args[1])
 	if (anim) then
 		local f = function()
 			self:SetMoveType(kMoveType_Floor)
 			self.disableAnimTick = false
 			self.customMove = false
+			
+			if (args[2]) then
+				self:Teleport(args[2], args[3])
+			else
+				local fp = self:FindFloor()
+				if (fp) then
+					self.validFloorPosition = true
+					self:SetFloorPosition(fp)
+					error("PlayerPawn.PlayCinematicAnim: walked off the floor.")
+				else
+					self.validFloorPosition = false
+				end
+			end
+			
 			self:TickPhysics() -- get us a new state immediately
 		end
 		self:SetMoveType(kMoveType_Ska)
 		self.disableAnimTick = true
 		self.customMove = true
 		self.state = nil
-		self:EnableFlags(kPhysicsFlag_Friction, true)
+		self:Stop()
 		local blend = self:PlayAnim(anim, self.model)
 		if (blend) then
 			blend.Seq(f)

@@ -482,14 +482,22 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		self:Kill()
 		return true
 	elseif (cmd == "teleport") then
-		local target = World.FindEntityTargets(args)
+		args = Tokenize(args)
+		local target = World.FindEntityTargets(args[1])
 		if (target) then
 			target = target[1]
 		end
 		if (target and target.validFloorPosition) then
 			self:Stop()
 			self:SetFloorPosition(target:FloorPosition())
+			
+			if (args[2]) then
+				self:SetFacing(tonumber(args[2]))
+			end
 		end
+		return true
+	elseif (cmd == "set_facing") then
+		self:SetFacing(tonumber(args[2]))
 		return true
 	elseif (cmd == "play") then
 		self:PlayCinematicAnim(args)

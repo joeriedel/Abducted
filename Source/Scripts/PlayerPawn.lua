@@ -13,6 +13,7 @@ PlayerPawn.kShieldAccel = 0.5
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "Hand_right"
 PlayerPawn.PulseBeamScale = 1/120
+PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {
 	default = {
@@ -424,7 +425,7 @@ function PlayerPawn.PulseExplode(self)
 end
 
 function PlayerPawn.Kill(self)
-	if (self.dead) then
+	if (self.dead or PlayerPawn.GodMode) then
 		return
 	end
 	self.dead = true

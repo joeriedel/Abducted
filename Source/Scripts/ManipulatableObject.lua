@@ -239,7 +239,6 @@ function ManipulatableObject.Sleep(self)
 	
 	self.awake = false
 	self.enabled = false
-	self.canAttack = false
 	
 	if (self.listItem) then
 		LL_Remove(ManipulatableObject.Objects, self.listItem)
@@ -265,6 +264,8 @@ function ManipulatableObject.Awaken(self)
 	COutLine(kC_Debug, "ManipulatableObject.Awaken")
 	self.think = nil
 	self.awake = true
+	self.canAttack = true
+	
 	if (self.autoFace) then
 		self:SetAutoFace(World.playerPawn)
 	end
@@ -292,8 +293,9 @@ end
 function ManipulatableObject.Idle(self)
 	COutLine(kC_Debug, "ManipulatableObject.Idle")
 	self.think = nil
-	self:PlayAnim("idle", self.model)
+	self.awake = true
 	self.canAttack = true
+	self:PlayAnim("idle", self.model)
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end

@@ -21,7 +21,8 @@ PlayerPawn.AnimationStates = {
 	-- example, idle isn't listed here, so "idle" will just become "idle"
 		OnSelect = function()
 			HUD:EnableAll()
-		end
+		end,
+		bbox = {mins = {-24, -24, -48}, maxs = {24, 24, 64}}
 	},
 	limp = {
 		idle = "limpidle",
@@ -34,6 +35,7 @@ PlayerPawn.AnimationStates = {
 		manipulate_down = "limpmandown",
 		speedScale = 0.5,
 		tapAdjust = -20, -- CheckTappedOn
+		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})
@@ -62,8 +64,14 @@ function PlayerPawn.Spawn(self)
 	
 	self:SetMotionSka(self.model)
 	
-	self:SetMins({-24, -24, -48})
-	self:SetMaxs({ 24,  24,  48})
+	local set = PlayerPawn.AnimationStates[self.animState]
+	local bbox = set.bbox
+	if (not bbox) then
+		bbox = PlayerPawn.AnimationStates.default.bbox
+	end
+	
+	self:SetMins(bbox.mins)
+	self:SetMaxs(bbox.maxs)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	-- shield mesh
@@ -166,6 +174,14 @@ function PlayerPawn.SelectAnimState(self, state)
 		if (set and set.OnSelect) then
 			set.OnSelect(self)
 		end
+		local bbox = set.bbox
+		if (not bbox) then
+			bbox = PlayerPawn.AnimationStates.default.bbox
+		end
+		
+		self:SetMins(bbox.mins)
+		self:SetMaxs(bbox.maxs)
+		self.model.dm:SetBounds(self:Mins(), self:Maxs())
 		self:SetSpeeds()
 		self.state = nil -- force change
 	end

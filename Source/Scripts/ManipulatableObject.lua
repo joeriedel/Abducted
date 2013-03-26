@@ -239,6 +239,7 @@ function ManipulatableObject.Sleep(self)
 	
 	self.awake = false
 	self.enabled = false
+	self.canAttack = false
 	
 	if (self.listItem) then
 		LL_Remove(ManipulatableObject.Objects, self.listItem)

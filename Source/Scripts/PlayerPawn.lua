@@ -513,14 +513,11 @@ function PlayerPawn.OnEvent(self, cmd, args)
 	return false
 end
 
-function PlayerPawn.Teleport(self, targetName, facing)
-	local target = World.FindEntityTargets(targetName)
-	if (target) then
-		target = target[1]
-	end
-	if (target and target.validFloorPosition) then
+function PlayerPawn.Teleport(self, userId, facing)
+	local waypoints = World.WaypointsForUserId(userId)
+	if (waypoints) then
 		self:Stop()
-		self:SetFloorPosition(target:FloorPosition())
+		self:SetFloorPosition(World.WaypointFloorPosition(waypoints[1]))
 		
 		if (facing) then
 			self:SetFacing(facing)

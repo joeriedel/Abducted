@@ -10,8 +10,9 @@ function Music.Spawn(self)
 end
 
 function Music.Play(self)
+	self.think = nil
+
 	if (self.name and (self.name == self.args[1])) then
-		self.think = nil
 		-- already playing
 		return
 	end
@@ -38,7 +39,23 @@ function Music.Play(self)
 	end
 	
 	self.args = nil
-	self.think = nil
+	self.think = Music.Check
+	self:SetNextThink(1)
+	
+	World.PostEvent("shiphum fadeto 0.5 1")
+end
+
+function Music.Check(self)
+
+	if (self.active) then
+		if (not self.active:Playing()) then
+			World.PostEvent("shiphum fadeto 1 1")
+			self.think = nil
+		end
+	else
+		self.think = nil
+	end
+
 end
 
 function Music.Stop(self)

@@ -26,11 +26,11 @@ function SoundEmitter.Spawn(self)
 	self.fadeTime = nil
 	self.enabled = false
 	
-	if channel == "UI" then
+	if (channel == "UI") then
 		self.channel = kSoundChannel_UI
-	elseif channel == "Ambient" then
+	elseif (channel == "Ambient") then
 		self.channel = kSoundChannel_Ambient
-	elseif channel == "FX" then
+	elseif (channel == "FX") then
 		self.channel = kSoundChannel_FX
 	else
 		self.channel = kSoundChannel_Music
@@ -72,9 +72,16 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	elseif cmd == "fadein" then
 		self.on = true
 		self.fadeTime = tonumber(args)
+		self.fadeLevel = 1
 	elseif cmd == "fadeout" then
 		self.on = false
 		self.fadeTime = tonumber(args)
+	elseif cmd == "fadeto" then
+		args = Tokenize(args)
+		self.volume = tonumber(args[1])
+		self.fadeTime = tonumber(args[2])
+		self.sound:FadeVolume(self.volume, self.fadeTime)
+		return true
 	elseif cmd == "rewind" then	
 		self.on = false
 		if self.sound then
@@ -86,7 +93,8 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	end
 	
 	self:Trigger()
-
+	return true
+	
 end
 
 function SoundEmitter.Trigger(self)

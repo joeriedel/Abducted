@@ -4,6 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 PlayerSkills = Class:New()
+PlayerSkills.DebugAllAbilitiesEnabled = false
 
 PlayerSkills.ManipulateRechargeTimes = { -- 3 levels of manipulate upgrades
 	15,
@@ -24,8 +25,6 @@ PlayerSkills.PulseRechargeTimes = {
 	20,
 	15
 }
-
-PlayerSkills.DebugAllAbilitiesEnabled = true
 
 function PlayerSkills.Load(self)
 	self.Manipulate = 0
@@ -56,9 +55,12 @@ function PlayerSkills.ArmUnlocked(self)
 end
 
 function PlayerSkills.UnlockArm(self)
-	self.armUnlocked = true
-	Persistence.WriteBool(SaveGame, "armUnlocked", true)
-	SaveGame:Save()
+	if (not (self.armUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
+		self.armUnlocked = true
+		Persistence.WriteBool(SaveGame, "armUnlocked", true)
+		SaveGame:Save()
+		HUD:AnimateUnlock({arm=true})
+	end
 end
 
 function PlayerSkills.ManipulateUnlocked(self)
@@ -66,9 +68,12 @@ function PlayerSkills.ManipulateUnlocked(self)
 end
 
 function PlayerSkills.UnlockManipulate(self)
-	self.manipulateUnlocked = true
-	Persistence.WriteBool(SaveGame, "manipulateUnlocked", true)
-	SaveGame:Save()
+	if (not (self.manipulateUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
+		self.manipulateUnlocked = true
+		Persistence.WriteBool(SaveGame, "manipulateUnlocked", true)
+		SaveGame:Save()
+		HUD:AnimateUnlock({manipulate=true})
+	end
 end
 
 function PlayerSkills.ShieldUnlocked(self)
@@ -76,9 +81,12 @@ function PlayerSkills.ShieldUnlocked(self)
 end
 
 function PlayerSkills.UnlockShield(self)
-	self.shieldUnlocked = true
-	Persistence.WriteBool(SaveGame, "shieldUnlocked", true)
-	SaveGame:Save()
+	if (not (self.shieldUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
+		self.shieldUnlocked = true
+		Persistence.WriteBool(SaveGame, "shieldUnlocked", true)
+		SaveGame:Save()
+		HUD:AnimateUnlock({shield=true})
+	end
 end
 
 function PlayerSkills.PulseUnlocked(self)
@@ -86,7 +94,10 @@ function PlayerSkills.PulseUnlocked(self)
 end
 
 function PlayerSkills.UnlockPulse(self)
-	self.pulseUnlocked = true
-	Persistence.WriteBool(SaveGame, "pulseUnlocked", true)
-	SaveGame:Save()
+	if (not (self.pulseUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
+		self.pulseUnlocked = true
+		Persistence.WriteBool(SaveGame, "pulseUnlocked", true)
+		SaveGame:Save()
+		HUD:AnimateUnlock({pulse=true})
+	end
 end

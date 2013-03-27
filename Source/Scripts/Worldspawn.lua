@@ -19,6 +19,10 @@ function Worldspawn.Spawn(self)
 	
 	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
 	Arm:LoadChats(self.keys.arm_chats)
+	
+	if (StringForString(self.keys.arm_state, "unlocked") == "locked") then
+		Arm:ChatLockout()
+	end
 end
 
 function Worldspawn.PostSpawn(self)

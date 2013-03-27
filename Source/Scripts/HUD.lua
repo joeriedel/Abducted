@@ -28,6 +28,7 @@ function HUD.Load(self)
 	self.gfx = {
 		Arm = "UI/arm_button_M",
 		ArmPressed = "UI/arm_button_pressed_M",
+		ArmSignaled = "UI/arm_button_signaled_M",
 		ManipulateDisabled = "UI/manipulate_button_charging_M",
 		ManipulateEnabled = "UI/manipulate_button_M",
 		ManipulateFlashing = "UI/manipulate_button_flashing_M",
@@ -40,6 +41,11 @@ function HUD.Load(self)
 	}
 	
 	map(self.gfx, World.Load)
+	
+	self.sfx = {}
+	
+	self.sfx.Signaled = World.Load("Audio/armsignaled")
+	self.sfx.AbilityUnlocked = World.Load("Audio/ability_unlocked")
 	
 	self.widgets.Arm = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
@@ -260,19 +266,22 @@ end
 
 function HUD.AnimateUnlock(self, items)
 
+	self.sfx.AbilityUnlocked:Play(kSoundChannel_UI, 0)
+
 	if (PlayerSkills:ArmUnlocked()) then
-		if (items["arm"]) then
+		if (items.arm) then
 			local r = self.widgets.Arm:Rect()
 			self.widgets.Arm:SetRect({r[1]-r[3], r[2], r[3], r[4]})
 			self.widgets.Arm:MoveTo({r[1], r[2]}, {0.3, 0})
 			self.armEnabled = true
 			self.widgets.Arm.class:SetEnabled(self.widgets.Arm, true)
+			self.widgets.Arm:SetVisible(true)
 		end
 	end
 
 	local y = 42
 	if (PlayerSkills:ManipulateUnlocked()) then
-		local unlock = items["manipulate"]
+		local unlock = items.manipulate
 		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
 		self.widgets.ManipulateCharging:SetRect(r)
 		self.widgets.ManipulateShimmer:SetRect(r)
@@ -291,7 +300,7 @@ function HUD.AnimateUnlock(self, items)
 	end
 	
 	if (PlayerSkills:ShieldUnlocked()) then
-		local unlock = items["shield"]
+		local unlock = items.shield
 		if (unlock) then
 			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
 			self.widgets.ShieldCharging:SetRect(r)
@@ -299,6 +308,7 @@ function HUD.AnimateUnlock(self, items)
 			y = y + r[4] + (24 * UI.identityScale[2])
 			self.widgets.Shield:ScaleTo({0,0}, {0,0})
 			self.widgets.Shield:ScaleTo({1,1}, {0.3, 0.3})
+			self.widgets.Shield:SetVisible(true)
 			if (self.shieldEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
@@ -317,13 +327,14 @@ function HUD.AnimateUnlock(self, items)
 	end
 	
 	if (PlayerSkills:PulseUnlocked()) then
-		local unlock = items["pulse"]
+		local unlock = items.pulse
 		if (unlock) then
 			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
 			self.widgets.PulseCharging:SetRect(r)
 			self.widgets.PulseShimmer:SetRect(r)
 			self.widgets.Pulse:ScaleTo({0,0}, {0,0})
 			self.widgets.Pulse:ScaleTo({1,1}, {0.3, 0.3})
+			self.widgets.Pulse:SetVisible(true)
 			if (self.pulseEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
@@ -496,10 +507,10 @@ function HUD.Enable(self, items)
 		state[v] = true
 	end
 	
-	HUD:EnableArm(state["arm"] == true)
-	HUD:EnableManipulate(state["manipulate"] == true)
-	HUD:EnableShield(state["shield"] == true)
-	HUD:EnablePulse(state["pulse"] == true)
+	HUD:EnableArm(state.arm)
+	HUD:EnableManipulate(state.manipulate)
+	HUD:EnableShield(state.shield)
+	HUD:EnablePulse(state.pulse)
 
 end
 
@@ -510,6 +521,23 @@ function HUD.EnableArm(self, enable)
 	
 	self.armEnabled = enable
 	self.widgets.Arm.class:SetEnabled(self.widgets.Arm, enable)
+end
+
+function HUD.SignalArm(self, signal)
+	
+	local gfx = {}
+	
+	if (signal) then
+		gfx.pressed = self.gfx.ArmPressed
+		gfx.enabled = self.gfx.ArmSignaled
+		self.sfx.Signaled:Play(kSoundChannel_UI, 0)
+	else
+		gfx.pressed = self.gfx.ArmPressed
+		gfx.enabled = self.gfx.Arm
+	end
+	
+	self.widgets.Arm.class:ChangeGfx(self.widgets.Arm, gfx)
+
 end
 
 function HUD.EnableManipulate(self, enable)

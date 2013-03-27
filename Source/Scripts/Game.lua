@@ -68,23 +68,46 @@ function Game.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "enablewaypoints") then
 		Floors:SetWaypointTargetnameState(args, kWaypointState_Enabled)
+		return true
 	elseif (cmd == "disablewaypoints") then
 		Floors:SetWaypointTargetnameState(args, nil, bit.bnot(kWaypointState_Enabled))
+		return true
 	elseif (cmd == "enablewaypointuserid") then
 		Floors:SetWaypointUserIdState(args, kWaypointState_Enabled)
+		return true
 	elseif (cmd == "disablewaypointuserid") then
 		Floors:SetWaypointUserIdState(args, nil, bit.bnot(kWaypointState_Enabled))
+		return true
 	elseif (cmd == "enablefloor") then
 		Floors:SetFloorState(args, kFloorState_Enabled)
+		return true
 	elseif (cmd == "disablefloor") then
 		Floors:SetFloorState(args, nil, bit.bnot(kFloorState_Enabled))
+		return true
 	elseif (cmd == "play") then
 		Cinematics:Play(args)
+		return true
 	elseif (cmd == "music") then
 		args = Tokenize(args)
 		cmd = args[1]
 		table.remove(args, 1)
 		Music.entity:Command(cmd, args)
+		return true
+	elseif (cmd == "signal_arm") then
+		Arm:Signal(args)
+		return true
+	elseif (cmd == "enable_arm") then
+		PlayerSkills:UnlockArm()
+		return true
+	elseif (cmd == "enable_manipulate") then
+		PlayerSkills:UnlockManipulate()
+		return true
+	elseif (cmd == "enable_shield") then
+		PlayerSkills:UnlockShield()
+		return true
+	elseif (cmd == "enable_pulse") then
+		PlayerSkills:UnlockPulse()
+		return true
 	end
 end
 

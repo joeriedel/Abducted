@@ -151,6 +151,7 @@ function Arm.ProcessActions(self, actions)
 	local b = FindArrayElement(actions, "clear_topic")
 	if (b) then
 		self.requiredTopic = nil
+		HUD:SignalArm(false)
 	end
 end
 
@@ -323,13 +324,14 @@ function Arm.DisplayChatLockout(self)
 	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.5)
 		
 	local f = function()
+		self.armLockTimer = nil
 		Abducted.entity.eatInput = false
 		Arm:ShowSymbol(true, 0.1)
 		Arm:ClearChat()
 	end
 	
 	Abducted.entity.eatInput = true
-	World.globalTimers:Add(f, 0.5, true)
+	self.armLockTimer = World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.ChatLockout(self, time)

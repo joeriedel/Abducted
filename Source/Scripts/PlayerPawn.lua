@@ -500,7 +500,7 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "teleport") then
 		args = Tokenize(args)
-		self:Teleport(args[1], args[2])
+		self:Teleport(args[1], tonumber(args[2]))
 		return true
 	elseif (cmd == "set_facing") then
 		self:SetFacing(tonumber(args[2]))
@@ -535,7 +535,7 @@ function PlayerPawn.PlayCinematicAnim(self, args)
 			self.customMove = false
 			
 			if (args[2]) then
-				self:Teleport(args[2], args[3])
+				self:Teleport(args[2], tonumber(args[3]))
 			else
 				local fp = self:FindFloor()
 				if (fp) then

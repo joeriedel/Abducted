@@ -39,7 +39,7 @@ function ManipulatableObject.Spawn(self)
 	if (self.keys.damage_bone) then
 		local boneIdx = self.model.dm:FindBone(self.keys.damage_bone)
 		if (boneIdx < 0) then
-			error("ManipulatableObject: bone named %s not found", self.keys.damage_bone)
+			error(string.format("ManipulatableObject: bone named %s not found", self.keys.damage_bone))
 		end
 		local size = Vec3ForString(self.keys.dmage_bone_size, {16, 16, 16})
 		VecScale(size, 0.5)

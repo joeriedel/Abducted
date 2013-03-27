@@ -70,7 +70,7 @@ function Markup.EmitText(widgets, strings, x, elem, options)
 
 	local typeface = options.typefaces[elem.font]
 	if (typeface == nil) then
-		error("Markup typeface '%s' is not loaded", elem.font)
+		error(string.format("Markup typeface '%s' is not loaded", elem.font))
 	end
 	
 	if (#strings.array >= options.maxLinesPerModel) then
@@ -100,7 +100,7 @@ function Markup.EmitImage(widget, x, elem, options)
 
 	local material = options.materials[elems.src]
 	if (material == nil) then
-		error("Markup image '%s' is not loaded", elems.src)
+		error(string.format("Markup image '%s' is not loaded", elems.src))
 	end
 	
 	local w = UI:CreateWidget("MatWidget", {rect={elem.x+x, elem.y, elem.w, elem.h}, material=material})

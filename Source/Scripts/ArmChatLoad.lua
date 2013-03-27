@@ -6,33 +6,129 @@
 --[[---------------------------------------------------------------------------
 	Load available conversations
 -----------------------------------------------------------------------------]]
+kArmChatFlag_Locked = 1
+kArmChatFlag_AutoGenerate = 2
+kArmChatFlag_Procedural = 4
+kArmChatFlag_ShuffleChoices = 8
 
 Arm.Chats.Available = {}
+Arm.Chats.Loaded = {}
+Arm.Chats.Procedural = {}
 
-function Arm.PopulateChats(self, group)
-	for k,v in pairs(Arm.Chats) do
-		for a,b in pairs(v) do
-			if (b.group == group) then
-				Arm.Chats.Available[a] = b
+function Arm.LinkDialogDB(self, db)
+
+	local strings = db:StringTable()
+	local data = db:Data()
+	
+	if (data) then
+		data.stringTable = strings
+		
+		for k,v in pairs(data.roots) do
+			if (Arm.Chats.Loaded[k] ~= nil) then
+				error(string.format("Arm topic '%s' is defined multiple times.", k))
+			end
+			Arm.Chats.Loaded[k] = v
+			v.stringTable = strings
+			Arm:SetTopicFlags(k, v)
+			Arm:LinkProceduralChat(k, v)
+		end
+		
+		for k,v in pairs(data.dialogs) do
+			v.stringTable = strings
+		end
+	end
+
+	return data
+end
+
+function Arm.LinkProceduralChat(self, name, topic)
+
+	if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
+		return
+	end
+	
+	if (topic.priority <= 0) then
+		return
+	end
+	
+	local t = Arm.Chats.Procedural[topic.priority]
+	if (t == nil) then
+		t = {}
+		Arm.Chats.Procedural[topic.priority] = t
+	end
+	
+	if (#topic.choices ~= 1) then
+		error(string.format("Arm topic '%s' is a procedural topic and must contain 1 dialog.", name))
+	end
+	
+	t[name] = topic.choices[1]
+
+end
+
+function Arm.UnlockTopic(self, name, topic)
+	if (topic == nil) then
+		topic = Arm.Chats.Loaded[name]
+		assert(topic)
+		if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
+			if (topic.priority <= 0) then
+				error(string.format("Arm topic '%s' is a critical path topic, it should never be unlocked!", name))
+			end
+			Arm.Chats.Available[name] = topic
+		end
+	end
+	topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
+	Persistence.WriteBool(SaveGame, "armTopicUnlocked", true, name)
+	SaveGame:Save()
+end
+
+function Arm.SetTopicFlags(self, name, topic)
+
+	local unlocked = Persistence.ReadBool(SaveGame, "armTopicUnlocked", false, name)
+	if (unlocked) then
+		topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
+	end
+
+end
+
+function Arm.AddAvailableChats(self, db, group, flags)
+
+	if (flags == nil) then
+		flags = 0
+	end
+	
+	for k,v in pairs(db.roots) do
+		if (v.priority > 0) then
+			if (v.group == group) then
+			
+				local skip = false
+				
+				if (bit.band(v.flags, kArmChatFlag_Locked) ~= 0) then
+					if (bit.band(flags, kArmChatFlag_Locked) ~= 0) then
+						Arm:UnlockTopic(k, v)
+					else
+						skip = true
+					end
+				end
+				
+				if (bit.band(v.flags, kArmChatFlag_Procedural) ~= 0) then
+					skip = true
+				end
+				
+				if (not skip) then
+					Arm.Chats.Available[k] = v
+				end
 			end
 		end
 	end
+
 end
 
 function Arm.LoadCommonChat(self)
     Arm.Chats.CommonDB = World.Load("UI/ArmChat")
-    local strings = Arm.Chats.CommonDB:StringTable()
-    Arm.Chats.CommonDB = Arm.Chats.CommonDB:Data()
+    Arm.Chats.CommonDB = Arm:LinkDialogDB(Arm.Chats.CommonDB)
     
     if (Arm.Chats.CommonDB) then
-		Arm.Chats.CommonDB.StringTable = strings
-		
-		for k,v in pairs(Arm.Chats.CommonDB) do
-			v.stringTable = strings
-			if ((v.group == nil) or (v.group == "Default")) then
-				Arm.Chats.Available[k] = v
-			end
-		end
+		Arm:AddAvailableChats(Arm.Chats.CommonDB, "Default")
 	end
 end
 
@@ -41,17 +137,10 @@ function Arm.LoadChatList(self, chats)
 	
 	for k,v in pairs(chats) do
 		local db = World.Load(v)
-		local strings = db:StringTable()
-		db = db:Data()
+		db = Arm:LinkDialogDB(db)
 		if (db) then
+			Arm:AddAvailableChats(db, "Default")
 			Arm.Chats[v] = db
-			db.StringTable = strings
-			for a,b in pairs(db) do
-				b.stringTable = strings
-				if ((b.group == nil) or (b.group == "Default")) then
-					Arm.Chats.Available[a] = b
-				end
-			end
 		end
 	end
     

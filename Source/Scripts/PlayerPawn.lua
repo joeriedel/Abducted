@@ -517,7 +517,9 @@ function PlayerPawn.Teleport(self, userId, facing)
 	local waypoints = World.WaypointsForUserId(userId)
 	if (waypoints) then
 		self:Stop()
-		self:SetFloorPosition(World.WaypointFloorPosition(waypoints[1]))
+		local fp = World.WaypointFloorPosition(waypoints[1])
+		self:SetFloorPosition(fp)
+		self:SetDesiredMove(nil)
 		
 		if (facing) then
 			self:SetFacing(facing)

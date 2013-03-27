@@ -321,6 +321,7 @@ function ManipulatableObject.Attack(self)
 	self.think = nil
 	self.hitPlayer = false
 	self.canAttack = false
+	self.nextAttackTime = nil
 	local args = Tokenize(self.attackArgs)
 	
 	local blend = self:PlayAnim(args[1], self.model)
@@ -358,6 +359,8 @@ function ManipulatableObject.Attack(self)
 end
 
 function ManipulatableObject.AttackFinish(self)
+	COutLine(kC_Debug, "ManipulatableObject.AttackFinish")
+	
 	self:Idle()
 	self:EnableTouch(false)
 	
@@ -371,7 +374,9 @@ function ManipulatableObject.AttackFinish(self)
 	
 	if (self.nextAttackTime) then
 		self.think = ManipulatableObject.Attack
-		self:SetNextThink(FloatRand(self.nextAttackTime[1], self.nextAttackTime[2]))
+		local t = FloatRand(self.nextAttackTime[1], self.nextAttackTime[2])
+		COutLine(kC_Debug, "ManipulatableObject: attacking again in %f seconds", t)
+		self:SetNextThink(t)
 		self.nextAttackTime = nil
 	end
 end

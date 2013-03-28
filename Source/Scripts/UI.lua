@@ -93,6 +93,16 @@ function UI.Spawn(self)
 			1 / UI.fontScale[1], 
 			1 / UI.fontScale[2]
 		}
+	elseif ((UI.screenWidth == 1024) and (UI.screenHeight == 768)) then
+		UI.fontScale = {
+			1,
+			1
+		}
+		
+		UI.invFontScale = {
+			1,
+			1
+		}
 	else
 		UI.fontScale = {
 			UI.identityScale[1],
@@ -496,14 +506,12 @@ end
 function UI.HCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = label:Rect()
 	
 	r[1] = rect[1] + ((rect[3]-d[1]) / 2)
-	r[3] = w
-	r[4] = h
+	r[3] = d[1]
+	r[4] = d[2]
 	
 	label:SetRect(r)
 	return r
@@ -512,8 +520,6 @@ end
 function UI.VCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = label:Rect()
 	
@@ -528,8 +534,6 @@ end
 function UI.CenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = {
 		rect[1] + ((rect[3]-d[1]) / 2),
@@ -545,8 +549,6 @@ end
 function UI.RAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -569,8 +571,6 @@ end
 function UI.VAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -592,8 +592,6 @@ end
 function UI.RVAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()

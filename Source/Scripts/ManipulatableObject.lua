@@ -460,7 +460,7 @@ function ManipulatableObject.FindSwipeTarget(g)
 			
 			-- must be on screen
 			if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
-			    (screen[2] >= 1) and (screen[2] < UI.systemScreen.height)) then
+			    (screen[2] >= 0) and (screen[2] < UI.systemScreen.height)) then
 				
 				local keep = false
 				

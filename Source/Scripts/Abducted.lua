@@ -232,6 +232,7 @@ function Abducted.PlayerDied(self)
 	end
 	
 	AlertPanel:Run(
+		"ALERT_PANEL_DIED",
 		"DEFAULT_KILLED_MESSAGE",
 		{
 			{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},

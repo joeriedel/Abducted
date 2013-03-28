@@ -13,32 +13,41 @@ function AlertPanel.Create(self)
 	self.sfx = {}
 	self.sfx.Command = World.Load("Audio/ui_command")
 	self.typefaces = {}
-	self.typefaces.Default = World.Load("UI/ChatChoice_TF")
+	self.typefaces.Text = World.Load("UI/AlertText_TF")
+	self.typefaces.Title = World.Load("UI/AlertTitle_TF")
 	
 	self.widgets = {}
 	self.widgets.root = UI:CreateRoot(UI.kLayer_AlertPanel, AlertPanel.EatInput)
 	
-	self.widgets.panel = UI:CreateWidget("MatWidget", {rect={0, 0, UI.screenWidth*0.5, UI.screenHeight*0.5}, material=self.gfx.LineBorder})
+	local panelWidth = 700*UI.identityScale[1]
+	if (panelWidth < 700) then
+		panelWidth = 700
+	end
+	
+	self.widgets.panel = UI:CreateWidget("MatWidget", {rect={0, 0, panelWidth, panelWidth*9/16}, material=self.gfx.LineBorder})
 	self.widgets.panel:SetHAlign(kHorizontalAlign_Center)
 	self.widgets.panel:SetVAlign(kVerticalAlign_Center)
 	self.widgets.root:AddChild(self.widgets.panel)
 	
-	self.widgets.text = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Default})
+	self.widgets.title = UI:CreateWidget("TextLabel", {rect={0,16*UI.identityScale[2],8,8}, typeface=self.typefaces.Title})
+	self.widgets.panel:AddChild(self.widgets.title)
+	self.widgets.text = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Text})
 	self.widgets.panel:AddChild(self.widgets.text)
 	UI:CenterWidget(self.widgets.panel, UI.fullscreenRect)
 	
 	-- scale buttons accordingly:
 	local buttonSize = UI.gfx.Button:Dimensions()
 	
-	buttonSize[1] = buttonSize[1] * 0.7
-	buttonSize[2] = buttonSize[2] * 0.7
+	buttonSize[1] = buttonSize[1] * 0.8
+	buttonSize[2] = buttonSize[2] * 0.8
 	
 	local panelRect = self.widgets.panel:Rect()
+	local titleSize = UI:FontAdvanceSize(self.typefaces.Title)+(48*UI.identityScale[2])
 	local textRect = {
-		16*UI.identityScale[1],
-		16*UI.identityScale[2],
-		panelRect[3] - (32*UI.identityScale[1]),
-		panelRect[4] - (32*UI.identityScale[2]) - buttonSize[2]
+		48*UI.identityScale[1],
+		titleSize,
+		panelRect[3] - (48*2*UI.identityScale[1]),
+		panelRect[4] - titleSize - (48*UI.identityScale[2]) - buttonSize[2]
 	}
 	
 	self.widgets.text:SetRect(textRect)
@@ -58,6 +67,7 @@ end
 function AlertPanel.Dismiss(self, result)
 
 	self.active = false
+	self.widgets.title:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.text:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.buttonA:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.buttonB:BlendTo({1,1,1,0}, 0.1)
@@ -84,7 +94,7 @@ function AlertPanel.ButtonPressed(widget, e)
 	AlertPanel:Dismiss(widget.code)
 end
 
-function AlertPanel.Run(self, msg, buttons, callback)
+function AlertPanel.Run(self, title, msg, buttons, callback)
 	
 	assert(self.active == false)
 	
@@ -94,13 +104,16 @@ function AlertPanel.Run(self, msg, buttons, callback)
 	local buttonRect = self.widgets.buttonA:Rect()
 	local panelRect = self.widgets.panel:Rect()
 	
-	
-	local text = StringTable.Get(msg)
+	local text = StringTable.Get(title)
+	UI:SetLabelText(self.widgets.title, text)
+	UI:HCenterLabel(self.widgets.title, {0, 0, panelRect[3], panelRect[4]})
+			
+	text = StringTable.Get(msg)
 	UI:LineWrapLJustifyText(
 		self.widgets.text,
 		nil,
 		true,
-		0,
+		6,
 		text,
 		UI.fontScale,
 		UI.invFontScale
@@ -111,7 +124,7 @@ function AlertPanel.Run(self, msg, buttons, callback)
 		self.widgets.buttonA.label,
 		nil,
 		nil,
-		0,
+		2,
 		text,
 		UI.fontScale,
 		UI.invFontScale
@@ -128,7 +141,7 @@ function AlertPanel.Run(self, msg, buttons, callback)
 			self.widgets.buttonB.label,
 			nil,
 			nil,
-			0,
+			2,
 			text,
 			UI.fontScale,
 			UI.invFontScale
@@ -147,12 +160,14 @@ function AlertPanel.Run(self, msg, buttons, callback)
 	self.widgets.buttonA.class:SetEnabled(self.widgets.buttonA, true)
 	self.widgets.buttonB.class:SetEnabled(self.widgets.buttonB, true)
 	
+	self.widgets.title:BlendTo({1,1,1,0},0)
 	self.widgets.text:BlendTo({1,1,1,0},0)
 	self.widgets.buttonA:BlendTo({1,1,1,0},0)
 	self.widgets.buttonB:BlendTo({1,1,1,0},0)
 	self.widgets.panel:ScaleTo({0,0}, {0,0})
 	
 	local f = function()
+		self.widgets.title:BlendTo({1,1,1,1}, 0.3)
 		self.widgets.text:BlendTo({1,1,1,1}, 0.3)
 		self.widgets.buttonA:BlendTo({1,1,1,1}, 0.3)
 		if (doButtonB) then
@@ -166,12 +181,13 @@ function AlertPanel.Run(self, msg, buttons, callback)
 
 end
 
-function AlertPanel.OK(self, msg, callback)
-	AlertPanel:Run(msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback)
+function AlertPanel.OK(self, title, msg, callback)
+	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback)
 end
 
-function AlertPanel.OKCancel(self, msg)
+function AlertPanel.OKCancel(self, title, msg)
 	AlertPanel:Run(
+		title,
 		msg, 
 		{
 			{"ALERT_PANEL_OK", r=AlertPanel.OKButton}, 

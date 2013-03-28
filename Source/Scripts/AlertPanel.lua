@@ -18,7 +18,7 @@ function AlertPanel.Create(self)
 	self.widgets = {}
 	self.widgets.root = UI:CreateRoot(UI.kLayer_AlertPanel, AlertPanel.EatInput)
 	
-	self.widgets.panel = UI:CreateWidget("MatWidget", {rect={0, 0, UI.screenWidth*0.4, UI.screenHeight*0.4}, material=self.gfx.LineBorder})
+	self.widgets.panel = UI:CreateWidget("MatWidget", {rect={0, 0, UI.screenWidth*0.5, UI.screenHeight*0.5}, material=self.gfx.LineBorder})
 	self.widgets.panel:SetHAlign(kHorizontalAlign_Center)
 	self.widgets.panel:SetVAlign(kVerticalAlign_Center)
 	self.widgets.root:AddChild(self.widgets.panel)
@@ -61,6 +61,8 @@ function AlertPanel.Dismiss(self, result)
 	self.widgets.text:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.buttonA:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.buttonB:BlendTo({1,1,1,0}, 0.1)
+	self.widgets.buttonA.class:SetEnabled(self.widgets.buttonA, false)
+	self.widgets.buttonB.class:SetEnabled(self.widgets.buttonB, false)
 	
 	local f = function ()
 		self.widgets.panel:ScaleTo({0,0}, {0.3, 0.3})
@@ -141,6 +143,9 @@ function AlertPanel.Run(self, msg, buttons, callback)
 		UI:MoveWidget(self.widgets.buttonA, 0, yButtonPos)
 		UI:CenterWidget(self.widgets.buttonA, {0,0,panelRect[3],panelRect[4]})
 	end
+	
+	self.widgets.buttonA.class:SetEnabled(self.widgets.buttonA, true)
+	self.widgets.buttonB.class:SetEnabled(self.widgets.buttonB, true)
 	
 	self.widgets.text:BlendTo({1,1,1,0},0)
 	self.widgets.buttonA:BlendTo({1,1,1,0},0)

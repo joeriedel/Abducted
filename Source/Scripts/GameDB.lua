@@ -4,12 +4,13 @@
 -- See Abducted/LICENSE for licensing terms
 
 GameDB = Class:New()
-GameDB.GameSecondsPerSecond = 8 -- means about 4 hours of gameplay = 1 day
+GameDB.GameSecondsPerSecond = 8 -- means 4 hours of gameplay = 1 day
 GameDB.SecondsPerMinute = 60
 GameDB.MinutesPerHour = 60
 GameDB.HoursPerDay = 24
 GameDB.SecondsPerHour = 60*60
 GameDB.SecondsPerDay = 60*60*24
+GameDB.PersistentObjects = {}
 
 function GameDB.Load(self)
 
@@ -17,11 +18,72 @@ function GameDB.Load(self)
 	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/character-profiletest1_M")
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
-		
+	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
+	
 	self:LoadTime()
 	self:LoadChatLockouts()
 	EventLog:Load()
 	
+end
+
+function GameDB.LoadingSaveGame(self)
+	return self.loadingCheckpoint
+end
+
+function GameDB.SaveCheckpoint(self)
+	GameDB:SavePeristentObjects()
+	Game.entity:SaveState()
+	SaveGame:Save()
+end
+
+function GameDB.LoadCheckpoint(self)
+	Persistence.WriteBool(Session, "loadCheckpoint", false)
+	Session:Save()
+	Game.entity:LoadState()
+	GameDB:LoadPersistentObjects()
+	self.loadingCheckpoint = false
+end
+
+function GameDB.LoadSaveGameData(self)
+	local name = Persistence.ReadString(Session, "checkpointFile")
+	SaveGame:Load(name)
+end
+
+function GameDB.LoadPersistentObjects(self)
+
+	local db = SaveGame.keys["persistentObjectData"]
+	
+	for k,v in pairs(GameDB.PersistentObjects) do
+		assert(type(k) == "string")
+		local x = db[k]
+		if (x) then
+			v:Load(x)
+		end
+	end
+	
+	for k,v in pairs(GameDB.PersistentObjects) do
+	
+		if (v.Done) then
+			v:Done()
+		end
+	
+	end
+
+end
+
+function GameDB.SavePeristentObjects(self)
+
+	local db = {}
+	
+	for k,v in pairs(GameDB.PersistentObjects) do
+		assert(type(k) == "string")
+		local x = v:Save()
+		db[tostring(k)] = x
+	
+	end
+	
+	SaveGame.keys["persistentObjectData"] = db
+
 end
 
 function GameDB.LoadTime(self)
@@ -44,8 +106,6 @@ function GameDB.Discover(self, name)
 	
 	self.discoveryTime = self.realTime
 	Persistence.WriteNumber(SaveGame, "lastDiscoveryTime", self.discoveryTime)
-	
-	SaveGame:Save()
 
 end
 
@@ -68,8 +128,6 @@ function GameDB.SaveChatLockouts(self)
 	else
 		Persistence.DeleteKey(SaveGame, "chatLockoutTime")
 	end
-	
-	SaveGame:Save()
 end
 
 function GameDB.LockoutChat(self, time)

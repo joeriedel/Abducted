@@ -78,7 +78,6 @@ function Arm.UnlockTopic(self, name, topic)
 	end
 	topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
 	Persistence.WriteBool(SaveGame, "armTopicUnlocked", true, name)
-	SaveGame:Save()
 end
 
 function Arm.SetTopicFlags(self, name, topic)

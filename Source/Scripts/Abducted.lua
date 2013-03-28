@@ -23,6 +23,36 @@ function Abducted.Initialize(self)
 	self.manipulate = false
 end
 
+function Abducted.PostSpawn(self)
+	
+	if (GameDB:LoadingSaveGame()) then
+		self:LoadCheckpoint()
+	else
+		self:SaveCheckpoint()
+	end
+	
+end
+
+function Abducted.LoadCheckpoint(self)
+	World.gameTimers = TimerList:Create()
+	World.globalTimers = TimerList:Create()
+	GameDB:LoadCheckpoint()
+end
+
+function Abducted.SaveCheckpoint(self)
+	if (not World.playerPawn.dead) then
+		GameDB:SaveCheckpoint()
+	end
+end
+
+function Abducted.LoadState(self)
+	HUD:LoadState()
+end
+
+function Abducted.SaveState(self)
+	HUD:SaveState()
+end
+
 function Abducted.Load(self)
 	self.gfx = {}
 	self.gfx.Manipulate = World.Load("Shared/spellcasting_edgelines_M")
@@ -200,6 +230,14 @@ function Abducted.PlayerDied(self)
 	if (self.pulse) then
 		self:EndPulse()
 	end
+	
+	AlertPanel:Run(
+		"DEFAULT_KILLED_MESSAGE",
+		{
+			{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
+			{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
+		}
+	)
 end
 
 function Abducted.Think(self, dt)

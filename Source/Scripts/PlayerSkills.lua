@@ -58,7 +58,6 @@ function PlayerSkills.UnlockArm(self)
 	if (not (self.armUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.armUnlocked = true
 		Persistence.WriteBool(SaveGame, "armUnlocked", true)
-		SaveGame:Save()
 		HUD:AnimateUnlock({arm=true})
 	end
 end
@@ -71,7 +70,6 @@ function PlayerSkills.UnlockManipulate(self)
 	if (not (self.manipulateUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.manipulateUnlocked = true
 		Persistence.WriteBool(SaveGame, "manipulateUnlocked", true)
-		SaveGame:Save()
 		HUD:AnimateUnlock({manipulate=true})
 	end
 end
@@ -84,7 +82,6 @@ function PlayerSkills.UnlockShield(self)
 	if (not (self.shieldUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.shieldUnlocked = true
 		Persistence.WriteBool(SaveGame, "shieldUnlocked", true)
-		SaveGame:Save()
 		HUD:AnimateUnlock({shield=true})
 	end
 end
@@ -97,7 +94,6 @@ function PlayerSkills.UnlockPulse(self)
 	if (not (self.pulseUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.pulseUnlocked = true
 		Persistence.WriteBool(SaveGame, "pulseUnlocked", true)
-		SaveGame:Save()
 		HUD:AnimateUnlock({pulse=true})
 	end
 end

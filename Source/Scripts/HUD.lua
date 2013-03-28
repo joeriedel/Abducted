@@ -165,7 +165,7 @@ function HUD.ShieldPressed(self, widget)
 	World.playerPawn:BeginShield()
 	
 	-- start ticking down the time.
-	self.shieldStartTime = Game.time
+	self.shieldStartTime = GAmeDB.realTime
 	
 	local gfx = {
 		enabled = self.gfx.ShieldDisabled
@@ -222,10 +222,10 @@ function HUD.RechargePulse(self)
 	
 	World.gameTimers:Add(f, rechargeTime, true)
 	
-	self.pulseStart = Game.time
+	self.pulseStart = GameDB.realTime
 	
 	f = function ()
-		local dd = Game.time - self.pulseStart
+		local dd = GameDB.realTime - self.pulseStart
 		self.widgets.PulseCharging:FillCircleTo(dd / rechargeTime, 0)
 	end
 	
@@ -417,7 +417,7 @@ function HUD.RechargeManipulate(self)
 	
 	World.gameTimers:Add(f, rechargeTime, true)
 	
-	self.manipulateStart = Game.time
+	self.manipulateStart = GameDB.realTime
 	
 	f = function ()
 		local dd = Game.time - self.manipulateStart
@@ -434,7 +434,7 @@ function HUD.ExpireShield(self)
 		self.shieldTimer = nil
 	end
 
-	local timeUsed = Min(Game.time - self.shieldStartTime, PlayerSkills.MaxShieldTime)
+	local timeUsed = Min(GameDB.realTime - self.shieldStartTime, PlayerSkills.MaxShieldTime)
 	local gfx = {
 		enabled = self.gfx.ShieldEnabled,
 		disabled = self.gfx.ShieldDisabled
@@ -443,7 +443,7 @@ function HUD.ExpireShield(self)
 	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
 	
 	self.shieldRechargeTime = PlayerSkills:ShieldRechargeTime(timeUsed)
-	self.shieldStartTime = Game.time
+	self.shieldStartTime = GameDB.realTime
 	self.shieldRechargeFrac = (PlayerSkills.MaxShieldTime - timeUsed) / PlayerSkills.MaxShieldTime
 	
 	local f = function ()
@@ -462,7 +462,7 @@ function HUD.ExpireShield(self)
 	World.gameTimers:Add(f, self.shieldRechargeTime, true)
 	
 	f = function ()
-		local dd = Game.time - self.shieldStartTime
+		local dd = GameDB.realTime - self.shieldStartTime
 		dd = dd / self.shieldRechargeTime
 		dd = self.shieldRechargeFrac + (dd * (1 - self.shieldRechargeFrac))
 		self.widgets.ShieldCharging:FillCircleTo(-dd, 0)
@@ -623,3 +623,10 @@ function HUD.Disable(self)
 	
 end
 
+function HUD.SaveState(self)
+
+end
+
+function HUD.LoadState(self)
+
+end

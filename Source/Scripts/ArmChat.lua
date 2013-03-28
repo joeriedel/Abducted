@@ -496,7 +496,6 @@ function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 	if (choice.generated) then -- flag as used
 		self.topicTree[choice.generated] = choice
 		Persistence.WriteBool(SaveGame, "armGeneratedTopicChosen", true, choice.generated)
-		SaveGame:Save()
 	end
 	
 	local f = function()

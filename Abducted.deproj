@@ -97,6 +97,9 @@
     <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Music.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Persistence.lua</filename>
   </file>
   <file>

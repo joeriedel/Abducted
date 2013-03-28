@@ -150,6 +150,21 @@ function PlayerPawn.Spawn(self)
 	World.SetPlayerPawn(self)
 	
 	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
+	
+	self.shieldActive = false
+	self.manipulateActive = false
+	self.pulseActive = false
+	
+	local io = {
+		Save = function()
+			self:SaveState()
+		end,
+		Load = function(x)
+			self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function PlayerPawn.PostSpawn(self)
@@ -271,12 +286,14 @@ end
 function PlayerPawn.NotifyManipulate(self, enabled)
 	
 	if (enabled) then
+		self.manipulateActive = true
 		self.disableAnimTick = true
 		self.state = nil
 		local anim = self:LookupAnimation("manipulate_idle")
 		self:PlayAnim(anim, self.model)
 		self:Stop()
 	else 
+		self.manipulateActive = false
 		if (self.manipulateDir == nil) then
 			self:EndManipulate()
 		end
@@ -350,6 +367,7 @@ function PlayerPawn.Stop(self)
 end
 
 function PlayerPawn.BeginPulse(self)
+	self.pulseActive = true
 	self.disableAnimTick = true
 	self.state = nil
 	local anim = self:LookupAnimation("pulse_idle")
@@ -401,6 +419,8 @@ function PlayerPawn.FirePulse(self, target, normal)
 		self:EndPulse()
 	end
 	
+	self.pulseActive = false
+	
 	local anim = self:LookupAnimation("pulse_fire")
 	self:PlayAnim(anim , self.model).Seq(f)
 	HUD:RechargePulse()
@@ -433,10 +453,12 @@ function PlayerPawn.DischargePulse(self)
 		return
 	end
 	
+	self.pulseActive = false
 	self:EndPulse()
 end
 
 function PlayerPawn.PulseExplode(self)
+	self.pulseActive = false
 	self:Kill()
 end
 
@@ -613,6 +635,51 @@ function PlayerPawn.CustomAnimMove(self, name)
 		end
 	end
 
+end
+
+function PlayerPawn.SaveState(self)
+	local fp = self:FloorPosition()
+	if (fp.floor == -1) then
+		error("PlayerPawn.SaveState: checkpoints not allowed when player is not on a floor!")
+	end
+	if (self.customMove) then
+		error("PlayerPawn.SaveState: executing custom move, cannot save!")
+	end
+	assert(not self.dead)
+	
+	local state = {
+		shieldActive = tostring(self.shieldActive),
+		manipulateActive = tostring(self.manipulateActive),
+		pulseActive = tostring(self.pulseActive),
+		animState = self.animState,
+		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
+	}
+	
+	return state
+end
+
+function PlayerPawn.LoadState(self, state)
+
+	if (state.shieldActive == "true") then
+		self:BeginShield()
+	end
+	
+	if (state.manipulateActive == "true") then
+		self:NotifyManipulate()
+	elseif (state.pulseActive == "true") then
+		self:BeginPulse()
+	end
+
+	local pos = Vec3ForString(state.pos)
+	local fp  = World.ClipToFloor(
+		{pos[1], pos[2], pos[3] + 8},
+		{pos[1], pos[2], pos[3] - 8}
+	)
+	
+	assert(fp)
+	self:SetFloorPosition(fp)
+
+	self:SelectAnimState(state.animState)
 end
 
 info_player_start = PlayerPawn

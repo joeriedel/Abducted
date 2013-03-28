@@ -41,7 +41,7 @@ function ManipulatableObject.Spawn(self)
 		if (boneIdx < 0) then
 			error(string.format("ManipulatableObject: bone named %s not found", self.keys.damage_bone))
 		end
-		local size = Vec3ForString(self.keys.dmage_bone_size, {16, 16, 16})
+		local size = Vec3ForString(self.keys.damage_bone_size, {16, 16, 16})
 		VecScale(size, 0.5)
 		self:SetTouchBone(self.model.dm, boneIdx)
 		self:SetTouchBoneBounds(VecNeg(size), size)

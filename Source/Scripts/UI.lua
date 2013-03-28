@@ -12,7 +12,7 @@ UI.kLayer_Interactive = 3
 UI.kLayer_Arm = 4
 UI.kLayer_TerminalPuzzles = 5
 UI.kLayer_LB = 6
-UI.kLayer_Popups = 7
+UI.kLayer_AlertPanel = 7
 UI.kLayer_Notifications = 8
 UI.kLayer_Feedback = 9
 UI.kLayer_FX = 10
@@ -117,6 +117,7 @@ function UI.Spawn(self)
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
 	UI:CreateInteractiveLayer()
+	AlertPanel:Create()
 	
 --	self.think = UI.Think
 --	self:SetNextThink(1/30)
@@ -223,8 +224,8 @@ function UI.FadeOutLetterBox(self, color, time)
 
 end
 
-function UI.CreateRoot(self, layer)
-	local root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+function UI.CreateRoot(self, layer, input)
+	local root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=input})
 	World.SetRootWidget(layer, root)
 	return root
 end

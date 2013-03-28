@@ -60,8 +60,6 @@ function EventLog.AddEvent(self, time, style, text)
 		Persistence.DeleteKey(SaveGame, dst.."/text")
 	end
 	
-	SaveGame:Save()
-	
 end
 
 function EventLog.LoadList(self)

@@ -108,6 +108,19 @@ function HUD.Load(self)
 		nil,
 		self.widgets.Root
 	)
+
+    self.widgets.MemoryGame = UIPushButton:Create(
+        UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
+        { -- we go to disabled state when pulse is fired
+            enabled = self.gfx.PulseEnabled,
+            disabled = self.gfx.PulseDisabled,
+            pressed = self.gfx.PulseDisabled
+        },
+        nil,
+        {pressed=function (widget) HUD:MemoryGamePressed(widget) end},
+        nil,
+        self.widgets.Root
+    )
 	
 	self.widgets.PulseCharging = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.PulseEnabled})
 	self.widgets.Root:AddChild(self.widgets.PulseCharging)
@@ -190,6 +203,12 @@ function HUD.PulsePressed(self, widget)
 		return
 	end
 	Game.entity:BeginPulse()
+end
+
+-- djr, not sure if this is right or will work
+function HUD.MemoryGamePressed(self, widget)
+    COutLine(kC_Debug, "Memory Game Pressed!")
+   TerminalPuzzles:DebugStart();
 end
 
 function HUD.RechargePulse(self)

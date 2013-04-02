@@ -171,7 +171,7 @@ end
 function TerminalPuzzles.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = 60
-	self.REFLEX_BOARD_OFFSET = 0
+	self.REFLEX_BOARD_OFFSET =80
 	self.INDEX_MAX_X = 21
 	self.INDEX_MAX_Y = 15
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
@@ -205,7 +205,7 @@ function TerminalPuzzles.InitUI(self)
 
 -- djr, border might not be needed
 --	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
+	self.widgets.board = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.board})
 	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
 -- djr, border might not be needed
 --	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
@@ -257,7 +257,6 @@ function TerminalPuzzles.LoadMaterials(self)
 --	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")
 --	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
 
--- djr, keeping these but they are off for the first test run
 --	self.gfx.symbol_a = World.Load("Memory-Game/memory-symbol-a_M")
 --	self.gfx.symbol_b = World.Load("Memory-Game/memory-symbol-b_M")
 --	self.gfx.symbol_c = World.Load("Memory-Game/memory-symbol-c_M")

@@ -23,12 +23,15 @@ function Abducted.Initialize(self)
 	self.manipulate = false
 end
 
-function Abducted.PostSpawn(self)
+function Abducted.OnLevelStart(self)
 	
 	if (GameDB:LoadingSaveGame()) then
 		self:LoadCheckpoint()
 	else
-		self:SaveCheckpoint()
+		local f = function()
+			self:SaveCheckpoint()
+		end
+		World.globalTimers:Add(f, 1, true) -- let scripts and stuff fire to set states
 	end
 	
 end
@@ -51,6 +54,20 @@ end
 
 function Abducted.SaveState(self)
 	HUD:SaveState()
+end
+
+function Abducted.DoLoadCheckpoint(self)
+	Abducted.entity.eatInput = true
+	UI:BlendTo({1,1,1,1}, 0.5)
+	
+	local f = function ()
+		self:LoadCheckpoint()
+		UI:BlendTo({1,1,1,0}, 0.5)
+		Abducted.entity.eatInput = false
+	end
+
+	World.globalTimers:Add(f, 0.5, true)
+	
 end
 
 function Abducted.Load(self)
@@ -222,6 +239,12 @@ function Abducted.FirePulse(self, target, normal)
 	self.pulse = false
 end
 
+function Abducted.PlayerDiedAlertPanelDone(self, result)
+	if (result == 1) then
+		self:DoLoadCheckpoint()
+	end
+end
+
 function Abducted.PlayerDied(self)
 	HUD:PlayerDied()
 	if (self.manipulate) then
@@ -231,14 +254,21 @@ function Abducted.PlayerDied(self)
 		self:EndPulse()
 	end
 	
-	AlertPanel:Run(
-		"ALERT_PANEL_DIED",
-		"DEFAULT_KILLED_MESSAGE",
-		{
-			{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
-			{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
-		}
-	)
+	local f = function()
+		AlertPanel:Run(
+			"ALERT_PANEL_DIED",
+			"DEFAULT_KILLED_MESSAGE",
+			{
+				{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
+				{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
+			},
+			function (result)
+				self:PlayerDiedAlertPanelDone(result)
+			end
+		)
+	end
+	
+	World.globalTimers:Add(f, 1, true)
 end
 
 function Abducted.Think(self, dt)

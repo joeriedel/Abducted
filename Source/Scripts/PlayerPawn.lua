@@ -157,10 +157,10 @@ function PlayerPawn.Spawn(self)
 	
 	local io = {
 		Save = function()
-			self:SaveState()
+			return self:SaveState()
 		end,
-		Load = function(x)
-			self:LoadState(x)
+		Load = function(s, x)
+			return self:LoadState(x)
 		end
 	}
 	
@@ -449,7 +449,7 @@ function PlayerPawn.DischargePulse(self)
 	trace = World.LineTrace(trace)
 	
 	if (trace and (not trace.startSolid)) then
-		self:FirePulse(trace.traceEnd)
+		self:FirePulse(trace.traceEnd, trace.normal)
 		return
 	end
 	
@@ -647,11 +647,14 @@ function PlayerPawn.SaveState(self)
 	end
 	assert(not self.dead)
 	
+	local vertex = self:Angles()
+	
 	local state = {
 		shieldActive = tostring(self.shieldActive),
 		manipulateActive = tostring(self.manipulateActive),
 		pulseActive = tostring(self.pulseActive),
 		animState = self.animState,
+		facing = tostring(vertex.pos[3]),
 		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
 	}
 	
@@ -659,9 +662,15 @@ function PlayerPawn.SaveState(self)
 end
 
 function PlayerPawn.LoadState(self, state)
-
+	
+	self.dead = false
+	self.disableAnimTick = false
+	self.state = "idle"
+	
 	if (state.shieldActive == "true") then
 		self:BeginShield()
+	else
+		self:ShowShield(false)
 	end
 	
 	if (state.manipulateActive == "true") then
@@ -678,8 +687,17 @@ function PlayerPawn.LoadState(self, state)
 	
 	assert(fp)
 	self:SetFloorPosition(fp)
-
+	self:SetDesiredMove(nil)
+	self:SetMoveType(kMoveType_Floor)
+	self:SetFacing(tonumber(state.facing))
 	self:SelectAnimState(state.animState)
+	
+	local anim = self:LookupAnimation("idle")
+	if (anim) then
+		self.model:BlendImmediate(anim)
+	end
+	
+	self:Link()
 end
 
 info_player_start = PlayerPawn

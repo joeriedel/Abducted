@@ -12,6 +12,17 @@ ViewController.Targets = {}
 function ViewController.Spawn(self)
 	World.viewController = self
 	World.SetViewController(self)
+	
+	local io = {
+		Save = function ()
+			return self:SaveState()
+		end,
+		Load = function (s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects["vc"] = io
 end
 
 function ViewController.OnLevelStart(self)
@@ -32,6 +43,9 @@ function ViewController.OnEvent(self, cmd, args)
 end
 
 function ViewController.HandleCameraCmd(self, args)
+
+	self.lastCmd = args
+
 	local x = Tokenize(args)
 	local lx = #x
 	if (lx < 2) then
@@ -183,7 +197,7 @@ end
 
 function ViewController.AddLookTarget(self, target, fov)
 	for k,v in pairs(ViewController.Targets) do
-		if (t.target.id == target.id) then
+		if (v.target.id == target.id) then
 			return
 		end
 	end
@@ -233,5 +247,17 @@ function ViewController.RemoveLookTarget(self, target)
 		end
 	end
 end	
+
+function ViewController.SaveState(self)
+	assert(self.lastCmd)
+	return {lastCmd = self.lastCmd}
+end
+
+function ViewController.LoadState(self, state)
+	self:FadeOutLookTargets(0)
+	self:SetFixedCamera(VecZero(), VecZero())
+	self:HandleCameraCmd(state.lastCmd)
+	self:Sync()
+end
 
 view_controller = ViewController

@@ -61,9 +61,7 @@ function ManipulatableObject.Spawn(self)
 	self.canAttack = false
 	self.swipePos = {0, 0, 0}
 	
-	if (not BoolForString(self.keys.visible, true)) then
-		self:Show(false)
-	end
+	self:Show(BoolForString(self.keys.visible, true))
 	
 	if (not self.left) then
 		self.left = {0, 1, 0}
@@ -85,6 +83,17 @@ function ManipulatableObject.Spawn(self)
 	else
 		self:Dormant()
 	end
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function ManipulatableObject.PostSpawn(self)
@@ -168,6 +177,7 @@ function ManipulatableObject.LoadSounds(self)
 end
 
 function ManipulatableObject.Show(self, show)
+	self.visible = show
 	self.model.dm:SetVisible(show)
 	self.model.vision:SetVisible(show)
 end
@@ -301,9 +311,11 @@ function ManipulatableObject.Idle(self)
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end
 	
+	if (self.listItem == nil) then
+		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+	end
 	if (not self.enabled) then
 		self.enabled = true
-		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		if (Game.entity.manipulate) then -- show ourselves
 			ManipulatableObject.NotifyManipulate(true)
 		end
@@ -452,56 +464,58 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 	while (x) do
 	
-		local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
-		local screen,r = World.Project(world)
-		local dx, dy, dd
-		
-		if (r) then
+		if (x.visible) then
+			local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
+			local screen,r = World.Project(world)
+			local dx, dy, dd
 			
-			-- must be on screen
-			if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
-			    (screen[2] >= 0) and (screen[2] < UI.systemScreen.height)) then
+			if (r) then
 				
-				local keep = false
-				
-				-- closer than another matching object?
-				local worldDist = VecDot(world, cameraFwd)
-				if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
-					-- capsule distance
+				-- must be on screen
+				if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
+					(screen[2] >= 0) and (screen[2] < UI.systemScreen.height)) then
 					
-					local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
-					if (segPos < lineSegDist[1]) then
-						-- distance to endpoints check:
-						dx = screen[1] - lineStart[1]
-						dy = screen[2] - lineStart[2]
-						dd = math.sqrt(dx*dx + dy*dy)
-						if (dd <= kMaxDist) then
-							keep = true
-						end
-					elseif (segPos > lineSegDist[2]) then
-						dx = screen[1] - lineEnd[1]
-						dy = screen[2] - lineEnd[2]
-						dd = math.sqrt(dx*dx + dy*dy)
-						if (dd <= kMaxDist) then
-							keep = true
-						end
-					else
-						-- orthogonal distance check
-						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
-						dd = math.abs(dd - lineDist)
+					local keep = false
+					
+					-- closer than another matching object?
+					local worldDist = VecDot(world, cameraFwd)
+					if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
+						-- capsule distance
 						
-						if (dd <= kMaxDist) then
-							keep = true
+						local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
+						if (segPos < lineSegDist[1]) then
+							-- distance to endpoints check:
+							dx = screen[1] - lineStart[1]
+							dy = screen[2] - lineStart[2]
+							dd = math.sqrt(dx*dx + dy*dy)
+							if (dd <= kMaxDist) then
+								keep = true
+							end
+						elseif (segPos > lineSegDist[2]) then
+							dx = screen[1] - lineEnd[1]
+							dy = screen[2] - lineEnd[2]
+							dd = math.sqrt(dx*dx + dy*dy)
+							if (dd <= kMaxDist) then
+								keep = true
+							end
+						else
+							-- orthogonal distance check
+							dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
+							dd = math.abs(dd - lineDist)
+							
+							if (dd <= kMaxDist) then
+								keep = true
+							end
 						end
 					end
+					
+					if (keep) then
+						bestWorldDist = worldDist
+						best = x.entity
+					end
 				end
-				
-				if (keep) then
-					bestWorldDist = worldDist
-					best = x.entity
-				end
+			
 			end
-		
 		end
 		
 		x = LL_Next(x)
@@ -608,7 +622,8 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	
 	self.manipulate = objDir
 	self.canAttack = false
-	self:PlayAnim(state, self.model).Seq(f)
+	self.enabled = false
+	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
 	
 	-- no longer manipulatable
 	if (self.listItem) then
@@ -628,6 +643,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 		World.gameTimers:Add(f, self.manipulateWindow, true)
 	else
 		-- object is not going to reset
+		self.saveManipulateDir = objDir
 		World.viewController:RemoveLookTarget(self)
 	end
 	
@@ -701,6 +717,59 @@ function ManipulatableObject.DoManipulateDamage(self, dir)
 			end
 		end
 	end
+end
+
+function ManipulatableObject.SaveState(self)
+
+	local state = {
+		awake = tostring(self.awake),
+		visible = tostring(self.visible)
+	}
+	
+	if (self.saveManipulateDir) then
+		state.manipulate = self.saveManipulateDir
+	end
+
+	return state
+end
+
+function ManipulatableObject.LoadState(self, state)
+
+	self:Show(state.visible == "true")
+	self.think = nil
+	self.model.vision:BlendTo({1,1,1,0}, 0)
+	
+	if (state.awake == "true") then
+		self.awake = true
+		if (state.manipulate) then
+			self.canAttack = false
+			self.enabled = false
+			self.saveManipulateDir = state.manipulate
+			-- no longer manipulatable
+			if (self.listItem) then
+				LL_Remove(ManipulatableObject.Objects, self.listItem)
+				self.listItem = nil
+			end
+			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
+		else
+			self.enabled = true
+			self.canAttack = true
+			self:PlayAnim("idle", self.model)
+			if (self.listItem == nil) then
+				self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+			end
+		end
+	else
+		self.awake = false
+		self.enabled = false
+		self.canAttack = false
+		if (self.listItem) then
+			LL_Remove(ManipulatableObject.Objects, self.listItem)
+			self.listItem = nil
+		end
+		self.model:BlendImmediate("dormant")
+	end
+
 end
 
 --[[---------------------------------------------------------------------------

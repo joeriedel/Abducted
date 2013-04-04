@@ -37,16 +37,13 @@ function GameDB.SaveCheckpoint(self)
 end
 
 function GameDB.LoadCheckpoint(self)
+	GameDB:Load()
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
+	self.loadingCheckpoint = true
 	Game.entity:LoadState()
 	GameDB:LoadPersistentObjects()
 	self.loadingCheckpoint = false
-end
-
-function GameDB.LoadSaveGameData(self)
-	local name = Persistence.ReadString(Session, "checkpointFile")
-	SaveGame:Load(name)
 end
 
 function GameDB.LoadPersistentObjects(self)
@@ -56,9 +53,7 @@ function GameDB.LoadPersistentObjects(self)
 	for k,v in pairs(GameDB.PersistentObjects) do
 		assert(type(k) == "string")
 		local x = db[k]
-		if (x) then
-			v:Load(x)
-		end
+		v:Load(x)
 	end
 	
 	for k,v in pairs(GameDB.PersistentObjects) do
@@ -78,8 +73,10 @@ function GameDB.SavePeristentObjects(self)
 	for k,v in pairs(GameDB.PersistentObjects) do
 		assert(type(k) == "string")
 		local x = v:Save()
-		db[tostring(k)] = x
-	
+		if (x) then
+			db[k] = x
+		end
+		
 	end
 	
 	SaveGame.keys["persistentObjectData"] = db

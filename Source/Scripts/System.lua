@@ -51,9 +51,10 @@ World.CreateEntity
 	Sets up entity system table
 --]]
 
-function World.CreateEntity(entity, id, _ptr)
+function World.CreateEntity(entity, id, uid, _ptr)
 	
 	entity.id = id
+	entity.uid = uid
 	
 	entity.sys = { 
 		ptr = _ptr, 

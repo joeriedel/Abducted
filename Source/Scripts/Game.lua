@@ -108,6 +108,9 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "enable_pulse") then
 		PlayerSkills:UnlockPulse()
 		return true
+	elseif (cmd == "checkpoint") then
+		self.showCheckpointNotification = true
+		World.RequestGenerateSaveGame()
 	end
 end
 

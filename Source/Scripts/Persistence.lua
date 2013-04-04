@@ -11,18 +11,16 @@ function Persistence.MakePath(key, args)
 	
 	if args then
 		for k,v in pairs(args) do
-			if (type(k) == "number") then
-				if s ~= nil then
-					s = s.."/"..tostring(v)
-				else
-					s = tostring(v)
-				end
+			if s ~= nil then
+				s = s.."/"..tostring(v)
+			else
+				s = tostring(v)
 			end
 		end
 	end
 	
 	if s ~= nil then
-		return s.."/"..tostring(key)
+		return tostring(key).."/"..s
 	end
 	
 	return tostring(key)

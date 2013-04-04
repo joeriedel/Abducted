@@ -758,6 +758,13 @@ function ManipulatableObject.LoadState(self, state)
 			if (self.listItem == nil) then
 				self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 			end
+			if (self.cameraFocus) then
+				local fov = NumberForString(self.keys.camera_focus_fov, 10)
+				if (fov <= 0) then
+					fov = nil
+				end
+				World.viewController:AddLookTarget(self, fov)
+			end
 		end
 	else
 		self.awake = false

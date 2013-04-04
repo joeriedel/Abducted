@@ -254,7 +254,6 @@ function ViewController.SaveState(self)
 end
 
 function ViewController.LoadState(self, state)
-	self:FadeOutLookTargets(0)
 	self:SetFixedCamera(VecZero(), VecZero())
 	self:HandleCameraCmd(state.lastCmd)
 	self:Sync()

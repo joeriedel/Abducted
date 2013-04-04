@@ -651,8 +651,6 @@ function PlayerPawn.SaveState(self)
 	
 	local state = {
 		shieldActive = tostring(self.shieldActive),
-		manipulateActive = tostring(self.manipulateActive),
-		pulseActive = tostring(self.pulseActive),
 		animState = self.animState,
 		facing = tostring(vertex.pos[3]),
 		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
@@ -670,15 +668,10 @@ function PlayerPawn.LoadState(self, state)
 	if (state.shieldActive == "true") then
 		self:BeginShield()
 	else
+		self.shieldActive = false
 		self:ShowShield(false)
 	end
 	
-	if (state.manipulateActive == "true") then
-		self:NotifyManipulate()
-	elseif (state.pulseActive == "true") then
-		self:BeginPulse()
-	end
-
 	local pos = Vec3ForString(state.pos)
 	local fp  = World.ClipToFloor(
 		{pos[1], pos[2], pos[3] + 8},

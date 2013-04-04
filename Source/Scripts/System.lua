@@ -358,26 +358,31 @@ end
 -----------------------------------------------------------------------------]]
 
 function World.NotifyBackground()
-	if World.game and World.game.NotifyBackground then
-		World.game:NotifyBackground()
+	if (Game.entity and Game.entity.NotifyBackground) then
+		Game.entity:NotifyBackground()
 	end
 end
 
 function World.NotifyResume()
-	if World.game and World.game.NotifyResume then
-		World.game:NotifyResume()
+	if (Game.entity and Game.entity.NotifyResume) then
+		Game.entity:NotifyResume()
 	end
 end
 
 function World.SaveApplicationState()
-	if World.game and World.game.SaveApplicationState then
-		World.game:SaveApplicationState()
+	if (Game.entity and Game.entity.SaveApplicationState) then
+		Game.entity:SaveApplicationState()
 	end
 end
 
 function World.RestoreApplicationState()
-	if World.game and World.game.RestoreApplicationState then
-		World.game:RestoreApplicationState()
+	if (Game.entity and Game.entity.RestoreApplicationState) then
+		Game.entity:RestoreApplicationState()
 	end
 end
 
+function World.SaveGameState()
+	if (Game.entity and Game.entity.SaveCheckpoint) then
+		Game.entity:SaveCheckpoint()
+	end
+end

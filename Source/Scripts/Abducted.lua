@@ -29,7 +29,8 @@ function Abducted.OnLevelStart(self)
 		self:LoadCheckpoint()
 	else
 		local f = function()
-			self:SaveCheckpoint()
+			self.showCheckpointNotification = false
+			World.RequestGenerateSaveGame()
 		end
 		World.globalTimers:Add(f, 1, true) -- let scripts and stuff fire to set states
 	end
@@ -49,11 +50,22 @@ function Abducted.SaveCheckpoint(self)
 end
 
 function Abducted.LoadState(self)
+
+	World.SetGameSpeed(1, 0)
+	self.overlays.Manipulate:FadeOut(0)
+	self.sfx.ManipulateBegin:Stop()
+	self.manipulate = false
+	World.SetEnabledGestures(0)
+	World.FlushInput(true)
+	self.pulse = false
+
 	HUD:LoadState()
+	Arm:LoadState()
 end
 
 function Abducted.SaveState(self)
 	HUD:SaveState()
+	Arm:SaveState()
 end
 
 function Abducted.DoLoadCheckpoint(self)

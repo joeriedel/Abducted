@@ -31,6 +31,7 @@ function GameDB.LoadingSaveGame(self)
 end
 
 function GameDB.SaveCheckpoint(self)
+	GameDB:SaveEvents()
 	GameDB:SavePeristentObjects()
 	Game.entity:SaveState()
 	SaveGame:Save()
@@ -41,13 +42,44 @@ function GameDB.LoadCheckpoint(self)
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
 	self.loadingCheckpoint = true
+	GameDB:LoadEvents()
 	Game.entity:LoadState()
 	GameDB:LoadPersistentObjects()
 	self.loadingCheckpoint = false
 end
 
+function GameDB.SaveEvents(self)
+
+	local t = World.GetEvents() or {}
+	
+	Persistence.WriteNumber(SaveGame, "worldEventQueueSize", #t)
+	
+	for k,v in pairs(t) do
+		Persistence.WriteString(SaveGame, "worldEventQueue", v, k)
+	end
+
+end
+
+function GameDB.LoadEvents(self)
+
+	World.FlushEvents()
+	
+	local n = Persistence.ReadNumber(SaveGame, "worldEventQueueSize", 0)
+	
+	for i = 1,n do
+	
+		local x = Persistence.ReadString(SaveGame, "worldEventQueue", nil, i)
+		World.PostEvent(x)
+	
+	end
+
+end
+
 function GameDB.LoadPersistentObjects(self)
 
+	World.viewController:FadeOutLookTargets(0)
+	ViewController.Targets = {}
+	
 	local db = SaveGame.keys["persistentObjectData"]
 	
 	for k,v in pairs(GameDB.PersistentObjects) do

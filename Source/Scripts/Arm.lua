@@ -721,4 +721,12 @@ function Arm.OnEvent(self, cmd, args)
 
 end
 
+function Arm.SaveState(self)
+
+end
+
+function Arm.LoadState(self)
+
+end
+
 arm_ui = Arm

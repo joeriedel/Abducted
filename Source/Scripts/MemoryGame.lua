@@ -1,22 +1,22 @@
--- TerminalPuzzles.lua
+-- MemoryGame.lua
 -- Copyright (c) 2012 Sunside Inc., All Rights Reserved
 -- Author: Dave Reese
 -- See Abducted/LICENSE for licensing terms
 
-TerminalPuzzles = Class:New()
-TerminalPuzzles.active = false
+MemoryGame = Class:New()
+MemoryGame.active = false
 
 kMGPhase_DiscoverPattern = 0
 kMGPhase_MatchTiles = 1
 
-function TerminalPuzzles.DebugStart(self)
-    TerminalPuzzles:InitGame("memory-game: debug_start", 1, 1)
-    TerminalPuzzles:ShowBoard(true)
-    TerminalPuzzles:StartGame()
+function MemoryGame.DebugStart(self)
+    MemoryGame:InitGame("memory-game: debug_start", 1, 1)
+    MemoryGame:ShowBoard(true)
+    MemoryGame:StartGame()
 end
 
-function TerminalPuzzles.Spawn(self)
-	TerminalPuzzles.entity = self
+function MemoryGame.Spawn(self)
+	MemoryGame.entity = self
 		
 	self:LoadMaterials()
 	self:InitUI()
@@ -25,34 +25,34 @@ function TerminalPuzzles.Spawn(self)
 
 end
 
-function TerminalPuzzles.ShowBoard(self, show)
-	self = TerminalPuzzles.entity
+function MemoryGame.ShowBoard(self, show)
+	self = MemoryGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 	self.widgets.root:SetVisible(show)
 	World.DrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function TerminalPuzzles.InitGame(self, gameType, playerSkill, terminalSkill)
-	self = TerminalPuzzles.entity
+function MemoryGame.InitGame(self, gameType, playerSkill, terminalSkill)
+	self = MemoryGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 end
 
-function TerminalPuzzles.StartGame(self, gameCompleteCallback)
-	self = TerminalPuzzles.entity
+function MemoryGame.StartGame(self, gameCompleteCallback)
+	self = MemoryGame.entity
 	
-	TerminalPuzzles.active = true
+	MemoryGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
 	
-	self.think = TerminalPuzzles.Think
+	self.think = MemoryGame.Think
 	self:SetNextThink(0)
 
     World.SetEnabledGestures(kIG_Line)
 	World.FlushInput(true)
 end
 
-function TerminalPuzzles.EndGame(self, result)
+function MemoryGame.EndGame(self, result)
 
 	
 	World.SetEnabledGestures(0)
@@ -63,14 +63,14 @@ function TerminalPuzzles.EndGame(self, result)
 
 end
 
-function TerminalPuzzles.ResetGame(self)
-	self = TerminalPuzzles.entity
+function MemoryGame.ResetGame(self)
+	self = MemoryGame.entity
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
-	TerminalPuzzles.active = false
+	MemoryGame.active = false
 end
 
-function TerminalPuzzles.CreateLevel1x1(self)
+function MemoryGame.CreateLevel1x1(self)
 	local level = {}
 	
 	level.name = "1x1"
@@ -80,19 +80,17 @@ function TerminalPuzzles.CreateLevel1x1(self)
 	
 	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
 
-	level.board = { 
-		-- row 0
--- keeping these here just for reference in case we want to statically construct
---		{ x=0, y=0, img="symbol_a" }
---		, { x=1, y=0, img="symbol_b" }
-		-- row 2
-		-- row 3
+	level.board = {
+        "symbol_a"
+        , "symbol_b"
+        , "symbol_c"
+        , "symbol_d"
 		}
 	
 	return level
 end
 
-function TerminalPuzzles.CreateBoards(self)
+function MemoryGame.CreateBoards(self)
 	self.db = { }
 	self.db.levels = { }    
 
@@ -109,8 +107,8 @@ function TerminalPuzzles.CreateBoards(self)
 		}
 end
 
-function TerminalPuzzles.OnInputEvent(self,e)
-	self = TerminalPuzzles.entity
+function MemoryGame.OnInputEvent(self,e)
+	self = MemoryGame.entity
 
 -- djr, disabling this for now
 --	if (e.type == kI_KeyDown) then
@@ -142,8 +140,8 @@ function TerminalPuzzles.OnInputEvent(self,e)
 	return false
 end
 
-function TerminalPuzzles.OnInputGesture(self,g)
-	self = TerminalPuzzles.entity
+function MemoryGame.OnInputGesture(self,g)
+	self = MemoryGame.entity
 
 --  djr, disabling this for now (joe added this i think)
 --	if (g.id ~= kIG_Line) then
@@ -168,7 +166,7 @@ function TerminalPuzzles.OnInputGesture(self,g)
 	return true
 end
 
-function TerminalPuzzles.InitUI(self)
+function MemoryGame.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = 60
 	self.REFLEX_BOARD_OFFSET =80
@@ -198,7 +196,7 @@ function TerminalPuzzles.InitUI(self)
 	self.widgets.goals = { }
 	self.widgets.board = { }		
 	self.widgets.grid = { }
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=TerminalPuzzles.OnInputEvent, OnInputGesture=TerminalPuzzles.OnInputGesture})
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=MemoryGame.OnInputEvent, OnInputGesture=MemoryGame.OnInputGesture})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	
 	self.widgets.root:SetVisible(false)
@@ -211,8 +209,8 @@ function TerminalPuzzles.InitUI(self)
 --	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
 -- djr, border might not be needed
 --	self.widgets.root:AddChild(self.widgets.border)
-	self.widgets.root:AddChild(self.widgets.board)	
-		
+	self.widgets.root:AddChild(self.widgets.board)
+
 	COutLine(kC_Debug, "memory.level.name=" .. self.state.level.name)
 	for i,v in ipairs(self.state.level.goal) do 
 		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
@@ -224,19 +222,21 @@ function TerminalPuzzles.InitUI(self)
 	end
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
-	for i,v in ipairs(self.state.level.board) do
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
-		local index = self:ConvertCoordToIndex(v.x,v.y)
-		b.state = self:CreateState(v.img)
-		self.widgets.root:AddChild(b)
-		self.widgets.grid[index] = b		
-		self:SetPositionByGrid(b,v.x,v.y)
-	end
+--    for yo = 0, yo < 2, yo = yo + 1 do
+--        for xo = 0, xo < self.INDEX_MAX_X, xo = xo + 1 do
+--            local v = self.state.level.board[random(#self.state.level.board)];
+--            local b = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
+--            b.state = self:CreateState(v.img)
+--            self.widgets.root:AddChild(b)
+--            self.widgets.grid[index] = b
+--            self:SetPositionByGrid(b,v.x,v.y)
+--        end
+--    end
 
 	COutLine(kC_Debug, "Board Completed")		
 end
 
-function TerminalPuzzles.LoadMaterials(self)
+function MemoryGame.LoadMaterials(self)
 	
 	self.gfx = {}
 --	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
@@ -266,7 +266,7 @@ function TerminalPuzzles.LoadMaterials(self)
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
 end
 
-function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
+function MemoryGame.SetPositionByGrid(self,w,x,y)
 	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
 	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
 
@@ -274,7 +274,7 @@ function TerminalPuzzles.SetPositionByGrid(self,w,x,y)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
-function TerminalPuzzles.Vec2Normal(self,x,y)
+function MemoryGame.Vec2Normal(self,x,y)
 	local n = math.sqrt(x * x + y * y)
 	--COutLine(kC_Debug,"Vec2Normal: x=%.02f, y=%.02f, n = %f",x,y,n)	
 	local vec2 = { }
@@ -287,7 +287,7 @@ function TerminalPuzzles.Vec2Normal(self,x,y)
 	return vec2
 end
 
-function TerminalPuzzles.LerpVec2(self,v,heading,dt,speed)	
+function MemoryGame.LerpVec2(self,v,heading,dt,speed)	
 	local dx = heading.x * dt * speed
 	local dy = heading.y * dt * speed
 	
@@ -301,7 +301,7 @@ function TerminalPuzzles.LerpVec2(self,v,heading,dt,speed)
 	return vec2	
 end
 
-function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)	
+function MemoryGame.LerpWidget(self,widget,heading,dt,speed)	
 	local r = widget:Rect()
 	
 	local width = r[3]
@@ -331,7 +331,7 @@ function TerminalPuzzles.LerpWidget(self,widget,heading,dt,speed)
 	return o
 end
 
-function TerminalPuzzles.GetGridCellFromVec2(self,v)
+function MemoryGame.GetGridCellFromVec2(self,v)
 	local x = (v.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
 	local y = (v.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
 	local ix = math.floor(x)
@@ -344,7 +344,7 @@ function TerminalPuzzles.GetGridCellFromVec2(self,v)
 	return vec2
 end
 
-function TerminalPuzzles.GetGridCell(self,widget)
+function MemoryGame.GetGridCell(self,widget)
 	local pos = self:GetPosition(widget)
 
 	local x = (pos.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
@@ -359,7 +359,7 @@ function TerminalPuzzles.GetGridCell(self,widget)
 	return vec2
 end
 
-function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
+function MemoryGame.IsGridCellOnBoard(self,x,y)
 	if (x >= 0 and y >= 0 and x < self.INDEX_MAX_X and y < self.INDEX_MAX_Y) then
 		return true
 	end
@@ -367,11 +367,11 @@ function TerminalPuzzles.IsGridCellOnBoard(self,x,y)
 	return false
 end
 
-function TerminalPuzzles.ConvertCoordToIndex(self,x,y)
+function MemoryGame.ConvertCoordToIndex(self,x,y)
 	return bit.bor(bit.lshift(y, 16), x)
 end
 
-function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
+function MemoryGame.ConstrainPointToBoard(self,x,y)
 	if (x < self.COORD_MIN_X) then
 		x = self.COORD_MIN_X
 	end
@@ -391,7 +391,7 @@ function TerminalPuzzles.ConstrainPointToBoard(self,x,y)
 	return vec2			
 end
 
-function TerminalPuzzles.GetPosition(self,w)
+function MemoryGame.GetPosition(self,w)
 	local r = w:Rect()
 	local vec2 = { } 
 	vec2.x = r[1] + r[3]/2
@@ -400,13 +400,13 @@ function TerminalPuzzles.GetPosition(self,w)
 end
 
 
-function TerminalPuzzles.CreateState(self,architype)
+function MemoryGame.CreateState(self,architype)
 	local state = { }
 	state.architype = architype
 	return state
 end
 
-function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
+function MemoryGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	--COutLine(kC_Debug,"SetLineSegment start/end @ start=%i,%i, end=%i,%i",startPos.x,startPos.y,endPos.x,endPos.y)		
 
 	local x = startPos.x
@@ -445,7 +445,7 @@ function TerminalPuzzles.SetLineSegmentPosition(self,line,startPos,endPos)
 	line:SetRect(r)
 end
 
-function TerminalPuzzles.CollideWithLine(self,x,y,ignore)
+function MemoryGame.CollideWithLine(self,x,y,ignore)
 	local count = #self.widgets.lines
 	if (ignore) then
 		count = count - 2
@@ -461,7 +461,7 @@ function TerminalPuzzles.CollideWithLine(self,x,y,ignore)
 	return false
 end
 
-function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
+function MemoryGame.CollideWithBoard(self,x,y,isPlayer)
 	if (x < self.COORD_MIN_X) then
 		COutLine(kC_Debug,"CollideWihtBoard found min X @ x=%i, y=%i",x,y)		
 		return true
@@ -509,7 +509,7 @@ function TerminalPuzzles.CollideWithBoard(self,x,y,isPlayer)
 	return true
 end
 
-function TerminalPuzzles.Think(self,dt)
+function MemoryGame.Think(self,dt)
 	if (self.state.gameOver) then
 		self.state.gameOverTimer = self.state.gameOverTimer - dt
 		if (self.state.gameOverTimer < 0) then
@@ -648,4 +648,4 @@ function TerminalPuzzles.Think(self,dt)
 --	end
 end
 
-terminal_puzzles = TerminalPuzzles
+memory_game = MemoryGame

@@ -236,21 +236,21 @@ end
 function TerminalScreen.HackPressed()
 	Abducted.entity.eatInput = true -- during transition
 	UI:BlendTo({1,1,1,1}, 0.3)
-	TerminalPuzzles:InitGame("hack", 1, 1)
+	ReflexGame:InitGame("hack", 1, 1)
 	
 	local entity = TerminalScreen.PopupEntity
 	TerminalScreen.CancelUI()
 	
 	local f = function ()
 		UI:BlendTo({0,0,0,0}, 0.3)
-		TerminalPuzzles:ShowBoard(true)
+        ReflexGame:ShowBoard(true)
 		
 		local f = function ()
 			local f = function(result)
 				TerminalScreen.GameComplete(entity, result)
 			end
 			Abducted.entity.eatInput = false
-			TerminalPuzzles:StartGame(f)
+            ReflexGame:StartGame(f)
 		end
 		
 		World.globalTimers:Add(f, 0.3, true)
@@ -269,8 +269,8 @@ function TerminalScreen.GameComplete(self, result)
 	local f = function()
 		Abducted.entity.eatInput = false
 		UI:BlendTo({0,0,0,0}, 0.3)
-		TerminalPuzzles:ShowBoard(false)
-		TerminalPuzzles:ResetGame()
+        ReflexGame:ShowBoard(false)
+        ReflexGame:ResetGame()
 		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.3, true)

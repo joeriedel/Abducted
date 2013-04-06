@@ -59,19 +59,24 @@ function Abducted.OnInputEvent(self, e)
 	if (Arm.active) then
 		return false
 	end
-	if (TerminalPuzzles.active) then
+	if (MemoryGame.active) then
 		return false
-	end
+    end
+    if (ReflexGame.active) then
+        return false
+    end
 	if (self.manipulate) then
 		return false
 	end
-	if (TerminalPuzzles.active) then
+	if (MemoryGame.active) then
 		return false
-	end
-	if (TerminalScreen.Touch(e)) then
+    end
+    if (ReflexGame.active) then
+        return false
+    end
+	if (TerminalScreen.Touch.Touch(e)) then
 		return true
-	end
-	
+    end
 	local handled, action = PlayerInput:OnInputEvent(e)
 	return handled
 end
@@ -81,9 +86,13 @@ function Abducted.OnInputGesture(self, g)
 		return false
 	end
 	
-	if (TerminalPuzzles.active) then
+	if (MemoryGame.active) then
 		return false
-	end
+    end
+
+    if (ReflexGame.active) then
+        return false
+    end
 	
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then

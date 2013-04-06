@@ -259,7 +259,7 @@ function ReflexGame.InitUI(self)
 	self.widgets.spiders = { }
 	self.widgets.grid = { }
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
-	World.SetRootWidget(UI.kLayer_ReflexGame, self.widgets.root)
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	
 	self.widgets.root:SetVisible(false)
 	
@@ -334,7 +334,7 @@ function ReflexGame.LoadMaterials(self)
 	self.gfx.symbol_d = World.Load("Reflex-Game/reflex-symbol-d_M")
 	
 	self.typefaces = {}
-	self.typefaces.BigText = World.Load("UI/ReflexGameBigFont_TF")				
+	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
 end
 
 function ReflexGame.SetPositionByGrid(self,w,x,y)
@@ -717,5 +717,4 @@ function ReflexGame.Think(self,dt)
 	end	
 end
 
---terminal_puzzles = ReflexGame
 reflex_game = ReflexGame

@@ -207,8 +207,10 @@ end
 
 -- djr, not sure if this is right or will work
 function HUD.MemoryGamePressed(self, widget)
-    COutLine(kC_Debug, "Memory Game Pressed!")
-   TerminalPuzzles:DebugStart();
+    COutLine(kC_Debug, "Reflex Game Pressed!")
+    ReflexGame:DebugStart();
+--    COutLine(kC_Debug, "Memory Game Pressed!")
+--    MemoryGame:DebugStart();
 end
 
 function HUD.RechargePulse(self)

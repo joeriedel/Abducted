@@ -96,6 +96,7 @@ function World.BuiltIns()
 		"ui_code",
 		"game_code",
 		"scexec_code",
-		"terminal_puzzles"
+		"memory_game",
+        "reflex_game"
 	}
 end

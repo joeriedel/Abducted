@@ -42,7 +42,9 @@ end
 function Cinematics.PlayLevelCinematics(self)
 	World.PlayCinematic("environment", kCinematicFlag_CanPlayForever, 0)
 	World.PlayCinematic("environment_loop", kCinematicFlag_Loop, 0)
-	Cinematics:Play("intro")
+	if (not GameDB.loadingCheckpoint) then
+		Cinematics:Play("intro")
+	end
 end
 
 Cinematics.Callbacks = {}

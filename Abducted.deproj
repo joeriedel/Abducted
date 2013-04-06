@@ -7,6 +7,9 @@
     <filename>Source\Scripts\Actor.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\AlertPanel.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Animation.lua</filename>
   </file>
   <file>

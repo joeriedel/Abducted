@@ -16,7 +16,7 @@
 #include <Engine/Persistence.h>
 #endif
 
-#if defined(RAD_OPT_IOS_DEVICE) && defined(RAD_TARGET_GOLDEN)
+#if defined(RAD_OPT_IOS_DEVICE) && defined(RAD_TARGET_GOLDEN) && !defined(RAD_OPT_SHIP)
 #define VALIDATE_NEON_SKIN
 #endif
 
@@ -78,8 +78,8 @@ bool AbductedApp::InitWindow() {
 
 	const char *vidString = "1280x720";
 
-	vidString = settings->keys->StringForKey("vidMode", vidString);
-	mode.fullscreen = settings->keys->BoolForKey("fullscreen", false);
+	vidString = settings->StringForKey("vidMode", vidString);
+	mode.fullscreen = settings->BoolForKey("fullscreen", false);
 	
 	sscanf(vidString, "%dx%d", &mode.w, &mode.h);
 

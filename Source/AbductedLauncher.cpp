@@ -42,7 +42,13 @@ enum {
 namespace {
 
 bool LoadPixmap(const char *filename, QPixmap &pixmap) {
-	file::MMapping::Ref mm = App::Get()->engine->sys->files->MapFile(filename, ZTools);
+	int mask = App::Get()->engine->sys->files->globalMask;
+	App::Get()->engine->sys->files->globalMask = file::kFileMask_Base;
+	
+	file::MMapping::Ref mm = App::Get()->engine->sys->files->MapFile(filename, ZEngine);
+	
+	App::Get()->engine->sys->files->globalMask = mask;
+	
 	if (!mm)
 		return false;
 
@@ -62,7 +68,7 @@ int AbductedApp::DoLauncher() {
 #if defined(RAD_OPT_WIN)
 	{
 		QPixmap icon;
-		if (LoadPixmap("icon.tga", icon))
+		if (LoadPixmap("icon.png", icon))
 			qApp->setWindowIcon(QIcon(icon));
 	}
 #endif
@@ -295,10 +301,10 @@ void AbductedLauncher::Center(const QRect &rect) {
 void AbductedLauncher::PlayMusic() {
 	enum { kNumSongs = 4 };
 	static const char *s_songs[kNumSongs] = {
-		"Audio/EntertheFight",
-		"Audio/ch2_audio",
-		"Audio/demon_background",
-		"Audio/rain_wind_thunder01"
+		"Audio/Amb04-Cine4",
+		"Audio/Amb06-Cine6",
+		"Audio/Amb20-Atmos3",
+		"Audio/Amb24-The Event"
 	};
 
 	srand((unsigned int)xtime::ReadMilliseconds());

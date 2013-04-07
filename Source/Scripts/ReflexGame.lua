@@ -213,10 +213,10 @@ end
 
 function ReflexGame.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = 60
-	self.REFLEX_BOARD_OFFSET = 80
-	self.INDEX_MAX_X = 21
-	self.INDEX_MAX_Y = 15
+	self.REFLEX_CELL_SIZE = 64
+	self.REFLEX_BOARD_OFFSET = 0
+	self.INDEX_MAX_X = 16
+	self.INDEX_MAX_Y = 9
 	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
@@ -256,14 +256,14 @@ function ReflexGame.InitUI(self)
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	
 	self.widgets.root:SetVisible(false)
-	
+
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
 	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
 	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
 	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
-	self.widgets.root:AddChild(self.widgets.border)	
-	self.widgets.root:AddChild(self.widgets.board)	
-		
+	self.widgets.root:AddChild(self.widgets.border)
+	self.widgets.root:AddChild(self.widgets.board)
+
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 
 	COutLine(kC_Debug, "Creating Board")	
@@ -300,8 +300,8 @@ function ReflexGame.LoadMaterials(self)
 	
 	self.gfx = {}
 	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
-	self.gfx.board = World.Load("Reflex-Game/reflex-board_M")
-	self.gfx.border = World.Load("Reflex-Game/reflex-border_M")
+	self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
+	self.gfx.border = World.Load("UI/arm_screen1_M")
 
     self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
     self.gfx.mark_line_v = self.gfx.mark_current

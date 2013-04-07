@@ -31,6 +31,7 @@ function GameDB.LoadingSaveGame(self)
 end
 
 function GameDB.SaveCheckpoint(self)
+	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	GameDB:SaveEvents()
 	GameDB:SavePeristentObjects()
 	Game.entity:SaveState()
@@ -192,7 +193,6 @@ end
 
 function GameDB.IncrementTime(self, dt)
 	self.realTime = self.realTime + dt
-	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	self:UpdateTimes()
 end
 

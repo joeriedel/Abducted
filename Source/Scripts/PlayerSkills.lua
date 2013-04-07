@@ -12,9 +12,9 @@ PlayerSkills.ManipulateRechargeTimes = { -- 3 levels of manipulate upgrades
 	5
 }
 
-PlayerSkills.MaxShieldTime = 1000
+PlayerSkills.MaxShieldTime = 30
 PlayerSkills.ShieldRechargeMultipliers = {
-	0.001,
+	1,
 	0.66,
 	0.5
 }

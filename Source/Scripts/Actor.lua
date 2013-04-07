@@ -45,12 +45,31 @@ function Actor.OnEvent(self, cmd, args)
 		self.visible = true
 		if (self.model) then
 			self.model.dm:SetVisible(true)
+			self.model.dm:BlendTo({1,1,1,1}, 0)
 		end
 		return true
 	elseif (cmd == "hide") then
 		self.visible = false
 		if (self.model) then
 			self.model.dm:SetVisible(false)
+		end
+		return true
+	elseif (cmd == "fadein") then
+		if (not self.visible) then
+			self.visible = true
+			if (self.model) then
+				self.model.dm:BlendTo({1,1,1,0}, 0)
+				self.model.dm:SetVisible(true)
+			end
+		end
+		if (self.model) then
+			self.model.dm:BlendTo({1,1,1,1}, tonumber(args))
+		end
+		return true
+	elseif (cmd == "fadeout") then
+		self.visible = false
+		if (self.model) then
+			self.model.dm:BlendTo({1,1,1,0}, tonumber(args))
 		end
 		return true
 	elseif (cmd == "play") then

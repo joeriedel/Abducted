@@ -11,6 +11,18 @@ function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
 	Entity.Spawn(self)
 	
+	-- setup auto-face smoothing
+	local angleVertex = self:Angles()
+	angleVertex.mass = 5
+	angleVertex.drag[1] = 7
+	angleVertex.drag[2] = 7
+	angleVertex.friction = 0.5
+	self:SetAngles(angleVertex)
+	
+	local spring = self:AngleSpring()
+	spring.elasticity = 160
+	self:SetAngleSpring(spring)
+	
 	self.model = LoadSkModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.vision = self.model.dm:CreateInstance()
@@ -18,8 +30,28 @@ function ManipulatableObject.Spawn(self)
 	self.model.vision:BlendTo({1,1,1,0}, 0)
 	self:SetFacing(NumberForString(self.keys.angle, 0))
 	
+	self.model.dm:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
+	self.model.vision:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
+	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
+	
+	if (self.keys.damage_bone) then
+		local boneIdx = self.model.dm:FindBone(self.keys.damage_bone)
+		if (boneIdx < 0) then
+			error(string.format("ManipulatableObject: bone named %s not found", self.keys.damage_bone))
+		end
+		local size = Vec3ForString(self.keys.damage_bone_size, {16, 16, 16})
+		VecScale(size, 0.5)
+		self:SetTouchBone(self.model.dm, boneIdx)
+		self:SetTouchBoneBounds(VecNeg(size), size)
+		self:SetTouchClassBits(kEntityClass_Player)
+		self.canDamage = true
+	end
+	
+	self.keepAttacking = BoolForString(self.keys.keep_attacking, false)
+	self.cameraFocus = BoolForString(self.keys.camera_focus, false)
+	self.autoFace = BoolForString(self.keys.auto_face, false)
 	
 	self.skillRequired = NumberForString(self.keys.required_skill, 0)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
@@ -28,6 +60,8 @@ function ManipulatableObject.Spawn(self)
 	self.enabled = false
 	self.canAttack = false
 	self.swipePos = {0, 0, 0}
+	
+	self:Show(BoolForString(self.keys.visible, true))
 	
 	if (not self.left) then
 		self.left = {0, 1, 0}
@@ -49,6 +83,17 @@ function ManipulatableObject.Spawn(self)
 	else
 		self:Dormant()
 	end
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function ManipulatableObject.PostSpawn(self)
@@ -96,6 +141,10 @@ function ManipulatableObject.LoadSounds(self)
 		self.sounds.Dormant:SetLoop(true)
 	end
 	
+	if (self.keys.sleep_sound) then
+		self.sounds.Sleep = World.LoadSound(self.keys.sleep_sound)
+	end
+	
 	if (self.keys.awaken_sound) then
 		self.sounds.Awaken = World.LoadSound(self.keys.awaken_sound)
 	end
@@ -127,38 +176,117 @@ function ManipulatableObject.LoadSounds(self)
 
 end
 
+function ManipulatableObject.Show(self, show)
+	self.visible = show
+	self.model.dm:SetVisible(show)
+	self.model.vision:SetVisible(show)
+end
+
 function ManipulatableObject.OnEvent(self, cmd, args)
 	COutLineEvent("ManipulatableObject", cmd, args)
 	
 	if (cmd == "activate") then
 		self:Awaken()
 		return true
-	elseif (cmd == "attack") then
-		self:Attack(args)
+	elseif(cmd == "deactivate") then
+		self:Sleep()
 		return true
-	elseif (cmd == "touch_trigger_touched") then
-		if (self.sounds.Hit) then
-			self.sounds.Hit:Play(kSoundChannel_FX, 0)
+	elseif (cmd == "attack") then
+		self.attackArgs = args
+		self:Attack()
+		return true
+	elseif (cmd == "idle") then
+		if (self.enabled) then
+			self:Idle()
 		end
-		if (self.keys.attack_brush) then
-			World.PostEvent(self.keys.attack_brush.." disable")
-		end
+		return true
+	elseif (cmd == "show") then
+		self:Show(true)
+		return true
+	elseif (cmd == "hide") then
+		self:Show(false)
+		return true
 	end
 	
 	return false
 	
 end
 
+function ManipulatableObject.OnTouchEnter(self, instigator)
+
+	if (self.keys.on_player_attacked) then
+		World.PostEvent(self.keys.on_player_attacked)
+	end
+	
+	self.hitPlayer = true
+
+end
+
+function ManipulatableObject.OnTouchExit(self)
+
+end
+
 function ManipulatableObject.Dormant(self)
 	COutLine(kC_Debug, "ManipulatableObject.Dormant")
+	
+	self.awake = false
+	
+	self.think = nil
 	self:PlayAnim("dormant", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:Play(kSoundChannel_FX, 0)
 	end
 end
 
+function ManipulatableObject.Sleep(self)
+	COutLine(kC_Debug, "ManipulatableObject.Sleep")
+	
+	self.think = nil
+	
+	if (not self.awake) then
+		return
+	end
+	
+	self.awake = false
+	self.enabled = false
+	self.canAttack = false
+	
+	if (self.listItem) then
+		LL_Remove(ManipulatableObject.Objects, self.listItem)
+		self.listItem = nil
+	end
+	
+	self:SetAutoFace(nil)
+	World.viewController:RemoveLookTarget(self)
+	
+	local blend = self:PlayAnim("sleep", self.model)
+	if (self.sounds.Sleep) then
+		self.sounds.Sleep:Play(kSoundChannel_FX, 0)
+	end
+	
+	if (blend) then
+		blend.Seq(ManipulatableObject.Dormant)
+	else
+		self:Dormant()
+	end
+end
+
 function ManipulatableObject.Awaken(self)
 	COutLine(kC_Debug, "ManipulatableObject.Awaken")
+	self.think = nil
+	self.awake = true
+	self.canAttack = true
+	
+	if (self.autoFace) then
+		self:SetAutoFace(World.playerPawn)
+	end
+	if (self.cameraFocus) then
+		local fov = NumberForString(self.keys.camera_focus_fov, 10)
+		if (fov <= 0) then
+			fov = nil
+		end
+		World.viewController:AddLookTarget(self, fov)
+	end
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeVolume(0, 1)
@@ -175,47 +303,94 @@ end
 
 function ManipulatableObject.Idle(self)
 	COutLine(kC_Debug, "ManipulatableObject.Idle")
-	self:PlayAnim("idle", self.model)
+	self.think = nil
+	self.awake = true
 	self.canAttack = true
+	self:PlayAnim("idle", self.model)
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end
 	
+	if (self.listItem == nil) then
+		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+	end
 	if (not self.enabled) then
 		self.enabled = true
-		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		if (Game.entity.manipulate) then -- show ourselves
 			ManipulatableObject.NotifyManipulate(true)
 		end
 	end
 end
 
-function ManipulatableObject.Attack(self, args)
-	if (not self.canAttack) then
+function ManipulatableObject.Attack(self)
+	if (not (self.canAttack and self.canDamage)) then
 		COutLine(kC_Debug, "ManipulatableObject.Attack(ignored): cannot attack right now.")
 		return
 	end
 	
 	COutLine(kC_Debug, "ManipulatableObject.Attack")
-	
+		
+	self.think = nil
+	self.hitPlayer = false
 	self.canAttack = false
-	local blend = self:PlayAnim(args, self.model)
+	self.nextAttackTime = nil
+	local args = Tokenize(self.attackArgs)
+	
+	local blend = self:PlayAnim(args[1], self.model)
 	if (blend) then
 		blend.Seq(ManipulatableObject.AttackFinish)
 		if (self.sounds.Attack) then
 			self.sounds.Attack:Play(kSoundChannel_FX, 0)
 		end
-		if (self.keys.attack_brush) then
-			World.PostEvent(self.keys.attack_brush.." enable")
+		self:EnableTouch(true)
+		
+		if (self.keys.on_attack_begin) then
+			World.PostEvent(self.keys.on_attack_begin)
 		end
+		
+		local min = nil
+		local max = nil
+		
+		if (args[2]) then
+			min = tonumber(args[2])
+		end
+		
+		if (args[3]) then
+			max = tonumber(args[3])
+		end
+		
+		if (min) then
+			if (max) then
+				self.nextAttackTime = {min, max}
+			else
+				self.nextAttackTime = {min, min}
+			end
+		end
+		
 	end
 end
 
 function ManipulatableObject.AttackFinish(self)
-	if (self.keys.attack_brush) then
-		World.PostEvent(self.keys.attack_brush.." disable")
-	end
+	COutLine(kC_Debug, "ManipulatableObject.AttackFinish")
+	
 	self:Idle()
+	self:EnableTouch(false)
+	
+	if (self.keys.on_attack_end) then
+		World.PostEvent(self.keys.on_attack_end)
+	end
+	
+	if (self.hitPlayer and (not self.keepAttacking)) then
+		self.nextAttackTime = nil
+	end
+	
+	if (self.nextAttackTime) then
+		self.think = ManipulatableObject.Attack
+		local t = FloatRand(self.nextAttackTime[1], self.nextAttackTime[2])
+		COutLine(kC_Debug, "ManipulatableObject: attacking again in %f seconds", t)
+		self:SetNextThink(t)
+		self.nextAttackTime = nil
+	end
 end
 
 function ManipulatableObject.NotifyManipulate(enabled)
@@ -289,56 +464,58 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 	while (x) do
 	
-		local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
-		local screen,r = World.Project(world)
-		local dx, dy, dd
-		
-		if (r) then
+		if (x.visible) then
+			local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
+			local screen,r = World.Project(world)
+			local dx, dy, dd
 			
-			-- must be on screen
-			if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
-			    (screen[2] >= 1) and (screen[2] < UI.systemScreen.height)) then
+			if (r) then
 				
-				local keep = false
-				
-				-- closer than another matching object?
-				local worldDist = VecDot(world, cameraFwd)
-				if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
-					-- capsule distance
+				-- must be on screen
+				if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
+					(screen[2] >= 0) and (screen[2] < UI.systemScreen.height)) then
 					
-					local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
-					if (segPos < lineSegDist[1]) then
-						-- distance to endpoints check:
-						dx = screen[1] - lineStart[1]
-						dy = screen[2] - lineStart[2]
-						dd = math.sqrt(dx*dx + dy*dy)
-						if (dd <= kMaxDist) then
-							keep = true
-						end
-					elseif (segPos > lineSegDist[2]) then
-						dx = screen[1] - lineEnd[1]
-						dy = screen[2] - lineEnd[2]
-						dd = math.sqrt(dx*dx + dy*dy)
-						if (dd <= kMaxDist) then
-							keep = true
-						end
-					else
-						-- orthogonal distance check
-						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
-						dd = math.abs(dd - lineDist)
+					local keep = false
+					
+					-- closer than another matching object?
+					local worldDist = VecDot(world, cameraFwd)
+					if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
+						-- capsule distance
 						
-						if (dd <= kMaxDist) then
-							keep = true
+						local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
+						if (segPos < lineSegDist[1]) then
+							-- distance to endpoints check:
+							dx = screen[1] - lineStart[1]
+							dy = screen[2] - lineStart[2]
+							dd = math.sqrt(dx*dx + dy*dy)
+							if (dd <= kMaxDist) then
+								keep = true
+							end
+						elseif (segPos > lineSegDist[2]) then
+							dx = screen[1] - lineEnd[1]
+							dy = screen[2] - lineEnd[2]
+							dd = math.sqrt(dx*dx + dy*dy)
+							if (dd <= kMaxDist) then
+								keep = true
+							end
+						else
+							-- orthogonal distance check
+							dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
+							dd = math.abs(dd - lineDist)
+							
+							if (dd <= kMaxDist) then
+								keep = true
+							end
 						end
 					end
+					
+					if (keep) then
+						bestWorldDist = worldDist
+						best = x.entity
+					end
 				end
-				
-				if (keep) then
-					bestWorldDist = worldDist
-					best = x.entity
-				end
+			
 			end
-		
 		end
 		
 		x = LL_Next(x)
@@ -445,7 +622,8 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	
 	self.manipulate = objDir
 	self.canAttack = false
-	self:PlayAnim(state, self.model).Seq(f)
+	self.enabled = false
+	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
 	
 	-- no longer manipulatable
 	if (self.listItem) then
@@ -463,6 +641,10 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 		end
 		World.gameTimers:Add(f, self.manipulateWindow, true)
+	else
+		-- object is not going to reset
+		self.saveManipulateDir = objDir
+		World.viewController:RemoveLookTarget(self)
 	end
 	
 	-- tell the player they moved us
@@ -537,6 +719,66 @@ function ManipulatableObject.DoManipulateDamage(self, dir)
 	end
 end
 
+function ManipulatableObject.SaveState(self)
+
+	local state = {
+		awake = tostring(self.awake),
+		visible = tostring(self.visible)
+	}
+	
+	if (self.saveManipulateDir) then
+		state.manipulate = self.saveManipulateDir
+	end
+
+	return state
+end
+
+function ManipulatableObject.LoadState(self, state)
+
+	self:Show(state.visible == "true")
+	self.think = nil
+	self.model.vision:BlendTo({1,1,1,0}, 0)
+	
+	if (state.awake == "true") then
+		self.awake = true
+		if (state.manipulate) then
+			self.canAttack = false
+			self.enabled = false
+			self.saveManipulateDir = state.manipulate
+			-- no longer manipulatable
+			if (self.listItem) then
+				LL_Remove(ManipulatableObject.Objects, self.listItem)
+				self.listItem = nil
+			end
+			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
+		else
+			self.enabled = true
+			self.canAttack = true
+			self:PlayAnim("idle", self.model)
+			if (self.listItem == nil) then
+				self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+			end
+			if (self.cameraFocus) then
+				local fov = NumberForString(self.keys.camera_focus_fov, 10)
+				if (fov <= 0) then
+					fov = nil
+				end
+				World.viewController:AddLookTarget(self, fov)
+			end
+		end
+	else
+		self.awake = false
+		self.enabled = false
+		self.canAttack = false
+		if (self.listItem) then
+			LL_Remove(ManipulatableObject.Objects, self.listItem)
+			self.listItem = nil
+		end
+		self.model:BlendImmediate("dormant")
+	end
+
+end
+
 --[[---------------------------------------------------------------------------
 	Tentacles
 -----------------------------------------------------------------------------]]
@@ -548,10 +790,7 @@ function Tentacle.Spawn(self)
 	
 	self:SetMins({-24, -24, -48+64})
 	self:SetMaxs({ 24,  24,  48+64})
-	self.model.dm:ScaleTo({0.5, 0.5, 0.5}, 0)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	
-	self.model.vision:ScaleTo({0.5, 0.5, 0.5}, 0)
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	
 	self.manipulateShift = {0,0,64}

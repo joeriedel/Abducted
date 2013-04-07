@@ -18,11 +18,16 @@ function Worldspawn.Spawn(self)
 	SaveGame:EnableCloudStorage(World.cloudEnabled)
 	
 	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
-	Arm:LoadChats(StringForString(self.keys.arm_chats, "Ep1Crushed"))
+	Arm:LoadChats(self.keys.arm_chats)
+	
+	if (StringForString(self.keys.arm_state, "unlocked") == "locked") then
+		Arm:ChatLockout()
+	end
 end
 
 function Worldspawn.PostSpawn(self)
 	GameNetwork.LogEvent("Loaded ("..self.keys.mappath..")")
+	Game.entity:PostSpawn()
 end
 
 function Worldspawn.OnEvent(self, cmd, args)

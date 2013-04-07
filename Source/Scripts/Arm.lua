@@ -329,6 +329,11 @@ function Arm.ReturnPressed(widget)
 		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.2, true)
+	
+	if (Arm.armLockTimer) then
+		Arm.armLockTimer:Clean()
+		Arm.armLockTimer = nil
+	end
 end
 
 function Arm.DatabasePressed(widget)
@@ -408,6 +413,17 @@ function Arm.Start(self, mode)
 	end
 	
 	World.globalTimers:Add(f, 0.2, true)
+end
+
+function Arm.Signal(self, topic)
+
+	if (topic) then
+		self.requiredTopic = topic
+		HUD:SignalArm(true)
+	end
+	
+	Arm:ClearLockout()
+	
 end
 
 function Arm.SwitchToChat(self)
@@ -500,6 +516,11 @@ function Arm.SwitchMode(self, mode)
 
 	if (self.mode == mode) then
 		return
+	end
+	
+	if (self.armLockTimer) then
+		self.armLockTimer:Clean()
+		self.armLockTimer = nil
 	end
 	
 	self.mode = mode
@@ -697,6 +718,14 @@ function Arm.EnableMenuButtons(self, enable)
 end
 
 function Arm.OnEvent(self, cmd, args)
+
+end
+
+function Arm.SaveState(self)
+
+end
+
+function Arm.LoadState(self)
 
 end
 

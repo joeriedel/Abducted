@@ -75,28 +75,27 @@ function Arm.LoadLog(self)
 	for k,v in pairs(events) do
 	
 		-- parse the kind of event
-		local strings = string.split(v, " ")
-		local time = strings[1]
+		local time = v.time
 		
 		local text = nil
 		local typeface = nil
 		
-		if (strings[2] == "!ARM_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
+		if (v.style == "!ARM_REPLY") then
+			text = kEventLogArm.." "..v.text
 			typeface = self.typefaces.Chat
-		elseif (strings[2] == "!ARM_LOCKED_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
+		elseif (v.style == "!ARM_LOCKED_REPLY") then
+			text = kEventLogArm.." "..v.text
 			typeface = self.typefaces.ChatLocked
-		elseif (strings[2] == "!ARM_ASK") then
-			text = kEventLogYou.." "..StringTable.Get(strings[3], Arm.Chats.Strings)
+		elseif (v.style == "!ARM_ASK") then
+			text = kEventLogYou.." "..v.text
 			typeface = self.typefaces.LogArmAsk
-		elseif (strings[2] == "!ARM_LOCKED") then
+		elseif (v.style == "!ARM_LOCKED") then
 			text = kEventLogArmLocked
 			typeface = self.typefaces.ChatLocked
-		elseif (strings[2] == "!DISCOVERY") then
+		elseif (v.style == "!DISCOVERY") then
 			text = StringTable.Get(strings[2])
 			typeface = self.typefaces.LogDiscovery
-		elseif (strings[2] == "!DISCOVERY_TEXT") then
+		elseif (v.style == "!DISCOVERY_TEXT") then
 			text = strings[2]
 			typeface = self.typefaces.LogDiscovery
 		else

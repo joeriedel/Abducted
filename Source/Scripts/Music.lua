@@ -7,11 +7,23 @@ Music = Class:New()
 
 function Music.Spawn(self)
 	Music.entity = self
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects["music"] = io
 end
 
 function Music.Play(self)
+	self.think = nil
+
 	if (self.name and (self.name == self.args[1])) then
-		self.think = nil
 		-- already playing
 		return
 	end
@@ -38,7 +50,25 @@ function Music.Play(self)
 	end
 	
 	self.args = nil
-	self.think = nil
+	self.think = Music.Check
+	self:SetNextThink(1)
+	
+	World.PostEvent("shiphum fadeto 0.5 1")
+end
+
+function Music.Check(self)
+
+	if (self.active) then
+		if (not self.active:Playing()) then
+			World.PostEvent("shiphum fadeto 1 1")
+			self.think = nil
+			self.active = nil
+			self.name = nil
+		end
+	else
+		self.think = nil
+	end
+
 end
 
 function Music.Stop(self)
@@ -78,6 +108,38 @@ function Music.Command(self, cmd, args)
 	
 	COutLine(kC_Debug, "Music.Command(%s) was not recognized.", cmd)
 	
+end
+
+function Music.SaveState(self)
+	local state = {}
+	
+	self.think = nil
+	
+	if (self.name and self.active) then
+		state.active = self.name
+	end
+	
+	return state
+	
+end
+
+function Music.LoadState(self, state)
+
+	if (state.active) then
+	-- spin up another one
+		self.name = nil
+		self.args = {state.active}
+		self:Play()
+	else
+		if (self.active) then
+			self.active:FadeOutAndStop(1)
+			self.active = nil
+			self.name = nil
+			self.think = nil
+		end
+		World.PostEvent("shiphum fadeto 1 1")
+	end
+
 end
 
 imuse = Music

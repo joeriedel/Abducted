@@ -23,6 +23,65 @@ function Abducted.Initialize(self)
 	self.manipulate = false
 end
 
+function Abducted.OnLevelStart(self)
+	
+	if (GameDB:LoadingSaveGame()) then
+		self:LoadCheckpoint()
+	else
+		local f = function()
+			self.showCheckpointNotification = false
+			World.RequestGenerateSaveGame()
+		end
+		World.globalTimers:Add(f, 1, true) -- let scripts and stuff fire to set states
+	end
+	
+end
+
+function Abducted.LoadCheckpoint(self)
+	World.gameTimers = TimerList:Create()
+	World.globalTimers = TimerList:Create()
+	GameDB:LoadCheckpoint()
+end
+
+function Abducted.SaveCheckpoint(self)
+	if (not World.playerPawn.dead) then
+		GameDB:SaveCheckpoint()
+	end
+end
+
+function Abducted.LoadState(self)
+
+	World.SetGameSpeed(1, 0)
+	self.overlays.Manipulate:FadeOut(0)
+	self.sfx.ManipulateBegin:Stop()
+	self.manipulate = false
+	World.SetEnabledGestures(0)
+	World.FlushInput(true)
+	self.pulse = false
+
+	HUD:LoadState()
+	Arm:LoadState()
+end
+
+function Abducted.SaveState(self)
+	HUD:SaveState()
+	Arm:SaveState()
+end
+
+function Abducted.DoLoadCheckpoint(self)
+	Abducted.entity.eatInput = true
+	UI:BlendTo({1,1,1,1}, 0.5)
+	
+	local f = function ()
+		self:LoadCheckpoint()
+		UI:BlendTo({1,1,1,0}, 0.5)
+		Abducted.entity.eatInput = false
+	end
+
+	World.globalTimers:Add(f, 0.5, true)
+	
+end
+
 function Abducted.Load(self)
 	self.gfx = {}
 	self.gfx.Manipulate = World.Load("Shared/spellcasting_edgelines_M")
@@ -201,6 +260,12 @@ function Abducted.FirePulse(self, target, normal)
 	self.pulse = false
 end
 
+function Abducted.PlayerDiedAlertPanelDone(self, result)
+	if (result == 1) then
+		self:DoLoadCheckpoint()
+	end
+end
+
 function Abducted.PlayerDied(self)
 	HUD:PlayerDied()
 	if (self.manipulate) then
@@ -209,6 +274,22 @@ function Abducted.PlayerDied(self)
 	if (self.pulse) then
 		self:EndPulse()
 	end
+	
+	local f = function()
+		AlertPanel:Run(
+			"ALERT_PANEL_DIED",
+			"DEFAULT_KILLED_MESSAGE",
+			{
+				{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
+				{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
+			},
+			function (result)
+				self:PlayerDiedAlertPanelDone(result)
+			end
+		)
+	end
+	
+	World.globalTimers:Add(f, 1, true)
 end
 
 function Abducted.Think(self, dt)

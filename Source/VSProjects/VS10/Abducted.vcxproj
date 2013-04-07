@@ -374,6 +374,7 @@
     <QtMOC Include="..\..\AbductedLauncher.h" />
     <ClInclude Include="..\..\Game\AbductedGame.h" />
     <ClInclude Include="..\..\Game\Entities\G_Exports.h" />
+    <ClInclude Include="..\..\Game\Entities\G_ManipulatableObject.h" />
     <ClInclude Include="..\..\Game\Entities\G_PlayerPawn.h" />
     <ClInclude Include="..\..\Game\Entities\G_TouchTrigger.h" />
     <ClInclude Include="..\..\Game\Entities\G_ViewController.h" />
@@ -389,6 +390,7 @@
     <ClCompile Include="..\..\AbductedLauncher.cpp" />
     <ClCompile Include="..\..\Game\AbductedGame.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_Exports.cpp" />
+    <ClCompile Include="..\..\Game\Entities\G_ManipulatableObject.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_PlayerPawn.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_TouchTrigger.cpp" />
     <ClCompile Include="..\..\Game\Entities\G_ViewController.cpp" />

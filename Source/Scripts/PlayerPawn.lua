@@ -13,6 +13,7 @@ PlayerPawn.kShieldAccel = 0.5
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "Hand_right"
 PlayerPawn.PulseBeamScale = 1/120
+PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {
 	default = {
@@ -20,7 +21,8 @@ PlayerPawn.AnimationStates = {
 	-- example, idle isn't listed here, so "idle" will just become "idle"
 		OnSelect = function()
 			HUD:EnableAll()
-		end
+		end,
+		bbox = {mins = {-24, -24, -48}, maxs = {24, 24, 64}}
 	},
 	limp = {
 		idle = "limpidle",
@@ -32,6 +34,8 @@ PlayerPawn.AnimationStates = {
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
 		speedScale = 0.5,
+		tapAdjust = -20, -- CheckTappedOn
+		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})
@@ -60,8 +64,14 @@ function PlayerPawn.Spawn(self)
 	
 	self:SetMotionSka(self.model)
 	
-	self:SetMins({-24, -24, -48})
-	self:SetMaxs({ 24,  24,  48})
+	local set = PlayerPawn.AnimationStates[self.animState]
+	local bbox = set.bbox
+	if (not bbox) then
+		bbox = PlayerPawn.AnimationStates.default.bbox
+	end
+	
+	self:SetMins(bbox.mins)
+	self:SetMaxs(bbox.maxs)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	-- shield mesh
@@ -140,6 +150,21 @@ function PlayerPawn.Spawn(self)
 	World.SetPlayerPawn(self)
 	
 	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
+	
+	self.shieldActive = false
+	self.manipulateActive = false
+	self.pulseActive = false
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function PlayerPawn.PostSpawn(self)
@@ -164,6 +189,14 @@ function PlayerPawn.SelectAnimState(self, state)
 		if (set and set.OnSelect) then
 			set.OnSelect(self)
 		end
+		local bbox = set.bbox
+		if (not bbox) then
+			bbox = PlayerPawn.AnimationStates.default.bbox
+		end
+		
+		self:SetMins(bbox.mins)
+		self:SetMaxs(bbox.maxs)
+		self.model.dm:SetBounds(self:Mins(), self:Maxs())
 		self:SetSpeeds()
 		self.state = nil -- force change
 	end
@@ -253,12 +286,14 @@ end
 function PlayerPawn.NotifyManipulate(self, enabled)
 	
 	if (enabled) then
+		self.manipulateActive = true
 		self.disableAnimTick = true
 		self.state = nil
 		local anim = self:LookupAnimation("manipulate_idle")
 		self:PlayAnim(anim, self.model)
 		self:Stop()
 	else 
+		self.manipulateActive = false
 		if (self.manipulateDir == nil) then
 			self:EndManipulate()
 		end
@@ -332,6 +367,7 @@ function PlayerPawn.Stop(self)
 end
 
 function PlayerPawn.BeginPulse(self)
+	self.pulseActive = true
 	self.disableAnimTick = true
 	self.state = nil
 	local anim = self:LookupAnimation("pulse_idle")
@@ -383,6 +419,8 @@ function PlayerPawn.FirePulse(self, target, normal)
 		self:EndPulse()
 	end
 	
+	self.pulseActive = false
+	
 	local anim = self:LookupAnimation("pulse_fire")
 	self:PlayAnim(anim , self.model).Seq(f)
 	HUD:RechargePulse()
@@ -411,19 +449,21 @@ function PlayerPawn.DischargePulse(self)
 	trace = World.LineTrace(trace)
 	
 	if (trace and (not trace.startSolid)) then
-		self:FirePulse(trace.traceEnd)
+		self:FirePulse(trace.traceEnd, trace.normal)
 		return
 	end
 	
+	self.pulseActive = false
 	self:EndPulse()
 end
 
 function PlayerPawn.PulseExplode(self)
+	self.pulseActive = false
 	self:Kill()
 end
 
 function PlayerPawn.Kill(self)
-	if (self.dead) then
+	if (self.dead or PlayerPawn.GodMode) then
 		return
 	end
 	self.dead = true
@@ -435,7 +475,14 @@ end
 function PlayerPawn.CheckTappedOn(self, e)
 
 	local pos = self:WorldPos()
-	pos = VecAdd(pos, {0, 0, 50})
+	
+	local set = PlayerPawn.AnimationStates[self.animState]
+	
+	if (set.tapAdjust) then
+		pos = VecAdd(pos, {0, 0, set.tapAdjust})
+	else
+		pos = VecAdd(pos, {0, 0, 50})
+	end
 	
 	local screen, r = World.Project(pos)
 	if (r) then
@@ -474,14 +521,11 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		self:Kill()
 		return true
 	elseif (cmd == "teleport") then
-		local target = World.FindEntityTargets(args)
-		if (target) then
-			target = target[1]
-		end
-		if (target and target.validFloorPosition) then
-			self:Stop()
-			self:SetFloorPosition(target:FloorPosition())
-		end
+		args = Tokenize(args)
+		self:Teleport(args[1], tonumber(args[2]))
+		return true
+	elseif (cmd == "set_facing") then
+		self:SetFacing(tonumber(args[2]))
 		return true
 	elseif (cmd == "play") then
 		self:PlayCinematicAnim(args)
@@ -491,20 +535,49 @@ function PlayerPawn.OnEvent(self, cmd, args)
 	return false
 end
 
-function PlayerPawn.PlayCinematicAnim(self, anim)
-	local anim = self:LookupAnimation(anim)
+function PlayerPawn.Teleport(self, userId, facing)
+	local waypoints = World.WaypointsForUserId(userId)
+	if (waypoints) then
+		self:Stop()
+		local fp = World.WaypointFloorPosition(waypoints[1])
+		self:SetFloorPosition(fp)
+		self:SetDesiredMove(nil)
+		
+		if (facing) then
+			self:SetFacing(facing)
+		end
+	end
+end
+
+function PlayerPawn.PlayCinematicAnim(self, args)
+	args = Tokenize(args)
+	local anim = self:LookupAnimation(args[1])
 	if (anim) then
 		local f = function()
 			self:SetMoveType(kMoveType_Floor)
 			self.disableAnimTick = false
 			self.customMove = false
+			
+			if (args[2]) then
+				self:Teleport(args[2], tonumber(args[3]))
+			else
+				local fp = self:FindFloor()
+				if (fp) then
+					self.validFloorPosition = true
+					self:SetFloorPosition(fp)
+					error("PlayerPawn.PlayCinematicAnim: walked off the floor.")
+				else
+					self.validFloorPosition = false
+				end
+			end
+			
 			self:TickPhysics() -- get us a new state immediately
 		end
 		self:SetMoveType(kMoveType_Ska)
 		self.disableAnimTick = true
 		self.customMove = true
 		self.state = nil
-		self:EnableFlags(kPhysicsFlag_Friction, true)
+		self:Stop()
 		local blend = self:PlayAnim(anim, self.model)
 		if (blend) then
 			blend.Seq(f)
@@ -562,6 +635,62 @@ function PlayerPawn.CustomAnimMove(self, name)
 		end
 	end
 
+end
+
+function PlayerPawn.SaveState(self)
+	local fp = self:FloorPosition()
+	if (fp.floor == -1) then
+		error("PlayerPawn.SaveState: checkpoints not allowed when player is not on a floor!")
+	end
+	if (self.customMove) then
+		error("PlayerPawn.SaveState: executing custom move, cannot save!")
+	end
+	assert(not self.dead)
+	
+	local vertex = self:Angles()
+	
+	local state = {
+		shieldActive = tostring(self.shieldActive),
+		animState = self.animState,
+		facing = tostring(vertex.pos[3]),
+		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
+	}
+	
+	return state
+end
+
+function PlayerPawn.LoadState(self, state)
+	
+	self.dead = false
+	self.disableAnimTick = false
+	self.state = "idle"
+	
+	if (state.shieldActive == "true") then
+		self:BeginShield()
+	else
+		self.shieldActive = false
+		self:ShowShield(false)
+	end
+	
+	local pos = Vec3ForString(state.pos)
+	local fp  = World.ClipToFloor(
+		{pos[1], pos[2], pos[3] + 8},
+		{pos[1], pos[2], pos[3] - 8}
+	)
+	
+	assert(fp)
+	self:SetFloorPosition(fp)
+	self:SetDesiredMove(nil)
+	self:SetMoveType(kMoveType_Floor)
+	self:SetFacing(tonumber(state.facing))
+	self:SelectAnimState(state.animState)
+	
+	local anim = self:LookupAnimation("idle")
+	if (anim) then
+		self.model:BlendImmediate(anim)
+	end
+	
+	self:Link()
 end
 
 info_player_start = PlayerPawn

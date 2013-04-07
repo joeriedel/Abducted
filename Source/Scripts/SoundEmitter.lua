@@ -26,11 +26,11 @@ function SoundEmitter.Spawn(self)
 	self.fadeTime = nil
 	self.enabled = false
 	
-	if channel == "UI" then
+	if (channel == "UI") then
 		self.channel = kSoundChannel_UI
-	elseif channel == "Ambient" then
+	elseif (channel == "Ambient") then
 		self.channel = kSoundChannel_Ambient
-	elseif channel == "FX" then
+	elseif (channel == "FX") then
 		self.channel = kSoundChannel_FX
 	else
 		self.channel = kSoundChannel_Music
@@ -50,9 +50,20 @@ function SoundEmitter.Spawn(self)
 		self:Trigger()
 	end
 	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
+	
 end
 
-function SoundEmitter.OnLevelStart(self)
+function SoundEmitter.PostSpawn(self)
 	self:Trigger()
 end
 
@@ -72,9 +83,16 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	elseif cmd == "fadein" then
 		self.on = true
 		self.fadeTime = tonumber(args)
+		self.fadeLevel = 1
 	elseif cmd == "fadeout" then
 		self.on = false
 		self.fadeTime = tonumber(args)
+	elseif cmd == "fadeto" then
+		args = Tokenize(args)
+		self.volume = tonumber(args[1])
+		self.fadeTime = tonumber(args[2])
+		self.sound:FadeVolume(self.volume, self.fadeTime)
+		return true
 	elseif cmd == "rewind" then	
 		self.on = false
 		if self.sound then
@@ -86,7 +104,8 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	end
 	
 	self:Trigger()
-
+	return true
+	
 end
 
 function SoundEmitter.Trigger(self)
@@ -108,14 +127,41 @@ function SoundEmitter.Trigger(self)
 			self.sound:FadeVolume(self.volume, 0)
 		end
 		self.sound:Play(self.channel, self.priority)
-		self.think = nil
 	elseif playing and (not on) then
 		if (self.fadeTime) then
-			self.sound:FadeVolume(0, self.fadeTime)
+			self.sound:FadeOutAndStop(self.fadeTime)
 			self.fadeTime = nil
 		else
 			self.sound:Stop()
-			self.think = nil
+		end
+	end
+
+end
+
+function SoundEmitter.SaveState(self)
+	local state = {
+		on = tostring(self.on)
+	}
+	
+	state.volume = tostring(self.volume)
+		
+	return state
+end
+
+function SoundEmitter.LoadState(self, state)
+
+	self.fadeTime = 1 -- smooth transitions
+	self.volume = tonumber(state.volume)
+	
+	local on = state.on == "true"
+	
+	if (self.on ~= on) then
+		self.on = on
+		self:Trigger()
+		if (not on) then
+			if (self.sound) then
+				self.sound:Rewind()
+			end
 		end
 	end
 

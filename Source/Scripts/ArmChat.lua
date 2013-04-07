@@ -116,10 +116,9 @@ end
 
 function Arm.LoadChats(self, chats)
 
-    Arm:LoadChatData()
-    Arm:PopulateChats()
-    Arm:PopulateChats(chat)
-    
+    if (chats) then
+		Arm:LoadChatList(chats)
+    end
 end
 
 function Arm.StartConversation(self)
@@ -130,15 +129,17 @@ function Arm.StartConversation(self)
 	
 	if (self.requiredTopic) then
 		self.changeConversationCount = 0
-		self.topic = Arm.Chats.Roots[self.requiredTopic]
+		self.topic = Arm.Chats.Loaded[self.requiredTopic]
 	elseif (self.requestedTopic) then
 		self.changeConversationCount = 0
-		self.topic = Arm.Chats.Roots[self.requestedTopic]
+		self.topic = Arm.Chats.Loaded[self.requestedTopic]
 		self.requestedTopic = nil
 	else
 		self.changeConversationCount = self.changeConversationCount + 1
 		self.topic = self:SelectChatRoot()
 	end
+	
+	self.topicTree = {}
 	
 	if (self.topic) then
 		self:ChatPrompt()
@@ -146,41 +147,58 @@ function Arm.StartConversation(self)
 
 end
 
+function Arm.ProcessActions(self, actions)
+	local b = FindArrayElement(actions, "clear_topic")
+	if (b) then
+		self.requiredTopic = nil
+		HUD:SignalArm(false)
+	end
+end
+
 function Arm.ChatPrompt(self)
 
-	-- create the necessaray chat controls and append them to the VList
+	-- create the necessary chat controls and append them to the VList
 	self.choiceWidgets = nil
 	
+	if (self.topic.priority) then
+		self.topicPriority = self.topic.priority
+	end
+	
+	assert(self.topicPriority)
+	
 	if (self.topic.choices) then
-		self.choices = Arm:ChatChoices(self.topic)
+		self.choices = Arm:ChatChoices(self.topic, self.topicPriority)
 	else
 		self.choices = nil
 	end
 	
-	if (self.topic.reply == nil) then
+	if (next(self.topic.reply) == nil) then
 		self.topic.reply = {{"I_DONT_KNOW"}}
 	end
 	
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
-	self.promptText = "> "..StringTable.Get(self.prompt[1], Arm.Chats.Strings)
+	assert(self.topic.stringTable)
+		
+	local promptText = StringTable.Get(self.prompt[1], self.topic.stringTable)
+	self.promptText = "> "..promptText
 	
 	local lock = false
 	
 	if (self.topic.action) then
-		if (self.topic.action == "lock") then
-			lock = true
-		end
+		local actions = string.split(self.topic.action, ";")
+		Arm:ProcessActions(actions)
+		lock = FindArrayElement(actions, "lock")
 	end
 	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
 		if (lock) then
-			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED_REPLY "..self.prompt[1])
+			EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED_REPLY", promptText)
 		else
-			EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_REPLY "..self.prompt[1])
+			EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_REPLY", promptText)
 		end
 	end
 	
 	if (lock) then
-		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED")
 		Arm:ChatLockout() -- until a trigger.
 	end
 	
@@ -306,13 +324,14 @@ function Arm.DisplayChatLockout(self)
 	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.5)
 		
 	local f = function()
+		self.armLockTimer = nil
 		Abducted.entity.eatInput = false
 		Arm:ShowSymbol(true, 0.1)
 		Arm:ClearChat()
 	end
 	
 	Abducted.entity.eatInput = true
-	World.globalTimers:Add(f, 0.5, true)
+	self.armLockTimer = World.globalTimers:Add(f, 0.5, true)
 end
 
 function Arm.ChatLockout(self, time)
@@ -344,11 +363,12 @@ function Arm.DisplayChoices(self)
 	self.chatPos[2] = self.chatPos[2] + (Arm.ChatChoiceExtraSpaceAfterPrompt*UI.identityScale[2])
 	
 	for k,v in pairs(self.choices) do
-	
+		assert(v.stringTable)
+		
 		local prompt = self:ChooseChatPrompt(v.prompt)
 		prompts[k] = prompt
 		
-		local text = StringTable.Get(prompt[1], Arm.Chats.Strings)
+		local text = StringTable.Get(prompt[1], v.stringTable)
 		promptText[k] = text
 		
 		local w,h = UI:StringDimensions(self.typefaces.ChatChoice, text)
@@ -385,7 +405,7 @@ function Arm.DisplayChoices(self)
 		
 		local r = {0, 0, size[1], size[2]}
 		local f = function(widget)
-			Arm:ChoiceSelected(widget, self.choices[k], prompt)
+			Arm:ChoiceSelected(widget, self.choices[k], prompt, text)
 		end
 		
 		local w = UI:CreateStylePushButton(
@@ -449,12 +469,12 @@ function Arm.DisplayChoices(self)
 	self.chatTimer = World.globalTimers:Add(f, 1, true)
 end
 
-function Arm.ChoiceSelected(self, widget, choice, prompt)
+function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 
 	self.changeConversationCount = 0
 	
 	-- add event
-	EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_ASK "..prompt[1])
+	EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_ASK", text)
 	
 	-- disable all choices
 	for k,v in pairs(self.choiceWidgets) do
@@ -473,6 +493,11 @@ function Arm.ChoiceSelected(self, widget, choice, prompt)
 	self.choiceWidgets = nil
 	self.topic = choice
 	
+	if (choice.generated) then -- flag as used
+		self.topicTree[choice.generated] = choice
+		Persistence.WriteBool(SaveGame, "armGeneratedTopicChosen", true, choice.generated)
+	end
+	
 	local f = function()
 		Arm:ChatPrompt()
 	end
@@ -484,9 +509,9 @@ end
 function Arm.SelectChatRoot(self)
 
 	if (self.changeConversationCount > Arm.MaxChangeConversationTimes) then
-		EventLog:AddEvent(GameDB:CurrentTimeString().." !ARM_LOCKED")
+		EventLog:AddEvent(GameDB:CurrentTimeString(), "!ARM_LOCKED")
 		Arm:ChatLockout(FloatRand(35, 95))
-		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}}
+		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}, stringTable=Arm.Chats.CommonDB.StringTable}
 	end
 
 	local roots = {}
@@ -494,7 +519,7 @@ function Arm.SelectChatRoot(self)
 	
 	for k,v in pairs(Arm.Chats.Available) do
 		if (v == nil) then
-			error("Error in arm chat table for chat root %s", k)
+			error(string.format("Error in arm chat table for chat root %s", k))
 		end
 		local num = Persistence.ReadNumber(SaveGame, "chatRoots", 0, k)
 		if (num == 0) then -- never seen this one
@@ -538,7 +563,7 @@ function Arm.SelectChatRoot(self)
 	end
 	
 	-- random topic
-	local last
+	local last, name
 	local p = math.random()
 	
 	for k,v in pairs(roots) do
@@ -549,9 +574,10 @@ function Arm.SelectChatRoot(self)
 			return v
 		end
 		last = v
+		name = k
 	end
 	
-	return last -- precision
+	return last, name -- precision
 end
 
 function Arm.ChooseChatPrompt(self, root)
@@ -561,7 +587,7 @@ function Arm.ChooseChatPrompt(self, root)
 	
 	for k,v in pairs(root) do
 		if (v == nil) then
-			error("Error in arm chat table for prompt %s", k)
+			error(string.format("Error in arm chat table for prompt %s", k))
 		end
 		local p = v.prob
 		if (p == nil) then
@@ -597,13 +623,13 @@ function Arm.ChooseChatPrompt(self, root)
 	return last -- precision
 end
 
-function Arm.ChatChoices(self, root)
+function Arm.ChatChoices(self, root, priority)
 
 	local responses = {}
 	
 	for k,v in pairs(root.choices) do
 		if (v == nil) then
-			error("Error in arm chat table for choice %s", k)
+			error(string.format("Error in arm chat table for choice %s", k))
 		end
 		if (v.prob) then
 			local p = math.random()
@@ -615,6 +641,89 @@ function Arm.ChatChoices(self, root)
 		end
 	end
 	
+	if (bit.band(root.flags, kArmChatFlag_AutoGenerate) ~= 0) then
+		Arm:FillInChoices(responses, priority)
+	end
+	
+	if (bit.band(root.flags, kArmChatFlag_ShuffleChoices) ~= 0) then
+		Arm:ShuffleResponses(responses)
+	end
+	
 	return responses
 
+end
+
+function Arm.ShuffleResponses(self, responses)
+
+	local range = #responses
+		
+	for i = 1,2 do
+	
+		local a = IntRand(1, #responses)
+		local b = IntRand(1, #responses)
+		
+		if (a ~= b) then
+			local x = responses[a]
+			responses[a] = responses[b]
+			responses[b] = x
+		end
+	
+	end
+
+end
+
+Arm.AutoFillChoiceCount = 3
+
+function Arm.FillInChoices(self, responses, priority)
+	if (#responses >= Arm.AutoFillChoiceCount) then
+		return
+	end
+	
+	if (priority < 1) then
+		priority = 1
+	end
+	
+	local exit = false
+	local added = {}
+	
+	for k = 1,2 do
+		for i = priority, 10 do
+			local t = Arm.Chats.Procedural[i]
+			if (t ~= nil) then
+				for k,v in pairs(t) do
+					if (self.topicTree[k] == nil) then -- has not been selected by user
+						local chosen = false
+						if (k == 1) then
+							-- knock out this choices if the user has selected it before
+							chosen = Persistence.ReadBool(SaveGame, "armGeneratedTopicChosen", false, k)
+						end
+						
+						if (not chosen) then
+							if (added[k]) then
+								chosen = true
+							end
+						end
+						
+						if (not chosen) then
+							v.generated = k -- flag as a generated option
+							table.insert(responses, v)
+							added[k] = true
+						end
+					end
+					
+					if (#responses >= Arm.AutoFillChoiceCount) then
+						exit = true
+						break
+					end
+				end
+				
+				if (exit) then
+					break
+				end
+			end
+		end
+		if (exit) then
+			break
+		end
+	end	
 end

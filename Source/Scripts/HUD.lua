@@ -28,6 +28,7 @@ function HUD.Load(self)
 	self.gfx = {
 		Arm = "UI/arm_button_M",
 		ArmPressed = "UI/arm_button_pressed_M",
+		ArmSignaled = "UI/arm_button_signaled_M",
 		ManipulateDisabled = "UI/manipulate_button_charging_M",
 		ManipulateEnabled = "UI/manipulate_button_M",
 		ManipulateFlashing = "UI/manipulate_button_flashing_M",
@@ -40,6 +41,11 @@ function HUD.Load(self)
 	}
 	
 	map(self.gfx, World.Load)
+	
+	self.sfx = {}
+	
+	self.sfx.Signaled = World.Load("Audio/armsignaled")
+	self.sfx.AbilityUnlocked = World.Load("Audio/ability_unlocked")
 	
 	self.widgets.Arm = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
@@ -161,18 +167,25 @@ end
 
 function HUD.ShieldPressed(self, widget)
 	if (World.playerPawn.shieldActive) then
-		if (self.shieldExpiryTimer) then
-			self.shieldExpiryTimer:Clean()
-			self.shieldExpiryTimer = nil
-		end
 		HUD:ExpireShield()
 		return
 	end
 	
-	World.playerPawn:BeginShield()
+	HUD:BeginShield()
+end
+
+function HUD.BeginShield(self, gameTime)
+
+	if (gameTime == nil) then
+		World.playerPawn:BeginShield()
+	end
+	
+	if (gameTime == nil) then
+		gameTime = Game.realTime
+	end
 	
 	-- start ticking down the time.
-	self.shieldStartTime = Game.time
+	self.shieldStartTime = gameTime
 	
 	local gfx = {
 		enabled = self.gfx.ShieldDisabled
@@ -186,10 +199,10 @@ function HUD.ShieldPressed(self, widget)
 		HUD:ExpireShield()
 	end
 	
-	self.shieldExpiryTimer = World.gameTimers:Add(f, PlayerSkills.MaxShieldTime)
+	self.shieldExpiryTimer = World.gameTimers:Add(f, PlayerSkills.MaxShieldTime - (Game.realTime - gameTime), true)
 	
 	f = function ()
-		local dd = Game.time - HUD.shieldStartTime
+		local dd = Game.realTime - HUD.shieldStartTime
 		self.widgets.ShieldCharging:FillCircleTo(-(1 - (dd / PlayerSkills.MaxShieldTime)), 0)
 	end
 	
@@ -237,10 +250,10 @@ function HUD.RechargePulse(self)
 	
 	World.gameTimers:Add(f, rechargeTime, true)
 	
-	self.pulseStart = Game.time
+	self.pulseStart = GameDB.realTime
 	
 	f = function ()
-		local dd = Game.time - self.pulseStart
+		local dd = GameDB.realTime - self.pulseStart
 		self.widgets.PulseCharging:FillCircleTo(dd / rechargeTime, 0)
 	end
 	
@@ -261,6 +274,8 @@ function HUD.Layout(self)
 		y = y + r[4] + (24 * UI.identityScale[2])
 	else
 		self.widgets.Manipulate:SetVisible(false)
+		self.widgets.ManipulateCharging:SetVisible(false)
+		self.widgets.ManipulateShimmer:SetVisible(false)
 	end
 	if (PlayerSkills:ShieldUnlocked()) then
 		local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
@@ -269,6 +284,8 @@ function HUD.Layout(self)
 		y = y + r[4] + (24 * UI.identityScale[2])
 	else
 		self.widgets.Shield:SetVisible(false)
+		self.widgets.ShieldCharging:SetVisible(false)
+		self.widgets.ShieldShimmer:SetVisible(false)
 	end
 	if (PlayerSkills:PulseUnlocked()) then
 		local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
@@ -276,24 +293,29 @@ function HUD.Layout(self)
 		self.widgets.PulseShimmer:SetRect(r)
 	else
 		self.widgets.Pulse:SetVisible(false)
+		self.widgets.PulseCharging:SetVisible(false)
+		self.widgets.PulseShimmer:SetVisible(false)
 	end
 end
 
 function HUD.AnimateUnlock(self, items)
 
+	self.sfx.AbilityUnlocked:Play(kSoundChannel_UI, 0)
+
 	if (PlayerSkills:ArmUnlocked()) then
-		if (items["arm"]) then
+		if (items.arm) then
 			local r = self.widgets.Arm:Rect()
 			self.widgets.Arm:SetRect({r[1]-r[3], r[2], r[3], r[4]})
 			self.widgets.Arm:MoveTo({r[1], r[2]}, {0.3, 0})
 			self.armEnabled = true
 			self.widgets.Arm.class:SetEnabled(self.widgets.Arm, true)
+			self.widgets.Arm:SetVisible(true)
 		end
 	end
 
 	local y = 42
 	if (PlayerSkills:ManipulateUnlocked()) then
-		local unlock = items["manipulate"]
+		local unlock = items.manipulate
 		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
 		self.widgets.ManipulateCharging:SetRect(r)
 		self.widgets.ManipulateShimmer:SetRect(r)
@@ -312,7 +334,7 @@ function HUD.AnimateUnlock(self, items)
 	end
 	
 	if (PlayerSkills:ShieldUnlocked()) then
-		local unlock = items["shield"]
+		local unlock = items.shield
 		if (unlock) then
 			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
 			self.widgets.ShieldCharging:SetRect(r)
@@ -320,6 +342,7 @@ function HUD.AnimateUnlock(self, items)
 			y = y + r[4] + (24 * UI.identityScale[2])
 			self.widgets.Shield:ScaleTo({0,0}, {0,0})
 			self.widgets.Shield:ScaleTo({1,1}, {0.3, 0.3})
+			self.widgets.Shield:SetVisible(true)
 			if (self.shieldEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
@@ -338,13 +361,14 @@ function HUD.AnimateUnlock(self, items)
 	end
 	
 	if (PlayerSkills:PulseUnlocked()) then
-		local unlock = items["pulse"]
+		local unlock = items.pulse
 		if (unlock) then
 			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
 			self.widgets.PulseCharging:SetRect(r)
 			self.widgets.PulseShimmer:SetRect(r)
 			self.widgets.Pulse:ScaleTo({0,0}, {0,0})
 			self.widgets.Pulse:ScaleTo({1,1}, {0.3, 0.3})
+			self.widgets.Pulse:SetVisible(true)
 			if (self.pulseEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
@@ -427,7 +451,7 @@ function HUD.RechargeManipulate(self)
 	
 	World.gameTimers:Add(f, rechargeTime, true)
 	
-	self.manipulateStart = Game.time
+	self.manipulateStart = GameDB.realTime
 	
 	f = function ()
 		local dd = Game.time - self.manipulateStart
@@ -443,18 +467,33 @@ function HUD.ExpireShield(self)
 		self.shieldTimer:Clean()
 		self.shieldTimer = nil
 	end
+	
+	if (self.shieldExpiryTimer) then
+		self.shieldExpiryTimer:Clean()
+		self.shieldExpiryTimer = nil
+	end
 
-	local timeUsed = Min(Game.time - self.shieldStartTime, PlayerSkills.MaxShieldTime)
+	local timeUsed = Min(GameDB.realTime - self.shieldStartTime, PlayerSkills.MaxShieldTime)
+		
+	self.shieldRechargeTime = PlayerSkills:ShieldRechargeTime(timeUsed)
+	self.shieldStartTime = GameDB.realTime
+	self.shieldRechargeFrac = (PlayerSkills.MaxShieldTime - timeUsed) / PlayerSkills.MaxShieldTime
+	
+	HUD:RechargeShield()
+	
+	World.playerPawn:EndShield()
+	
+end
+
+function HUD.RechargeShield(self)
+
 	local gfx = {
 		enabled = self.gfx.ShieldEnabled,
 		disabled = self.gfx.ShieldDisabled
 	}
 	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
 	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
-	
-	self.shieldRechargeTime = PlayerSkills:ShieldRechargeTime(timeUsed)
-	self.shieldStartTime = Game.time
-	self.shieldRechargeFrac = (PlayerSkills.MaxShieldTime - timeUsed) / PlayerSkills.MaxShieldTime
+	self.widgets.ShieldCharging:SetVisible(true)
 	
 	local f = function ()
 		if (not HUD.enabled) then
@@ -464,15 +503,24 @@ function HUD.ExpireShield(self)
 			self.shieldTimer:Clean()
 			self.shieldTimer = nil
 		end
+		self.shieldStartTime = nil
 		self.widgets.ShieldCharging:SetVisible(false)
-		self.widgets.Shield.class:SetEnabled(self.widgets.Shield, true)
+				
+		local gfx = {}
+		gfx.enabled = self.gfx.ShieldEnabled
+		gfx.disabled = self.gfx.ShieldDisabled
+		gfx.pressed = self.gfx.ShieldDisabled
+		
+		self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
+		self.widgets.Shield.class:SetEnabled(self.widgets.Shield, self.shieldEnabled)
+	
 		HUD:Shimmer(self.widgets.ShieldShimmer)
 	end
 	
 	World.gameTimers:Add(f, self.shieldRechargeTime, true)
 	
 	f = function ()
-		local dd = Game.time - self.shieldStartTime
+		local dd = GameDB.realTime - self.shieldStartTime
 		dd = dd / self.shieldRechargeTime
 		dd = self.shieldRechargeFrac + (dd * (1 - self.shieldRechargeFrac))
 		self.widgets.ShieldCharging:FillCircleTo(-dd, 0)
@@ -480,9 +528,8 @@ function HUD.ExpireShield(self)
 	
 	self.shieldTimer = World.gameTimers:Add(f, 0)
 	
-	World.playerPawn:EndShield()
-	
 end
+
 
 function HUD.Shimmer(self, widget)
 	widget:SetVisible(true)
@@ -517,10 +564,10 @@ function HUD.Enable(self, items)
 		state[v] = true
 	end
 	
-	HUD:EnableArm(state["arm"] == true)
-	HUD:EnableManipulate(state["manipulate"] == true)
-	HUD:EnableShield(state["shield"] == true)
-	HUD:EnablePulse(state["pulse"] == true)
+	HUD:EnableArm(state.arm)
+	HUD:EnableManipulate(state.manipulate)
+	HUD:EnableShield(state.shield)
+	HUD:EnablePulse(state.pulse)
 
 end
 
@@ -531,6 +578,23 @@ function HUD.EnableArm(self, enable)
 	
 	self.armEnabled = enable
 	self.widgets.Arm.class:SetEnabled(self.widgets.Arm, enable)
+end
+
+function HUD.SignalArm(self, signal)
+	
+	local gfx = {}
+	
+	if (signal) then
+		gfx.pressed = self.gfx.ArmPressed
+		gfx.enabled = self.gfx.ArmSignaled
+		self.sfx.Signaled:Play(kSoundChannel_UI, 0)
+	else
+		gfx.pressed = self.gfx.ArmPressed
+		gfx.enabled = self.gfx.Arm
+	end
+	
+	self.widgets.Arm.class:ChangeGfx(self.widgets.Arm, gfx)
+
 end
 
 function HUD.EnableManipulate(self, enable)
@@ -563,13 +627,13 @@ function HUD.EnableShield(self, enable)
 	
 	self.shieldEnabled = enable
 	
-	if (self.shieldExpiryTimer) then
-		self.shieldExpiryTimer:Clean()
-		self.shieldExpiryTimer = nil
-	end
-	if (self.shieldTimer) then
-		self.shieldTimer:Clean()
-		self.shieldTimer = nil
+	if (self.shieldStartTime and (not World.playerPawn.dead)) then
+		if (not enabled) then
+			if (World.playerPawn.shieldActive) then
+				HUD:ExpireShield()
+			end
+		end
+		return
 	end
 		
 	local gfx = {}
@@ -616,3 +680,56 @@ function HUD.Disable(self)
 	
 end
 
+function HUD.SaveShieldState(self)
+
+	Persistence.WriteBool(SaveGame, "HUDShieldEnabled", self.shieldEnabled)
+
+	if (World.playerPawn.shieldActive) then
+		Persistence.WriteString(SaveGame, "HUDShieldState", "on")
+		Persistence.WriteNumber(SaveGame, "HUDShieldTime", self.shieldStartTime)
+	elseif (self.shieldStartTime) then
+		Persistence.WriteString(SaveGame, "HUDShieldState", "charging")
+		Persistence.WriteNumber(SaveGame, "HUDShieldRechargeTime", self.shieldRechargeTime)
+		Persistence.WriteNumber(SaveGame, "HUDShieldTime", self.shieldStartTime)
+		Persistence.WriteNumber(SaveGame, "HUDShieldRechargeFrac", self.shieldRechargeFrac)
+	else
+		Persistence.WriteString(SaveGame, "HUDShieldState", "off")
+	end
+	
+end
+
+function HUD.LoadShieldState(self)
+
+	self.shieldEnabled = Persistence.ReadBool(SaveGame, "HUDShieldEnabled", false)
+	
+	local gfx = {}
+	gfx.enabled = self.gfx.ShieldEnabled
+	gfx.disabled = self.gfx.ShieldDisabled
+	gfx.pressed = self.gfx.ShieldDisabled
+	
+	self.widgets.ShieldCharging:SetVisible(false)
+	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
+	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, self.shieldEnabled)
+
+	local state = Persistence.ReadString(SaveGame, "HUDShieldState", "off")
+	
+	if (state == "on") then
+		local gameTime = Persistence.ReadNumber(SaveGame, "HUDShieldTime")
+		HUD:BeginShield(gameTime)
+	elseif (state == "charging") then
+		self.shieldRechargeTime = Persistence.ReadNumber(SaveGame, "HUDShieldRechargeTime")
+		self.shieldStartTime = Persistence.ReadNumber(SaveGame, "HUDShieldTime")
+		self.shieldRechargeFrac = Persistence.ReadNumber(SaveGame, "HUDShieldRechargeFrac")
+		HUD:RechargeShield()
+	end
+
+end
+
+function HUD.SaveState(self)
+	HUD:SaveShieldState()
+end
+
+function HUD.LoadState(self)
+	HUD:Layout()
+	HUD:LoadShieldState()
+end

@@ -7,10 +7,22 @@ ViewController = Class:New()
 
 ViewController.TM_Distance = 0
 ViewController.TM_Look = 1
+ViewController.Targets = {}
 
 function ViewController.Spawn(self)
 	World.viewController = self
 	World.SetViewController(self)
+	
+	local io = {
+		Save = function ()
+			return self:SaveState()
+		end,
+		Load = function (s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects["vc"] = io
 end
 
 function ViewController.OnLevelStart(self)
@@ -31,6 +43,9 @@ function ViewController.OnEvent(self, cmd, args)
 end
 
 function ViewController.HandleCameraCmd(self, args)
+
+	self.lastCmd = args
+
 	local x = Tokenize(args)
 	local lx = #x
 	if (lx < 2) then
@@ -178,6 +193,70 @@ function ViewController.Defaults(self)
 		0, -- min distance == minFOV +Plus or -Minus 
 		0  -- max distance == maxFOV +Plus or -Minus
 	)
+end
+
+function ViewController.AddLookTarget(self, target, fov)
+	for k,v in pairs(ViewController.Targets) do
+		if (v.target.id == target.id) then
+			return
+		end
+	end
+	
+	local id = self:BlendToLookTarget(
+		target:WorldPos(),
+		1,
+		1,
+		-1,
+		0.6,
+		1,
+		1
+	)
+	
+	if (fov) then
+		self:LerpCameraFOVShift(fov, 1)
+	end
+	
+	local t = {id=id, fov=fov, target=target}
+	
+	table.insert(ViewController.Targets, t)
+end
+
+function ViewController.RemoveLookTarget(self, target)
+	for k,v in pairs(ViewController.Targets) do
+		if (v.target.id == target.id) then
+			table.remove(ViewController.Targets, k)
+			self:FadeOutLookTarget(
+				v.id,
+				1
+			)
+			
+			local fov
+			local z = #ViewController.Targets
+			
+			if (z > 0) then
+				fov = ViewController.Targets[z].fov
+			end
+			
+			if (fov) then
+				self:LerpCameraFOVShift(fov, 1)
+			else
+				self:LerpCameraFOVShift(0, 1)
+			end
+			
+			return
+		end
+	end
+end	
+
+function ViewController.SaveState(self)
+	assert(self.lastCmd)
+	return {lastCmd = self.lastCmd}
+end
+
+function ViewController.LoadState(self, state)
+	self:SetFixedCamera(VecZero(), VecZero())
+	self:HandleCameraCmd(state.lastCmd)
+	self:Sync()
 end
 
 view_controller = ViewController

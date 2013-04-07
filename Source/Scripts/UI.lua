@@ -12,7 +12,7 @@ UI.kLayer_Interactive = 3
 UI.kLayer_Arm = 4
 UI.kLayer_TerminalPuzzles = 5
 UI.kLayer_LB = 6
-UI.kLayer_Popups = 7
+UI.kLayer_AlertPanel = 7
 UI.kLayer_Notifications = 8
 UI.kLayer_Feedback = 9
 UI.kLayer_FX = 10
@@ -93,6 +93,16 @@ function UI.Spawn(self)
 			1 / UI.fontScale[1], 
 			1 / UI.fontScale[2]
 		}
+	elseif ((UI.screenWidth == 1024) and (UI.screenHeight == 768)) then
+		UI.fontScale = {
+			1,
+			1
+		}
+		
+		UI.invFontScale = {
+			1,
+			1
+		}
 	else
 		UI.fontScale = {
 			UI.identityScale[1],
@@ -117,6 +127,7 @@ function UI.Spawn(self)
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
 	UI:CreateInteractiveLayer()
+	AlertPanel:Create()
 	
 --	self.think = UI.Think
 --	self:SetNextThink(1/30)
@@ -223,8 +234,8 @@ function UI.FadeOutLetterBox(self, color, time)
 
 end
 
-function UI.CreateRoot(self, layer)
-	local root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+function UI.CreateRoot(self, layer, input)
+	local root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=input})
 	World.SetRootWidget(layer, root)
 	return root
 end
@@ -495,14 +506,12 @@ end
 function UI.HCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = label:Rect()
 	
 	r[1] = rect[1] + ((rect[3]-d[1]) / 2)
-	r[3] = w
-	r[4] = h
+	r[3] = d[1]
+	r[4] = d[2]
 	
 	label:SetRect(r)
 	return r
@@ -511,8 +520,6 @@ end
 function UI.VCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = label:Rect()
 	
@@ -527,8 +534,6 @@ end
 function UI.CenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	local r = {
 		rect[1] + ((rect[3]-d[1]) / 2),
@@ -544,8 +549,6 @@ end
 function UI.RAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -568,8 +571,6 @@ end
 function UI.VAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()
@@ -591,8 +592,6 @@ end
 function UI.RVAlignLabel(self, label, x, y)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.identityScale[1]
-	d[2] = d[2] * UI.identityScale[2]
 	
 	if ((x == nil) or (y == nil)) then
 		local r = label:Rect()

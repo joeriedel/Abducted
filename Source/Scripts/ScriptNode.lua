@@ -28,6 +28,8 @@ function ScriptNode.Spawn(self)
 	
 	if BoolForString(self.keys.triggerOnLevelStart, false) then
 		self.think = ScriptNode.Emit
+		self.thinkFunc = "emit"
+		self.thinkTime = 0
 		self:SetNextThink(0)
 	end
 	
@@ -40,6 +42,17 @@ function ScriptNode.Spawn(self)
 	else
 		self.Test = ScriptNode.Threshold
 	end
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 
 end
 
@@ -78,12 +91,6 @@ end
 
 function ScriptNode.Emit(self)
 
-	if (self.time and (self.time > World.Time())) then
-		return
-	end
-	
-	self.time = nil
-
 	-- reset inputs
 	for k,v in pairs(self.inputs) do
 		self.inputs[k] = false
@@ -112,9 +119,10 @@ function ScriptNode.Emit(self)
 	
 	if self.delay[2] > 0 then
 		local delay = FloatRand(self.delay[1], self.delay[2])*1000
-		self.time = World.Time() + delay
-		self:SetNextThink(0)
+		self:SetNextThink(delay)
 		self.think = ScriptNode.Post
+		self.thinkTime = GameDB.realTime + delay
+		self.thinkFunc = "post"
 		COutLine(kC_Debug, "ScriptNode(%s).Emit(Delayed - %dms)", self.name, delay)
 	else
 		self:Post()
@@ -124,13 +132,8 @@ end
 
 function ScriptNode.Post(self)
 
-	if self.time and self.time > World.Time() then
-		return
-	end
-	
 	COutLine(kC_Debug, "ScriptNode(%s) - Firing", self.name)
 	
-	self.time = nil
 	self.think = nil
 	
 	if self.script then
@@ -141,9 +144,10 @@ function ScriptNode.Post(self)
 	end
 	
 	if self.autorepeat > -1 then
-		COutLine(kC_Debug, "ScriptNode(%s) - AutoRepatDelay(%f)", self.name, self.autorepeat)
+		COutLine(kC_Debug, "ScriptNode(%s) - AutoRepeatDelay(%f)", self.name, self.autorepeat)
 		self.think = ScriptNode.Emit
-		self.time = World.Time() + self.autorepeat * 1000
+		self.thinkTime = GameDB.realTime + (self.autorepeat*1000)
+		self.thinkFunc = "emit"
 		self:SetNextThink(self.autorepeat * 1000)
 	end
 	
@@ -208,7 +212,6 @@ function ScriptNode.OnEvent(self, cmd, args)
 		self.triggers[1] = 0
 		self.think = nil
 		self.busy = false
-		self.time = nil
 		return true
 	elseif cmd == "enable" then
 		if not self.enabled then
@@ -219,7 +222,6 @@ function ScriptNode.OnEvent(self, cmd, args)
 	elseif cmd == "disable" then
 		self.think = nil
 		self.busy = false
-		self.time = nil
 		if self.enabled then
 			self.enabled = false
 			COutLine(kC_Debug, "ScriptNode(%s).Disable", self.name)
@@ -227,6 +229,54 @@ function ScriptNode.OnEvent(self, cmd, args)
 	end
 
 	return false
+
+end
+
+function ScriptNode.SaveState(self)
+
+	local state = {
+		busy = tostring(self.busy),
+		trigger1 = tostring(self.triggers[1]),
+		trigger2 = tostring(self.triggers[2])
+	}
+	
+	if (self.think) then
+		state.think = self.thinkFunc
+		state.thinkTime = tostring(self.thinkTime)
+	end
+	
+	return state
+
+end
+
+function ScriptNode.LoadState(self, state)
+
+	self.busy = state.busy == "true"
+	self.triggers[1] = tonumber(state.trigger1)
+	self.triggers[2] = tonumber(state.trigger2)
+	
+	if (state.think) then
+		self.thinkFunc = state.thinkFunc
+		self.thinkTime = tonumber(state.thinkTime)
+		
+		if (state.thinkFunc == "emit") then
+			self.think = ScriptNode.Emit
+		elseif (state.thinkFunc == "post") then
+			self.think = ScriptNode.Post
+		else
+			self.think = nil
+		end
+		
+		if (self.think ~= nil) then
+			if (self.thinkTime < 1) then
+				self:SetNextThink(0)
+			else
+				local delay = self.thinkTime - GameDB.realTime
+				assert(delay >= 0)
+				self:SetNextThink(delay)
+			end
+		end
+	end
 
 end
 

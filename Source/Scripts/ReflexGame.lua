@@ -257,10 +257,10 @@ function ReflexGame.InitUI(self)
 	
 	self.widgets.root:SetVisible(false)
 
-	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect={self.REFLEX_BOARD_OFFSET,self.REFLEX_BOARD_OFFSET,UI.screenWidth-self.REFLEX_BOARD_OFFSET*2,UI.screenHeight-self.REFLEX_BOARD_OFFSET*2}, material=self.gfx.board})
-	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
-	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
+	self.widgets.border = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.border})
+	self.widgets.board = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.board})
+--	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
+--	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
 	self.widgets.root:AddChild(self.widgets.border)
 	self.widgets.root:AddChild(self.widgets.board)
 
@@ -341,6 +341,33 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+	
+	local xScale = UI.screenWidth / 1280
+	local yScale = UI.screenHeight / 720
+	
+	-- the border is authored to be a 16:9 image packed in a square image, adjust for this
+	
+	local region = (1 - UI.yAspect) / 2
+	local inset  = region * UI.screenWidth
+	
+	self.magicBoardRect = {0, -inset, UI.screenWidth, UI.screenHeight+inset*2}
+	
+	local wideRegion = (1 - (9/16)) / 2
+	local wideInset = wideRegion * 1280 * xScale
+	
+	if (UI.systemScreen.aspect == "4x3") then
+		wideInset = wideInset * 0.92 -- wtf?
+	end
+	
+	self.screen = {
+		1280 * 0.03906 * xScale,
+		(720 * 0.06944 * yScale) + (wideInset-inset)*yScale,
+		0,
+		0
+	}
+	
+	self.screen[3] = UI.screenWidth - (self.screen[1]*2)
+	self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 end
 
 function ReflexGame.SetPositionByGrid(self,w,x,y)

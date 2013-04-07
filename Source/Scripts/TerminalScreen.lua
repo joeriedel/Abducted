@@ -247,14 +247,14 @@ function TerminalScreen.HackPressed()
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
-        ReflexGame:ShowBoard(true)
+			ReflexGame:ShowBoard(true)
 			
 			local f = function ()
 				local f = function(result)
 					TerminalScreen.GameComplete(entity, "hack", result)
 				end
 				Abducted.entity.eatInput = false
-            ReflexGame:StartGame(f)
+				ReflexGame:StartGame(f)
 			end
 			
 			World.globalTimers:Add(f, 0.3, true)

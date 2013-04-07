@@ -40,6 +40,8 @@ end
 function Abducted.LoadCheckpoint(self)
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()
+	World.gameTimers.time = Game.time
+	World.globalTimers.time = Game.sysTime
 	GameDB:LoadCheckpoint()
 end
 

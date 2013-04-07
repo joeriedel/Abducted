@@ -63,7 +63,6 @@ function Persistence.ReadString(storage, key, default, ...)
 
 end
 
-
 function Persistence.WriteString(storage, key, value, ...)
 	local path = Persistence.MakePath(key, {...})
 

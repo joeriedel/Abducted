@@ -181,7 +181,7 @@ function HUD.BeginShield(self, gameTime)
 	end
 	
 	if (gameTime == nil) then
-		gameTime = Game.realTime
+		gameTime = GameDB.realTime
 	end
 	
 	-- start ticking down the time.
@@ -199,10 +199,10 @@ function HUD.BeginShield(self, gameTime)
 		HUD:ExpireShield()
 	end
 	
-	self.shieldExpiryTimer = World.gameTimers:Add(f, PlayerSkills.MaxShieldTime - (Game.realTime - gameTime), true)
+	self.shieldExpiryTimer = World.gameTimers:Add(f, PlayerSkills.MaxShieldTime - (GameDB.realTime - gameTime), true)
 	
 	f = function ()
-		local dd = Game.realTime - HUD.shieldStartTime
+		local dd = GameDB.realTime - HUD.shieldStartTime
 		self.widgets.ShieldCharging:FillCircleTo(-(1 - (dd / PlayerSkills.MaxShieldTime)), 0)
 	end
 	
@@ -730,6 +730,7 @@ function HUD.SaveState(self)
 end
 
 function HUD.LoadState(self)
+	HUD.enabled = true
 	HUD:Layout()
 	HUD:LoadShieldState()
 end

@@ -467,6 +467,9 @@ function PlayerPawn.Kill(self)
 		return
 	end
 	self.dead = true
+	if (self.shieldActive) then
+		self:EndShield()
+	end
 	self:SetMoveType(kMoveType_None)
 	self:PlayAnim("death", self.model)
 	Game.entity:PlayerDied()
@@ -650,6 +653,7 @@ function PlayerPawn.SaveState(self)
 	local vertex = self:Angles()
 	
 	local state = {
+		visible = tostring(self.visible),
 		shieldActive = tostring(self.shieldActive),
 		animState = self.animState,
 		facing = tostring(vertex.pos[3]),
@@ -665,11 +669,14 @@ function PlayerPawn.LoadState(self, state)
 	self.disableAnimTick = false
 	self.state = "idle"
 	
+	self:Show(state.visible == "true")
+	
 	if (state.shieldActive == "true") then
 		self:BeginShield()
 	else
 		self.shieldActive = false
-		self:ShowShield(false)
+		self.shield.dm:BlendTo({0,0,0,0}, 0)
+		self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	end
 	
 	local pos = Vec3ForString(state.pos)

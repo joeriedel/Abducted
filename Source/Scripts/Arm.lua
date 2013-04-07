@@ -722,10 +722,25 @@ function Arm.OnEvent(self, cmd, args)
 end
 
 function Arm.SaveState(self)
-
+		
+	if (self.requiredTopic) then
+		Persistence.WriteString(SaveGame, "armReqTopic", self.requiredTopic)
+	else
+		Persistence.DeleteKey(SaveGame, "armReqTopic")
+	end
+	
 end
 
 function Arm.LoadState(self)
+
+	local x = Persistence.ReadString(SaveGame, "armReqTopic")
+	if (x) then
+		Arm:Signal(x)
+	else
+		HUD:SignalArm(false)
+	end
+	
+	self.requestedTopic = nil
 
 end
 

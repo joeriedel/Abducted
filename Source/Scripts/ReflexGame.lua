@@ -75,9 +75,7 @@ function ReflexGame.CreateLevel1x1(self)
 	level.antivirusSpiderSpawnRate = 5
 	level.antivirusSpiderSpeed = 40
 	
-	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
-
-	level.board = { 
+	level.board = {
 		-- row 0
 		-- row 1
 		{ x=0, y=1, img="mark_start" }				
@@ -118,8 +116,6 @@ function ReflexGame.CreateLevel1x2(self)
 	local level = {}
 	
 	level.name = "1x2"	
-	
-	level.goal = { "symbol_d", "symbol_b", "symbol_a", "symbol_c" }
 
 	level.board = {  { x=0, y=0, img="cell_green" }
 		, { x=9, y=3, img="cell_green" }
@@ -134,8 +130,6 @@ function ReflexGame.CreateLevel1x3(self)
 	
 	level.name = "1x3"	
 	
-	level.goal = { "symbol_b", "symbol_a", "symbol_c", "symbol_d" }
-
 	level.board = {  { x=0, y=0, img="cell_green" }
 		, { x=6, y=3, img="cell_green" }
 		, { x=3, y=5, img="cell_green" }
@@ -271,14 +265,7 @@ function ReflexGame.InitUI(self)
 	self.widgets.root:AddChild(self.widgets.board)	
 		
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
-	for i,v in ipairs(self.state.level.goal) do 
-		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
-		local goal = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
-		goal.state = self:CreateState(string.gsub(v,"symbol_","cell_"))
-		table.insert(self.widgets.goals,goal)
-		self.widgets.root:AddChild(goal)
-		UI:MoveWidgetByCenter(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
-	end
+
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
 	for i,v in ipairs(self.state.level.board) do
@@ -316,23 +303,42 @@ function ReflexGame.LoadMaterials(self)
 	self.gfx.board = World.Load("Reflex-Game/reflex-board_M")
 	self.gfx.border = World.Load("Reflex-Game/reflex-border_M")
 
-	self.gfx.cell_a = World.Load("Reflex-Game/reflex-cell-a_M")	
-	self.gfx.cell_b = World.Load("Reflex-Game/reflex-cell-b_M")	
-	self.gfx.cell_c = World.Load("Reflex-Game/reflex-cell-c_M")	
-	self.gfx.cell_d = World.Load("Reflex-Game/reflex-cell-d_M")			
+    self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
+    self.gfx.mark_line_v = self.gfx.mark_current
+    self.gfx.mark_line_h = self.gfx.mark_current
+    self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
-	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")				
+    self.gfx.cell_green = World.Load("Puzzles/reflex-block1_M")
 
-	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
-	self.gfx.mark_line_v = self.gfx.mark_current
-	self.gfx.mark_line_h = self.gfx.mark_current	
-	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")						
-	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")							
-	self.gfx.symbol_a = World.Load("Reflex-Game/reflex-symbol-a_M")
-	self.gfx.symbol_b = World.Load("Reflex-Game/reflex-symbol-b_M")
-	self.gfx.symbol_c = World.Load("Reflex-Game/reflex-symbol-c_M")
-	self.gfx.symbol_d = World.Load("Reflex-Game/reflex-symbol-d_M")
-	
+    self.gfx.cell_a = World.Load("Puzzles/glyph01_M")
+    self.gfx.cell_b = World.Load("Puzzles/glyph02_M")
+    self.gfx.cell_c = World.Load("Puzzles/glyph03_M")
+    self.gfx.cell_d = World.Load("Puzzles/glyph04_M")
+    self.gfx.cell_05 = World.Load("Puzzles/glyph05_M")
+    self.gfx.cell_06 = World.Load("Puzzles/glyph06_M")
+    self.gfx.cell_07 = World.Load("Puzzles/glyph07_M")
+    self.gfx.cell_08 = World.Load("Puzzles/glyph08_M")
+    self.gfx.cell_09 = World.Load("Puzzles/glyph09_M")
+    self.gfx.cell_10 = World.Load("Puzzles/glyph10_M")
+    self.gfx.cell_11 = World.Load("Puzzles/glyph11_M")
+    self.gfx.cell_12 = World.Load("Puzzles/glyph12_M")
+    self.gfx.cell_13 = World.Load("Puzzles/glyph13_M")
+    self.gfx.cell_14 = World.Load("Puzzles/glyph14_M")
+    self.gfx.cell_15 = World.Load("Puzzles/glyph15_M")
+    self.gfx.cell_16 = World.Load("Puzzles/glyph16_M")
+    self.gfx.cell_17 = World.Load("Puzzles/glyph17_M")
+    self.gfx.cell_18 = World.Load("Puzzles/glyph18_M")
+    self.gfx.cell_19 = World.Load("Puzzles/glyph19_M")
+    self.gfx.cell_20 = World.Load("Puzzles/glyph20_M")
+    self.gfx.cell_21 = World.Load("Puzzles/glyph21_M")
+    self.gfx.cell_22 = World.Load("Puzzles/glyph22_M")
+    self.gfx.cell_23 = World.Load("Puzzles/glyph23_M")
+    self.gfx.cell_24 = World.Load("Puzzles/glyph24_M")
+    self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
+    self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
+    self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
+
+    self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
 end

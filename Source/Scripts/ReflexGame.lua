@@ -213,7 +213,7 @@ end
 
 function ReflexGame.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = 46
+	self.REFLEX_CELL_SIZE = 50 -- 46
     self.REFLEX_CELL_SPACING = 50
 	self.REFLEX_BOARD_OFFSET_X = 50
     self.REFLEX_BOARD_OFFSET_Y = 92

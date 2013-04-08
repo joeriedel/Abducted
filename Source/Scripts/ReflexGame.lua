@@ -213,15 +213,17 @@ end
 
 function ReflexGame.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = 64
-	self.REFLEX_BOARD_OFFSET = 0
+	self.REFLEX_CELL_SIZE = 46
+    self.REFLEX_CELL_SPACING = 50
+	self.REFLEX_BOARD_OFFSET_X = 50
+    self.REFLEX_BOARD_OFFSET_Y = 92
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 9
 	self.PLAYER_SPEED = 100
-	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE	
+	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET_X + self.REFLEX_CELL_SPACING/2 + 0 * self.REFLEX_CELL_SPACING
+	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET_Y + self.REFLEX_CELL_SPACING/2 + 0 * self.REFLEX_CELL_SPACING
+	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET_X + self.REFLEX_CELL_SPACING/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SPACING
+	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET_Y + self.REFLEX_CELL_SPACING/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SPACING
 
 	self:CreateBoards()	
 	
@@ -371,8 +373,8 @@ function ReflexGame.LoadMaterials(self)
 end
 
 function ReflexGame.SetPositionByGrid(self,w,x,y)
-	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
-	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
+	local xo = self.REFLEX_BOARD_OFFSET_X + self.REFLEX_CELL_SPACING/2 + x * self.REFLEX_CELL_SPACING
+	local yo = self.REFLEX_BOARD_OFFSET_Y + self.REFLEX_CELL_SPACING/2 + y * self.REFLEX_CELL_SPACING
 
 	UI:MoveWidgetByCenter(w,xo,yo)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
@@ -436,8 +438,8 @@ function ReflexGame.LerpWidget(self,widget,heading,dt,speed)
 end
 
 function ReflexGame.GetGridCellFromVec2(self,v)
-	local x = (v.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
-	local y = (v.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local x = (v.x - self.REFLEX_BOARD_OFFSET_X)/self.REFLEX_CELL_SPACING
+	local y = (v.y - self.REFLEX_BOARD_OFFSET_Y)/self.REFLEX_CELL_SPACING
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 
@@ -451,8 +453,8 @@ end
 function ReflexGame.GetGridCell(self,widget)
 	local pos = self:GetPosition(widget)
 
-	local x = (pos.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
-	local y = (pos.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local x = (pos.x - self.REFLEX_BOARD_OFFSET_X)/self.REFLEX_CELL_SPACING
+	local y = (pos.y - self.REFLEX_BOARD_OFFSET_Y)/self.REFLEX_CELL_SPACING
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 

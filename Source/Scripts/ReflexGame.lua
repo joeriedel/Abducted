@@ -78,7 +78,8 @@ function ReflexGame.CreateLevel1x1(self)
 	level.board = {
 		-- row 0
 		-- row 1
-		{ x=0, y=1, img="mark_start" }				
+		{ x=0, y=1, img="mark_start" }	
+		, { x=0, y=0, img="cell_green" }
 		, { x=3, y=1, img="cell_green" }
 		, { x=11, y=1, img="cell_green" }		
 		-- row 2
@@ -213,15 +214,15 @@ end
 
 function ReflexGame.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = 64
-	self.REFLEX_BOARD_OFFSET = 0
+	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1]}
+	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
-	self.INDEX_MAX_Y = 9
+	self.INDEX_MAX_Y = 8
 	self.PLAYER_SPEED = 100
-	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE	
+	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + 0 * self.REFLEX_CELL_SIZE[1]
+	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + 0 * self.REFLEX_CELL_SIZE[2]
+	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
+	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]	
 
 	self:CreateBoards()	
 	
@@ -254,6 +255,7 @@ function ReflexGame.InitUI(self)
 	self.widgets.grid = { }
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
 	
 	self.widgets.root:SetVisible(false)
 
@@ -269,14 +271,14 @@ function ReflexGame.InitUI(self)
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
 	for i,v in ipairs(self.state.level.board) do
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v.img]})
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx[v.img]})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
 		b.state = self:CreateState(v.img)
 		self.widgets.root:AddChild(b)
 		self.widgets.grid[index] = b		
 		self:SetPositionByGrid(b,v.x,v.y)
 		if (v.img == "mark_start") then
-			local current = UI:CreateWidget("MatWidget", {rect={200,200,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_current})		
+			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})		
 			current.state = self:CreateState("mark_current")
 			self.widgets.current = current
 			self.widgets.root:AddChild(current)
@@ -356,12 +358,12 @@ function ReflexGame.LoadMaterials(self)
 	local wideInset = wideRegion * 1280 * xScale
 	
 	if (UI.systemScreen.aspect == "4x3") then
-		wideInset = wideInset * 0.92 -- wtf?
+		wideInset = wideInset * 0.91 -- wtf?
 	end
 	
 	self.screen = {
-		1280 * 0.03906 * xScale,
-		(720 * 0.06944 * yScale) + (wideInset-inset)*yScale,
+		1280 * 0.05156 * xScale,
+		(720 * 0.07644 * yScale) + (wideInset-inset)*yScale,
 		0,
 		0
 	}
@@ -371,8 +373,8 @@ function ReflexGame.LoadMaterials(self)
 end
 
 function ReflexGame.SetPositionByGrid(self,w,x,y)
-	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
-	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
+	local xo = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + x * self.REFLEX_CELL_SIZE[1]
+	local yo = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + y * self.REFLEX_CELL_SIZE[2]
 
 	UI:MoveWidgetByCenter(w,xo,yo)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
@@ -436,8 +438,8 @@ function ReflexGame.LerpWidget(self,widget,heading,dt,speed)
 end
 
 function ReflexGame.GetGridCellFromVec2(self,v)
-	local x = (v.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
-	local y = (v.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local x = (v.x - self.REFLEX_BOARD_OFFSET[1])/self.REFLEX_CELL_SIZE[1]
+	local y = (v.y - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[2]
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 
@@ -451,8 +453,8 @@ end
 function ReflexGame.GetGridCell(self,widget)
 	local pos = self:GetPosition(widget)
 
-	local x = (pos.x - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE
-	local y = (pos.y - self.REFLEX_BOARD_OFFSET)/self.REFLEX_CELL_SIZE	
+	local x = (pos.x - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[1]
+	local y = (pos.y - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[2]
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 
@@ -668,7 +670,7 @@ function ReflexGame.Think(self,dt)
 		local oldR = self.widgets.current:Rect()
 		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])			
 		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
-		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
+		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
 		line.state = self:CreateState("mark_line_v")
 		table.insert(self.widgets.lines,line)
 		self.widgets.current = line
@@ -716,7 +718,7 @@ function ReflexGame.Think(self,dt)
 		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate		
 		local x = math.random(self.INDEX_MAX_X)-1
 		local y = math.random(self.INDEX_MAX_Y)-1		
-		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
+		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.antivirus_spider})
 		self.widgets.root:AddChild(spider)	
 		table.insert(self.widgets.spiders,spider)
 		self:SetPositionByGrid(spider,x,y)		

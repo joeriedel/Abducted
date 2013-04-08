@@ -24,6 +24,7 @@ function Arm.SpawnShared(self)
 
 	self.widgets = {}
 	self.widgets.Root = UI:CreateRoot(UI.kLayer_Arm)
+	self.widgets.Root:SetOpaqueLayerInput(true)
 	self.widgets.Root.OnInputEvent = Arm.EatAllInput
 	self.widgets.Root:SetVisible(false)
 

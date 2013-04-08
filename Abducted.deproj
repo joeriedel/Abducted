@@ -100,6 +100,9 @@
     <filename>Source\Scripts\Math.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\MemoryGame.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Music.lua</filename>
   </file>
   <file>
@@ -115,6 +118,9 @@
     <filename>Source\Scripts\PlayerSkills.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ReflexGame.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\SCExecContext.lua</filename>
   </file>
   <file>
@@ -128,9 +134,6 @@
   </file>
   <file>
     <filename>Source\Scripts\System.lua</filename>
-  </file>
-  <file>
-    <filename>Source\Scripts\TerminalPuzzles.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\TerminalScreen.lua</filename>

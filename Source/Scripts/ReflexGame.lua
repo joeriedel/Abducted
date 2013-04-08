@@ -217,7 +217,7 @@ function ReflexGame.InitUI(self)
 	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1]}
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
-	self.INDEX_MAX_Y = 8
+	self.INDEX_MAX_Y = 9
 	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + 0 * self.REFLEX_CELL_SIZE[1]
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + 0 * self.REFLEX_CELL_SIZE[2]

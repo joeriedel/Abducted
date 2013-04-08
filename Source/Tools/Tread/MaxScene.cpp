@@ -28,13 +28,16 @@ namespace
 		Version2 = 2,
 		Version3 = 3,
 		Version4 = 4,
-		Version = 5,
+		Version5 = 5,
+		Version = 6,
 		MaxUVChannels = 1,
 
 		HasMaterialFlag = 0x80000000,
 		HasMeshFlag = 0x00100000,
 		HasAnimsFlag = 0x00200000,
-		kSetBBoxFlag = 0x00008000
+		kSetBBoxFlag = 0x00008000,
+		kAnimType_Skeletal = 0,
+		kAnimType_Vertex = 1
 	};
 
 	struct Material
@@ -250,49 +253,81 @@ namespace
 
 		fread(&frameRate, sizeof(S32), 1, fp);
 
-		if (flags&HasMeshFlag)
-		{
-			// skin
-			for (U32 i = 0; i < nv; ++i)
+		S32 animType = kAnimType_Skeletal;
+
+		if (version > Version5)
+			fread(&animType, sizeof(S32), 1, fp);
+
+		if (animType == kAnimType_Skeletal) {
+
+			if (flags&HasMeshFlag)
 			{
-				U32 numWeights;
-				fread(&numWeights, sizeof(S32), 1, fp);
-
-				for (U32 j = 0; j < numWeights; ++j)
+				// skin
+				for (U32 i = 0; i < nv; ++i)
 				{
-					float w;
-					U32 b;
+					U32 numWeights;
+					fread(&numWeights, sizeof(S32), 1, fp);
 
-					fread(&w, sizeof(float), 1, fp);
-					fread(&b, sizeof(U32), 1, fp);
+					for (U32 j = 0; j < numWeights; ++j)
+					{
+						float w;
+						U32 b;
 
+						fread(&w, sizeof(float), 1, fp);
+						fread(&b, sizeof(U32), 1, fp);
+
+					}
 				}
 			}
-		}
 
-		// anims
-		for (int i = 0; i < numAnims; ++i)
-		{
-			ReadString(fp);
+			// anims
+			for (int i = 0; i < numAnims; ++i)
+			{
+				ReadString(fp);
 			
-			U32 v[3];
+				U32 v[3];
 
-			if (version > Version2)
-			{
-				fread(v, sizeof(U32), 3, fp);
-				v[1] = v[2];
-			}
-			else
-			{
-				fread(v, sizeof(U32), 2, fp);
-			}
-
-			for (U32 j = 0; j < v[1]; ++j)
-			{
-				for (int k = 0; k < numSkelBones; ++k)
+				if (version > Version2)
 				{
-					ReadBoneTM(fp);
-					ReadString(fp);
+					fread(v, sizeof(U32), 3, fp);
+					v[1] = v[2];
+				}
+				else
+				{
+					fread(v, sizeof(U32), 2, fp);
+				}
+
+				for (U32 j = 0; j < v[1]; ++j)
+				{
+					for (int k = 0; k < numSkelBones; ++k)
+					{
+						ReadBoneTM(fp);
+						ReadString(fp);
+					}
+				}
+			}
+		} else {
+			
+			if (!(flags&HasMeshFlag))
+				return;
+
+			for (int i = 0; i < numAnims; ++i) {
+				ReadString(fp);
+			
+				U32 flags, numFrames, firstFrame, numVertFrames;
+				fread(&flags, sizeof(U32), 1, fp);
+				fread(&numFrames, sizeof(U32), 1, fp);
+				fread(&firstFrame, sizeof(U32), 1, fp);
+				fread(&numVertFrames, sizeof(U32), 1, fp);
+
+				for (U32 j = 0; j < numVertFrames; ++j) {
+								
+					U32 frame, numVerts;
+					fread(&frame, sizeof(U32), 1, fp);
+					fread(&numVerts, sizeof(U32), 1, fp);
+					
+					for (U32 k = 0; k < numVerts; ++k)
+						ReadVec3(fp);
 				}
 			}
 		}
@@ -649,11 +684,17 @@ bool MaxScene::Load(const char *filename)
 			U32 unused, z;
 			ReadString(fp);
 			fread(&unused, sizeof(U32), 1, fp);
-			fread(&unused, sizeof(U32), 1, fp);
 
-			fread(&z, sizeof(U32), 1, fp);
-			fread(&unused, sizeof(U32), 1, fp);
-
+			if (version > Version5) {
+				fread(&z, sizeof(U32), 1, fp);
+				fread(&unused, sizeof(U32), 1, fp);
+				fread(&unused, sizeof(U32), 1, fp);
+			} else {
+				fread(&unused, sizeof(U32), 1, fp);
+				fread(&z, sizeof(U32), 1, fp);
+				fread(&unused, sizeof(U32), 1, fp);
+			}
+			
 			for (U32 k = 0; k < z; ++k)
 			{
 				ReadString(fp);

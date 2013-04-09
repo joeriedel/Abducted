@@ -278,8 +278,17 @@ function ReflexGame.InitUI(self)
 		self.widgets.grid[index] = b		
 		self:SetPositionByGrid(b,v.x,v.y)
 		if (v.img == "mark_start") then
-			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})		
+            local player = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})
+            player.state = self:CreateState("player")
+            self.widgets.player = player
+            self.widgets.root:AddChild(player)
+            self:SetPositionByGrid(player,v.x,v.y)
+
+			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
 			current.state = self:CreateState("mark_current")
+            -- widget:RotateTo({cx, cx, angle}, {time, time, time}, bool shortestAngle)
+            -- so the first arg there is a Vec3, or just a [3] array
+            -- cx, cy are the coordinates to rotate around
 			self.widgets.current = current
 			self.widgets.root:AddChild(current)
 			self:SetPositionByGrid(current,v.x,v.y)	
@@ -301,13 +310,13 @@ end
 function ReflexGame.LoadMaterials(self)
 	
 	self.gfx = {}
-	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
+	self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
 	self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
 	self.gfx.border = World.Load("UI/arm_screen1_M")
 
     self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
-    self.gfx.mark_line_v = self.gfx.mark_current
-    self.gfx.mark_line_h = self.gfx.mark_current
+    self.gfx.mark_line_v = World.Load("Puzzles/reflex-goal1_M")
+    self.gfx.mark_line_h = self.gfx.mark_line_v
     self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
     self.gfx.cell_green = World.Load("Puzzles/reflex-block1_M")
@@ -340,7 +349,7 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
     self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
 
-    self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
+    self.gfx.mark_start = nil
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
 	
@@ -664,9 +673,11 @@ function ReflexGame.Think(self,dt)
 	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 	self.widgets.current.state.endPos = currentPos
 	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
-	
+    UI:MoveWidgetByCenter(self.widgets.player,currentPos.x,currentPos.y)
+
 	-- detect change of direction
 	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+
 		local oldR = self.widgets.current:Rect()
 		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])			
 		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
@@ -674,8 +685,8 @@ function ReflexGame.Think(self,dt)
 		line.state = self:CreateState("mark_line_v")
 		table.insert(self.widgets.lines,line)
 		self.widgets.current = line
-		self.widgets.root:AddChild(line)		
-					
+		self.widgets.root:AddChild(line)
+
 		line.state.startPos = currentPos
 		line.state.endPos = line.state.startPos
 		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)

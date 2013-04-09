@@ -117,16 +117,22 @@ function UIPushButton.OnInputEvent(widget, e)
 		return true
 	elseif ((widget.state.pressed) and widget.busy and Input.IsTouchEnd(e, widget.busy)) then
 		widget:SetCapture(false)
-		if (widget.options.manualUnpress) then
+		if (e.type == kI_TouchCancelled) then
 			widget.busy = nil
-			return true
-		end
-		if (UIPushButton:DoUnpressed(widget)) then
-			if (widget.sfx.pressed) then
-				widget.sfx.pressed:Play(kSoundChannel_UI, 0)
+			widget.state.pressed = false
+			UIPushButton:SetGfxState(widget)
+		else
+			if (widget.options.manualUnpress) then
+				widget.busy = nil
+				return true
 			end
-			if (widget.events.pressed) then
-				widget.events.pressed(widget, e)
+			if (UIPushButton:DoUnpressed(widget)) then
+				if (widget.sfx.pressed) then
+					widget.sfx.pressed:Play(kSoundChannel_UI, 0)
+				end
+				if (widget.events.pressed) then
+					widget.events.pressed(widget, e)
+				end
 			end
 		end
 	end

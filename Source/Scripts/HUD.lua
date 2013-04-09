@@ -10,6 +10,7 @@ function HUD.Spawn(self)
 	HUD:Load()
 	HUD:Layout()
 	HUD.enabled = true
+	HUD.visible = true
 	
 	World.globalTimers:Add(
 		function () HUD:Think() end,
@@ -18,6 +19,7 @@ function HUD.Spawn(self)
 end
 
 function HUD.SetVisible(self, visible)
+	self.visible = visible
 	self.widgets.Root:SetVisible(visible)
 end
 
@@ -726,11 +728,14 @@ function HUD.LoadShieldState(self)
 end
 
 function HUD.SaveState(self)
+	Persistence.WriteBool(SaveGame, "HUDVisible", self.visible)
 	HUD:SaveShieldState()
 end
 
 function HUD.LoadState(self)
 	HUD.enabled = true
+	HUD.visible = Persistence.ReadBool(SaveGame, "HUDVisible", true)
+	HUD:SetVisible(HUD.visible)
 	HUD:Layout()
 	HUD:LoadShieldState()
 end

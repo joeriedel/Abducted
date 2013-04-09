@@ -413,7 +413,7 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		x.entity.model.vision:BlendTo(rgba, time)
 	end
 	
-	LL_Iterate(ManipulatableObject.Objects, f)
+	LL_Do(ManipulatableObject.Objects, f)
 
 end
 

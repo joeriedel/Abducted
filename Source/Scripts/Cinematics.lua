@@ -5,14 +5,15 @@
 
 Cinematics = Class:New()
 Cinematics.busy = 0
+Cinematics.Active = LL_New()
 
-function Cinematics.Play(self, args)
+function Cinematics.Play(self, args, time)
 		
-	args = Tokenize(args)
-	local animateCamera = not FindArrayElement(args, "camera=no")
-	local looping = FindArrayElement(args, "loop=true")
-	local playForever = FindArrayElement(args, "forever=true")
-	local interactive = FindArrayElement(args, "interactive=true")
+	x = Tokenize(args)
+	local animateCamera = not FindArrayElement(x, "camera=no")
+	local looping = FindArrayElement(x, "loop=true")
+	local playForever = FindArrayElement(x, "forever=true")
+	local interactive = FindArrayElement(x, "interactive=true")
 	local flags = 0
 	
 	if (animateCamera) then
@@ -27,15 +28,48 @@ function Cinematics.Play(self, args)
 		flags = bit.bor(flags, kCinematicFlag_Loop)
 	end
 	
+	local item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
+	
 	if (interactive) then
-		World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.InteractiveCallbacks)
+		local callbacks = {
+			OnTag = function(self, tag)
+				World.PostEvent(tag)
+			end,
+			OnComplete = function(self)
+				LL_Remove(Cinematics.Active, item)
+			end
+		}
+		if (not World.PlayCinematic(x[1], flags, 0, Game.entity, callbacks)) then
+			LL_Remove(Cinematics.Active, item)
+			time = nil
+		end
 	else
-		if (World.PlayCinematic(args[1], flags, 0, Game.entity, Cinematics.Callbacks)) then
+		local callbacks = {
+			OnTag = function(self, tag)
+				World.PostEvent(tag)
+			end,
+			OnComplete = function(self)
+				LL_Remove(Cinematics.Active, item)
+				Cinematics.busy = Cinematics.busy - 1
+				if (Cinematics.busy == 0) then
+					HUD:SetVisible(true)
+				end
+			end
+		}
+		
+		if (World.PlayCinematic(x[1], flags, 0, Game.entity, callbacks)) then
 			if (self.busy == 0) then
 				HUD:SetVisible(false)
 			end
 			self.busy = self.busy + 1
+		else
+			LL_Remove(Cinematics.Active, item)
+			time = nil
 		end
+	end
+	
+	if (time) then
+		World.SetCinematicTime(x[1], time)
 	end
 end
 
@@ -47,21 +81,71 @@ function Cinematics.PlayLevelCinematics(self)
 	end
 end
 
-Cinematics.Callbacks = {}
+function Cinematics.SaveState(self)
 
-function Cinematics.Callbacks.OnTag(self, tag)
-	World.PostEvent(tag)
-end
-
-function Cinematics.Callbacks.OnComplete(self)
-	Cinematics.busy = Cinematics.busy - 1
-	if (Cinematics.busy == 0) then
-		HUD:SetVisible(true)
+	local cmds = {}
+	local times = {}
+	
+	local f = function(x)
+		table.insert(cmds, x)
+		local t = World.CinematicTime(x.name)
+		table.insert(times, t)
 	end
+	
+	LL_Do(Cinematics.Active, f)
+	
+	if (next(cmds) == nil) then
+	
+		Persistence.DeleteKey(SaveGame, "activeCinematics")
+		Persistence.DeleteKey(SaveGame, "activeCinematicTimes")
+	
+	else
+	
+		local cs = nil
+		local ts = nil
+		
+		for k,v in pairs(cmds) do
+		
+			if (cs == nil) then
+				cs = v.cmd
+				ts = tostring(times[k])
+			else
+				cs = cs..";"..v.cmd
+				ts = ts..";"..tostring(times[k])
+			end
+		
+		end
+		
+		Persistence.WriteString(SaveGame, "activeCinematics", cs)
+		Persistence.WriteString(SaveGame, "activeCinematicTimes", ts)
+	
+	end
+
 end
 
-Cinematics.InteractiveCallbacks = {}
+function Cinematics.LoadState(self)
 
-function Cinematics.InteractiveCallbacks.OnTag(self, tag)
-	World.PostEvent(tag)
+	-- stop active cinematics
+	local f = function(x)
+		World.StopCinematic(x.name, true)
+	end
+	
+	LL_Do(Cinematics.Active, f)
+	Cinematics.Active = LL_New()
+	
+	self.busy = 0
+	
+	local cmds = Persistence.ReadString(SaveGame, "activeCinematics")
+	if (cmds) then
+		cmds = string.split(cmds, ";")
+		local times = Persistence.ReadString(SaveGame, "activeCinematicTimes")
+		assert(times)
+		times = string.split(times, ";")
+		
+		for k,v in pairs(cmds) do
+			Cinematics.Play(v, tonumber(times[k]))
+		end
+	end
+
 end
+

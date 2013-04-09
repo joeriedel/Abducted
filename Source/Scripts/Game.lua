@@ -88,10 +88,10 @@ function Game.OnEvent(self, cmd, args)
 		Cinematics:Play(args)
 		return true
 	elseif (cmd == "music") then
-		args = Tokenize(args)
-		cmd = args[1]
-		table.remove(args, 1)
-		Music.entity:Command(cmd, args)
+		local x = Tokenize(args)
+		cmd = x[1]
+		table.remove(x, 1)
+		Music.entity:Command(cmd, x, args)
 		return true
 	elseif (cmd == "signal_arm") then
 		Arm:Signal(args)

@@ -63,11 +63,15 @@ function Abducted.LoadState(self)
 
 	HUD:LoadState()
 	Arm:LoadState()
+	Cinematics:LoadState()
+	Floors:LoadState()
 end
 
 function Abducted.SaveState(self)
 	HUD:SaveState()
 	Arm:SaveState()
+	Cinematics:SaveState()
+	Floors:SaveState()
 end
 
 function Abducted.DoLoadCheckpoint(self)

@@ -259,7 +259,7 @@ function LL_Append(list, item)
 	return LL_Insert(list, item, list.ll_tail)
 end
 
-function LL_Iterate(list, f)
+function LL_Do(list, f)
 
 	local item = LL_Head(list)
 	

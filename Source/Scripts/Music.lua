@@ -20,20 +20,25 @@ function Music.Spawn(self)
 	GameDB.PersistentObjects["music"] = io
 end
 
-function Music.Play(self)
+function Music.Play(self, cmd, args)
 	self.think = nil
 
-	if (self.name and (self.name == self.args[1])) then
+	if (self.name and (self.name == args[1])) then
 		-- already playing
 		return
 	end
 	
 	self:Stop() -- fade out active music
-	self.active = World.Load(self.args[1])
-	self.name = self.args[1]
+	if (GameDB.loadingCheckpoint) then
+		self.active = World.Load(args[1], 1, false) -- blocking load
+	else
+		self.active = World.Load(args[1])
+	end
+	self.name = args[1]
+	self.cmd = cmd
 	
-	local fade = not FindArrayElement(self.args, "fade=false")
-	local loop = FindArrayElement(self.args, "loop=true")
+	local fade = not FindArrayElement(args, "fade=false")
+	local loop = FindArrayElement(args, "loop=true")
 	
 	if (fade) then
 		self.active:FadeVolume(0, 0)
@@ -49,7 +54,6 @@ function Music.Play(self)
 		self.active:FadeVolume(1, 1)
 	end
 	
-	self.args = nil
 	self.think = Music.Check
 	self:SetNextThink(1)
 	
@@ -64,6 +68,7 @@ function Music.Check(self)
 			self.think = nil
 			self.active = nil
 			self.name = nil
+			self.cmd = nil
 		end
 	else
 		self.think = nil
@@ -73,30 +78,28 @@ end
 
 function Music.Stop(self)
 	self.name = nil
+	self.cmd = nil
 	if (self.active) then
 		if (self.active:Playing()) then
-			if (args == nil) then
-				args = "1"
-			end
-			args = tonumber(args)
 			local sound = self.active
 			local f = function()
 				sound = nil
 			end
-			self.active:FadeOutAndStop(args)
+			self.active:FadeOutAndStop(1)
 			self.active = nil
-			World.gameTimers:Add(f, args+0.1, true)
+			World.gameTimers:Add(f, 1.1, true)
 		else
 			self.active = nil
 		end
 	end
 end
 
-function Music.Command(self, cmd, args)
+function Music.Command(self, cmd, args, event)
 		
 	if (cmd == "play") then
-		self.args = args
-		self.think = Music.Play
+		self.think = function (self)
+			Music.Play(self, event, args)
+		end
 		self:SetNextThink(0)
 		COutLine(kC_Debug, "Music.Command(%s, %s)", cmd, args[1])
 		return true
@@ -116,7 +119,7 @@ function Music.SaveState(self)
 	self.think = nil
 	
 	if (self.name and self.active) then
-		state.active = self.name
+		state.active = self.cmd
 	end
 	
 	return state
@@ -128,13 +131,15 @@ function Music.LoadState(self, state)
 	if (state.active) then
 	-- spin up another one
 		self.name = nil
-		self.args = {state.active}
-		self:Play()
+		local x = Tokenize(state.active)
+		table.remove(x, 1)
+		self:Play(state.active, x)
 	else
 		if (self.active) then
 			self.active:FadeOutAndStop(1)
 			self.active = nil
 			self.name = nil
+			self.cmd = nil
 			self.think = nil
 		end
 		World.PostEvent("shiphum fadeto 1 1")

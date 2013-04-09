@@ -286,9 +286,6 @@ function ReflexGame.InitUI(self)
 
 			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
 			current.state = self:CreateState("mark_current")
-            -- widget:RotateTo({cx, cx, angle}, {time, time, time}, bool shortestAngle)
-            -- so the first arg there is a Vec3, or just a [3] array
-            -- cx, cy are the coordinates to rotate around
 			self.widgets.current = current
 			self.widgets.root:AddChild(current)
 			self:SetPositionByGrid(current,v.x,v.y)	
@@ -677,6 +674,17 @@ function ReflexGame.Think(self,dt)
 
 	-- detect change of direction
 	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+        local angle = 0
+        if (self.state.heading.x < 0) then
+            angle = 180
+        elseif (self.state.heading.y < 0) then
+            angle = 270
+        elseif (self.state.heading.y > 0) then
+            angle = 90
+        end
+        self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
+        -- so the first arg there is a Vec3, or just a [3] array
+        -- cx, cy are the coordinates to rotate around
 
 		local oldR = self.widgets.current:Rect()
 		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])			

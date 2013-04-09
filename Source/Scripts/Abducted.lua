@@ -32,7 +32,7 @@ function Abducted.OnLevelStart(self)
 			self.showCheckpointNotification = false
 			World.RequestGenerateSaveGame()
 		end
-		World.globalTimers:Add(f, 1, true) -- let scripts and stuff fire to set states
+		World.globalTimers:Add(f, 0.25, true) -- let scripts and stuff fire to set states
 	end
 	
 end

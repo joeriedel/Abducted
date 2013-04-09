@@ -98,6 +98,17 @@ end
 
 function ManipulatableObject.PostSpawn(self)
 
+	if (self.keys.manipulate_target) then
+		local x = World.FindEntityTargets(self.keys.manipulate_target)
+		if (x) then
+			self.manipulateTarget = x[1]
+		end
+	end
+	
+	if (self.manipulateTarget == nil) then
+		self.manipulateTarget = self
+	end
+	
 	if (self.keys.manipulate_damage_base_name) then
 		if (self.manipulateDamage) then
 			self.manipulateBrushes = {
@@ -115,6 +126,19 @@ function ManipulatableObject.PostSpawn(self)
 		end
 	end
 
+end
+
+function ManipulatableObject.AddToManipulateList(self)
+	if (self.listItem == nil) then
+		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+	end
+end
+
+function ManipulatableObject.RemoveFromManipulateList(self)
+	if (self.listItem) then
+		LL_Remove(ManipulatableObject.Objects, self.listItem)
+		self.listItem = nil
+	end
 end
 
 function ManipulatableObject.LoadAndSwapManipulateMaterials(self)
@@ -251,10 +275,7 @@ function ManipulatableObject.Sleep(self)
 	self.enabled = false
 	self.canAttack = false
 	
-	if (self.listItem) then
-		LL_Remove(ManipulatableObject.Objects, self.listItem)
-		self.listItem = nil
-	end
+	self:RemoveFromManipulateList()
 	
 	self:SetAutoFace(nil)
 	World.viewController:RemoveLookTarget(self)
@@ -311,9 +332,8 @@ function ManipulatableObject.Idle(self)
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end
 	
-	if (self.listItem == nil) then
-		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
-	end
+	self:AddToManipulateList()
+	
 	if (not self.enabled) then
 		self.enabled = true
 		if (Game.entity.manipulate) then -- show ourselves
@@ -464,8 +484,8 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 	while (x) do
 	
-		if (x.visible) then
-			local world = VecAdd(x.entity.manipulateShift, x.entity:WorldPos())
+		if (x.entity.visible) then
+			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
 			local screen,r = World.Project(world)
 			local dx, dy, dd
 			
@@ -626,11 +646,8 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
 	
 	-- no longer manipulatable
-	if (self.listItem) then
-		self.model.vision:BlendTo({1,1,1,0}, 0.5)
-		LL_Remove(ManipulatableObject.Objects, self.listItem)
-		self.listItem = nil
-	end
+	self.model.vision:BlendTo({1,1,1,0}, 0.5)
+	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
 	if (self.keys.reset or (self.skillRequired > PlayerSkills.Manipulate)) then
@@ -638,19 +655,27 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 			self.manipulate = nil
 			self:PlayAnim(ret, self.model).Seq(ManipulatableObject.Idle)
 			-- manipulatable again
-			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+			self:AddToManipulateList()
 		end
 		World.gameTimers:Add(f, self.manipulateWindow, true)
 	else
 		-- object is not going to reset
 		self.saveManipulateDir = objDir
 		World.viewController:RemoveLookTarget(self)
+		
+		if (self.keys.on_permanent_manipulated) then
+			World.PostEvent(self.keys.on_permanent_manipulated)
+		end
 	end
 	
 	-- tell the player they moved us
 	World.playerPawn:ManipulateDir(playerDir)
-	
 	self:LookInDir(objDir)
+	
+	if (self.keys.on_manipulated) then
+		World.PostEvent(self.keys.on_manipulated)
+	end
+	
 	return true
 
 end
@@ -686,7 +711,7 @@ function ManipulatableObject.LookInDir(self, dir)
 	vec = VecScale(vec, self.lookScale)
 	
 	local cameraTarget = World.playerPawn:CameraPos()
-	local target = VecSub(self:WorldPos(), cameraTarget)
+	local target = VecSub(self.manipulateTarget:WorldPos(), cameraTarget)
 	target[2] = 0
 	target = VecAdd(cameraTarget, target) -- our position, equal to camera height
 	target = VecAdd(target, vec)
@@ -746,18 +771,13 @@ function ManipulatableObject.LoadState(self, state)
 			self.enabled = false
 			self.saveManipulateDir = state.manipulate
 			-- no longer manipulatable
-			if (self.listItem) then
-				LL_Remove(ManipulatableObject.Objects, self.listItem)
-				self.listItem = nil
-			end
+			self:RemoveFromManipulateList()
 			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
 		else
 			self.enabled = true
 			self.canAttack = true
 			self:PlayAnim("idle", self.model)
-			if (self.listItem == nil) then
-				self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
-			end
+			self:AddToManipulateList()
 			if (self.cameraFocus) then
 				local fov = NumberForString(self.keys.camera_focus_fov, 10)
 				if (fov <= 0) then
@@ -770,10 +790,7 @@ function ManipulatableObject.LoadState(self, state)
 		self.awake = false
 		self.enabled = false
 		self.canAttack = false
-		if (self.listItem) then
-			LL_Remove(ManipulatableObject.Objects, self.listItem)
-			self.listItem = nil
-		end
+		self:RemoveFromManipulateList()
 		self.model:BlendImmediate("dormant")
 	end
 

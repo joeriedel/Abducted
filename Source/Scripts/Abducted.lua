@@ -135,7 +135,7 @@ function Abducted.OnInputEvent(self, e)
     if (ReflexGame.active) then
         return false
     end
-	if (TerminalScreen.Touch.Touch(e)) then
+	if (TerminalScreen.Touch(e)) then
 		return true
     end
 	local handled, action = PlayerInput:OnInputEvent(e)

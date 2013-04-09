@@ -681,12 +681,14 @@ bool MaxScene::Load(const char *filename)
 		fread(&n, sizeof(U32), 1, fp);
 		for (U32 i = 0; i < n; ++i)
 		{
-			U32 unused, z;
+			S32 unused, z;
 			ReadString(fp);
 			fread(&unused, sizeof(U32), 1, fp);
 
 			if (version > Version5) {
 				fread(&z, sizeof(U32), 1, fp);
+				if (z < 0)
+					continue;
 				fread(&unused, sizeof(U32), 1, fp);
 				fread(&unused, sizeof(U32), 1, fp);
 			} else {
@@ -695,7 +697,7 @@ bool MaxScene::Load(const char *filename)
 				fread(&unused, sizeof(U32), 1, fp);
 			}
 			
-			for (U32 k = 0; k < z; ++k)
+			for (S32 k = 0; k < z; ++k)
 			{
 				ReadString(fp);
 				fread(&unused, sizeof(U32), 1, fp);

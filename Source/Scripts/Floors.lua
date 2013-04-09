@@ -69,10 +69,13 @@ function Floors.SaveState(self)
 	
 	for i = 1,y do
 		if (i > x) then
-			Persistence.DeleteKey(SaveGame, "Floors/floor"..i)
+			Persistence.DeleteKey(SaveGame, "Floors/floorName"..i)
+			Persistence.DeleteKey(SaveGame, "Floors/floorState"..i)
 		else
+			local s = World.FloorName(i-1)
 			local z = World.FloorState(i-1)
-			Persistence.WriteNumber(SaveGame, "Floors/floor"..i, z)
+			Persistence.WriteNumber(SaveGame, "Floors/floorName"..i, s)
+			Persistence.WriteNumber(SaveGame, "Floors/floorState"..i, z)
 		end
 	end
 	
@@ -98,8 +101,14 @@ function Floors.LoadState(self)
 	local x = World.NumFloors()
 	
 	for i = 1,x do
-		local z = Persistence.ReadNumber(SaveGame, "Floors/floor"..i, 0)
-		World.SetFloorState(i-1, z)
+		local s = Persistence.ReadString(SaveGame, "Floors/floorName"..i)
+		if (s) then
+			local n = World.FindFloor(s)
+			if (n >= 0) then
+				local z = Persistence.ReadNumber(SaveGame, "Floors/floorState"..i, 0)
+				World.SetFloorState(n, z)
+			end
+		end
 	end
 
 	x = World.NumWaypoints()

@@ -126,7 +126,6 @@ function UI.Spawn(self)
 	UI:LoadShared()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
-	UI:CreateInteractiveLayer()
 	AlertPanel:Create()
 	
 --	self.think = UI.Think
@@ -147,16 +146,25 @@ function UI.LoadShared(self)
 	self.gfx.Solid = World.Load("UI/Solid_M")
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
-	self.gfx.TerminalHack = World.Load("UI/terminal_hack_M")
-	self.gfx.TerminalHackPressed = World.Load("UI/terminal_hack_pressed_M")
-	self.gfx.TerminalSolve = World.Load("UI/terminal_solve_M")
-	self.gfx.TerminalSolvePressed = World.Load("UI/terminal_solve_pressed_M")
 	
 	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
 	self.typefaces.StandardButtonDark = World.Load("UI/StandardButtonDark_TF")
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
 	
 	self.sfx.Command = World.Load("Audio/ui_command")
+end
+
+function UI.InitMap(self)
+	UI:CreateInteractiveLayer()
+	self.gfx.TerminalHack = World.Load("UI/terminal_hack_M")
+	self.gfx.TerminalHackPressed = World.Load("UI/terminal_hack_pressed_M")
+	self.gfx.TerminalSolve = World.Load("UI/terminal_solve_M")
+	self.gfx.TerminalSolvePressed = World.Load("UI/terminal_solve_pressed_M")
+end
+
+function UI.CreateInteractiveLayer(self)
+	self.widgets.interactive = {}
+	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive)
 end
 
 function UI.CreateFeedbackLayer(self)
@@ -171,11 +179,6 @@ function UI.CreateFeedbackLayer(self)
 	self.widgets.feedback.Root:AddChild(self.widgets.feedback.Finger)
 	self.widgets.feedback.Finger:BlendTo({0, 0, 0, 0}, 0)
 	
-end
-
-function UI.CreateInteractiveLayer(self)
-	self.widgets.interactive = {}
-	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive)
 end
 
 function UI.CreateFXLayer(self)

@@ -352,7 +352,7 @@ function LL_PopTail(list)
 end
 
 --[[---------------------------------------------------------------------------
-		CurrentDateAndTimeString
+	CurrentDateAndTimeString
 -----------------------------------------------------------------------------]]
 
 function CurrentDateAndTimeString()
@@ -384,7 +384,7 @@ function CurrentDateAndTimeString()
 end
 
 --[[---------------------------------------------------------------------------
-		Support for parsing entity keys
+	Support for parsing entity keys
 -----------------------------------------------------------------------------]]
 
 function Vec3ToString(vec)
@@ -465,7 +465,7 @@ function TimeStringForNumber(n)
 end
 
 --[[---------------------------------------------------------------------------
-		COut/COutLine
+	COut/COutLine
 -----------------------------------------------------------------------------]]
 	
 function COut(level, str, ...)
@@ -479,7 +479,7 @@ function COutLine(level, str, ...)
 end
 
 --[[---------------------------------------------------------------------------
-		String Table / Languages
+	String Table / Languages
 -----------------------------------------------------------------------------]]
 
 StringTable = {}

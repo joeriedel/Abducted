@@ -23,6 +23,11 @@ function Abducted.Initialize(self)
 	self.manipulate = false
 end
 
+function Abducted.PostSpawn(self)
+	Game.PostSpawn(self)
+	Cinematics:PlayLevelCinematics()
+end
+
 function Abducted.OnLevelStart(self)
 	
 	if (GameDB:LoadingSaveGame()) then

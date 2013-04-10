@@ -17,9 +17,16 @@ end
 
 function MemoryGame.Spawn(self)
 	MemoryGame.entity = self
-		
-	self:LoadMaterials()
-	self:InitUI()
+end
+
+function MemoryGame.PostSpawn(self)
+
+	if (Game.entity.type == "Map") then
+
+		self:LoadMaterials()
+		self:InitUI()
+	
+	end
 	
 	-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
 

@@ -18,10 +18,13 @@ function Worldspawn.Spawn(self)
 	SaveGame:EnableCloudStorage(World.cloudEnabled)
 	
 	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
-	Arm:LoadChats(self.keys.arm_chats)
 	
-	if (StringForString(self.keys.arm_state, "unlocked") == "locked") then
-		Arm:ChatLockout()
+	if (Game.entity.type == "Map") then
+		Arm:LoadChats(self.keys.arm_chats)
+		
+		if (StringForString(self.keys.arm_state, "unlocked") == "locked") then
+			Arm:ChatLockout()
+		end
 	end
 end
 

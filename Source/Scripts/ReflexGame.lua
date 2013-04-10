@@ -14,12 +14,17 @@ end
 
 function ReflexGame.Spawn(self)
 	ReflexGame.entity = self
-		
-	self:LoadMaterials()
-	self:InitUI()
 	
-	-- Note: InitUI sets widgets.root to be invisible (hides the whole board)
+end
 
+function ReflexGame.PostSpawn(self)
+
+	if (Game.entity.type == "Map") then
+		self:LoadMaterials()
+		self:InitUI()
+		-- Note: InitUI sets widgets.root to be invisible (hides the whole board)
+	end
+	
 end
 
 function ReflexGame.ShowBoard(self, show)

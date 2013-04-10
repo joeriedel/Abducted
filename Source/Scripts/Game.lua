@@ -22,6 +22,9 @@ function Game.Initialize(self, type)
 	if (type == "Map") then
 		Abducted:New(Game.entity)
 		Game.entity:Initialize()
+	elseif (type == "MainMenu") then
+		MainMenu:New(Game.entity)
+		Game.entity:Initialize()
 	end
 end
 
@@ -38,7 +41,7 @@ function Game.Think(self)
 end
 
 function Game.PostSpawn(self)
-	Cinematics:PlayLevelCinematics()
+	
 end
 
 function Game.OnEvent(self, cmd, args)

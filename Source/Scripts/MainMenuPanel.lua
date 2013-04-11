@@ -54,12 +54,12 @@ function MainMenuPanel.AddBlendedBorders(self)
 
 end
 
-function MainMenuPanel.TransitionIn(self, scale, time, fade, onComplete)
+function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 
 	self.eatInput = true
 	
 	self:PrepareContents()
-	self.widgets.panel:ScaleTo({0,0}, {0,0})
+	self.widgets.panel:ScaleTo(scale, {0,0})
 	self.widgets.panel:ScaleTo({1,1}, {time,time})
 	self.widgets.panel:SetVisible(true)
 	
@@ -77,7 +77,7 @@ function MainMenuPanel.TransitionIn(self, scale, time, fade, onComplete)
 
 end
 
-function MainMenuPanel.TransitionOut(self, time, fade, onComplete)
+function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 
 	self.eatInput = true
 	
@@ -89,7 +89,7 @@ function MainMenuPanel.TransitionOut(self, time, fade, onComplete)
 				onComplete()
 			end
 		end
-		self.widgets.panel:ScaleTo({0,0}, {time,time})
+		self.widgets.panel:ScaleTo(scale, {time,time})
 		World.globalTimers:Add(f, time, true)
 	end
 	

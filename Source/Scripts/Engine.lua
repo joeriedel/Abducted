@@ -153,6 +153,16 @@ kLangId_RU = 5
 kLangId_JP = 6
 kLangId_CH = 7
 
+-- HTTP
+
+kHTTP_OpStatus_None = 0
+kHTTP_OpStatus_Pending = 1
+kHTTP_OpStatus_Success = 2
+kHTTP_OpStatus_SocketError = -1
+kHTTP_OpStatus_ResponseError = -2
+kHTTP_OpStatus_UnknownHostError = -3
+kHTTP_OpStatus_BusyError = -4
+
 -- Input Helpers
 
 function I_IsMouse(event)

@@ -74,6 +74,7 @@ function ReflexGame.CreateLevel1x1(self)
 	
 	level.antivirusSpiderSpawnRate = 5
 	level.antivirusSpiderSpeed = 40
+    level.lineTimerEnabledEnabledTimer = 5
 	
 	level.board = {
 		-- row 0
@@ -218,6 +219,7 @@ function ReflexGame.InitUI(self)
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 9
+    self.LINE_SPAWN_TIME = 1
 	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + 0 * self.REFLEX_CELL_SIZE[1]
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + 0 * self.REFLEX_CELL_SIZE[2]
@@ -232,7 +234,9 @@ function ReflexGame.InitUI(self)
 	self.state.heading = { }
 	self.state.lastHeading = { }
 	self.state.victory = { }
-	self.state.current = { }	
+	self.state.current = {}
+	self.state.path = {}
+	self.state.pathByCell = { }
 	self.state.heading.x = 0
 	self.state.heading.y = 0
 	self.state.lastHeading.x = 0
@@ -244,15 +248,19 @@ function ReflexGame.InitUI(self)
 	self.state.level = level
 	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
 	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
+    self.state.lineTimerEnabledTimer = level.lineTimerEnabledEnabledTimer
+    self.state.lineTimer = 0
 	self.state.goalCounter = 1
-	
+    self.state.lineIndex = 1
+
 	-- define structure self.widgets
 	self.widgets = {}
 	self.widgets.goals = { }
 	self.widgets.board = { }		
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
-	self.widgets.grid = { }
+	self.widgets.grid = {}
+
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
@@ -288,7 +296,8 @@ function ReflexGame.InitUI(self)
 			current.state = self:CreateState("mark_current")
 			self.widgets.current = current
 			self.widgets.root:AddChild(current)
-			self:SetPositionByGrid(current,v.x,v.y)	
+			self:SetPositionByGrid(current,v.x,v.y)
+            current.state.lastCell = v
 			current.state.startPos = self:GetPosition(current) 
 			current.state.endPos = current.state.startPos
 			table.insert(self.widgets.lines,current)
@@ -671,6 +680,15 @@ function ReflexGame.Think(self,dt)
 	self.widgets.current.state.endPos = currentPos
 	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
     UI:MoveWidgetByCenter(self.widgets.player,currentPos.x,currentPos.y)
+    local nextCell = self:GetGridCellFromVec2(currentPos)
+    if (nextCell.x ~= self.widgets.current.state.lastCell.x or nextCell.y ~= self.widgets.current.state.lastCell.y) then
+        self.widgets.current.state.lastCell = nextCell
+        local index = self:ConvertCoordToIndex(nextCell.x,nextCell.y)
+        if (self.state.pathByCell[index] == nil) then
+            self.state.pathByCell[index] = nextCell
+            self.state.path[#self.state.path+1] = nextCell
+        end
+    end
 
 	-- detect change of direction
 	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
@@ -695,14 +713,34 @@ function ReflexGame.Think(self,dt)
 		self.widgets.current = line
 		self.widgets.root:AddChild(line)
 
+        line.state.lastCell = nextCell
 		line.state.startPos = currentPos
 		line.state.endPos = line.state.startPos
 		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
 		
 		self.state.lastHeading.x = self.state.heading.x
 		self.state.lastHeading.y = self.state.heading.y
-	end
-	
+    end
+
+    self.state.lineTimerEnabledTimer = self.state.lineTimerEnabledTimer - dt
+    if (self.state.lineTimerEnabledTimer <= 0) then
+        self.state.lineTimer = self.state.lineTimer + dt
+        if (self.state.lineTimer >= self.LINE_SPAWN_TIME) then
+            self.state.lineTimer = 0
+
+            local v = self.state.path[self.state.lineIndex]
+            local index = self:ConvertCoordToIndex(v.x,v.y)
+            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.cell_green})
+            b.state = self:CreateState("cell_green")
+            self.widgets.root:AddChild(b)
+            self.widgets.grid[index] = b
+            self:SetPositionByGrid(b,v.x,v.y)
+            b:ScaleTo({0,0}, {0,0})
+            b:ScaleTo({1,1}, {1,1})
+            self.state.lineIndex = self.state.lineIndex + 1
+        end
+    end
+
 	local playerGridCell = self:GetGridCellFromVec2(currentPos)
 	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)	 
 	

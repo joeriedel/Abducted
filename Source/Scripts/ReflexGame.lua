@@ -762,12 +762,13 @@ function ReflexGame.Think(self,dt)
 			self.state.victory = true
 			return
 		end		
-	end
-	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
-		COutLine(kC_Debug,"Game Over - collided with own line")
-		self.state.gameOver = true
-		return
-	end
+    end
+-- this isn't how it works now
+--	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
+--		COutLine(kC_Debug,"Game Over - collided with own line")
+--		self.state.gameOver = true
+--		return
+--	end
 	
 	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
@@ -795,16 +796,17 @@ function ReflexGame.Think(self,dt)
 		if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
 			table.remove(self.widgets.spiders,i)
 			self.widgets.root:RemoveChild(k)
-			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)			
-		else
-			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)						
-			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)		
-			-- TODO: detect spider crossing a line segment
-			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
-				COutLine(kC_Debug,"Game Over - spider crossed player line")
-				self.state.gameOver = true
-				return
-			end
+			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)
+-- this isn't how it works now
+--		else
+--			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
+--			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)
+--			-- TODO: detect spider crossing a line segment
+--			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
+--				COutLine(kC_Debug,"Game Over - spider crossed player line")
+--				self.state.gameOver = true
+--				return
+--			end
 		end	
 	end	
 end

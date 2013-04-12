@@ -81,31 +81,27 @@ function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 
 	self.eatInput = true
 	
-	self:FadeContents({1,1,1,0}, fade)
+	self:FadeOutContents(fade)
 	
 	local f = function()
-		local f = function()
-			if (onComplete) then
+		self.widgets.panel:ScaleTo(scale, {time,time})
+		if (onComplete) then
+			local f = function()
 				onComplete()
 			end
+			World.globalTimers:Add(f, time, true)
 		end
-		self.widgets.panel:ScaleTo(scale, {time,time})
-		World.globalTimers:Add(f, time, true)
 	end
 	
 	World.globalTimers:Add(f, fade, true)
 end
 
 function MainMenuPanel.PrepareContents(self)
-	MainMenuPanel.FadeContents(self, {1,1,1,0}, 0)
+
 end
 
 function MainMenuPanel.AnimateContents(self, onComplete)
 	if (onComplete) then
 		onComplete()
 	end
-end
-
-function MainMenuPanel.FadeContents(self, color, time)
-
 end

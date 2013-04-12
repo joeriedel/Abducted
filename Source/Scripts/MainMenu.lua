@@ -21,11 +21,6 @@ function MainMenu.Initialize(self)
 	self.think = Game.Think
 	self:SetNextThink(0)
 	
-	-- download news
-	self.httpGet = System.NewHTTPGet()
-	self.httpGet:SendRequest("www.sunsidegames.com", "/abducted_news_en.txt", "text/plain")
-	self.newsPending = true
-	
 end
 
 function MainMenu.Load(self)
@@ -36,10 +31,12 @@ function MainMenu.Load(self)
 	self.gfx.MMFacebook = World.Load("UI/facebook_icon_M")
 	self.gfx.MMTwitter = World.Load("UI/twitter_icon_M")
 	self.gfx.MMLogo = World.Load("UI/abducted_logo1_M")
+	self.gfx.MMSelectedItem = World.Load("UI/MMSelectedItem_M")
 	
 	self.typefaces = {}
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
 	self.typefaces.Normal = World.Load("UI/MMNormal_TF")
+	self.typefaces.NewsTitle = World.Load("UI/MMNewsTitle_TF")
 
 end
 
@@ -62,6 +59,16 @@ function MainMenu.InitUI(self)
 	
 	rect, firstItemY = self.widgets.mainPanel:Layout()
 	
+	self.contentRect = {
+		rect[1] + rect[3] + 16 * UI.identityScale[1],
+		16 * UI.identityScale[2],
+		0,
+		0
+	}
+	
+	self.contentRect[3] = UI.screenWidth - self.contentRect[1] - (16 * UI.identityScale[1])
+	self.contentRect[4] = UI.screenHeight - self.contentRect[2] - (16 * UI.identityScale[2])
+			
 	-- How big can the logo be?
 	
 	local logoPad = 8*UI.identityScale[1]
@@ -90,6 +97,8 @@ function MainMenu.InitUI(self)
 	end
 	
 	World.globalTimers:Add(f, 1, true)
+	
+	self:InitNews()
 	
 end
 
@@ -127,12 +136,47 @@ function MainMenu.MainPanel.CreateMMText(self, data, item)
 	
 		if (Input.IsTouchBegin(e)) then
 			widget:SetCapture(true)
-			self:SelectItem(item)
+			if (self.item ~= item) then
+				widget.ignore = false
+				widget.selecting = true
+				local f = function()
+					widget.selecting = false
+					if (self.busy) then
+						local f = function()
+							data.Action(self, item)
+						end
+						if (self.unselectItem) then
+							self.unselectItem(f)
+							self.unselectItem = nil
+						else
+							f()
+						end
+					end					
+				end
+				self:SelectItem(item, f)
+			else
+				widget.ignore = true
+			end
 		elseif (Input.IsTouchEnd(e)) then
 			widget:SetCapture(false)
-			data.Action(self, item)
+			if (not widget.ignore) then
+				self.busy = true
+				if (not widget.selecting) then
+					local f = function()
+						data.Action(self, item)
+					end
+					
+					if (self.unselectItem) then
+						self.unselectItem(f)
+						self.unselectItem = nil
+					else
+						f()
+					end
+				end
+			end
 		end
 		
+		return true
 	end
 	
 	local w = UI:CreateWidget("TextLabel", {rect={0, 0, 8, 8}, typeface=MainMenu.typefaces.Normal, OnInputEvent=OnInputEvent})
@@ -184,43 +228,53 @@ function MainMenu.MainPanel.CreateMMIcons(self, data, item)
 end
 
 function MainMenu.MainPanel.News(self, item)
+	local f = function()
+		self.busy = false
+	end
+	
+	MainMenu.newsPanel:LayoutNews()
+	MainMenu.newsPanel:TransitionIn({0,0}, 0.3, f)
+
+	self.unselectItem = function(callback)
+		MainMenu.newsPanel:TransitionOut({0,0}, 0.2, 0.3, callback)
+	end
 	
 end
 
 function MainMenu.MainPanel.Continue(self, item)
-
+	self.busy = false
 end
 
 function MainMenu.MainPanel.NewGame(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.LoadGame(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Store(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Leaderboards(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Achievements(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Credits(self, item)
-	
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Facebook(self)
-
+	self.busy = false
 end
 
 function MainMenu.MainPanel.Twitter(self)
-
+	self.busy = false
 end
 
 function MainMenu.MainPanel.ValidCheckpoint(self)
@@ -245,6 +299,11 @@ function MainMenu.MainPanel.Create(self, options, parent)
 	
 	self.items = {}
 	
+	self.widgets.selectionIndicator = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=MainMenu.gfx.MMSelectedItem})
+	self.widgets.panel:AddChild(self.widgets.selectionIndicator)
+	self.widgets.selectionIndicator:SetVisible(false)
+	self.widgets.selectionIndicator:SetHAlign(kHorizontalAlign_Left)
+		
 	for k,v in pairs(MainMenu.Items) do
 	
 		if ((v.Condition == nil) or (v.Condition(self))) then
@@ -297,6 +356,7 @@ function MainMenu.MainPanel.Layout(self)
 			r[1] = xInset + (maxWidth-r[3]) / 2
 		else
 			r[1] = xInset
+			r[3] = maxWidth
 		end
 		
 		if (v.w.alignBottom) then
@@ -334,13 +394,13 @@ function MainMenu.MainPanel.AnimateNextItem(self, index, onComplete)
 		return
 	end
 
-	x.w:BlendTo({1,1,1,1}, 0.32)
+	x.w:BlendTo({1,1,1,1}, 0.2)
 		
 	local f = function()
 		self:AnimateNextItem(index+1, onComplete)
 	end
 
-	World.globalTimers:Add(f, 0.32, true)
+	World.globalTimers:Add(f, 0.2, true)
 	
 end
 
@@ -348,7 +408,49 @@ function MainMenu.MainPanel.AnimateContents(self, onComplete)
 	self:AnimateNextItem(1, onComplete)
 end
 
-function MainMenu.MainPanel.SelectItem(self, item)
+function MainMenu.MainPanel.SelectItem(self, item, onComplete)
+	local itemRect = item.w:Rect()
+	local panelRect = self.widgets.panel:Rect()
+	
+	local hPad = 16 * UI.identityScale[1]
+	local vPad = 8  * UI.identityScale[2]
+	
+	local rect = {
+		-hPad,
+		itemRect[2] - vPad,
+		panelRect[3] + (hPad*2),
+		itemRect[4] + (vPad*2)
+	}
+	
+	if (self.item) then
+		-- move selection bar to the selected item
+		
+		local itemRect = item.w:Rect()
+		local time = 0.12
+		
+		self.widgets.selectionIndicator:MoveTo({rect[1], rect[2]}, {0, time})
+		
+		if (onComplete) then
+			World.globalTimers:Add(onComplete, time, true)
+		end
+		
+		self.item = item
+		
+	else
+		self.item = item
+		
+		self.widgets.selectionIndicator:SetVisible(true)
+		self.widgets.selectionIndicator:SetRect(rect)
+		self.widgets.selectionIndicator:ScaleTo({0,1}, {0,0})
+		self.widgets.selectionIndicator:ScaleTo({1,1}, {0.3, 0})
+		
+		if (onComplete) then
+			World.globalTimers:Add(onComplete, 0.3, true)
+		end
+	end
+end
+
+function MainMenu.MainPanel.CloseActiveItem(self, callback)
 
 end
 
@@ -356,6 +458,5 @@ function MainMenu.MainPanel.OnInputEvent(self, e)
 	if (self.busy) then
 		return true
 	end
-	
 	return MainMenuPanel.OnInputEvent(self, e)
 end

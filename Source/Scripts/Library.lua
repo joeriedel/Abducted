@@ -116,7 +116,10 @@ function string:split(delim, maxNb)
     end
     -- Handle the last field
     if nb ~= maxNb then
-        result[nb + 1] = self:sub(lastPos)
+		local z = self:sub(lastPos)
+		if (z ~= "") then
+			result[nb + 1] = z
+		end
     end
     return result
 end
@@ -209,6 +212,80 @@ function Tokenize(s)
 	end
 	
 	return x
+
+end
+
+function GetToken(s, i)
+
+	if (i == nil) then
+		i = 1
+	end
+	
+	local z = ""
+	
+	while (i <= #s) do
+		local c = s:sub(i, i)
+		local b = s:byte(i)
+		
+		if (b <= 32) then
+			if (z ~= "") then
+				return z, i
+			end
+		else
+			if (c == "\"") then -- quoted
+			
+				if (z ~= "") then
+					return z, i
+				end
+			
+				-- go until end of quote
+				local k = i+1
+				while (k <= #s) do
+					c = s:sub(k, k)
+					if (c == "\"") then
+						return z, (k+1)
+					else
+						z = z..c
+					end
+					k = k+1
+				end
+				
+				i = k
+				
+				if (z ~= "") then
+					return z, i
+				end
+			else
+				z = z..c -- build token
+			end
+		end
+	
+		i = i+1
+	end
+	
+	if (z == "") then
+		z = nil
+	end
+	
+	return z, i
+
+end
+
+function SkipWhitespace(s, i)
+
+	if (i == nil) then
+		i = 1
+	end
+	
+	while (i <= #s) do
+		local b = s:byte(i)
+		if (b > 32) then
+			return i
+		end
+		i = i + 1
+	end
+	
+	return nil
 
 end
 

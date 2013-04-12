@@ -742,6 +742,7 @@ function Arm.LoadState(self)
 	end
 	
 	self.requestedTopic = nil
+	self.logTime = -1
 
 end
 

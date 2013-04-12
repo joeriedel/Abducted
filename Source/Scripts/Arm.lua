@@ -324,7 +324,7 @@ function Arm.ReturnPressed(widget)
 		Arm.active = false
 		Arm.widgets.Root:SetVisible(false)
 		Arm:ClearButtonHighlights()
-		World.DrawUIOnly(false)
+		World.SetDrawUIOnly(false)
 		World.PauseGame(false)
 		UI:BlendTo({0,0,0,0}, 0.2)
 		collectgarbage()
@@ -408,7 +408,7 @@ function Arm.Start(self, mode)
 	local f = function()
 		UI:BlendTo({1,1,1,0}, 0.2)
 		HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
-		World.DrawUIOnly(true) -- no world rendering anymore
+		World.SetDrawUIOnly(true) -- no world rendering anymore
 		World.PauseGame(true)
 		Arm:Intro()
 	end

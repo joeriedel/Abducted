@@ -32,7 +32,7 @@ function ReflexGame.ShowBoard(self, show)
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 	self.widgets.root:SetVisible(show)
-	World.DrawUIOnly(show) -- < disable/enable 3D rendering
+	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
 function ReflexGame.InitGame(self, gameType, playerSkill, terminalSkill)

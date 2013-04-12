@@ -7,14 +7,14 @@ MainMenuPanel = Class:New()
 
 function MainMenuPanel.Create(self, options, parent)
 
-	if (options == nil) then
-		options = {}
+	options = options or {}
+	
+	if (options.rect == nil) then
+		options.rect = {0,0,8,8}
 	end
 	
-	local rect = options.rect
-	if (rect == nil) then
-		rect = {0,0,8,8}
-		options.rect = rect
+	if (options.background == nil) then
+		options.background = MainMenu.gfx.MMPanel
 	end
 	
 	local OnInputEvent = function(widget, e)
@@ -22,7 +22,7 @@ function MainMenuPanel.Create(self, options, parent)
 	end
 
 	self.widgets = {}
-	self.widgets.panel = UI:CreateWidget("MatWidget", {material=MainMenu.gfx.MMPanel, rect=rect, OnInputEvent=OnInputEvent})
+	self.widgets.panel = UI:CreateWidget("MatWidget", {material=options.background, rect=options.rect, OnInputEvent=OnInputEvent})
 	
 	if (parent) then
 		parent:AddChild(self.widgets.panel)

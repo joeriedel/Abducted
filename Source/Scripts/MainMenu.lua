@@ -32,12 +32,14 @@ function MainMenu.Load(self)
 	self.gfx.MMTwitter = World.Load("UI/twitter_icon_M")
 	self.gfx.MMLogo = World.Load("UI/abducted_logo1_M")
 	self.gfx.MMSelectedItem = World.Load("UI/MMSelectedItem_M")
+	self.gfx.CharPortrait = World.Load("UI/character-profiletest1_M")
+	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
 	
 	self.typefaces = {}
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
 	self.typefaces.Normal = World.Load("UI/MMNormal_TF")
-	self.typefaces.NewsTitle = World.Load("UI/MMNewsTitle_TF")
-
+	self.typefaces.Gold = World.Load("UI/MMGold_TF")
+	
 end
 
 function MainMenu.InitUI(self)
@@ -52,12 +54,12 @@ function MainMenu.InitUI(self)
 		UI.screenHeight
 	}
 	
-	self.widgets.mainPanel = MainMenu.MainPanel:New()
-	self.widgets.mainPanel:Create({rect=rect}, self.widgets.root)
+	self.mainPanel = MainMenu.MainPanel:New()
+	self.mainPanel:Create({rect=rect}, self.widgets.root)
 	
 	local firstItemY
 	
-	rect, firstItemY = self.widgets.mainPanel:Layout()
+	rect, firstItemY = self.mainPanel:Layout()
 	
 	self.contentRect = {
 		rect[1] + rect[3] + 16 * UI.identityScale[1],
@@ -85,13 +87,13 @@ function MainMenu.InitUI(self)
 	
 	-- intro
 	self.widgets.logo:BlendTo({0,0,0,0}, 0)
-	self.widgets.mainPanel:Show(false)
-	self.widgets.mainPanel.widgets.panel:SetVAlign(kVerticalAlign_Bottom)
+	self.mainPanel:Show(false)
+	self.mainPanel.widgets.panel:SetVAlign(kVerticalAlign_Bottom)
 	
 	local f = function()
 		self.widgets.logo:BlendTo({1,1,1,1}, 3)
 		local f = function()
-			self.widgets.mainPanel:TransitionIn({1,0}, 0.4)
+			self.mainPanel:TransitionIn({1,0}, 0.4)
 		end
 		World.globalTimers:Add(f, 4, true)
 	end
@@ -99,6 +101,7 @@ function MainMenu.InitUI(self)
 	World.globalTimers:Add(f, 1, true)
 	
 	self:InitNews()
+	self:InitNewGame()
 	
 end
 
@@ -107,6 +110,9 @@ function MainMenu.ValidCheckpoint(self)
 end
 
 function MainMenu.InputEventFilter(self, e)
+	if (MainMenu.mainPanel and MainMenu.mainPanel.busy) then
+		return true
+	end
 	return false
 end
 
@@ -243,10 +249,24 @@ end
 
 function MainMenu.MainPanel.Continue(self, item)
 	self.busy = false
+	
+	local f = function(result)
+	
+	end
+	
+	AlertPanel:YesNo("MM_CONTINUE_GAME_TITLE", "MM_CONTINUE_GAME_PROMPT", f, MainMenu.contentRect)
 end
 
 function MainMenu.MainPanel.NewGame(self, item)
-	self.busy = false
+	local f = function()
+		self.busy = false
+	end
+	
+	MainMenu.newGamePanel:TransitionIn({0,0}, 0.3, f)
+
+	self.unselectItem = function(callback)
+		MainMenu.newGamePanel:TransitionOut({0,0}, 0.2, 0.3, callback)
+	end
 end
 
 function MainMenu.MainPanel.LoadGame(self, item)
@@ -448,15 +468,10 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 			World.globalTimers:Add(onComplete, 0.3, true)
 		end
 	end
+	
+	UI.sfx.Command:Play(kSoundChannel_UI, 0)
 end
 
 function MainMenu.MainPanel.CloseActiveItem(self, callback)
 
-end
-
-function MainMenu.MainPanel.OnInputEvent(self, e)
-	if (self.busy) then
-		return true
-	end
-	return MainMenuPanel.OnInputEvent(self, e)
 end

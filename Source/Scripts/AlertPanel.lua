@@ -5,7 +5,9 @@
 
 AlertPanel = {}
 AlertPanel.OKButton = 1
+AlertPanel.YesButton = 1
 AlertPanel.CancelButton = 2
+AlertPanel.NoButton = 2
 
 function AlertPanel.Create(self)
 	self.gfx = {}
@@ -33,8 +35,7 @@ function AlertPanel.Create(self)
 	self.widgets.panel:AddChild(self.widgets.title)
 	self.widgets.text = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Text})
 	self.widgets.panel:AddChild(self.widgets.text)
-	UI:CenterWidget(self.widgets.panel, UI.fullscreenRect)
-	
+		
 	-- scale buttons accordingly:
 	local buttonSize = UI.gfx.Button:Dimensions()
 	
@@ -51,6 +52,14 @@ function AlertPanel.Create(self)
 	}
 	
 	self.widgets.text:SetRect(textRect)
+	
+	self.widgets.buttonAbk = UI:CreateWidget("MatWidget", {rect={0,0,buttonSize[1], buttonSize[2]}, material=UI.gfx.Solid})
+	self.widgets.buttonAbk:BlendTo({0,0,0,1}, 0)
+	self.widgets.panel:AddChild(self.widgets.buttonAbk)
+	
+	self.widgets.buttonBbk = UI:CreateWidget("MatWidget", {rect={0,0,buttonSize[1], buttonSize[2]}, material=UI.gfx.Solid})
+	self.widgets.buttonBbk:BlendTo({0,0,0,1}, 0)
+	self.widgets.panel:AddChild(self.widgets.buttonBbk)
 	
 	self.widgets.buttonA = UI:CreateStylePushButton({0,0,buttonSize[1],buttonSize[2]}, AlertPanel.ButtonPressed, {fontSize="small"}, self.widgets.panel)
 	self.widgets.buttonB = UI:CreateStylePushButton({0,0,buttonSize[1],buttonSize[2]}, AlertPanel.ButtonPressed, {fontSize="small"}, self.widgets.panel)
@@ -70,7 +79,9 @@ function AlertPanel.Dismiss(self, result)
 	self.widgets.title:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.text:BlendTo({1,1,1,0}, 0.1)
 	self.widgets.buttonA:BlendTo({1,1,1,0}, 0.1)
+	self.widgets.buttonAbk:BlendTo({0,0,0,0}, 0.1)
 	self.widgets.buttonB:BlendTo({1,1,1,0}, 0.1)
+	self.widgets.buttonBbk:BlendTo({0,0,0,0}, 0.1)
 	self.widgets.buttonA.class:SetEnabled(self.widgets.buttonA, false)
 	self.widgets.buttonB.class:SetEnabled(self.widgets.buttonB, false)
 	
@@ -94,7 +105,13 @@ function AlertPanel.ButtonPressed(widget, e)
 	AlertPanel:Dismiss(widget.code)
 end
 
-function AlertPanel.Run(self, title, msg, buttons, callback)
+function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
+	
+	if (screenRect == nil) then
+		screenRect = UI.fullscreenRect
+	end
+	
+	UI:CenterWidget(self.widgets.panel, screenRect)
 	
 	assert(self.active == false)
 	
@@ -149,12 +166,16 @@ function AlertPanel.Run(self, title, msg, buttons, callback)
 		
 		local xInset = 64*UI.identityScale[1]
 		UI:MoveWidget(self.widgets.buttonA, xInset, yButtonPos)
+		UI:MoveWidget(self.widgets.buttonAbk, xInset, yButtonPos)
 		UI:MoveWidget(self.widgets.buttonB, panelRect[3]-xInset-buttonRect[3], yButtonPos)
+		UI:MoveWidget(self.widgets.buttonBbk, panelRect[3]-xInset-buttonRect[3], yButtonPos)
 		self.widgets.buttonB.code = buttons[2].r
 		doButtonB = true
 	else
 		UI:MoveWidget(self.widgets.buttonA, 0, yButtonPos)
 		UI:CenterWidget(self.widgets.buttonA, {0,0,panelRect[3],panelRect[4]})
+		local r = self.widgets.buttonA:Rect()
+		self.widgets.buttonAbk:SetRect(r)
 	end
 	
 	self.widgets.buttonA.class:SetEnabled(self.widgets.buttonA, true)
@@ -163,15 +184,19 @@ function AlertPanel.Run(self, title, msg, buttons, callback)
 	self.widgets.title:BlendTo({1,1,1,0},0)
 	self.widgets.text:BlendTo({1,1,1,0},0)
 	self.widgets.buttonA:BlendTo({1,1,1,0},0)
+	self.widgets.buttonAbk:BlendTo({0,0,0,0},0)
 	self.widgets.buttonB:BlendTo({1,1,1,0},0)
+	self.widgets.buttonBbk:BlendTo({0,0,0,0},0)
 	self.widgets.panel:ScaleTo({0,0}, {0,0})
 	
 	local f = function()
 		self.widgets.title:BlendTo({1,1,1,1}, 0.3)
 		self.widgets.text:BlendTo({1,1,1,1}, 0.3)
 		self.widgets.buttonA:BlendTo({1,1,1,1}, 0.3)
+		self.widgets.buttonAbk:BlendTo({0,0,0,1},0.3)
 		if (doButtonB) then
 			self.widgets.buttonB:BlendTo({1,1,1,1}, 0.3)
+			self.widgets.buttonBbk:BlendTo({0,0,0,1},0.3)
 		end
 	end
 	
@@ -181,11 +206,11 @@ function AlertPanel.Run(self, title, msg, buttons, callback)
 
 end
 
-function AlertPanel.OK(self, title, msg, callback)
-	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback)
+function AlertPanel.OK(self, title, msg, callback, screenRect)
+	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback, screenRect)
 end
 
-function AlertPanel.OKCancel(self, title, msg)
+function AlertPanel.OKCancel(self, title, msg, screenRect)
 	AlertPanel:Run(
 		title,
 		msg, 
@@ -193,6 +218,20 @@ function AlertPanel.OKCancel(self, title, msg)
 			{"ALERT_PANEL_OK", r=AlertPanel.OKButton}, 
 			{"ALERT_PANEL_CANCEL", r=AlertPanel.CancelButton}
 		}, 
-		callback
+		callback,
+		screenRect
+	)
+end
+
+function AlertPanel.YesNo(self, title, msg, callback, screenRect)
+	AlertPanel:Run(
+		title,
+		msg, 
+		{
+			{"ALERT_PANEL_YES", r=AlertPanel.YesButton}, 
+			{"ALERT_PANEL_NO", r=AlertPanel.NoButton}
+		}, 
+		callback,
+		screenRect
 	)
 end

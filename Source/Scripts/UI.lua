@@ -70,6 +70,11 @@ function UI.Spawn(self)
 		uiScreen.height / 720
 	}
 	
+	if (UI.systemScreen.aspect == "4x3") then
+	-- don't stretch weird on 4x3
+		UI.identityScale[2] = UI.identityScale[1]
+	end
+	
 	UI.invIdentityScale = {
 		1 / UI.identityScale[1],
 		1 / UI.identityScale[2]
@@ -151,7 +156,7 @@ function UI.LoadShared(self)
 	self.typefaces.StandardButtonDark = World.Load("UI/StandardButtonDark_TF")
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
 	
-	self.sfx.Command = World.Load("Audio/ui_command")
+	self.sfx.Command = World.LoadSound("Audio/ui_command", 2)
 end
 
 function UI.InitMap(self)

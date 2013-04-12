@@ -387,11 +387,17 @@ function ReflexGame.LoadMaterials(self)
 	self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 end
 
-function ReflexGame.SetPositionByGrid(self,w,x,y)
-	local xo = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + x * self.REFLEX_CELL_SIZE[1]
-	local yo = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + y * self.REFLEX_CELL_SIZE[2]
+function ReflexGame.GetPositionByGrid(self,x,y)
+    local v = { }
+    v.x = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + x * self.REFLEX_CELL_SIZE[1]
+    v.y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + y * self.REFLEX_CELL_SIZE[2]
+    return v
+end
 
-	UI:MoveWidgetByCenter(w,xo,yo)
+
+function ReflexGame.SetPositionByGrid(self,w,x,y)
+    local v = self:GetPositionByGrid(x,y)
+	UI:MoveWidgetByCenter(w,v.x,v.y)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
@@ -692,6 +698,10 @@ function ReflexGame.Think(self,dt)
 
 	-- detect change of direction
 	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+        currentPos = self:GetPositionByGrid(nextCell.x,nextCell.y)
+        self:SetPositionByGrid(self.widgets.player,currentPos.x,currentPos.y)
+        self.widgets.current.state.endPos = currentPos
+        self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
         local angle = 0
         if (self.state.heading.x < 0) then
             angle = 180

@@ -364,10 +364,6 @@ function MainMenu.MainPanel.LoadGame(self, item)
 	self.busy = false
 end
 
-function MainMenu.MainPanel.ManageGames(self, item)
-	self.busy = false
-end
-
 function MainMenu.MainPanel.Store(self, item)
 	self.busy = false
 end
@@ -405,7 +401,6 @@ MainMenu.Items = {
 	{data={string="MM_CONTINUE", Action=MainMenu.MainPanel.Continue}, Condition=MainMenu.MainPanel.ValidCheckpoint, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_NEW_GAME", Action=MainMenu.MainPanel.NewGame}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_LOAD_GAME", Action=MainMenu.MainPanel.LoadGame}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_MANAGE_GAMES", Action=MainMenu.MainPanel.ManageGames}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Create=MainMenu.MainPanel.CreateMMText},

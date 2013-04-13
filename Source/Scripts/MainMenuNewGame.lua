@@ -145,7 +145,7 @@ function MainMenu.NewGame.PrepareContents(self)
 	self.portrait = 1
 	
 	local gfx = {
-		enabled = MainMenu.gfx.portraits[self.portrait].material,
+		enabled = MainMenu.gfx.portraits[self.portrait],
 		highlight = UI.gfx.ButtonOverbright
 	}
 	
@@ -169,7 +169,6 @@ end
 function MainMenu.NewGame.FadeOutContents(self, time)
 	self.widgets.group:BlendTo({1,1,1,0}, time)
 end
-
 
 function MainMenu.NewGame.NextPortrait(self)
 	self.portrait = self.portrait + 1

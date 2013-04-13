@@ -7,6 +7,7 @@ Music = Class:New()
 
 function Music.Spawn(self)
 	Music.entity = self
+	self.queue = LL_New()
 	
 	local io = {
 		Save = function()
@@ -18,11 +19,30 @@ function Music.Spawn(self)
 	}
 	
 	GameDB.PersistentObjects["music"] = io
+	
+	self.think = Music.Next
+	self:SetNextThink(0)
+	
+end
+
+function Music.Next(self)
+
+	if (self.f) then
+		self.f(self)
+		self.f = nil
+	end
+	
+	local head = LL_Pop(self.queue)
+	if (head) then
+		self.f = head.f
+	end
+	
+	self:Check()
+
 end
 
 function Music.Play(self, cmd, args)
-	self.think = nil
-
+	
 	if (self.name and (self.name == args[1])) then
 		-- already playing
 		return
@@ -54,9 +74,6 @@ function Music.Play(self, cmd, args)
 		self.active:FadeVolume(1, 1)
 	end
 	
-	self.think = Music.Check
-	self:SetNextThink(1)
-	
 	World.PostEvent("shiphum fadeto 0.5 1")
 end
 
@@ -65,13 +82,10 @@ function Music.Check(self)
 	if (self.active) then
 		if (not self.active:Playing()) then
 			World.PostEvent("shiphum fadeto 1 1")
-			self.think = nil
 			self.active = nil
 			self.name = nil
 			self.cmd = nil
 		end
-	else
-		self.think = nil
 	end
 
 end
@@ -97,10 +111,10 @@ end
 function Music.Command(self, cmd, args, event)
 		
 	if (cmd == "play") then
-		self.think = function (self)
+		local f = function (self)
 			Music.Play(self, event, args)
 		end
-		self:SetNextThink(0)
+		LL_Append(self.queue, {f=f})
 		COutLine(kC_Debug, "Music.Command(%s, %s)", cmd, args[1])
 		return true
 	elseif (cmd == "stop") then
@@ -116,8 +130,6 @@ end
 function Music.SaveState(self)
 	local state = {}
 	
-	self.think = nil
-	
 	if (self.name and self.active) then
 		state.active = self.cmd
 	end
@@ -128,19 +140,23 @@ end
 
 function Music.LoadState(self, state)
 
+	self.queue = LL_New()
+
 	if (state.active) then
 	-- spin up another one
 		self.name = nil
-		local x = Tokenize(state.active)
-		table.remove(x, 1)
-		self:Play(state.active, x)
+		local f = function(self)
+			local x = Tokenize(state.active)
+			table.remove(x, 1)
+			Music.Play(self, state.active, x)
+		end
+		LL_Append(self.queue, {f=f})
 	else
 		if (self.active) then
 			self.active:FadeOutAndStop(1)
 			self.active = nil
 			self.name = nil
 			self.cmd = nil
-			self.think = nil
 		end
 		World.PostEvent("shiphum fadeto 1 1")
 	end

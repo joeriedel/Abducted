@@ -11,11 +11,21 @@ GameDB.HoursPerDay = 24
 GameDB.SecondsPerHour = 60*60
 GameDB.SecondsPerDay = 60*60*24
 GameDB.PersistentObjects = {}
-
+GameDB.Portraits = {
+	"UI/portrait1_M",
+	"UI/portrait2_M",
+	"UI/portrait3_M",
+	"UI/portrait4_M"
+}
+	
 function GameDB.Load(self)
 
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
-	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/portrait1_M")
+	self.portrait = Persistence.ReadNumber(SaveGame, "portrait", 1)
+	self.portrait = GameDB.Portraits[self.portrait]
+	if (self.portrait == nil) then
+		self.portrait = GameDB.Portraits[1]
+	end
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)

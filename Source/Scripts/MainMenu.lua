@@ -36,15 +36,10 @@ function MainMenu.Load(self)
 	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
 	self.gfx.PortraitSelectArrow = World.Load("UI/charselectarrow_M")
 	
-	self.gfx.portraits = {
-		{name="UI/portrait1_M"},
-		{name="UI/portrait2_M"},
-		{name="UI/portrait3_M"},
-		{name="UI/portrait4_M"}
-	}
+	self.gfx.portraits = {}
 	
-	for k,v in pairs(self.gfx.portraits) do
-		v.material = World.Load(v.name)
+	for k,v in pairs(GameDB.Portraits) do
+		self.gfx.portraits[k] = World.Load(v)
 	end
 	
 	self.typefaces = {}
@@ -149,9 +144,9 @@ end
 
 function MainMenu.ValidCheckpoint(self)
 	local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
-	if (checkpoint) then
-		local saveGames = Globals.keys.saveGames
-		if (saveGames and (saveGames[checkpoint] ~= nil)) then
+	if (checkpoint and self.saves) then
+		local saveInfo = self.saves[checkpoint]
+		if (saveInfo) then
 			return true
 		end
 	end
@@ -162,8 +157,15 @@ function MainMenu.SaveGamesExist(self)
 	return self.saves ~= nil
 end
 
-function MainMenu.LoadSaveGameInfo(self)
-
+function MainMenu.LoadSaveGameInfo(self, path)
+	local info = {
+		playerName = Persistence.ReadString(SaveGame, "playerName", "???"),
+		portrait = Persistence.ReadNumber(SaveGame, "portrait", 1),
+		level = Persistence.ReadString(SaveGame, "currentLevel"),
+		path = path
+	}
+	
+	return info
 end
 
 function MainMenu.PopulateSaveGames(self)
@@ -176,7 +178,7 @@ function MainMenu.PopulateSaveGames(self)
 	for k,v in pairs(saveGames) do
 		self.saves = self.saves or {}
 		SaveGame:LoadSavedGame(v)
-		local saveInfo = self:LoadSaveGameInfo()
+		local saveInfo = self:LoadSaveGameInfo(v)
 		self.saves[tonumber(k)] = saveInfo
 	end
 
@@ -327,7 +329,20 @@ function MainMenu.MainPanel.Continue(self, item)
 	self.busy = false
 	
 	local f = function(result)
-	
+		if (result == AlertPanel.YesButton) then
+		
+			local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
+			local saveInfo = MainMenu.saves[checkpoint]
+			SaveGame:LoadSavedGame(saveInfo.path)
+			Persistence.WriteBool(Session, "loadCheckpoint", true)
+			Session:Save()
+		
+			MainMenu.command = function()
+				World.RequestLoad(saveInfo.level, kUnloadDisposition_Slot)
+			end
+			
+			MainMenu.mainPanel:Exit()
+		end
 	end
 	
 	AlertPanel:YesNo("MM_CONTINUE_GAME_TITLE", "MM_CONTINUE_GAME_PROMPT", f, MainMenu.contentRect)
@@ -602,6 +617,8 @@ function MainMenu.MainPanel.Exit(self)
 	if (MainMenu.mainPanel.unselectItem) then
 		MainMenu.mainPanel.unselectItem(f)
 		MainMenu.mainPanel.unselectItem = nil
+	else
+		f()
 	end
 	
 end

@@ -32,6 +32,7 @@ end
 function Abducted.OnLevelStart(self)
 	
 	if (GameDB:LoadingSaveGame()) then
+		COutLine(kC_Debug, "Loading checkpoint!")
 		self:LoadCheckpoint()
 	else
 		local f = function()
@@ -46,8 +47,8 @@ end
 function Abducted.LoadCheckpoint(self)
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()
-	World.gameTimers.time = Game.time
-	World.globalTimers.time = Game.sysTime
+	World.gameTimers.time = Game.time or 0
+	World.globalTimers.time = Game.sysTime or 0
 	GameDB:LoadCheckpoint()
 end
 

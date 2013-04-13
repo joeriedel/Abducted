@@ -4,12 +4,6 @@
 -- See Abducted/LICENSE for licensing terms
 
 MainMenu.NewGame = MainMenuPanel:New()
-
-MainMenu.NewGame.CharDBInset = { 32, 16 }
-MainMenu.NewGame.CharDBTextSpace = {12, 8}
-MainMenu.NewGame.CharDBSectionHeightPct = 0.42
-MainMenu.NewGame.CharDBPulsePctSize = 0.95
-MainMenu.NewGame.CharDBPulseInset = 8
 MainMenu.NewGame.StartingLevel = "Ep1/ep1_falling_room2"
 
 function MainMenu.InitNewGame(self)
@@ -184,7 +178,7 @@ function MainMenu.NewGame.NextPortrait(self)
 	end
 	
 	local gfx = {
-		enabled = MainMenu.gfx.portraits[self.portrait].material,
+		enabled = MainMenu.gfx.portraits[self.portrait],
 		highlight = UI.gfx.ButtonOverbright
 	}
 	self.widgets.portrait.class:ChangeGfx(self.widgets.portrait, gfx)
@@ -208,7 +202,7 @@ function MainMenu.NewGame.StartGame(self)
 	
 	SaveGame:Create(filename)
 	Persistence.WriteString(SaveGame, "playerName", self.playerName)
-	Persistence.WriteString(SaveGame, "portrait", MainMenu.gfx.portraits[self.portrait].name)
+	Persistence.WriteNumber(SaveGame, "portrait", self.portrait)
 	Persistence.WriteString(SaveGame, "currentLevel", MainMenu.NewGame.StartingLevel)
 	SaveGame:Save()
 		
@@ -218,9 +212,9 @@ function MainMenu.NewGame.StartGame(self)
 	Persistence.WriteNumber(Globals, "checkpoint", index)
 	Globals:Save()
 	
-	MainMenu.mainPanel:Exit()
-	
 	MainMenu.command = function()
 		World.RequestLoad(MainMenu.NewGame.StartingLevel, kUnloadDisposition_Slot)
 	end
+	
+	MainMenu.mainPanel:Exit()
 end

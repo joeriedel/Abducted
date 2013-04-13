@@ -15,7 +15,7 @@ GameDB.PersistentObjects = {}
 function GameDB.Load(self)
 
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
-	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/character-profiletest1_M")
+	self.portrait = Persistence.ReadString(SaveGame, "portrait", "UI/portrait1_M")
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)

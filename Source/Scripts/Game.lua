@@ -114,6 +114,12 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "checkpoint") then
 		self.showCheckpointNotification = true
 		World.RequestGenerateSaveGame()
+		return true
+	elseif (cmd == "mainMenuCommand") then
+		if (self.OnMainMenuCommand) then
+			self:OnMainMenuCommand(cmds, args)
+		end
+		return true
 	end
 end
 

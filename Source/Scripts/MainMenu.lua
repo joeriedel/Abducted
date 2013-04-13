@@ -7,6 +7,7 @@ MainMenu = Game:New()
 
 function MainMenu.Initialize(self)
 
+	MainMenu:PopulateSaveGames()
 	MainMenu:Load()
 	MainMenu:InitUI()
 
@@ -16,7 +17,7 @@ function MainMenu.Initialize(self)
 		end
 	}
 
-	World.PlayCinematic("mainmenu", bit.bor(kCinematicFlag_Loop, kCinematicFlag_AnimateCamera), 0, Game.entity, callbacks)
+	MainMenu:PlayCinematic("mainmenu", bit.bor(kCinematicFlag_Loop, kCinematicFlag_AnimateCamera))
 	
 	self.think = Game.Think
 	self:SetNextThink(0)
@@ -32,8 +33,19 @@ function MainMenu.Load(self)
 	self.gfx.MMTwitter = World.Load("UI/twitter_icon_M")
 	self.gfx.MMLogo = World.Load("UI/abducted_logo1_M")
 	self.gfx.MMSelectedItem = World.Load("UI/MMSelectedItem_M")
-	self.gfx.CharPortrait = World.Load("UI/character-profiletest1_M")
 	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
+	self.gfx.PortraitSelectArrow = World.Load("UI/charselectarrow_M")
+	
+	self.gfx.portraits = {
+		{name="UI/portrait1_M"},
+		{name="UI/portrait2_M"},
+		{name="UI/portrait3_M"},
+		{name="UI/portrait4_M"}
+	}
+	
+	for k,v in pairs(self.gfx.portraits) do
+		v.material = World.Load(v.name)
+	end
 	
 	self.typefaces = {}
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
@@ -82,6 +94,11 @@ function MainMenu.InitUI(self)
 		logoSize
 	}
 	
+	self.widgets.black = UI:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=UI.gfx.Solid})
+	self.widgets.black:BlendTo({0,0,0,1}, 0)
+	self.widgets.black:SetVisible(false)
+	self.widgets.root:AddChild(self.widgets.black)
+	
 	self.widgets.logo = UI:CreateWidget("MatWidget", {rect=logoRect, material=self.gfx.MMLogo})
 	self.widgets.root:AddChild(self.widgets.logo)
 	
@@ -105,12 +122,71 @@ function MainMenu.InitUI(self)
 	
 end
 
+function MainMenu.PlayCinematic(self, name, flags, xfadeCamera)
+
+	local callbacks = {
+		OnTag = function(self, tag)
+			World.PostEvent(tag)
+		end
+	}
+	
+	if (xfadeCamera == nil) then
+		xfadeCamera = 0
+	end
+
+	World.PlayCinematic(name, flags, xfadeCamera, Game.entity, callbacks)
+	
+end
+
+function MainMenu.OnMainMenuCommand(self, cmd, args)
+
+	if (MainMenu.command) then
+		MainMenu.command()
+		MainMenu.command = nil
+	end
+
+end
+
 function MainMenu.ValidCheckpoint(self)
-	return true
+	local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
+	if (checkpoint) then
+		local saveGames = Globals.keys.saveGames
+		if (saveGames and (saveGames[checkpoint] ~= nil)) then
+			return true
+		end
+	end
+	return false
+end
+
+function MainMenu.SaveGamesExist(self)
+	return self.saves ~= nil
+end
+
+function MainMenu.LoadSaveGameInfo(self)
+
+end
+
+function MainMenu.PopulateSaveGames(self)
+
+	local saveGames = Globals.keys.saveGames
+	if (saveGames == nil) then
+		return
+	end
+	
+	for k,v in pairs(saveGames) do
+		self.saves = self.saves or {}
+		SaveGame:LoadSavedGame(v)
+		local saveInfo = self:LoadSaveGameInfo()
+		self.saves[tonumber(k)] = saveInfo
+	end
+
 end
 
 function MainMenu.InputEventFilter(self, e)
 	if (MainMenu.mainPanel and MainMenu.mainPanel.busy) then
+		return true
+	end
+	if (MainMenu.eatInput) then
 		return true
 	end
 	return false
@@ -273,6 +349,10 @@ function MainMenu.MainPanel.LoadGame(self, item)
 	self.busy = false
 end
 
+function MainMenu.MainPanel.ManageGames(self, item)
+	self.busy = false
+end
+
 function MainMenu.MainPanel.Store(self, item)
 	self.busy = false
 end
@@ -301,11 +381,16 @@ function MainMenu.MainPanel.ValidCheckpoint(self)
 	return MainMenu:ValidCheckpoint()
 end
 
+function MainMenu.MainPanel.SaveGamesExist(self)
+	return MainMenu:SaveGamesExist()
+end
+
 MainMenu.Items = {
 	{data={string="MM_NEWS", Action=MainMenu.MainPanel.News}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_CONTINUE", Action=MainMenu.MainPanel.Continue}, Condition=MainMenu.MainPanel.ValidCheckpoint, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_NEW_GAME", Action=MainMenu.MainPanel.NewGame}, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_LOAD_GAME", Action=MainMenu.MainPanel.LoadGame}, Create=MainMenu.MainPanel.CreateMMText},
+	{data={string="MM_LOAD_GAME", Action=MainMenu.MainPanel.LoadGame}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
+	{data={string="MM_MANAGE_GAMES", Action=MainMenu.MainPanel.ManageGames}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Create=MainMenu.MainPanel.CreateMMText},
@@ -327,11 +412,11 @@ function MainMenu.MainPanel.Create(self, options, parent)
 	for k,v in pairs(MainMenu.Items) do
 	
 		if ((v.Condition == nil) or (v.Condition(self))) then
-			local item = {i = k}
+			local item = {i = (#self.items + 1)}
 			local w = v.Create(self, v.data, item)
 			self.widgets.panel:AddChild(w)
 			item.w = w
-			self.items[k] = item
+			self.items[item.i] = item
 		end
 	end
 
@@ -472,6 +557,51 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 	UI.sfx.Command:Play(kSoundChannel_UI, 0)
 end
 
-function MainMenu.MainPanel.CloseActiveItem(self, callback)
+function MainMenu.MainPanel.Exit(self)
+	MainMenu.eatInput = true
+	
+	local f = function()
+		UI:BlendTo({1,1,1,1}, 0.3)
+		
+		local f = function()
+			self.widgets.panel:SetVisible(false)
+--			local r = self.widgets.panel:Rect()
+--			self.widgets.panel:MoveTo({-r[1]-r[3], 0}, {0.3, 0})
+		
+		-- center the abducted title
+			r = MainMenu.widgets.logo:Rect()
+			r[1] = (UI.screenWidth-r[3]) / 2
+			MainMenu.widgets.logo:SetRect(r)
+			r[2] = (UI.screenHeight-r[4]) / 2
+			MainMenu.widgets.logo:MoveTo({r[1], r[2]}, {0, 16})
+			MainMenu.widgets.logo:ScaleTo({2, 2}, {16, 16})
+	--		MainMenu.widgets.black:SetVisible(true)
+--			World.SetDrawUIOnly(true)
+			MainMenu:PlayCinematic("flyaway", kCinematicFlag_AnimateCamera, 0.2)
+			
+			UI:BlendTo({1,1,1,0}, 0.3)
+			
+			--[[local f = function()
+				UI:BlendTo({0,0,0,1}, 0.5)
+				World.SoundFadeMasterVolume(0, 0.5)
+				if (MainMenu.command) then
+					local f = function()
+						MainMenu.command()
+					end
+					World.globalTimers:Add(f, 0.55, true)
+				end
+			end
+			
+			World.globalTimers:Add(f, 8, true)]]--
+		end
+		World.globalTimers:Add(f, 0.3, true)
+--		MainMenu.widgets.logo:MoveTo({r[1], r[2]}, {3, 0})
 
+	end
+	
+	if (MainMenu.mainPanel.unselectItem) then
+		MainMenu.mainPanel.unselectItem(f)
+		MainMenu.mainPanel.unselectItem = nil
+	end
+	
 end

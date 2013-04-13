@@ -289,32 +289,41 @@ function UI.CreateStylePushButton(self, rect, OnPressed, options, parent)
 		typeface = self.typefaces.StandardButton
 	end
 	
+	local label = nil
+	if (not options.nolabel) then
+		label = {typeface = typeface}
+	end
+	
 	local sound = options.pressed or self.sfx.Command
 	
-	local highlight = options.highlight or {}
+	local highlight = nil
+
+	if (not options.nohighlight) then
+		highlight = options.highlight or {}
 	
-	if (highlight.on == nil) then
-		if (options.background) then
-			highlight.on = {0.5, 0.5, 0.5, 1}
-		else
-			highlight.on = {0, 0, 0, 0}
+		if (highlight.on == nil) then
+			if (options.background) then
+				highlight.on = {0.5, 0.5, 0.5, 1}
+			else
+				highlight.on = {0, 0, 0, 0}
+			end
 		end
-	end
-	
-	if (highlight.off == nil) then
-		highlight.off = {0,0,0,0}
-	end
-	
-	if (highlight.overbright == nil) then
-		highlight.overbright = {1,1,1,1}
-	end
-	
-	if (highlight.time == nil) then
-		highlight.time = 0.1
-	end
-	
-	if (highlight.overbrightTime == nil) then
-		highlight.overbrightTime = 0.1
+		
+		if (highlight.off == nil) then
+			highlight.off = {0,0,0,0}
+		end
+		
+		if (highlight.overbright == nil) then
+			highlight.overbright = {1,1,1,1}
+		end
+		
+		if (highlight.time == nil) then
+			highlight.time = 0.1
+		end
+		
+		if (highlight.overbrightTime == nil) then
+			highlight.overbrightTime = 0.1
+		end
 	end
 	
 	local w = UIPushButton:Create(
@@ -331,9 +340,7 @@ function UI.CreateStylePushButton(self, rect, OnPressed, options, parent)
 		},
 		{
 			highlight = highlight,
-			label = {
-				typeface = typeface
-			}
+			label = label
 		},
 		parent
 	)

@@ -10,6 +10,7 @@ MainMenu.NewGame.CharDBTextSpace = {12, 8}
 MainMenu.NewGame.CharDBSectionHeightPct = 0.42
 MainMenu.NewGame.CharDBPulsePctSize = 0.95
 MainMenu.NewGame.CharDBPulseInset = 8
+MainMenu.NewGame.StartingLevel = "Ep1/ep1_falling_room2"
 
 function MainMenu.InitNewGame(self)
 	self.newGamePanel = MainMenu.NewGame:New()
@@ -46,13 +47,22 @@ function MainMenu.NewGame.Create(self, options, parent)
 	local h = w
 	local x = (options.rect[3] - (self.xInset*2) - w) / 2
 		
-	self.widgets.portrait = UI:CreateWidget("MatWidget", {rect={x+self.xInset, y, w, h}, material=MainMenu.gfx.CharPortrait})
-	self.widgets.portrait:SetBlendWithParent(true)
-	self.widgets.group:AddChild(self.widgets.portrait)
+	self.widgets.portrait = UI:CreateStylePushButton(
+		{x+self.xInset, y, w, h},
+		function() self:NextPortrait() end,
+		{ nolabel = true, highlight={on={0,0,0,0}} },
+		self.widgets.group
+	)
 	
-	y = y + h + (16 * UI.identityScale[2])
+	self.widgets.portrait:SetBlendWithParent(true)
 	
 	local widget
+	
+	widget = UI:CreateWidget("MatWidget", {rect={x+self.xInset+w, y, 64*UI.identityScale[1], h}, material=MainMenu.gfx.PortraitSelectArrow})
+	widget:SetBlendWithParent(true)
+	self.widgets.group:AddChild(widget)
+		
+	y = y + h + (16 * UI.identityScale[2])
 
 	widget = UI:CreateWidget("TextLabel", {rect = {self.xInset, y, 8, 8}, typeface = MainMenu.typefaces.Normal})
 	self.widgets.group:AddChild(widget)
@@ -85,7 +95,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	
 	widget = UI:CreateStylePushButton(
 		{ x+self.xInset, y, w, h },
-		{ function () self:RenameCharacter() end },
+		function () self:RenameCharacter() end,
 		{ highlight={on={0,0,0,0}} },
 		self.widgets.group
 	)
@@ -111,7 +121,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	
 	widget = UI:CreateStylePushButton(
 		{ x+self.xInset, y, w, h },
-		{ function () self:StartGame() end },
+		function () self:StartGame() end,
 		{ highlight={on={0,0,0,0}} },
 		self.widgets.group
 	)
@@ -131,11 +141,22 @@ function MainMenu.NewGame.Create(self, options, parent)
 end
 
 function MainMenu.NewGame.PrepareContents(self)
-	self.name = "Eve"
-	UI:SetLabelText(self.widgets.name, self.name)
+	self.playerName = "Eve"
+	UI:SetLabelText(self.widgets.name, self.playerName)
 	UI:SizeLabelToContents(self.widgets.name)
 	local r = self.widgets.panel:Rect()
 	UI:HCenterWidget(self.widgets.name, {self.xInset,0,r[3]-(self.xInset*2),r[4]})
+	
+	-- start with portrait 1
+	self.portrait = 1
+	
+	local gfx = {
+		enabled = MainMenu.gfx.portraits[self.portrait].material,
+		highlight = UI.gfx.ButtonOverbright
+	}
+	
+	self.widgets.portrait.class:ChangeGfx(self.widgets.portrait, gfx)
+	
 	MainMenuPanel.PrepareContents(self)
 	self.widgets.group:BlendTo({1,1,1,0}, 0)
 end
@@ -157,7 +178,16 @@ end
 
 
 function MainMenu.NewGame.NextPortrait(self)
-
+	self.portrait = self.portrait + 1
+	if (MainMenu.gfx.portraits[self.portrait] == nil) then
+		self.portrait = 1
+	end
+	
+	local gfx = {
+		enabled = MainMenu.gfx.portraits[self.portrait].material,
+		highlight = UI.gfx.ButtonOverbright
+	}
+	self.widgets.portrait.class:ChangeGfx(self.widgets.portrait, gfx)
 end
 
 function MainMenu.NewGame.RenameCharacter(self)
@@ -165,5 +195,32 @@ function MainMenu.NewGame.RenameCharacter(self)
 end
 
 function MainMenu.NewGame.StartGame(self)
-
+	-- ok lets make a new game
+	local index = 1
+	if (MainMenu.saves) then
+		index = #MainMenu.saves + 1
+	end
+	
+	local filename = "Sav"..index..".dat"
+	local saveGames = Globals.keys.saveGames or {}
+	saveGames[tostring(index)] = filename
+	Globals.keys.saveGames = saveGames
+	
+	SaveGame:Create(filename)
+	Persistence.WriteString(SaveGame, "playerName", self.playerName)
+	Persistence.WriteString(SaveGame, "portrait", MainMenu.gfx.portraits[self.portrait].name)
+	Persistence.WriteString(SaveGame, "currentLevel", MainMenu.NewGame.StartingLevel)
+	SaveGame:Save()
+		
+	Persistence.WriteBool(Session, "loadCheckpoint", false)
+	Session:Save()
+	
+	Persistence.WriteNumber(Globals, "checkpoint", index)
+	Globals:Save()
+	
+	MainMenu.mainPanel:Exit()
+	
+	MainMenu.command = function()
+		World.RequestLoad(MainMenu.NewGame.StartingLevel, kUnloadDisposition_Slot)
+	end
 end

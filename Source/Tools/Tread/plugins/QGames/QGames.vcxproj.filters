@@ -12,6 +12,9 @@
     <Filter Include="jpeg">
       <UniqueIdentifier>{00a830a6-d02a-4d42-a07b-2e7c90762a48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lua-5.1.5">
+      <UniqueIdentifier>{cadc5ba3-cb83-4e11-b63f-93abbf871fbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Brush.cpp">
@@ -182,6 +185,99 @@
     <ClCompile Include="WaypointGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\bitop.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lapi.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lauxlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lbaselib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lcode.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ldblib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ldebug.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ldo.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ldump.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lfunc.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lgc.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\linit.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\liolib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\llex.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lmathlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lmem.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\loadlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lobject.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lopcodes.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\loslib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lparser.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lstate.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lstring.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lstrlib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ltable.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ltablib.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\ltm.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lundump.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lvm.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="lua-5.1.5\Lua\lzio.c">
+      <Filter>lua-5.1.5</Filter>
+    </ClCompile>
+    <ClCompile Include="RadianceMaterials.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brush.h">
@@ -284,6 +380,75 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="WaypointGrid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lzio.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lapi.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lauxlib.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lcode.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\ldebug.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\ldo.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lfunc.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lgc.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\llex.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\llimits.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lmem.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lobject.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lopcodes.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lparser.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lstate.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lstring.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\ltable.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\ltm.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\luaconf.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lualib.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lundump.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="lua-5.1.5\Lua\lvm.h">
+      <Filter>lua-5.1.5</Filter>
+    </ClInclude>
+    <ClInclude Include="RadianceMaterials.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

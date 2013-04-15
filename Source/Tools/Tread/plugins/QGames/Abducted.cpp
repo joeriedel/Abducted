@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "Abducted.h"
 #include "splinetrack.h"
+#include "RadianceMaterials.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // AbductedGame
@@ -36,6 +37,14 @@ CPluginFileExport *AbductedGame::FileExporter(int i)
 	case 0: return new AbductedMap();
 	}
 	return 0;
+}
+
+CLinkedList<CShader> *AbductedGame::ShaderList() {
+	if (!m_shadersLoaded) {
+		LoadRadianceMaterials(CString(GameDir()) + "/Base", m_shaders);
+		m_shadersLoaded = true;
+	}
+	return &m_shaders;
 }
 
 const char *AbductedGame::PakType(int i)

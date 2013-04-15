@@ -986,8 +986,11 @@ static void R_RenderObjectList( CMapView* pView, CLinkedList<CMapObject>* list, 
 		}
 
 		c = o->GetNumRenderMeshes( pView );
-		for(i = 0; i < c; i++)
-			proc( o->GetRenderMesh(i, pView), flags, blends, color );
+		for(i = 0; i < c; i++) {
+			CRenderMesh *m = o->GetRenderMesh(i, pView);
+			if (m)
+				proc( m, flags, blends, color );
+		}
 
 		o = list->GetNextItem();
 	}
@@ -1004,8 +1007,11 @@ static void R_RenderObjectList( CMapView* pView, CLinkedList<CMapObject>* list, 
 		list->AddItem( o );
 
 		c = o->GetNumRenderMeshes( pView );
-		for(i = 0; i < c; i++)
-			proc( o->GetRenderMesh(i, pView), flags, blends, color );
+		for(i = 0; i < c; i++) {
+			CRenderMesh *m = o->GetRenderMesh(i, pView);
+			if (m)
+				proc( m, flags, blends, color );
+		}
 	}
 }
 

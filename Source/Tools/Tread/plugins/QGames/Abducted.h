@@ -15,13 +15,15 @@ class AbductedGame : public CQuakeGame
 {
 public:
 
-	AbductedGame() : CQuakeGame(CQBrush::TYPE_Q3) {}
+	AbductedGame() : CQuakeGame(CQBrush::TYPE_Q3), m_shadersLoaded(false) {}
 
 	virtual const char *Name();
 
 	virtual void GetExportFile(const char *filename, char *buff, int buffSize);
 	virtual CPluginFileExport *NativeMapExporter();
 	virtual CPluginFileExport *FileExporter(int i);
+
+	virtual CLinkedList<CShader> *ShaderList();
 
 	virtual const char *PakType(int i);
 	virtual CTextureFactory *CreatePakFile();
@@ -37,6 +39,10 @@ protected:
 
 	virtual void RunMapCompile(const char *mappath, QuakeToolsList &tools, CTreadDoc *doc, bool runGame);
 
+private:
+
+	bool m_shadersLoaded;
+	CLinkedList<CShader> m_shaders;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

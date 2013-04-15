@@ -1451,8 +1451,12 @@ CRenderMesh* CEntity::GetRenderMesh( int num, CMapView* view )
 	{
 		if (m_pDef->GetDrawStyle() == EDDS_SCENE)
 		{
-			if (m_maxScene && num < (int)m_maxScene->meshes.size())
-				return m_maxScene->meshes[num].get();
+			if (m_maxScene && num < (int)m_maxScene->meshes.size()) {
+				CRenderMesh *m = m_maxScene->meshes[num].get();
+				if (m->shader) // don't draw meshes that have no shader bound.
+					return m;
+				return 0;
+			}
 		}
 
 		if( TC_VALID( m_iconhandle, m_iconkey ) &&

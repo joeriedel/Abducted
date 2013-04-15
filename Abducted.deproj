@@ -88,7 +88,19 @@
     <filename>Source\Scripts\Library.lua</filename>
   </file>
   <file>
-    <filename>Source\Scripts\LuaCrashCourse.lua</filename>
+    <filename>Source\Scripts\MainMenu.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\MainMenuLoadGame.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\MainMenuNewGame.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\MainMenuNews.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\MainMenuPanel.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\ManipulatableObject.lua</filename>

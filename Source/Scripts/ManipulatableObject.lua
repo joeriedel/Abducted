@@ -661,7 +661,12 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	if (self.keys.reset or (self.skillRequired > PlayerSkills.Manipulate)) then
 		local f = function ()
 			self.manipulate = nil
-			self:PlayAnim(ret, self.model).Seq(ManipulatableObject.Idle)
+			local blend = self:PlayAnim(ret, self.model)
+			if (blend) then
+				blend.Seq(ManipulatableObject.Idle)
+			else
+				self:Idle()
+			end
 			-- manipulatable again
 			self:AddToManipulateList()
 		end

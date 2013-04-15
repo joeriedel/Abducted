@@ -220,6 +220,9 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 		self:Attack()
 		return true
 	elseif (cmd == "idle") then
+		self:Idle()
+		return true
+	elseif (cmd == "idle_if_active") then
 		if (self.enabled) then
 			self:Idle()
 		end
@@ -286,7 +289,7 @@ function ManipulatableObject.Sleep(self)
 	self:RemoveFromManipulateList()
 	
 	self:SetAutoFace(nil)
-	World.viewController:RemoveLookTarget(self)
+	World.viewController:RemoveLookTarget(self.manipulateTarget)
 	
 	local blend = self:PlayAnim("sleep", self.model)
 	if (self.sounds.Sleep) then
@@ -314,7 +317,7 @@ function ManipulatableObject.Awaken(self)
 		if (fov <= 0) then
 			fov = nil
 		end
-		World.viewController:AddLookTarget(self, fov)
+		World.viewController:AddLookTarget(self.manipulateTarget, fov)
 	end
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
@@ -674,7 +677,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	else
 		-- object is not going to reset
 		self.saveManipulateDir = objDir
-		World.viewController:RemoveLookTarget(self)
+		World.viewController:RemoveLookTarget(self.manipulateTarget)
 		
 		if (self.keys.on_permanent_manipulated) then
 			World.PostEvent(self.keys.on_permanent_manipulated)
@@ -796,7 +799,7 @@ function ManipulatableObject.LoadState(self, state)
 				if (fov <= 0) then
 					fov = nil
 				end
-				World.viewController:AddLookTarget(self, fov)
+				World.viewController:AddLookTarget(self.manipulateTarget, fov)
 			end
 		end
 	else

@@ -115,10 +115,50 @@ function MainMenu.LoadGame.FadeOutContents(self, time)
 	self.widgets.vlist:BlendTo({1,1,1,0}, time)
 end
 
+function MainMenu.LoadGame.LoadGame(self, saveInfo)
+	Persistence.WriteBool(Session, "loadCheckpoint", true)
+	Session:Save()
+	
+	Persistence.WriteNumber(Globals, "checkpoint", saveInfo.index)
+	Globals:Save()
+	
+	SaveGame:LoadSavedGame(saveInfo.path)
+	
+	MainMenu.command = function()
+		World.RequestLoad(saveInfo.level, kUnloadDisposition_Slot)
+	end
+	
+	MainMenu.mainPanel:Exit()
+end
+
+function MainMenu.LoadGame.OnSaveGameInputEvent(self, panel, saveInfo, e)
+
+	if (Input.IsTouchBegin(e)) then
+		panel:SetCapture(true)
+		panel:SetMaterial(MainMenu.gfx.MMItemBackground2)
+	elseif (Input.IsTouchEnd(e)) then
+		panel:SetCapture(false)
+		panel:SetMaterial(MainMenu.gfx.MMItemBackground)
+		if (e.type ~= kI_TouchCancelled) then
+			UI.sfx.Command:Play(kSoundChannel_UI, 0)
+			self:LoadGame(saveInfo)
+		end
+	end
+
+	return true
+	
+end
+
 function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, picSize, panelWidth)
 
 	local panel = UI:CreateWidget("MatWidget", {rect={0,yOfs,panelWidth,8}, material=MainMenu.gfx.MMItemBackground})
 	panel:SetBlendWithParent(true)
+	
+	local OnInputEvent = function(widget, e)
+		return self:OnSaveGameInputEvent(panel, saveInfo, e)
+	end
+	
+	panel.OnInputEvent = OnInputEvent
 	
 	local labels = {}
 	

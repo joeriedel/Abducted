@@ -36,6 +36,7 @@ function MainMenu.Load(self)
 	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
 	self.gfx.PortraitSelectArrow = World.Load("UI/charselectarrow_M")
 	self.gfx.MMItemBackground = World.Load("UI/MMItemBackground_M")
+	self.gfx.MMItemBackground2 = World.Load("UI/MMItemBackground2_M")
 	
 	self.gfx.Portraits = {}
 	
@@ -47,7 +48,6 @@ function MainMenu.Load(self)
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
 	self.typefaces.Normal = World.Load("UI/MMNormal_TF")
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
-	self.typefaces.GoldLarge = World.Load("UI/MMGoldLarge_TF")
 	
 end
 
@@ -187,7 +187,8 @@ function MainMenu.PopulateSaveGames(self)
 		self.saves = self.saves or {}
 		SaveGame:LoadSavedGame(v)
 		local saveInfo = self:LoadSaveGameInfo(v)
-		self.saves[tonumber(k)] = saveInfo
+		saveInfo.index = tonumber(k)
+		self.saves[saveInfo.index] = saveInfo
 	end
 
 end

@@ -35,22 +35,12 @@ function MainMenu.NewGame.Create(self, options, parent)
 	
 	self.xInset = 16 * UI.identityScale[1]
 	
-	local y = 8 * UI.identityScale[2]
-	
-	self.widgets.label = UI:CreateWidget("TextLabel", {rect={0,y,8,8}, typeface=MainMenu.typefaces.Gold})
-	self.widgets.label:SetBlendWithParent(true)
-	local text = StringTable.Get("MM_NEW_GAME")
-	UI:SetLabelText(self.widgets.label, text)
-	local r = UI:SizeLabelToContents(self.widgets.label)
-	UI:HCenterWidget(self.widgets.label, {0,0, options.rect[3],y*2+r[4]})
-	self.widgets.group:AddChild(self.widgets.label)
-	
-	y = y*2 + r[4]
+	local y = 16 * UI.identityScale[2]
 	
 	local w = 256 * UI.identityScale[1]
 	local h = w
 	local x = (options.rect[3] - (self.xInset*2) - w) / 2
-		
+	
 	self.widgets.portrait = UI:CreateStylePushButton(
 		{x+self.xInset, y, w, h},
 		function() self:NextPortrait() end,
@@ -72,7 +62,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	self.widgets.group:AddChild(widget)
 	widget:SetBlendWithParent(true)
 	UI:SetLabelText(widget, StringTable.Get("ARM_CHARDB_NAME"))
-	r = UI:SizeLabelToContents(widget)
+	local r = UI:SizeLabelToContents(widget)
 	UI:HCenterWidget(widget, {self.xInset,0,options.rect[3]-(self.xInset*2), options.rect[4]})
 	y = y + r[4] + (8*UI.identityScale[2])
 	
@@ -105,7 +95,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	)
 	widget:SetBlendWithParent(true)
 	
-	text = StringTable.Get("MM_RENAME_CHARACTER")
+	local text = StringTable.Get("MM_RENAME_CHARACTER")
 	UI:LineWrapCenterText(
 		widget.label, 
 		nil, 

@@ -382,7 +382,7 @@ function Arm.DisplayChoices(self)
 	local inset = Arm.ChatChoiceInset[1] * UI.identityScale[1]
 	local maxWidth = self.chatRect[3] - self.chatPos[1] - inset
 	local horzSpace = Arm.ChatChoiceHorzSpace * UI.identityScale[1]
-	local horzSpacePerItem = (horzSpace+(Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1]*0.5))
+	local horzSpacePerItem = (horzSpace+(Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1]))
 	local totalHorzSpacing = horzSpacePerItem * (#prompts - 1)
 	
 	lineWidth = totalHorzSpacing + lineWidth

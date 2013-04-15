@@ -211,7 +211,7 @@ public:
 			}
 
 			std::swap(src, dst);
-			ImageDelete(&dst);
+			ImageDestroy(&dst);
 
 		}
 

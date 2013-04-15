@@ -102,8 +102,7 @@ copy "$(TargetPath)" "$(ProjectDir)..\..\..\..\..\Base\TreadBase\Plugins"
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -120,6 +119,7 @@ copy "$(TargetPath)" "$(ProjectDir)..\..\..\..\..\Base\TreadBase\Plugins"
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>md "$(ProjectDir)..\..\..\..\..\Base\TreadBase\Plugins"

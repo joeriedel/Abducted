@@ -11,8 +11,8 @@ function MainMenu.InitLoadGame(self)
 	
 	self.loadGamePanel:Create({rect=self.contentRect}, self.widgets.root)
 	UI:CenterWidget(self.loadGamePanel.widgets.panel, self.contentRect)
-	self.loadGamePanel.widgets.panel:SetHAlign(kHorizontalAlign_Center)
-	self.loadGamePanel.widgets.panel:SetVAlign(kVerticalAlign_Center)
+	self.loadGamePanel.widgets.panel:SetHAlign(kHorizontalAlign_Left)
+	self.loadGamePanel.widgets.panel:SetVAlign(kVerticalAlign_Bottom)
 	self.loadGamePanel.widgets.panel:SetVisible(false)
 	
 end

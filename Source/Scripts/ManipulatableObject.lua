@@ -658,7 +658,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
-	if (self.keys.reset or (self.skillRequired > PlayerSkills.Manipulate)) then
+	if (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate)) then
 		local f = function ()
 			self.manipulate = nil
 			local blend = self:PlayAnim(ret, self.model)

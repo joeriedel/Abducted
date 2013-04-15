@@ -35,17 +35,19 @@ function MainMenu.Load(self)
 	self.gfx.MMSelectedItem = World.Load("UI/MMSelectedItem_M")
 	self.gfx.LineBorder4 = World.Load("UI/lineborder4_M")
 	self.gfx.PortraitSelectArrow = World.Load("UI/charselectarrow_M")
+	self.gfx.MMItemBackground = World.Load("UI/MMItemBackground_M")
 	
-	self.gfx.portraits = {}
+	self.gfx.Portraits = {}
 	
 	for k,v in pairs(GameDB.Portraits) do
-		self.gfx.portraits[k] = World.Load(v)
+		self.gfx.Portraits[k] = World.Load(v)
 	end
 	
 	self.typefaces = {}
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
 	self.typefaces.Normal = World.Load("UI/MMNormal_TF")
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
+	self.typefaces.GoldLarge = World.Load("UI/MMGoldLarge_TF")
 	
 end
 
@@ -114,6 +116,7 @@ function MainMenu.InitUI(self)
 	
 	self:InitNews()
 	self:InitNewGame()
+	self:InitLoadGame()
 	
 end
 
@@ -158,10 +161,15 @@ function MainMenu.SaveGamesExist(self)
 end
 
 function MainMenu.LoadSaveGameInfo(self, path)
+
+	GameDB:Load()
+	
 	local info = {
 		playerName = Persistence.ReadString(SaveGame, "playerName", "???"),
 		portrait = Persistence.ReadNumber(SaveGame, "portrait", 1),
 		level = Persistence.ReadString(SaveGame, "currentLevel"),
+		lastPlayed = Persistence.ReadString(SaveGame, "lastPlayed"),
+		armDate = GameDB:ArmDateString(),
 		path = path
 	}
 	
@@ -361,7 +369,15 @@ function MainMenu.MainPanel.NewGame(self, item)
 end
 
 function MainMenu.MainPanel.LoadGame(self, item)
-	self.busy = false
+	local f = function()
+		self.busy = false
+	end
+	
+	MainMenu.loadGamePanel:TransitionIn({0,0}, 0.3, f)
+
+	self.unselectItem = function(callback)
+		MainMenu.loadGamePanel:TransitionOut({0,0}, 0.2, 0.3, callback)
+	end
 end
 
 function MainMenu.MainPanel.Store(self, item)

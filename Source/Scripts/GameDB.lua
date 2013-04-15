@@ -42,6 +42,7 @@ end
 
 function GameDB.SaveCheckpoint(self)
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
+	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
 	GameDB:SaveEvents()
 	GameDB:SavePeristentObjects()
 	Game.entity:SaveState()
@@ -229,7 +230,7 @@ function GameDB.UpdateTimes(self)
 	
 end
 
-function GameDB.CurrentTimeString(self)
+function GameDB.ArmDateString(self)
 	return string.format("%03d-%02d:%02d:%02d", self.days, self.hours, self.minutes, self.seconds)
 end
 
@@ -244,5 +245,4 @@ function GameDB.TimePlayedString(self)
 	return string.format("%02d:%02d:%02d", hours, minutes, seconds)
 	
 end
-
 

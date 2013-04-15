@@ -13,7 +13,7 @@ function MainMenu.InitNewGame(self)
 		0,
 		0,
 		384 * UI.identityScale[1],
-		590 * UI.identityScale[2]
+		640 * UI.identityScale[2]
 	}
 	
 	self.newGamePanel:Create({rect=rect}, self.widgets.root)
@@ -35,7 +35,17 @@ function MainMenu.NewGame.Create(self, options, parent)
 	
 	self.xInset = 16 * UI.identityScale[1]
 	
-	local y = 16 * UI.identityScale[2]
+	local y = 8 * UI.identityScale[2]
+	
+	self.widgets.label = UI:CreateWidget("TextLabel", {rect={0,y,8,8}, typeface=MainMenu.typefaces.Gold})
+	self.widgets.label:SetBlendWithParent(true)
+	local text = StringTable.Get("MM_NEW_GAME")
+	UI:SetLabelText(self.widgets.label, text)
+	local r = UI:SizeLabelToContents(self.widgets.label)
+	UI:HCenterWidget(self.widgets.label, {0,0, options.rect[3],y*2+r[4]})
+	self.widgets.group:AddChild(self.widgets.label)
+	
+	y = y*2 + r[4]
 	
 	local w = 256 * UI.identityScale[1]
 	local h = w
@@ -62,7 +72,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	self.widgets.group:AddChild(widget)
 	widget:SetBlendWithParent(true)
 	UI:SetLabelText(widget, StringTable.Get("ARM_CHARDB_NAME"))
-	local r = UI:SizeLabelToContents(widget)
+	r = UI:SizeLabelToContents(widget)
 	UI:HCenterWidget(widget, {self.xInset,0,options.rect[3]-(self.xInset*2), options.rect[4]})
 	y = y + r[4] + (8*UI.identityScale[2])
 	
@@ -95,7 +105,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	)
 	widget:SetBlendWithParent(true)
 	
-	local text = StringTable.Get("MM_RENAME_CHARACTER")
+	text = StringTable.Get("MM_RENAME_CHARACTER")
 	UI:LineWrapCenterText(
 		widget.label, 
 		nil, 
@@ -145,7 +155,7 @@ function MainMenu.NewGame.PrepareContents(self)
 	self.portrait = 1
 	
 	local gfx = {
-		enabled = MainMenu.gfx.portraits[self.portrait],
+		enabled = MainMenu.gfx.Portraits[self.portrait],
 		highlight = UI.gfx.ButtonOverbright
 	}
 	
@@ -172,12 +182,12 @@ end
 
 function MainMenu.NewGame.NextPortrait(self)
 	self.portrait = self.portrait + 1
-	if (MainMenu.gfx.portraits[self.portrait] == nil) then
+	if (MainMenu.gfx.Portraits[self.portrait] == nil) then
 		self.portrait = 1
 	end
 	
 	local gfx = {
-		enabled = MainMenu.gfx.portraits[self.portrait],
+		enabled = MainMenu.gfx.Portraits[self.portrait],
 		highlight = UI.gfx.ButtonOverbright
 	}
 	self.widgets.portrait.class:ChangeGfx(self.widgets.portrait, gfx)
@@ -203,6 +213,7 @@ function MainMenu.NewGame.StartGame(self)
 	Persistence.WriteString(SaveGame, "playerName", self.playerName)
 	Persistence.WriteNumber(SaveGame, "portrait", self.portrait)
 	Persistence.WriteString(SaveGame, "currentLevel", MainMenu.NewGame.StartingLevel)
+	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
 	SaveGame:Save()
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)

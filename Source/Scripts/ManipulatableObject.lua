@@ -837,3 +837,27 @@ function Pylon.Spawn(self)
 end
 
 info_pylon = Pylon
+
+--[[---------------------------------------------------------------------------
+	CustomManipulatableObject
+-----------------------------------------------------------------------------]]
+
+CustomManipulatableObject = ManipulatableObject:New()
+
+function CustomManipulatableObject.Spawn(self)
+	ManipulatableObject.Spawn(self)
+	
+	local mins = Vec3ForString(self.keys.mins, {-24, -24, -48})
+	local maxs = Vec3ForString(self.keys.maxs, { 24,  24,  48})
+	
+	self:SetMins( mins)
+	self:SetMaxs(maxs)
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
+	self.model.vision:SetBounds(self:Mins(), self:Maxs())
+	self.manipulateShift = Vec3ForString(self.keys.manipulate_shift, {0,0,0})
+	self.shakeCamera = BoolForString(self.keys.shake_camera, true)
+	
+	self:Link() -- kMoveType_None
+end
+
+info_custom_manipulatable = CustomManipulatableObject

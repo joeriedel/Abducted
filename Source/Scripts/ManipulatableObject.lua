@@ -256,9 +256,17 @@ function ManipulatableObject.Dormant(self)
 	self.awake = false
 	
 	self.think = nil
-	self:PlayAnim("dormant", self.model)
-	if (self.sounds.Dormant) then
-		self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+	
+	if (self.keys.idle_while_dormant) then
+		self:PlayAnim("idle", self.model)
+		if (self.sounds.Idle) then
+			self.sounds.Idle:Play(kSoundChannel_FX, 0)
+		end
+	else
+		self:PlayAnim("dormant", self.model)
+		if (self.sounds.Dormant) then
+			self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+		end
 	end
 end
 
@@ -327,7 +335,7 @@ function ManipulatableObject.Idle(self)
 	self.think = nil
 	self.awake = true
 	self.canAttack = true
-	self:PlayAnim("idle", self.model)
+	self:PlayAnim("idle", self.model, false)
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
 	end

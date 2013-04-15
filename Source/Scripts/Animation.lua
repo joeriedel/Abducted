@@ -28,13 +28,17 @@ function LoadSkModel(name)
 	return m
 end
 
-function Animation.Play(entity, state, model)
+function Animation.Play(entity, state, model, restart)
 
 	Animation.Cancel(entity)
 	
 	entity.animationStates = {
 		chain = LL_New()
 	}
+	
+	if (restart == nil) then
+		restart = true
+	end
 
 	local blend = {}
 	blend.OnEndFrame = function (self)
@@ -54,29 +58,35 @@ function Animation.Play(entity, state, model)
 		end
 	end
 	
-	blend.Seq = function (state)
+	blend.Seq = function (state, restart)
 		if (type(state) == "string") then
+			if (restart == nil) then
+				restart = true
+			end
 			local x = state
 			state = function (entity)
-				model:BlendToState(x, nil, true, entity, blend)
+				model:BlendToState(x, nil, restart, entity, blend)
 			end
 		end
 		LL_Append(entity.animationStates.chain, {seq=state})
 		return blend
 	end
 	
-	blend.And = function (state)
+	blend.And = function (state, restart)
 		if (type(state) == "string") then
 			local x = state
+			if (restart == nil) then
+				restart = true
+			end
 			state = function (entity)
-				model:BlendToState(x, nil, true, entity, blend)
+				model:BlendToState(x, nil, restart, entity, blend)
 			end
 		end
 		LL_Append(entity.animationStates.chain, {_and=state})
 		return blend
 	end	
 	
-	entity.animationStates.notify = model:BlendToState(state, nil, true, entity, blend)
+	entity.animationStates.notify = model:BlendToState(state, nil, restart, entity, blend)
 	
 	if (entity.animationStates.notify) then
 		return blend

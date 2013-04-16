@@ -135,6 +135,7 @@ function UIPushButton.OnInputEvent(widget, e)
 				end
 			end
 		end
+		return true
 	end
 
 	return false

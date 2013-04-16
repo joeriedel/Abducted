@@ -184,11 +184,13 @@ function MainMenu.PopulateSaveGames(self)
 	end
 	
 	for k,v in pairs(saveGames) do
-		self.saves = self.saves or {}
-		SaveGame:LoadSavedGame(v)
-		local saveInfo = self:LoadSaveGameInfo(v)
-		saveInfo.index = tonumber(k)
-		self.saves[saveInfo.index] = saveInfo
+		if (v) then
+			self.saves = self.saves or {}
+			SaveGame:LoadSavedGame(v)
+			local saveInfo = self:LoadSaveGameInfo(v)
+			saveInfo.index = tonumber(k)
+			self.saves[saveInfo.index] = saveInfo
+		end
 	end
 
 end
@@ -336,6 +338,13 @@ end
 
 function MainMenu.MainPanel.Continue(self, item)
 	self.busy = false
+	
+	if (Persistence.ReadNumber(Globals, "checkpoint") == nil) then
+	
+		AlertPanel:OK("MM_CANNOT_CONTINUE_TITLE", "MM_CANNOT_CONTINUE_PROMPT", nil, Menu.contentRect)
+		return
+	
+	end
 	
 	local f = function(result)
 		if (result == AlertPanel.YesButton) then

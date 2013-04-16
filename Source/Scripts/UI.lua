@@ -524,9 +524,9 @@ function UI.HCenterLabel(self, label, rect)
 	
 	local r = label:Rect()
 	
-	r[1] = rect[1] + ((rect[3]-d[1]) / 2)
-	r[3] = d[1]
-	r[4] = d[2]
+	r[1] = rect[1] + ((rect[3]-(d[3]-d[1])) / 2) - d[1]
+	r[3] = d[3]
+	r[4] = d[4]
 	
 	label:SetRect(r)
 	return r
@@ -538,9 +538,9 @@ function UI.VCenterLabel(self, label, rect)
 	
 	local r = label:Rect()
 	
-	r[2] = rect[2] + ((rect[4]-d[2]) / 2)
-	r[3] = w
-	r[4] = h
+	r[2] = rect[2] + ((rect[4]-(d[4]-d[2])) / 2) - d[2]
+	r[3] = d[3]
+	r[4] = d[4]
 	
 	label:SetRect(r)
 	return r
@@ -551,13 +551,13 @@ function UI.CenterLabel(self, label, rect)
 	local d = label:Dimensions()
 	
 	local r = {
-		rect[1] + ((rect[3]-d[1]) / 2),
-		rect[2] + ((rect[4]-d[2]) / 2),
-		w,
-		h
+		rect[1] + ((rect[3]-(d[3]-d[1])) / 2) - d[1],
+		rect[2] + ((rect[4]-(d[4]-d[2])) / 2) - d[2],
+		d[3],
+		d[4]
 	}
 	
-	label:SetRect(rect)
+	label:SetRect(r)
 	return r
 end
 
@@ -576,7 +576,7 @@ function UI.RAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x-w, y, d[1], d[2]}
+	local r = {x-d[3], y, d[3], d[4]}
 	label:SetRect(r)
 	return r
 
@@ -598,7 +598,7 @@ function UI.VAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x, y-h, d[1], d[2]}
+	local r = {x, y-d[4], d[3], d[4]}
 	label:SetRect(r)
 	return r
 
@@ -619,35 +619,7 @@ function UI.RVAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x-w, y-h, d[1], d[2]}
-	label:SetRect(r)
-	return r
-
-end
-
-function UI.SizeLabelToContents(self, label, x, y)
-
-	local d = label:Dimensions()
-	-- NOTE: dimensions are real-size scale here.
-	
-	local r = label:Rect()
-	
-	if ((x == nil) or (y == nil)) then
-		
-		if (x == nil) then
-			x = r[1]
-		end
-		
-		if (y == nil) then
-			y = r[2]
-		end
-	end
-	
-	r[1] = x
-	r[2] = y
-	r[3] = d[1]
-	r[4] = d[2]
-	
+	local r = {x-d[3], y-d[4], d[3], d[4]}
 	label:SetRect(r)
 	return r
 
@@ -825,6 +797,35 @@ end
 --[[---------------------------------------------------------------------------
 	Fonts are unaware of our UI scaling
 -----------------------------------------------------------------------------]]
+
+
+function UI.SizeLabelToContents(self, label, x, y)
+
+	local d = label:Dimensions()
+	-- NOTE: dimensions are real-size scale here.
+	
+	local r = label:Rect()
+	
+	if ((x == nil) or (y == nil)) then
+		
+		if (x == nil) then
+			x = r[1]
+		end
+		
+		if (y == nil) then
+			y = r[2]
+		end
+	end
+	
+	r[1] = x
+	r[2] = y
+	r[3] = d[3]
+	r[4] = d[4]
+	
+	label:SetRect(r)
+	return r
+
+end
 
 function UI.SetLabelText(self, label, text, fontScale)
 	if (fontScale == nil) then

@@ -10,6 +10,7 @@ function MainMenu.InitLoadGame(self)
 	self.loadGamePanel = MainMenu.LoadGame:New()
 	
 	self.loadGamePanel:Create({rect=self.contentRect}, self.widgets.root)
+	self.loadGamePanel:Layout()
 	UI:CenterWidget(self.loadGamePanel.widgets.panel, self.contentRect)
 	self.loadGamePanel.widgets.panel:SetHAlign(kHorizontalAlign_Left)
 	self.loadGamePanel.widgets.panel:SetVAlign(kVerticalAlign_Bottom)
@@ -21,46 +22,80 @@ function MainMenu.LoadGame.Create(self, options, parent)
 
 	options = MainMenuPanel.Create(self, options, parent)
 	
+	self.widgets.controls = {}
+	
 	if (MainMenu.saves == nil) then
-		return {0,0,8,8}
+		return options
 	end
-	
-	local inset = 8 * UI.identityScale[1]
-	local picSize = 160 * UI.identityScale[1]
-	
+
 	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect={0,0,8,8}})
 	self.widgets.vlist:SetBlendWithParent(true)
 	self.widgets.panel:AddChild(self.widgets.vlist)
 	
-	local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
+end
+
+function MainMenu.LoadGame.Layout(self)
+
+	for k,v in pairs(self.widgets.controls) do
+		v:Unmap()
+	end
+	
+	self.widgets.controls = {}
+	
+	if (MainMenu.saves == nil) then
+		return
+	end
+	
+	self.widgets.vlist:Clear()
+	
+	local parentRect = self.widgets.panel:Rect()
+
+	local inset = 8 * UI.identityScale[1]
+	local picSize = 160 * UI.identityScale[1]
 	
 	local w
 	local r 
+	local width = 0
+	local height = 0
 	
-	w, r = self:CreateGameInfoWidget(MainMenu.saves[checkpoint], 0, inset, picSize, options.rect[3])
-	self.widgets.vlist:AddItem(w)
+	local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
+	local first = true
 	
-	local width = r[3]
-	local height = r[4]
+	if (checkpoint) then
+		w, r = self:CreateGameInfoWidget(MainMenu.saves[checkpoint], 0, inset, picSize, parentRect[3])
+		self.widgets.vlist:AddItem(w)
+		table.insert(self.widgets.controls, w)
+		
+		width = r[3]
+		height = r[4]
 	
+		first = false
+	end
+		
 	local numSaves = 1
 	local widgets = {}
 	
 	for k,v in pairs(MainMenu.saves) do
 		if (k ~= checkpoint) then
-			local w = self:CreateLineBorder(height, options.rect[3])
-			self.widgets.vlist:AddChild(w)
-			table.insert(widgets, w)
+			local w
 			
-			height = height + 7
+			if (not first) then
+				w,r = self:CreateLineBorder(height, parentRect[3])
+				self.widgets.vlist:AddChild(w)
+				table.insert(widgets, w)
+				table.insert(self.widgets.controls, w)
+				height = height + 7
+			end
 			
-			w, r = self:CreateGameInfoWidget(v, height, inset, picSize, options.rect[3])
+			w, r = self:CreateGameInfoWidget(v, height, inset, picSize, parentRect[3])
 			self.widgets.vlist:AddItem(w)
 			width = Max(width, r[3])
 			height = height + r[4]
 		
 			table.insert(widgets, w)
+			table.insert(self.widgets.controls, w)
 			numSaves = numSaves + 1
+			first = false
 		end
 	end
 	
@@ -76,8 +111,8 @@ function MainMenu.LoadGame.Create(self, options, parent)
 	local panelRect = {
 		0,
 		0,
-		options.rect[3],
-		options.rect[4]
+		parentRect[3],
+		parentRect[4]
 	}
 	
 	self.widgets.vlist:SetRect(panelRect)
@@ -85,9 +120,8 @@ function MainMenu.LoadGame.Create(self, options, parent)
 	self.widgets.vlist:SetEndStops({0, panelRect[4]*0.1})
 	self.widgets.vlist:RecalcLayout()
 	self.widgets.vlist:ScrollTo({0,0}, 0)
-	
-	return panelRect
 
+	collectgarbage()
 end
 
 function MainMenu.LoadGame.CreateLineBorder(self, yOfs, width)
@@ -149,6 +183,27 @@ function MainMenu.LoadGame.OnSaveGameInputEvent(self, panel, saveInfo, e)
 	
 end
 
+function MainMenu.LoadGame.DeleteGame(self, saveInfo)
+
+	local f = function(result)
+		if (result == AlertPanel.YesButton) then
+			local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
+			if (saveInfo.index == checkpoint) then
+				Persistence.DeleteKey(Globals, "checkpoint")
+			end
+			Globals.keys.saveGames[tostring(saveInfo.index)] = nil
+			Globals:Save()
+			MainMenu.saves = nil
+			MainMenu:PopulateSaveGames()
+			self:Layout()
+		end
+	end
+	
+	AlertPanel:YesNo("MM_CONFIRM_DELETE_TITLE", "MM_CONFIRM_DELETE_PROMPT", f, MainMenu.contentRect)
+	
+	return true
+end
+
 function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, picSize, panelWidth)
 
 	local panel = UI:CreateWidget("MatWidget", {rect={0,yOfs,panelWidth,8}, material=MainMenu.gfx.MMItemBackground})
@@ -164,6 +219,7 @@ function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, pic
 	
 	local w = UI:CreateWidget("MatWidget", {rect={inset,inset, picSize, picSize}, material=MainMenu.gfx.Portraits[saveInfo.portrait]})
 	w:SetBlendWithParent(true)	
+	w:Unmap()
 	panel:AddChild(w)
 	
 	local yMargin = inset + picSize + (8 * UI.identityScale[1])
@@ -177,6 +233,7 @@ function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, pic
 	UI:SetLabelText(w, saveInfo.playerName)
 	UI:SizeLabelToContents(w)
 	table.insert(labels, w)
+	w:Unmap()
 	
 	local height = fontAdvance
 	
@@ -187,28 +244,31 @@ function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, pic
 	UI:SetLabelText(w, text)
 	UI:SizeLabelToContents(w)
 	table.insert(labels, w)
+	w:Unmap()
 	
 	height = height + fontAdvance
 	
 	w = UI:CreateWidget("TextLabel", {rect={yMargin, height+inset, 8, 8}, typeface=typeface})
 	w:SetBlendWithParent(true)
 	panel:AddChild(w)
-	local text = StringTable.Get("MM_LAST_PLAYED")
+	text = StringTable.Get("MM_LAST_PLAYED")
 	text = text.." "..saveInfo.lastPlayed
 	UI:SetLabelText(w, text)
 	UI:SizeLabelToContents(w)
 	table.insert(labels, w)
+	w:Unmap()
 	
 	height = height + fontAdvance
 	
 	w = UI:CreateWidget("TextLabel", {rect={yMargin, height+inset, 8, 8}, typeface=typeface})
 	w:SetBlendWithParent(true)
 	panel:AddChild(w)
-	local text = StringTable.Get("MM_ARM_DATE")
+	text = StringTable.Get("MM_ARM_DATE")
 	text = text.." "..saveInfo.armDate
 	UI:SetLabelText(w, text)
 	UI:SizeLabelToContents(w)
 	table.insert(labels, w)
+	w:Unmap()
 	
 	height = height + fontAdvance
 
@@ -228,6 +288,35 @@ function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, pic
 	local r = panel:Rect()
 	r[4] = height+inset*2
 	panel:SetRect(r)
+	
+	-- add a "delete" button.
+	w = UI:CreateStylePushButton({0, 0, 8, 8}, function () self:DeleteGame(saveInfo) end, { highlight={on={0,0,0,0}} }, nil)
+	text = StringTable.Get("MM_DELETE")
+	UI:SetLabelText(w.label, text)
 
+	local labelRect = UI:SizeLabelToContents(w.label)
+	local buttonPadd = {32 * UI.identityScale[1], 8 * UI.identityScale[2]}
+	
+	local buttonRect = {
+		r[3] - labelRect[3] - buttonPadd[1],
+		r[4] - labelRect[4] - buttonPadd[2],
+		labelRect[3] + buttonPadd[1],
+		labelRect[4] + buttonPadd[2]
+	}
+	
+	w:SetRect(buttonRect)
+	UI:CenterLabel(w.label, {0,0,buttonRect[3],buttonRect[4]})
+	w.highlight:SetRect({0,0,buttonRect[3],buttonRect[4]})
+	w:SetBlendWithParent(true)
+	
+	local black = UI:CreateWidget("MatWidget", {rect=buttonRect, material=UI.gfx.Solid})
+	black:BlendTo({0,0,0,1}, 0)
+	black:SetBlendWithParent(true)
+	panel:AddChild(black)
+	black:Unmap()
+	
+	panel:AddChild(w)
+	table.insert(self.widgets.controls, w)
+	
 	return panel, r
 end

@@ -13,7 +13,7 @@ function MainMenu.InitNewGame(self)
 		0,
 		0,
 		384 * UI.identityScale[1],
-		640 * UI.identityScale[2]
+		600 * UI.identityScale[2]
 	}
 	
 	self.newGamePanel:Create({rect=rect}, self.widgets.root)

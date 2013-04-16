@@ -179,6 +179,8 @@ public:
 			Sys_printf("ERROR: '%s' is not a supported image format.\n", texture.image);
 			return 0;
 		}
+		
+		free(data);
 
 		// too big?
 		if ((src.Width > 1024) || (src.Height > 1024)) {
@@ -196,7 +198,6 @@ public:
 
 			w = (w<1) ? 1 : w;
 			h = (h<1) ? 1 : h;
-
 
 			// gluScale image has overrun problems, so allocate some extra space
 

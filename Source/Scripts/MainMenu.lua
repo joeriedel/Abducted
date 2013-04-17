@@ -341,7 +341,7 @@ function MainMenu.MainPanel.Continue(self, item)
 	
 	if (Persistence.ReadNumber(Globals, "checkpoint") == nil) then
 	
-		AlertPanel:OK("MM_CANNOT_CONTINUE_TITLE", "MM_CANNOT_CONTINUE_PROMPT", nil, Menu.contentRect)
+		AlertPanel:OK("MM_CANNOT_CONTINUE_TITLE", "MM_CANNOT_CONTINUE_PROMPT", nil, MainMenu.contentRect)
 		return
 	
 	end

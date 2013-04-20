@@ -4,7 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 PlayerSkills = Class:New()
-PlayerSkills.DebugAllAbilitiesEnabled = true
+PlayerSkills.DebugAllAbilitiesEnabled = false
 
 PlayerSkills.ManipulateRechargeTimes = { -- 3 levels of manipulate upgrades
 	15,

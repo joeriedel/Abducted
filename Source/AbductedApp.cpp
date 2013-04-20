@@ -213,12 +213,12 @@ bool AbductedApp::RunAutoExec() {
 		float *refFloats = (float*)safe_zone_malloc(ZEngine, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 		float *simdFloats = (float*)safe_zone_malloc(ZEngine, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 		
-		skModel->SkinToBuffer(SIMD, i, simdFloats);
+		skModel->SkinToBuffer(*SIMD, i, simdFloats);
 
 		// Compare the reference implementation with optimized path:
 		static const SIMDDriver *SIMD_ref = SIMD_ref_bind();
 		
-		skModel->SkinToBuffer(SIMD_ref, i, refFloats);
+		skModel->SkinToBuffer(*SIMD_ref, i, refFloats);
 		const float *src = refFloats;
 		const float *cmp = simdFloats;
 		for (int z = 0; z < (int)m->totalVerts; ++z) {

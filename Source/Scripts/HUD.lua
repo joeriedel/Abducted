@@ -117,6 +117,7 @@ function HUD.Load(self)
 		self.widgets.Root
 	)
 
+--[[
     self.widgets.MemoryGame = UIPushButton:Create(
         UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
         { -- we go to disabled state when pulse is fired
@@ -129,7 +130,8 @@ function HUD.Load(self)
         nil,
         self.widgets.Root
     )
-	
+]]--
+
 	self.widgets.PulseCharging = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.PulseEnabled})
 	self.widgets.Root:AddChild(self.widgets.PulseCharging)
 	self.widgets.PulseCharging:SetDrawMode(kMaterialWidgetDrawMode_Circle)

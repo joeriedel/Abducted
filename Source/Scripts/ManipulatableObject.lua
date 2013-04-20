@@ -260,7 +260,7 @@ function ManipulatableObject.Dormant(self)
 	
 	self.think = nil
 	
-	if (self.keys.idle_while_dormant) then
+	if (BoolForString(self.keys.idle_while_dormant, false)) then
 		self:PlayAnim("idle", self.model)
 		if (self.sounds.Idle) then
 			self.sounds.Idle:Play(kSoundChannel_FX, 0)

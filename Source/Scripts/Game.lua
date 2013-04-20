@@ -57,6 +57,15 @@ function Game.OnEvent(self, cmd, args)
 	elseif cmd == "fadetowhite" then
 		UI:BlendTo({1, 1, 1, 1}, tonumber(args))
 		return true
+	elseif cmd == "maskfadein" then
+		UI:MaskFadeIn(tonumber(args))
+		return true
+	elseif cmd == "maskfadetoblack" then
+		UI:MaskBlendTo({0, 0, 0, 1}, tonumber(args))
+		return true
+	elseif cmd == "maskfadetowhite" then
+		UI:MaskBlendTo({1, 1, 1, 1}, tonumber(args))
+		return true
 	elseif cmd == "fadeinletterbox" then
 		UI:FadeInLetterBox({0, 0, 0, 1}, tonumber(args))
 		return true

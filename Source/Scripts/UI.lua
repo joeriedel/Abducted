@@ -129,6 +129,7 @@ function UI.Spawn(self)
 	UI.widgets = {}
 
 	UI:LoadShared()
+	UI:CreateMaskLayer()
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
 	AlertPanel:Create()
@@ -194,6 +195,14 @@ function UI.CreateFXLayer(self)
 	self.widgets.fx.Screen:BlendTo({0, 0, 0, 0}, 0) -- disable
 end
 
+function UI.CreateMaskLayer(self)
+	self.widgets.mask = {}
+	self.widgets.mask.Screen = self:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=self.gfx.Solid})
+	World.SetRootWidget(UI.kLayer_Mask, self.widgets.mask.Screen)
+	self.widgets.mask.Screen.color = { 0, 0, 0, 0 }
+	self.widgets.mask.Screen:BlendTo({0, 0, 0, 0}, 0) -- disable
+end
+
 --[[---------------------------------------------------------------------------
 	UI Library
 -----------------------------------------------------------------------------]]
@@ -232,6 +241,19 @@ end
 function UI.BlendTo(self, color, time)
 	self.widgets.fx.Screen.color = color
 	self.widgets.fx.Screen:BlendTo(color, time)
+end
+
+
+function UI.MaskFadeIn(self, time)
+
+	local c = self.widgets.mask.Screen.color
+	self.widgets.mask.Screen:BlendTo({c[1], c[2], c[3], 0}, time)
+
+end
+
+function UI.MaskBlendTo(self, color, time)
+	self.widgets.mask.Screen.color = color
+	self.widgets.mask.Screen:BlendTo(color, time)
 end
 
 function UI.FadeInLetterBox(self, color, time)

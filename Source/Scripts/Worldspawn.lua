@@ -30,7 +30,6 @@ end
 
 function Worldspawn.PostSpawn(self)
 	GameNetwork.LogEvent("Loaded ("..self.keys.mappath..")")
-	Game.entity:PostSpawn()
 end
 
 function Worldspawn.OnEvent(self, cmd, args)

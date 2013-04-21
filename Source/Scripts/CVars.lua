@@ -64,6 +64,9 @@ cv_scexec = CVarFunc("sc", "_cv_scexec_func")
 cv_sciexec = CVarFunc("sci", "_cv_sciexec_func")
 cv_r_speeds = CVarBool("r_speeds", false)
 cv_load = CVarFunc("load", "_cv_load_func")
+cv_loadcheckpoint = CVarFunc("loadcheckpoint", "_cv_loadcheckpoint_func")
+cv_savechecpoint = CVarFunc("savecheckpoint", "_cv_savecheckpoint_func")
+cv_postevent = CVarFunc("postevent", "_cv_postevent_func")
 
 -------------------------------------------------------------------------------
 
@@ -159,4 +162,17 @@ end
 
 function _cv_load_func(cmd)
 	World.RequestLoad(cmd, kUnloadDisposition_Slot)
+end
+
+function _cv_loadcheckpoint_func()
+	Abducted.entity:DoLoadCheckpoint()
+end
+
+function _cv_savecheckpoint_func()
+	Abducted.entity.showCheckpointNotification = true
+	World.RequestGenerateSaveGame()
+end
+
+function _cv_postevent_func(cmd)
+	World.PostEvent(cmd)
 end

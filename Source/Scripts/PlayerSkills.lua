@@ -21,7 +21,7 @@ PlayerSkills.ShieldRechargeMultipliers = {
 
 PlayerSkills.PulseExplodeTime = {8, 10}
 PlayerSkills.PulseRechargeTimes = {
-	1,
+	30,
 	20,
 	15
 }

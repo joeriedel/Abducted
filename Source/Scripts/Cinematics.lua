@@ -28,7 +28,11 @@ function Cinematics.Play(self, args, time)
 		flags = bit.bor(flags, kCinematicFlag_Loop)
 	end
 	
-	local item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
+	local item = nil
+
+	if (forever) then
+		item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
+	end
 	
 	if (interactive) then
 		local callbacks = {
@@ -36,11 +40,15 @@ function Cinematics.Play(self, args, time)
 				World.PostEvent(tag)
 			end,
 			OnComplete = function(self)
-				LL_Remove(Cinematics.Active, item)
+				if (item) then
+					LL_Remove(Cinematics.Active, item)
+				end
 			end
 		}
 		if (not World.PlayCinematic(x[1], flags, 0, Game.entity, callbacks)) then
-			LL_Remove(Cinematics.Active, item)
+			if (item) then
+				LL_Remove(Cinematics.Active, item)
+			end
 			time = nil
 		end
 	else
@@ -49,7 +57,9 @@ function Cinematics.Play(self, args, time)
 				World.PostEvent(tag)
 			end,
 			OnComplete = function(self)
-				LL_Remove(Cinematics.Active, item)
+				if (item) then
+					LL_Remove(Cinematics.Active, item)
+				end
 				Cinematics.busy = Cinematics.busy - 1
 				if (Cinematics.busy == 0) then
 					HUD:SetVisible(true)
@@ -63,7 +73,9 @@ function Cinematics.Play(self, args, time)
 			end
 			self.busy = self.busy + 1
 		else
-			LL_Remove(Cinematics.Active, item)
+			if (item) then
+				LL_Remove(Cinematics.Active, item)
+			end
 			time = nil
 		end
 	end
@@ -71,6 +83,23 @@ function Cinematics.Play(self, args, time)
 	if (time) then
 		World.SetCinematicTime(x[1], time)
 	end
+end
+
+function Cinematics.Stop(self, name)
+
+	item = LL_Head(Cinematics.active)
+	
+	while (item) do
+	
+		if (item.name == name) then
+			item = LL_Remove(Cinematics.Active, item)
+			break
+		else
+			item = LL_Next(item)
+		end
+	
+	end
+
 end
 
 function Cinematics.PlayLevelCinematics(self)
@@ -143,7 +172,7 @@ function Cinematics.LoadState(self)
 		times = string.split(times, ";")
 		
 		for k,v in pairs(cmds) do
-			Cinematics.Play(v, tonumber(times[k]))
+			Cinematics:Play(v, tonumber(times[k]))
 		end
 	end
 

@@ -99,6 +99,9 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "play") then
 		Cinematics:Play(args)
 		return true
+	elseif (cmd == "stop") then
+		Cinematics:Stop(args)
+		return true
 	elseif (cmd == "music") then
 		local x = Tokenize(args)
 		cmd = x[1]

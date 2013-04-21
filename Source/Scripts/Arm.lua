@@ -292,7 +292,7 @@ function Arm.CreateMenu(self)
 		self.widgets.WorkspaceRight
 	)
 	
-	text = StringTable.Get("ARM_SAVE_AND_QUIT_BTN")
+	text = StringTable.Get("ARM_QUIT_BTN")
 	UI:LineWrapCenterText(
 		self.widgets.Quit.label, 
 		nil, 
@@ -359,6 +359,21 @@ end
 
 function Arm.QuitPressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	
+	local f = function (result)
+		if (result == AlertPanel.YesButton) then
+			Abducted.entity.eatInput = true
+			UI:BlendTo({0,0,0,0}, 0)
+			UI:BlendTo({0,0,0,1}, 1)
+			World.SoundFadeMasterVolume(0, 1)
+			local f = function()
+				World.RequestLoad("UI/mainmenu", kUnloadDisposition_Slot)
+			end
+			World.globalTimers:Add(f, 1.1)
+		end
+	end
+	
+	AlertPanel:YesNo("ARM_QUIT_TITLE", "ARM_QUIT_PROMPT", f)
 end
 
 function Arm.ClearButtonHighlights(self, except)

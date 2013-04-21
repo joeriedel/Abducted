@@ -467,7 +467,7 @@ function HUD.InternalRechargeManipulate(self)
 	World.globalTimers:Add(f, self.manipulateRechargeTime - (GameDB.realTime - self.manipulateStart), true)
 	
 	f = function ()
-		local dd = Game.realTime - self.manipulateStart
+		local dd = GameDB.realTime - self.manipulateStart
 		self.widgets.ManipulateCharging:FillCircleTo(dd / self.manipulateRechargeTime, 0)
 	end
 	

@@ -6,6 +6,7 @@
 Cinematics = Class:New()
 Cinematics.busy = 0
 Cinematics.Active = LL_New()
+Cinematics.Persistent = LL_New()
 
 function Cinematics.Play(self, args, time, originEntity)
 		
@@ -28,10 +29,10 @@ function Cinematics.Play(self, args, time, originEntity)
 		flags = bit.bor(flags, kCinematicFlag_Loop)
 	end
 	
-	local item = nil
-
+	local item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
+	
 	if (forever) then
-		item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
+		item.persistent = LL_Append(Cinematics.Persistent, {cmd=args, name=x[1]})
 	end
 	
 	if (interactive) then
@@ -40,14 +41,16 @@ function Cinematics.Play(self, args, time, originEntity)
 				World.PostEvent(tag)
 			end,
 			OnComplete = function(self)
-				if (item) then
-					LL_Remove(Cinematics.Active, item)
+				LL_Remove(Cinematics.Active, item)
+				if (item.persistent) then
+					LL_Remove(Cinematics.Persistent, item.persistent)
 				end
 			end
 		}
 		if (not World.PlayCinematic(x[1], flags, 0, originEntity, Game.entity, callbacks)) then
-			if (item) then
-				LL_Remove(Cinematics.Active, item)
+			LL_Remove(Cinematics.Active, item)
+			if (item.persistent) then
+				LL_Remove(Cinematics.Persistent, item.persistent)
 			end
 			time = nil
 		end
@@ -57,8 +60,9 @@ function Cinematics.Play(self, args, time, originEntity)
 				World.PostEvent(tag)
 			end,
 			OnComplete = function(self)
-				if (item) then
-					LL_Remove(Cinematics.Active, item)
+				LL_Remove(Cinematics.Active, item)
+				if (item.persistent) then
+					LL_Remove(Cinematics.Persistent, item.persistent)
 				end
 				Cinematics.busy = Cinematics.busy - 1
 				if (Cinematics.busy == 0) then
@@ -73,8 +77,9 @@ function Cinematics.Play(self, args, time, originEntity)
 			end
 			self.busy = self.busy + 1
 		else
-			if (item) then
-				LL_Remove(Cinematics.Active, item)
+			LL_Remove(Cinematics.Active, item)
+			if (item.persistent) then
+				LL_Remove(Cinematics.Persistent, item.persistent)
 			end
 			time = nil
 		end
@@ -87,7 +92,7 @@ end
 
 function Cinematics.Stop(self, name)
 
-	item = LL_Head(Cinematics.active)
+	item = LL_Head(Cinematics.Active)
 	
 	while (item) do
 	
@@ -121,7 +126,7 @@ function Cinematics.SaveState(self)
 		table.insert(times, t)
 	end
 	
-	LL_Do(Cinematics.Active, f)
+	LL_Do(Cinematics.Persistent, f)
 	
 	if (next(cmds) == nil) then
 	
@@ -161,6 +166,7 @@ function Cinematics.LoadState(self)
 	
 	LL_Do(Cinematics.Active, f)
 	Cinematics.Active = LL_New()
+	Cinematics.Persistent = LL_New()
 	
 	self.busy = 0
 	

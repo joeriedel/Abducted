@@ -158,7 +158,11 @@ function Music.LoadState(self, state)
 			self.name = nil
 			self.cmd = nil
 		end
-		World.PostEvent("shiphum fadeto 1 1")
+		local f = function()
+			World.PostEvent("shiphum fadeto 1 1")
+		end
+		-- cannot post event here
+		World.globalTimers:Add(f, 0, true)
 	end
 
 end

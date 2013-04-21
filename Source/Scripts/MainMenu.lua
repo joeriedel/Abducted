@@ -613,7 +613,8 @@ function MainMenu.MainPanel.Exit(self)
 			MainMenu.widgets.logo:ScaleTo({2, 2}, {16, 16})
 	--		MainMenu.widgets.black:SetVisible(true)
 --			World.SetDrawUIOnly(true)
-			MainMenu:PlayCinematic("flyaway", kCinematicFlag_AnimateCamera, 0.2)
+			MainMenu:PlayCinematic("flyaway", kCinematicFlag_AnimateCamera)
+			World.StopCinematic("mainmenu")
 			
 			UI:BlendTo({1,1,1,0}, 0.3)
 			

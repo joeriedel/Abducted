@@ -691,6 +691,8 @@ function PlayerPawn.LoadState(self, state)
 	self:SetDesiredMove(nil)
 	self:SetMoveType(kMoveType_Floor)
 	self:SetFacing(tonumber(state.facing))
+	
+	self.animState = nil
 	self:SelectAnimState(state.animState)
 	
 	local anim = self:LookupAnimation("idle")

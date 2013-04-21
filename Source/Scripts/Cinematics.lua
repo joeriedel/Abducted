@@ -7,7 +7,7 @@ Cinematics = Class:New()
 Cinematics.busy = 0
 Cinematics.Active = LL_New()
 
-function Cinematics.Play(self, args, time)
+function Cinematics.Play(self, args, time, originEntity)
 		
 	x = Tokenize(args)
 	local animateCamera = not FindArrayElement(x, "camera=no")
@@ -45,7 +45,7 @@ function Cinematics.Play(self, args, time)
 				end
 			end
 		}
-		if (not World.PlayCinematic(x[1], flags, 0, Game.entity, callbacks)) then
+		if (not World.PlayCinematic(x[1], flags, 0, originEntity, Game.entity, callbacks)) then
 			if (item) then
 				LL_Remove(Cinematics.Active, item)
 			end
@@ -67,7 +67,7 @@ function Cinematics.Play(self, args, time)
 			end
 		}
 		
-		if (World.PlayCinematic(x[1], flags, 0, Game.entity, callbacks)) then
+		if (World.PlayCinematic(x[1], flags, 0, originEntity, Game.entity, callbacks)) then
 			if (self.busy == 0) then
 				HUD:SetVisible(false)
 			end

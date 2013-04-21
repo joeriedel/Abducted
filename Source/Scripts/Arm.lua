@@ -414,21 +414,38 @@ function Arm.Start(self, mode)
 	self.talk = false
 	self.introMode = mode
 	
-	UI:BlendTo({1,1,1,1}, 0.2)
-	self:ResetWidgets()
-	
-	self.sfx.ArmIntro:Rewind()
-	self.sfx.ArmIntro:Play(kSoundChannel_UI, 0)
+	local cameraMove = World.playerPawn:LookupAnimation("arm_default_flyin")
 	
 	local f = function()
-		UI:BlendTo({1,1,1,0}, 0.2)
-		HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
-		World.SetDrawUIOnly(true) -- no world rendering anymore
-		World.PauseGame(true)
-		Arm:Intro()
+		UI:BlendTo({1,1,1,1}, 0.2)
+		self:ResetWidgets()
+		
+		self.sfx.ArmIntro:Rewind()
+		self.sfx.ArmIntro:Play(kSoundChannel_UI, 0)
+		
+		local f = function()
+			UI:BlendTo({1,1,1,0}, 0.2)
+			HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
+			World.SetDrawUIOnly(true) -- no world rendering anymore
+			World.PauseGame(true)
+			World.StopCinematic(cameraMove)
+			Arm:Intro()
+		end
+		
+		World.globalTimers:Add(f, 0.2, true)
 	end
 	
-	World.globalTimers:Add(f, 0.2, true)
+	local callbacks = {
+		OnTag = function(self, tag)
+			if (tag == "@arm_transition") then
+				f()
+			else
+				World.PostEvent(tag)
+			end
+		end
+	}
+	
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, World.playerPawn, Game.entity, callbacks)
 end
 
 function Arm.Signal(self, topic)

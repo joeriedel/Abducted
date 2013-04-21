@@ -33,6 +33,7 @@ PlayerPawn.AnimationStates = {
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
+		arm_default_flyin = "arm_limp_flyin",
 		speedScale = 0.5,
 		tapAdjust = -20, -- CheckTappedOn
 		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},

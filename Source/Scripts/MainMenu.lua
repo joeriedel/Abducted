@@ -132,7 +132,7 @@ function MainMenu.PlayCinematic(self, name, flags, xfadeCamera)
 		xfadeCamera = 0
 	end
 
-	World.PlayCinematic(name, flags, xfadeCamera, Game.entity, callbacks)
+	World.PlayCinematic(name, flags, xfadeCamera, nil, Game.entity, callbacks)
 	
 end
 

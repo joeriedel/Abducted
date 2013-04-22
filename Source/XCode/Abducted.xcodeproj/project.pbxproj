@@ -42,6 +42,11 @@
 		3321A99C16FBB5C600E2102F /* pak0.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33BF6D5116FA97420021C144 /* pak0.pak */; };
 		3321A9F516FBB94D00E2102F /* libMainShipOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81281633CBC5002603A5 /* libMainShipOSX.a */; };
 		3321A9F616FBB94D00E2102F /* libRadianceShipOSX.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33FA81371633CBC5002603A5 /* libRadianceShipOSX.a */; };
+		3343893C1724C3F40048052A /* G_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343893A1724C3F40048052A /* G_VtModel.cpp */; };
+		3343893D1724C3F40048052A /* G_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343893A1724C3F40048052A /* G_VtModel.cpp */; };
+		3343893E1724C3F40048052A /* G_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343893A1724C3F40048052A /* G_VtModel.cpp */; };
+		3343893F1724C3F40048052A /* G_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343893A1724C3F40048052A /* G_VtModel.cpp */; };
+		334389401724C3F40048052A /* G_VtModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3343893A1724C3F40048052A /* G_VtModel.cpp */; };
 		33956A7A16FBD677008314CD /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		33956A7B16FBD677008314CD /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
 		33956A7C16FBD677008314CD /* G_SkModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC062A1626689800F8C9FF /* G_SkModel.cpp */; };
@@ -431,6 +436,8 @@
 		3321A97416FAAB9D00E2102F /* autoexec.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = autoexec.txt; path = ../../autoexec.txt; sourceTree = "<group>"; };
 		3321A9A016FBB5C600E2102F /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3321A9A416FBB82300E2102F /* AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = AppStore.entitlements; path = OSX/AppStore.entitlements; sourceTree = "<group>"; };
+		3343893A1724C3F40048052A /* G_VtModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_VtModel.cpp; sourceTree = "<group>"; };
+		3343893B1724C3F40048052A /* G_VtModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_VtModel.h; sourceTree = "<group>"; };
 		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		33956A7616FBC9AD008314CD /* 3rdParty.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = 3rdParty.entitlements; path = OSX/3rdParty.entitlements; sourceTree = "<group>"; };
 		33956AA616FBD677008314CD /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -923,6 +930,8 @@
 		33EC06291626689800F8C9FF /* Lua */ = {
 			isa = PBXGroup;
 			children = (
+				3343893A1724C3F40048052A /* G_VtModel.cpp */,
+				3343893B1724C3F40048052A /* G_VtModel.h */,
 				33EC062A1626689800F8C9FF /* G_SkModel.cpp */,
 				33EC062B1626689800F8C9FF /* G_SkModel.h */,
 			);
@@ -1505,6 +1514,7 @@
 				3321A98016FBB5C600E2102F /* G_SkModel.cpp in Sources */,
 				3321A98116FBB5C600E2102F /* G_TouchTrigger.cpp in Sources */,
 				33B55A571710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */,
+				3343893F1724C3F40048052A /* G_VtModel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1520,6 +1530,7 @@
 				33956A7F16FBD677008314CD /* G_ViewController.cpp in Sources */,
 				33956A8016FBD677008314CD /* G_TouchTrigger.cpp in Sources */,
 				33B55A581710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */,
+				334389401724C3F40048052A /* G_VtModel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1535,6 +1546,7 @@
 				339BA57D163656D50017FD79 /* G_ViewController.cpp in Sources */,
 				33982E8E16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */,
 				33B55A551710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */,
+				3343893D1724C3F40048052A /* G_VtModel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1551,6 +1563,7 @@
 				33BF6CD716FA89B50021C144 /* G_SkModel.cpp in Sources */,
 				33BF6CD816FA89B50021C144 /* G_TouchTrigger.cpp in Sources */,
 				33B55A561710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */,
+				3343893E1724C3F40048052A /* G_VtModel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1567,6 +1580,7 @@
 				33EC06301626689800F8C9FF /* G_SkModel.cpp in Sources */,
 				33982E8C16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */,
 				33B55A541710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */,
+				3343893C1724C3F40048052A /* G_VtModel.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

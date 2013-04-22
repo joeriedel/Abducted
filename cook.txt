@@ -1,22 +1,33 @@
 pak0 {
 
-	// Ep1 levels
+	UI/mainmenu
+
+	// Ep1
 
 	Ep1/ep1_falling
 	Ep1/ep1_crushed
 	Ep1/ep1_eaten
-	Ep1/testroom1_manipulate
 	Ep1/testroom2_manipulate
 	Ep1/testroom2_bugtest
 
+	Ep1/Falling
+	UI/ArmTestChat
 
 	// Shared
+	Objects/big_tentacle1
+	Objects/big_tentacle2
+	Objects/big_tentacle3
+	Objects/podshield1
 	Characters/Eve
 	Characters/Buggroup12
 	Characters/Bugtestmesh1
 	Characters/TentacleMedium1
+	Characters/TentacleFalling1
+	Characters/TentacleFalling2
 	Characters/tentacleskin1_M_manipulate
 	Characters/tentaclewings1_M_manipulate
+	Shared/alienskin1_M_manipulate
+	Shared/pylon1_M_manipulate
 	FX/shield1mesh
 	FX/pulsecone1mesh
 	FX/pulsebeam1mesh
@@ -58,19 +69,106 @@ pak0 {
 	UI/tab-selection-discoveries-pressed_M
 	UI/tab-selection-log_M
 	UI/tab-selection-log-pressed_M
-	UI/character-profiletest1_M
+	UI/portrait1_M
+	UI/portrait2_M
+	UI/portrait3_M
+	UI/portrait4_M
 	UI/discovery_bugs_M
 	UI/discovery_pod_M
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
 	UI/alphabet_scrollbar_M
+	UI/terminal_hack_M
+	UI/terminal_hack_pressed_M
+	UI/terminal_solve_M
+	UI/terminal_solve_pressed_M
+	UI/manipulate_button_M
+	UI/manipulate_button_charging_M
+	UI/manipulate_button_flashing_M
+	UI/pulse_button_M
+	UI/pulse_button_charging_M
+	UI/pulse_button_flashing_M
+	UI/shield_button_M
+	UI/shield_button_charging_M
 
+	UI/alertpanelbackground_M
+	UI/AlertText_TF
+	UI/AlertTitle_TF
+
+	UI/arm_buttons_M
+	UI/arm_buttons_overbright_M
+	UI/arm_button_M
+	UI/arm_button_pressed_M
+	UI/arm_button_signaled_M
+	UI/arm_screen1_M
+
+	UI/ability_recharge_shimmer_M
+
+	// Main menu
+	UI/MMGoldLarge_TF
+	UI/MMGold_TF
+	UI/MMLarge_TF
+	UI/MMNormal_TF
+	UI/charselectarrow_M
+	UI/MMItemBackground2_M
+	UI/MMItemBackground_M
+	UI/MMPanel_M
+	UI/MMSelPanel_M
+	UI/MMSelectedItem_M
+	UI/facebook_icon_M
+	UI/twitter_icon_M
+	UI/abducted_logo1_M
+	
 	Audio/Amb01-Cine
 	Audio/Amb02-Cine1	Audio/Amb03-Cine2	Audio/Amb04-Cine4	Audio/Amb05-Cine5	Audio/Amb06-Cine6	Audio/Amb07-Junkyard	Audio/Amb08-Lochness	Audio/Amb09-Deep1	Audio/Amb10-Deep2	Audio/Amb11-Spooked
-	"Audio/Amb12-Low Flutter1"	"Audio/Amb13-Low Flutter2"	"Audio/Amb14-Low Growl"	"Audio/Amb15-Low & Breathy"	"Audio/Amb16-Breath Drone"	"Audio/Amb17-Ghostly Drone"	Audio/Amb18-Atmos1	Audio/Amb19-Atmos2	Audio/Amb20-Atmos3	Audio/Amb21-Atmos4	Audio/Amb22-Atmos5	Audio/Amb23-Atmos6	"Audio/Amb24-The Event"	Audio/Amb25-Sinister	Audio/Amb26-Somewhere	Audio/Amb27-Lurking	Audio/Amb28-Shifter	"Audio/Amb29-Dead of Night"	Audio/Amb30-Anxiety	Audio/Amb31-DarkNightmare	"Audio/Amb32-Not Alone"	Audio/Amb33-Andromeda
+	"Audio/Amb12-Low Flutter1"	"Audio/Amb13-Low Flutter2"	"Audio/Amb14-Low Growl"	"Audio/Amb15-Low & Breathy"	"Audio/Amb16-Breath Drone"	"Audio/Amb17-Ghostly Drone"	Audio/Amb18-Atmos1	Audio/Amb19-Atmos2	Audio/Amb20-Atmos3	Audio/Amb21-Atmos4	Audio/Amb22-Atmos5	Audio/Amb23-Atmos6	"Audio/Amb24-The Event"	Audio/Amb25-Sinister	Audio/Amb26-Somewhere	Audio/Amb27-Lurking	Audio/Amb28-Shifter	"Audio/Amb29-Dead of Night"	Audio/Amb30-Anxiety	Audio/Amb31-DarkNightmare	"Audio/Amb32-Not-Alone"	Audio/Amb33-Andromeda
 	Audio/Amb34-Cryostasis	"Audio/Amb35-Bending Space"	Audio/Amb36-Future	"Audio/Amb37-Other World"	Audio/Amb38-CabinSpace	"Audio/Amb39-Sub Amb"	Audio/Amb40-Cyber
 
-	// Hack puzzle
+	Audio/Mus01-Cine4
+	Audio/Mus02-Future
+	Audio/Mus03-Junkyard
+	Audio/Mus04-Cyber
+	Audio/Mus05-TheEvent
+	Audio/Mus06-Lochness
+
+	// Puzzles
+	Puzzles/reflex-greenparticle1_M
+	Puzzles/reflex-block1_M
+	Puzzles/reflex-player1_M
+	Puzzles/AlienICE_M
+	Puzzles/reflex-blackhole0_M
+	Puzzles/reflex-blackhole1_M
+	Puzzles/reflex-blueglow1_M
+	Puzzles/reflex-goal1_M
+	Puzzles/glyph01_M
+	Puzzles/glyph02_M
+	Puzzles/glyph03_M
+	Puzzles/glyph04_M
+	Puzzles/glyph05_M
+	Puzzles/glyph06_M
+	Puzzles/glyph07_M
+	Puzzles/glyph08_M
+	Puzzles/glyph09_M
+	Puzzles/glyph10_M
+	Puzzles/glyph11_M
+	Puzzles/glyph12_M
+	Puzzles/glyph13_M
+	Puzzles/glyph14_M
+	Puzzles/glyph15_M
+	Puzzles/glyph16_M
+	Puzzles/glyph17_M
+	Puzzles/glyph18_M
+	Puzzles/glyph19_M
+	Puzzles/glyph20_M
+	Puzzles/glyph21_M
+	Puzzles/glyph22_M
+	Puzzles/glyph23_M
+	Puzzles/glyph24_M
+	Puzzles/glyph25_M
+	Puzzles/glyph26_M
+	Puzzles/glyph27_M
+	Puzzles/reflex-checkerboard1_M
+
 	Reflex-Game/reflex-mark-current_M
 	Reflex-Game/reflex-mark-start_M
 	Reflex-Game/reflex-mark-end_M
@@ -86,29 +184,8 @@ pak0 {
 	Reflex-Game/reflex-antivirus-spider_M
 	Reflex-Game/reflex-board_M
 	Reflex-Game/reflex-border_M
-
-	// UI
-	UI/terminal_hack_M
-	UI/terminal_hack_pressed_M
-	UI/terminal_solve_M
-	UI/terminal_solve_pressed_M
-	UI/manipulate_button_M
-	UI/manipulate_button_charging_M
-	UI/manipulate_button_flashing_M
-	UI/pulse_button_M
-	UI/pulse_button_charging_M
-	UI/pulse_button_flashing_M
-	UI/shield_button_M
-	UI/shield_button_charging_M
-
-	UI/arm_buttons_M
-	UI/arm_buttons_overbright_M
-	UI/arm_button_M
-	UI/arm_button_pressed_M
-	UI/arm_button_signaled_M
-	UI/arm_screen1_M
-
-	UI/ability_recharge_shimmer_M
+	
+	Memory-Game/memory-board_M
 
 	// Sounds
 	Audio/armbutton
@@ -117,12 +194,10 @@ pak0 {
 	Audio/player_command
 	Audio/ui_command
 	Audio/armintro1
+	Audio/armsignaled
 	Audio/shiphum1
-	Audio/penrose1
-	Audio/penrose2
-	Audio/penrose3
 	Audio/heartbeat1
-	Ep1/Handshake_contagion
+	Audio/ability_unlocked
 
 	// System (for DebugUI)
 

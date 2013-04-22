@@ -34,6 +34,8 @@ PlayerPawn.AnimationStates = {
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
 		arm_default_flyin = "arm_limp_flyin",
+		arm_default_flyout = "arm_limp_flyout",
+		arm_pose_standing = "arm_pose_limp",
 		speedScale = 0.5,
 		tapAdjust = -20, -- CheckTappedOn
 		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},
@@ -601,6 +603,50 @@ function PlayerPawn.Show(self, show)
 	self.model.dm:SetVisible(show)
 	
 	self:ShowShield(show)
+
+end
+
+function PlayerPawn.EnterArm(self)
+
+	Abducted.entity.eatInput = true
+	
+	local anim = self:LookupAnimation("arm_pose_standing")
+	local cameraMove = self:LookupAnimation("arm_default_flyin")
+
+	local callbacks = {
+		OnTag = function(self, tag)
+			if (tag == "@arm_transition") then
+				Arm:Start("chat")
+			else
+				World.PostEvent(tag)
+			end
+		end
+	}
+	
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
+	
+	self.state = nil
+	self.disableAnimTick = true
+	self.model:BlendToState(anim)
+	
+	HUD:SetVisible(false)
+end
+
+function PlayerPawn.ExitArm(self)
+
+	local callbacks = {
+		OnTag = function(self, tag)
+			World.PostEvent(tag)
+		end,
+		OnComplete = function()
+			Abducted.entity.eatInput = false
+			HUD:SetVisible(true)
+		end
+	}
+
+	self.disableAnimTick = false
+	local cameraMove = self:LookupAnimation("arm_default_flyout")
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
 
 end
 

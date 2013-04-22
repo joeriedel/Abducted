@@ -159,7 +159,7 @@ function HUD.ArmPressed(self, widget)
 	if (Game.entity.manipulate or Game.entity.pulse) then
 		return
 	end
-	Arm:Start("chat")
+	World.playerPawn:EnterArm()
 end
 
 function HUD.ManipulatePressed(self, widget)

@@ -209,9 +209,9 @@ bool AbductedApp::RunAutoExec() {
 	skModel->ska->Tick(1.f, -1.f, true, true, Mat4::Identity);
 	
 	for (int i = 0; i < skModel->numMeshes; ++i) {
-		const ska::DMesh *m = skModel->DMesh(i);
-		float *refFloats = (float*)safe_zone_malloc(ZEngine, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
-		float *simdFloats = (float*)safe_zone_malloc(ZEngine, ska::DMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+		const ska::DSkMesh *m = skModel->DMesh(i);
+		float *refFloats = (float*)safe_zone_malloc(ZEngine, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
+		float *simdFloats = (float*)safe_zone_malloc(ZEngine, ska::DSkMesh::kNumVertexFloats * m->totalVerts * sizeof(float), 0, SIMDDriver::kAlignment);
 		
 		skModel->SkinToBuffer(*SIMD, i, simdFloats);
 

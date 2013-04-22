@@ -617,6 +617,7 @@ function MainMenu.MainPanel.Exit(self)
 			World.StopCinematic("mainmenu")
 			
 			UI:BlendTo({1,1,1,0}, 0.3)
+			UI:MaskFadeIn(0)
 			
 			--[[local f = function()
 				UI:BlendTo({0,0,0,1}, 0.5)

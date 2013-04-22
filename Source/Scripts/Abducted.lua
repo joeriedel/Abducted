@@ -274,8 +274,17 @@ function Abducted.FirePulse(self, target, normal)
 end
 
 function Abducted.PlayerDiedAlertPanelDone(self, result)
-	if (result == 1) then
+	if (result == AlertPanel.YesButton) then
 		self:DoLoadCheckpoint()
+	else
+		Abducted.entity.eatInput = true
+		UI:BlendTo({0,0,0,0}, 0)
+		UI:BlendTo({0,0,0,1}, 1)
+		World.SoundFadeMasterVolume(0, 1)
+		local f = function()
+			World.RequestLoad("UI/mainmenu", kUnloadDisposition_Slot)
+		end
+		World.globalTimers:Add(f, 1.1)
 	end
 end
 

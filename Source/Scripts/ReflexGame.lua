@@ -254,6 +254,9 @@ function ReflexGame.InitUI(self)
     self.state.lineTimer = 0
 	self.state.goalCounter = 1
     self.state.lineIndex = 1
+    self.state.fadeInBoardTimer = 5
+    self.state.swipeToMoveTimer = 1
+    self.state.touchWhenReadyTimer = 5
 
 	-- define structure self.widgets
 	self.widgets = {}
@@ -262,6 +265,7 @@ function ReflexGame.InitUI(self)
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
 	self.widgets.grid = {}
+	self.widgets.cells = {}
 
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
@@ -284,8 +288,10 @@ function ReflexGame.InitUI(self)
 		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx[v.img]})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
 		b.state = self:CreateState(v.img)
+        b:BlendTo({1,1,1,0}, 0)
 		self.widgets.root:AddChild(b)
-		self.widgets.grid[index] = b		
+		self.widgets.grid[index] = b
+        table.insert(self.widgets.cells,b)
 		self:SetPositionByGrid(b,v.x,v.y)
 		if (v.img == "mark_start") then
             local player = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})
@@ -313,7 +319,13 @@ function ReflexGame.InitUI(self)
 
     self.widgets.touchWhenReadyLabel = UI:CreateWidget("TextLabel", {rect={ 320, UI.screenHeight/2 - 65, UI.screenWidth, UI.screenHeight/2 + 20}, typeface=self.typefaces.TouchWhenReadyText})
     self.widgets.touchWhenReadyLabel:SetText("Touch when ready")
+    self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,0}, 0)
     self.widgets.root:AddChild(self.widgets.touchWhenReadyLabel)
+
+    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 60, 500, 500, 100}, typeface=self.typefaces.SwipeToMoveText})
+    self.widgets.swipeToMoveLabel:SetText("Swipe to move - Collect the Glyphs")
+    self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
+    self.widgets.root:AddChild(self.widgets.swipeToMoveLabel)
 
     self:UpdateHud()
 
@@ -371,7 +383,8 @@ function ReflexGame.LoadMaterials(self)
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
     self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
     self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-	
+    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
 	
@@ -678,16 +691,43 @@ function ReflexGame.Think(self,dt)
 				
 		-- game over never advances past here
 		return
-	end
+    end
+
+    if (self.state.swipeToMoveTimer > 0) then
+        self.state.swipeToMoveTimer = self.state.swipeToMoveTimer - dt
+        if (self.state.swipeToMoveTimer <= 0) then
+            self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .5)
+        end
+    end
+
+    if (self.state.fadeInBoardTimer > 0) then
+        self.state.fadeInBoardTimer = self.state.fadeInBoardTimer - dt
+        if (self.state.fadeInBoardTimer <= 0) then
+            for i,k in pairs(self.widgets.cells) do
+                k:BlendTo({1,1,1,1}, 2)
+            end
+        end
+        return
+    end
+
+    if (self.state.touchWhenReadyTimer > 0) then
+        self.state.touchWhenReadyTimer = self.state.touchWhenReadyTimer - dt
+        if (self.state.touchWhenReadyTimer <= 0) then
+            self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,1}, 2)
+        end
+    end
 
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		
 		return
     end
 
-    -- hide the text
-    self.widgets.touchWhenReadyLabel:SetText("")
-	
+    if (not self.state.labelFadeOut) then
+        self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,0}, .5)
+        self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, .5)
+        self.state.labelFadeOut = true
+    end
+
 	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
 		self.state.lastHeading.x = self.state.heading.x
 		self.state.lastHeading.y = self.state.heading.y

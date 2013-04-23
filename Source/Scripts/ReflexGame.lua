@@ -75,6 +75,7 @@ function ReflexGame.CreateLevel1x1(self)
 	level.antivirusSpiderSpawnRate = 5
 	level.antivirusSpiderSpeed = 40
     level.lineTimerEnabledEnabledTimer = 5
+    level.time = 120
 	
 	level.board = {
 		-- row 0
@@ -85,22 +86,22 @@ function ReflexGame.CreateLevel1x1(self)
 		, { x=11, y=1, img="cell_green" }		
 		-- row 2
 		, { x=3, y=2, img="cell_green" }
-		, { x=4, y=2, img="cell_b" }
+		, { x=4, y=2, img="cell_02" }
 		, { x=11, y=2, img="cell_green" }		
 		, { x=12, y=2, img="cell_green" }				
 		-- row 3
 		, { x=5, y=3, img="cell_green" }
 		-- row 4
 		, { x=12, y=4, img="cell_green" }
-		, { x=13, y=4, img="cell_d" }
+		, { x=13, y=4, img="cell_04" }
 		-- row 5
 		, { x=6, y=5, img="cell_green" }
-		, { x=13, y=5, img="cell_c" }
+		, { x=13, y=5, img="cell_03" }
 		-- row 6
 		, { x=2, y=6, img="cell_green" }
 		, { x=3, y=6, img="cell_green" }
 		-- row 7
-		, { x=3, y=7, img="cell_a" }		
+		, { x=3, y=7, img="cell_01" }		
 		, { x=14, y=1, img="mark_end" }				
 		-- row 8
 		-- row 9
@@ -246,6 +247,7 @@ function ReflexGame.InitUI(self)
 	self.state.gameOverTimer = 2	
 	self.state.victory = false
 	self.state.level = level
+    self.state.timeLeft = level.time
 	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
 	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
     self.state.lineTimerEnabledTimer = level.lineTimerEnabledEnabledTimer
@@ -304,9 +306,18 @@ function ReflexGame.InitUI(self)
 			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
 			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)	
 		end
-	end
-	
-	if (self.widgets.current == nil) then
+    end
+
+    self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={80, 35, UI.screenWidth*.15,UI.screenHeight*.15}, typeface=self.typefaces.TimerText})
+    self.widgets.root:AddChild(self.widgets.timeLeftLabel)
+
+    self.widgets.touchWhenReadyLabel = UI:CreateWidget("TextLabel", {rect={ 320, UI.screenHeight/2 - 65, UI.screenWidth, UI.screenHeight/2 + 20}, typeface=self.typefaces.TouchWhenReadyText})
+    self.widgets.touchWhenReadyLabel:SetText("Touch when ready")
+    self.widgets.root:AddChild(self.widgets.touchWhenReadyLabel)
+
+    self:UpdateHud()
+
+    if (self.widgets.current == nil) then
 		COutLine(kC_Debug,"mark_start NOT FOUND --> ERROR")	
 	end
 	
@@ -327,10 +338,10 @@ function ReflexGame.LoadMaterials(self)
 
     self.gfx.cell_green = World.Load("Puzzles/reflex-block1_M")
 
-    self.gfx.cell_a = World.Load("Puzzles/glyph01_M")
-    self.gfx.cell_b = World.Load("Puzzles/glyph02_M")
-    self.gfx.cell_c = World.Load("Puzzles/glyph03_M")
-    self.gfx.cell_d = World.Load("Puzzles/glyph04_M")
+    self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
+    self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
+    self.gfx.cell_03 = World.Load("Puzzles/glyph03_M")
+    self.gfx.cell_04 = World.Load("Puzzles/glyph04_M")
     self.gfx.cell_05 = World.Load("Puzzles/glyph05_M")
     self.gfx.cell_06 = World.Load("Puzzles/glyph06_M")
     self.gfx.cell_07 = World.Load("Puzzles/glyph07_M")
@@ -358,6 +369,8 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.mark_start = nil
 	self.typefaces = {}
 	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesBigFont_TF")
 	
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
@@ -622,10 +635,10 @@ function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
 			return false
 		end
 		
-		if (piece.state.architype == "cell_a" 
-			or piece.state.architype == "cell_b" 
-			or piece.state.architype == "cell_c" 
-			or piece.state.architype == "cell_d" 
+		if (piece.state.architype == "cell_01" 
+			or piece.state.architype == "cell_02" 
+			or piece.state.architype == "cell_03" 
+			or piece.state.architype == "cell_04" 
 		) then
 			return false
 		end
@@ -633,6 +646,13 @@ function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
 	
 	COutLine(kC_Debug,"CollideWihtBoard found Piece @ x=%i, y=%i, type=%s",x,y,piece.state.architype)			
 	return true
+end
+
+function ReflexGame.UpdateHud(self)
+    local minutes = math.floor(self.state.timeLeft / 60)
+    local seconds = self.state.timeLeft - (minutes * 60)
+    local text = string.format("%i:%02i",minutes,seconds)
+    self.widgets.timeLeftLabel:SetText(text)
 end
 
 function ReflexGame.Think(self,dt)
@@ -663,7 +683,10 @@ function ReflexGame.Think(self,dt)
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		
 		return
-	end
+    end
+
+    -- hide the text
+    self.widgets.touchWhenReadyLabel:SetText("")
 	
 	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
 		self.state.lastHeading.x = self.state.heading.x
@@ -751,11 +774,14 @@ function ReflexGame.Think(self,dt)
         end
     end
 
+    self.state.timeLeft = self.state.timeLeft - dt
+    self:UpdateHud()
+
 	local playerGridCell = self:GetGridCellFromVec2(currentPos)
 	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)	 
-	
+
 	local pieceAtPlayer = self.widgets.grid[playerIndex]	
-	if (pieceAtPlayer) then		
+	if (pieceAtPlayer or self.state.timeLeft <= 0) then
 		if (self.state.goalCounter < #self.widgets.goals) then
 			local goalPiece = self.widgets.goals[self.state.goalCounter]
 			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
@@ -771,7 +797,14 @@ function ReflexGame.Think(self,dt)
 			self.state.gameOver = true
 			self.state.victory = true
 			return
-		end		
+		end
+
+        if (self.state.timeLeft <= 0) then
+            COutLine(kC_Debug,"Game Over Detected (time ran out)")
+            self.state.gameOver = true
+            self.state.victory = false
+            return
+        end
     end
 -- this isn't how it works now
 --	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then

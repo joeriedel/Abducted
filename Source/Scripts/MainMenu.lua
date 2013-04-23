@@ -17,6 +17,8 @@ function MainMenu.Initialize(self)
 		end
 	}
 
+	World.PlayCinematic("environment", kCinematicFlag_CanPlayForever, 0)
+	World.PlayCinematic("environment_loop", kCinematicFlag_Loop, 0)
 	MainMenu:PlayCinematic("mainmenu", bit.bor(kCinematicFlag_Loop, kCinematicFlag_AnimateCamera))
 	
 	self.think = Game.Think

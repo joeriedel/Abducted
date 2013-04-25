@@ -11,7 +11,7 @@ TerminalScreen.ButtonSize = {1/15, 1/15}
 TerminalScreen.PopupEntity = nil
 TerminalScreen.Objects = {}
 TerminalScreen.Widgets = {}
-TerminalScreen.Skip = true
+TerminalScreen.Skip = false
 
 function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)

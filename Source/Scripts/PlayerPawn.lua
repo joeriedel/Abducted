@@ -11,7 +11,7 @@ PlayerPawn.kRunSpeed = 200
 PlayerPawn.kShieldSpeed = 0.5
 PlayerPawn.kShieldAccel = 0.5
 PlayerPawn.kAccel = 200
-PlayerPawn.HandBone = "Hand_right"
+PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
 PlayerPawn.GodMode = false
 

@@ -74,6 +74,7 @@ function ReflexGame.CreateLevel1x1(self)
 	
 	level.antivirusSpiderSpawnRate = 5
 	level.antivirusSpiderSpeed = 40
+    level.blackholeSpeed = 40
     level.lineTimerEnabledEnabledTimer = 5
     level.time = 120
 	
@@ -102,10 +103,11 @@ function ReflexGame.CreateLevel1x1(self)
 		, { x=3, y=6, img="cell_green" }
 		-- row 7
 		, { x=3, y=7, img="cell_01" }		
-		, { x=14, y=1, img="mark_end" }				
+		, { x=16, y=7, img="mark_end" }
 		-- row 8
 		-- row 9
-		-- row 10
+        , { x=8, y=4, img="blackhole", heading={ 0,1 } }
+        -- row 10
 		-- row 11
 		-- row 12
 		-- row 13
@@ -216,7 +218,8 @@ end
 
 function ReflexGame.InitUI(self)
 	-- constants
-	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1]}
+	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1] }
+    self.BLACKHOLE_SIZE = {100*UI.identityScale[1], 100*UI.identityScale[1]}
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 9
@@ -254,9 +257,9 @@ function ReflexGame.InitUI(self)
     self.state.lineTimer = 0
 	self.state.goalCounter = 1
     self.state.lineIndex = 1
-    self.state.fadeInBoardTimer = 5
+    self.state.fadeInBoardTimer = 2
     self.state.swipeToMoveTimer = 1
-    self.state.touchWhenReadyTimer = 5
+    self.state.touchWhenReadyTimer = 3
 
 	-- define structure self.widgets
 	self.widgets = {}
@@ -264,6 +267,7 @@ function ReflexGame.InitUI(self)
 	self.widgets.board = { }		
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
+    self.widgets.blackholes = { }
 	self.widgets.grid = {}
 	self.widgets.cells = {}
 
@@ -285,23 +289,34 @@ function ReflexGame.InitUI(self)
 	COutLine(kC_Debug, "Creating Board")	
 	-- board step: board grid is x,y structure
 	for i,v in ipairs(self.state.level.board) do
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx[v.img]})
+
+        local objectTable = self.widgets.cells
+        local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
+
+        if (self.gfx[v.img] == self.gfx.blackhole) then
+            objectTable = self.widgets.blackholes
+            objectSize = { self.BLACKHOLE_SIZE[1], self.BLACKHOLE_SIZE[2] }
+        end
+
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=self.gfx[v.img]})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
-		b.state = self:CreateState(v.img)
+		b.state = self:CreateState(v.img,v)
         b:BlendTo({1,1,1,0}, 0)
 		self.widgets.root:AddChild(b)
-		self.widgets.grid[index] = b
-        table.insert(self.widgets.cells,b)
+        if (objectTable == self.widgets.cells) then
+		    self.widgets.grid[index] = b
+        end
+        table.insert(objectTable,b)
 		self:SetPositionByGrid(b,v.x,v.y)
 		if (v.img == "mark_start") then
             local player = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})
-            player.state = self:CreateState("player")
+            player.state = self:CreateState("player",v)
             self.widgets.player = player
             self.widgets.root:AddChild(player)
             self:SetPositionByGrid(player,v.x,v.y)
 
 			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
-			current.state = self:CreateState("mark_current")
+			current.state = self:CreateState("mark_current",v)
 			self.widgets.current = current
 			self.widgets.root:AddChild(current)
 			self:SetPositionByGrid(current,v.x,v.y)
@@ -339,8 +354,10 @@ end
 function ReflexGame.LoadMaterials(self)
 	
 	self.gfx = {}
+	self.gfx.blackhole = World.Load("Puzzles/reflex-blackhole1_M");
 	self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
-	self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
+    self.gfx.blue_glow = World.Load("Puzzles/reflex-blueglow1_M")
+    self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
 	self.gfx.border = World.Load("UI/arm_screen1_M")
 
     self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
@@ -454,7 +471,7 @@ function ReflexGame.LerpVec2(self,v,heading,dt,speed)
 	return vec2	
 end
 
-function ReflexGame.LerpWidget(self,widget,heading,dt,speed)	
+function ReflexGame.LerpWidget(self,widget,heading,dt,speed,constrain)
 	local r = widget:Rect()
 	
 	local width = r[3]
@@ -468,19 +485,20 @@ function ReflexGame.LerpWidget(self,widget,heading,dt,speed)
 
 	local o = self:LerpVec2(wv,heading,dt,speed)
 
-	if (o.x < half_width) then
-		o.x = 0
+    if (constrain) then
+        if (o.x < half_width) then
+            o.x = 0
+        end
+        if (o.x + width > UI.screenWidth) then
+            o.x = UI.screenWidth - half_width
+        end
+        if (o.y < half_height) then
+            o.y = 0
+        end
+        if (o.y + height > UI.screenHeight) then
+            o.y = UI.screenHeight - half_height
+        end
 	end
-	if (o.x + width > UI.screenWidth) then
-		o.x = UI.screenWidth - half_width
-	end
-	if (o.y < half_height) then
-		o.y = 0
-	end	
-	if (o.y + height > UI.screenHeight) then
-		o.y = UI.screenHeight - half_height
-	end
-	
 	return o
 end
 
@@ -553,9 +571,10 @@ function ReflexGame.GetPosition(self,w)
 end
 
 
-function ReflexGame.CreateState(self,architype)
+function ReflexGame.CreateState(self,architype,ref)
 	local state = { }
 	state.architype = architype
+    state.ref = ref
 	return state
 end
 
@@ -704,6 +723,9 @@ function ReflexGame.Think(self,dt)
         self.state.fadeInBoardTimer = self.state.fadeInBoardTimer - dt
         if (self.state.fadeInBoardTimer <= 0) then
             for i,k in pairs(self.widgets.cells) do
+                k:BlendTo({1,1,1,1}, 2)
+            end
+            for i,k in pairs(self.widgets.blackholes) do
                 k:BlendTo({1,1,1,1}, 2)
             end
         end
@@ -869,14 +891,36 @@ function ReflexGame.Think(self,dt)
 			spider.state.heading.x = 1
 		end
 		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
-	end	
-	
-	--COutLine(kC_Debug,"Spider move")
+    end
+
+    --COutLine(kC_Debug,"Blackhole move")
+    for i,k in pairs(self.widgets.blackholes) do
+        if (k.state.heading == null) then
+            k.state.heading = {}
+            k.state.heading.x = k.state.ref.heading[1]
+            k.state.heading.y = k.state.ref.heading[2]
+            COutLine(kC_Debug,"blackhole heading @ : x=%i, y=%i",k.state.heading.x,k.state.heading.y)
+        end
+
+        local pos = k:Rect()
+--        COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
+        local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.blackholeSpeed,false)
+        if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
+            k.state.heading.x = -k.state.heading.x
+            k.state.heading.y = -k.state.heading.y
+            nextPos = self:LerpWidget(k,k.state.heading,2*dt,self.state.level.blackholeSpeed,false)
+            COutLine(kC_Debug,"blackhole bounce @ : x=%i, y=%i",nextPos.x,nextPos.y)
+        end
+        UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
+    end
+
+    --COutLine(kC_Debug,"Spider move")
 	for i,k in pairs(self.widgets.spiders) do	
 		local pos = k:Rect()
-		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)			
-		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed)
-		if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
+--		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
+		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed,false)
+        UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
+        if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
 			table.remove(self.widgets.spiders,i)
 			self.widgets.root:RemoveChild(k)
 			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)

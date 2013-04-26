@@ -4,7 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 PlayerPawn = Entity:New()
-PlayerPawn.kWalkSpeed = 100
+PlayerPawn.kWalkSpeed = 80
 PlayerPawn.kAutoDecelDistance = 10
 PlayerPawn.kFriction = 300
 PlayerPawn.kRunSpeed = 200
@@ -36,7 +36,7 @@ PlayerPawn.AnimationStates = {
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
-		speedScale = 0.5,
+		speedScale = 0.7,
 		tapAdjust = -20, -- CheckTappedOn
 		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},
 		canRun = false,

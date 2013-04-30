@@ -617,20 +617,43 @@ function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	line:SetRect(r)
 end
 
-function ReflexGame.CollideWithLine(self,x,y,ignore)
-	local count = #self.widgets.lines
-	if (ignore) then
-		count = count - 2
-	end	
+function ReflexGame.CollideWithHazard(self,x,y)
+    local v2 = {}
+    v2.x = x
+    v2.y = y
+    local cell = self:GetGridCellFromVec2(v2)
 
-	for i, k in pairs(self.widgets.lines) do
-		local r = k:Rect()
-		if (i < count and x >= r[1] and x < r[1]+r[3] and y >= r[2] and y < r[2] + r[4]) then
-			return true
-		end
-	end
+    for i,k in pairs(self.widgets.blackholes) do
+        local v = self:GetGridCell(k)
+        if (v.x == cell.x and v.y == cell.y) then
+            return true
+        end
+    end
+
+    for i,k in pairs(self.widgets.spiders) do
+        local v = self:GetGridCell(k)
+        if (v.x == cell.x and v.y == cell.y) then
+            return true
+        end
+    end
 	
 	return false
+end
+
+function ReflexGame.CollideWithLine(self,x,y,ignore)
+    local count = #self.widgets.lines
+    if (ignore) then
+        count = count - 2
+    end
+
+    for i, k in pairs(self.widgets.lines) do
+        local r = k:Rect()
+        if (i < count and x >= r[1] and x < r[1]+r[3] and y >= r[2] and y < r[2] + r[4]) then
+            return true
+        end
+    end
+
+    return false
 end
 
 function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
@@ -760,13 +783,13 @@ function ReflexGame.Think(self,dt)
 	end
 
 	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
-	if (self:CollideWithBoard(currentPos.x,currentPos.y,true)) then
+	if (self:CollideWithBoard(currentPos.x,currentPos.y,true) or self:CollideWithHazard(currentPos.x,currentPos.y)) then
 		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)			
 		self.state.gameOver = true
 		return
-	end
-	
-	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)	
+    end
+
+	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)
 	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
 	self.widgets.current.state.endPos = currentPos
 	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)

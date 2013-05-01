@@ -62,6 +62,25 @@ BEGIN_VARYING
 	OUT_LIGHTREGS
 END_VARYING
 
+#if defined(FRAGMENT)
+
+HALF4 DiffuseLightPixel(
+	HALF4 lightDir,  // w contains radius
+	HALF4 lightDfColor, // w contains brightness
+	FIXED3 normal, 
+	FIXED4 diffuseColor 
+) {
+	HALF e = length(lightDir.xyz);
+	e = max(0, lightDir.w - e) / lightDir.w;
+	e = e * lightDfColor.w;
+	FIXED3 l = normalize(lightDir.xyz);
+	FIXED3 n = normalize(normal);
+	HALF r = max(0, dot(l, n));
+	return HALF4(diffuseColor.xyz * r * e, diffuseColor.w);
+}
+
+#endif
+
 #include <fragment>
 
 MAIN
@@ -73,15 +92,15 @@ MAIN
 	float HALF_PI = 3.14159265358979323846264/2.0;
 	
 #if defined(TANGENT_FRAME) || defined(NUM_SHADER_BITANGENTS)
-	FLOAT3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
+	FIXED3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
 #if defined(GENREFLECT) || (defined(LIGHTS) && defined(SHADER_LIGHT_HALFDIR))
-	FLOAT3 v_eyevec = normalize(UNIFORM(eye) - IN(position).xyz);
+	FIXED3 vn_eyevec = normalize(UNIFORM(eye) - IN(position).xyz);
 #endif
 
 #if defined(GENREFLECT)
-	FLOAT3 genReflectTC_ = reflect(IN(nm0), v_eyevec);
+	FLOAT3 genReflectTC_ = reflect(FLOAT3(IN(nm0)), FLOAT3(vn_eyevec));
 	FLOAT4 genReflectTC = FLOAT4(genReflectTC_.x, genReflectTC_.y, genReflectTC_.z, 1.f);
 #endif
 
@@ -90,16 +109,19 @@ MAIN
 
 #if defined(LIGHTS)
 #if defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_HALFDIR)
-	FLOAT3 v_light0_dir = normalize(UNIFORM(light0_pos) - IN(position).xyz);
+	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - IN(position).xyz;
+	FIXED3 vn_light0_dir = normalize(v_light0_dir);
 #endif
 #if defined(SHADER_LIGHT_DIR)
 	// should i pack tangent frame in a matrix?
-	OUT(light0_dir).x = dot(v_light0_dir, IN(tangent).xyz);
-	OUT(light0_dir).y = dot(v_light0_dir, v_bitan0);
-	OUT(light0_dir).z = dot(v_light0_dir, IN(nm0));
+//	OUT(light0_dir).x = dot(v_light0_dir, HALF3(IN(tan0).xyz));
+//	OUT(light0_dir).y = dot(v_light0_dir, HALF3(v_bitan0));
+//	OUT(light0_dir).z = dot(v_light0_dir, HALF3(IN(nm0)));
+//	OUT(light0_dir).w = UNIFORM(light0_pos).w;
+	OUT(light0_dir) = HALF4(v_light0_dir, UNIFORM(light0_pos).w);
 #endif
 #if defined(SHADER_LIGHT_HALFDIR)
-	FLOAT3 v_light0_halfdir = (v_light0_dir + v_eyevec) * 0.5f;
+	FIXED3 v_light0_halfdir = (vn_light0_dir + vn_eyevec) * 0.5f;
 	OUT(light0_halfdir).x = dot(v_light0_halfdir, IN(tan0).xyz);
 	OUT(light0_halfdir).y = dot(v_light0_halfdir, v_bitan0);
 	OUT(light0_halfdir).z = dot(v_light0_halfdir, IN(nm0));

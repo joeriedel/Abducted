@@ -563,12 +563,11 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 
 #if defined(NORMALS)
 	#define IN_NMREGS \
-		GLSL(attribute) FLOAT3 SEL(nm0, IN(nm0)) HLSL(:NORMAL);
+		GLSL(attribute) FIXED3 SEL(nm0, IN(nm0)) HLSL(:NORMAL);
 
 	#if defined(NUM_SHADER_NORMALS)
 		#define OUT_NMREGS \
-			GLSL(varying) FLOAT3 SEL(nm0, OUT(nm0)) HLSL(:NORMAL);
-		#define NMCOPY \
+			GLSL(varying) FIXED3 SEL(nm0, OUT(nm0)) HLSL(:NORMAL);
 	#else // !defined(NUM_SHADER_NORMALS)
 		#define OUT_NMREGS
 	#endif
@@ -582,13 +581,12 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 
 #if defined(TANGENTS)
 	#define IN_TANREGS \
-		GLSL(attribute) FLOAT4 SEL(tan0, IN(tan0)) HLSL(:TANGENT);
+		GLSL(attribute) FIXED4 SEL(tan0, IN(tan0)) HLSL(:TANGENT);
 	#if defined(NUM_SHADER_TANGENTS)
 		#define OUT_TANREGS \
-			GLSL(varying) FLOAT4 SEL(tan0, OUT(tan0)) HLSL(:TANGENT);
+			GLSL(varying) FIXED4 SEL(tan0, OUT(tan0)) HLSL(:TANGENT);
 	#else // !defined(NUM_SHADER_TANGENTS)
 		#define OUT_TANREGS
-		#define TANCOPY
 	#endif
 #else // !defined(TANGENTS)
 #define IN_TANREGS
@@ -600,7 +598,7 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #if defined(BITANGENTS)
 	#if defined(NUM_SHADER_BITANGENTS)
 		#define OUT_BITANREGS \
-			GLSL(varying) FLOAT3 SEL(bitan0, OUT(bitan0)) HLSL(:BITANGENT);
+			GLSL(varying) FIXED3 SEL(bitan0, OUT(bitan0)) HLSL(:BITANGENT);
 	#else // !defined(NUM_SHADER_BITANGENTS)
 		#define OUT_BITANREGS
 	#endif
@@ -611,29 +609,135 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 ///////////////////////////////////////////////////////////////////////////////
 
 #if defined(LIGHTS)
-	
-	#define ULIGHTREGS \
-		GLSL(uniform) FLOAT4 UDECL(light0_diffuseColor); \
-		GLSL(uniform) FLOAT4 UDECL(light0_specularColor); \
-		GLSL(uniform) FLOAT3 UDECL(light0_pos);
-	
-	#if defined(SHADER_LIGHT_DIR)
-		#define OUT_LIGHTDIR \
-			GLSL(varying) FLOAT3 SEL(light0_dir, OUT(light0_dir));
-	#else
-		#define OUT_LIGHTDIR
-	#endif
 
-	#if defined(SHADER_LIGHT_HALFDIR)
-		#define OUT_LIGHTHALFDIR \
-			GLSL(varying) FLOAT3 SEL(light0_halfdir, OUT(light0_halfdir));
-	#else
-		#define OUT_LIGHTHALFDIR
-	#endif
+#if defined(SHADER_LIGHT_DIR)
+#if SHADER_LIGHT_DIR == 4
+	#define ULIGHTPOSREGS \
+		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+		GLSL(uniform) FLOAT4 UDECL(light1_pos);
+		GLSL(uniform) FLOAT4 UDECL(light2_pos);
+		GLSL(uniform) FLOAT4 UDECL(light3_pos);
+#elif SHADER_LIGHT_DIR == 3
+	#define ULIGHTPOSREGS \
+		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+		GLSL(uniform) FLOAT4 UDECL(light1_pos);
+		GLSL(uniform) FLOAT4 UDECL(light2_pos);
+#elif SHADER_LIGHT_DIR == 2
+	#define ULIGHTPOSREGS \
+		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+		GLSL(uniform) FLOAT4 UDECL(light1_pos);
+#elif SHADER_LIGHT_DIR == 1
+	#define ULIGHTPOSREGS \
+		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+#endif
+#else
+#define ULIGHTPOSREGS
+#endif
 
-	#define OUT_LIGHTREGS \
-		OUT_LIGHTDIR \
-		OUT_LIGHTHALFDIR
+#if defined(SHADER_LIGHT_DIFFUSE_COLOR)
+#if SHADER_LIGHT_DIFFUSE_COLOR == 4
+	#define ULIGHTDFCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light2_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light3_diffuseColor);
+#elif SHADER_LIGHT_DIFFUSE_COLOR == 3
+	#define ULIGHTDFCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light2_diffuseColor);
+#elif SHADER_LIGHT_DIFFUSE_COLOR == 2
+	#define ULIGHTDFCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
+#elif SHADER_LIGHT_DIFFUSE_COLOR == 1
+	#define ULIGHTDFCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
+#endif
+#else
+#define ULIGHTDFCOLORREGS
+#endif
+
+#if defined(SHADER_LIGHT_SPECULAR_COLOR)
+#if SHADER_LIGHT_SPECULAR_COLOR == 4
+	#define ULIGHTSPCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_specularColor);
+		GLSL(uniform) HALF4 UDECL(light1_specularColor);
+		GLSL(uniform) HALF4 UDECL(light2_specularColor);
+		GLSL(uniform) HALF4 UDECL(light3_specularColor);
+#elif SHADER_LIGHT_SPECULAR_COLOR == 3
+	#define ULIGHTSPCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_specularColor);
+		GLSL(uniform) HALF4 UDECL(light1_specularColor);
+		GLSL(uniform) HALF4 UDECL(light2_specularColor);
+#elif SHADER_LIGHT_SPECULAR_COLOR == 2
+	#define ULIGHTSPCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_specularColor);
+		GLSL(uniform) HALF4 UDECL(light1_specularColor);
+#elif SHADER_LIGHT_SPECULAR_COLOR == 1
+	#define ULIGHTSPCOLORREGS \
+		GLSL(uniform) HALF4 UDECL(light0_specularColor);
+#endif
+#else
+#define ULIGHTSPCOLORREGS
+#endif
+	
+#if defined(SHADER_LIGHT_DIR)
+#if SHADER_LIGHT_DIR == 4
+	#define OUT_LIGHTDIR \
+		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
+		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
+		GLSL(varying) HALF4 SEL(light2_dir, OUT(light2_dir));
+		GLSL(varying) HALF4 SEL(light3_dir, OUT(light3_dir));
+#elif SHADER_LIGHT_DIR == 3
+	#define OUT_LIGHTDIR \
+		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
+		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
+		GLSL(varying) HALF4 SEL(light2_dir, OUT(light2_dir));
+#elif SHADER_LIGHT_DIR == 2
+	#define OUT_LIGHTDIR \
+		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
+		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
+#elif SHADER_LIGHT_DIR == 1
+	#define OUT_LIGHTDIR \
+		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
+#endif
+#else
+#define OUT_LIGHTDIR
+#endif
+
+#if defined(SHADER_LIGHT_HALFDIR)
+#if SHADER_LIGHT_HALFDIR == 4
+	#define OUT_LIGHTHALFDIR \
+		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
+		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
+		GLSL(varying) FIXED3 SEL(light2_halfdir, OUT(light2_halfdir));
+		GLSL(varying) FIXED3 SEL(light3_halfdir, OUT(light3_halfdir));
+#elif SHADER_LIGHT_HALFDIR == 3
+	#define OUT_LIGHTHALFDIR \
+		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
+		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
+		GLSL(varying) FIXED3 SEL(light2_halfdir, OUT(light2_halfdir));
+#elif SHADER_LIGHT_HALFDIR == 2
+	#define OUT_LIGHTHALFDIR \
+		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
+		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
+#elif SHADER_LIGHT_HALFDIR == 1
+	#define OUT_LIGHTHALFDIR \
+		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
+#endif
+#else
+#define OUT_LIGHTHALFDIR
+#endif
+
+#define OUT_LIGHTREGS \
+	OUT_LIGHTDIR \
+	OUT_LIGHTHALFDIR
+
+#define ULIGHTREGS \
+	ULIGHTPOSREGS \
+	ULIGHTDFCOLORREGS \
+	ULIGHTSPCOLORREGS
 
 #else
 #define ULIGHTREGS

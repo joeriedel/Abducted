@@ -161,14 +161,14 @@ end
 
 function ReflexGame.OnInputEvent(self,e)
 	self = ReflexGame.entity
-	
+
 	if (e.type == kI_KeyDown) then
 		--COutLine(kC_Debug,"key=%i",e.data[1])
 		if (e.data[1] == kKeyCode_I) then
 			--COutLine(kC_Debug,"moving widget")
 			self.state.heading.x = 0
 			self.state.heading.y = -1
-			--UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
+            --UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
 			return true
 		end
 		if (e.data[1] == kKeyCode_K) then
@@ -197,7 +197,7 @@ function ReflexGame.OnInputGesture(self,g)
 	if (g.id ~= kIG_Line) then
 		return true
 	end
-	
+
 	-- left?
 	if (g.args[1] > 0.707) then
 		self.state.heading.x = 1
@@ -803,6 +803,8 @@ function ReflexGame.Think(self,dt)
 		self.widgets.current.heading = self.state.heading
     end
 
+
+
 	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
     self:CollideWithSymbol(currentPos.x,currentPos.y)
 
@@ -828,39 +830,46 @@ function ReflexGame.Think(self,dt)
     end
 
 	-- detect change of direction
-	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
-        currentPos = self:GetPositionByGrid(nextCell.x,nextCell.y)
-        self:SetPositionByGrid(self.widgets.player,currentPos.x,currentPos.y)
-        self.widgets.current.state.endPos = currentPos
-        self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
-        local angle = 0
-        if (self.state.heading.x < 0) then
-            angle = 180
-        elseif (self.state.heading.y < 0) then
-            angle = 270
-        elseif (self.state.heading.y > 0) then
-            angle = 90
+    local rpos = self:GetPositionByGrid(nextCell.x,nextCell.y)
+    local dx2 = math.abs(currentPos.x - rpos.x)
+    local dy2 = math.abs(currentPos.y - rpos.y)
+
+    local threshold = (dx2 < 1 and dy2 < 1)
+    if (threshold) then
+        if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+            currentPos = self:GetPositionByGrid(nextCell.x,nextCell.y)
+            self:SetPositionByGrid(self.widgets.player,currentPos.x,currentPos.y)
+            self.widgets.current.state.endPos = currentPos
+            self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
+            local angle = 0
+            if (self.state.heading.x < 0) then
+                angle = 180
+            elseif (self.state.heading.y < 0) then
+                angle = 270
+            elseif (self.state.heading.y > 0) then
+                angle = 90
+            end
+            self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
+            -- so the first arg there is a Vec3, or just a [3] array
+            -- cx, cy are the coordinates to rotate around
+
+            local oldR = self.widgets.current:Rect()
+            COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])
+            COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
+            local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
+            line.state = self:CreateState("mark_line_v")
+            table.insert(self.widgets.lines,line)
+            self.widgets.current = line
+            self.widgets.root:AddChild(line)
+
+            line.state.lastCell = nextCell
+            line.state.startPos = currentPos
+            line.state.endPos = line.state.startPos
+            self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
+
+            self.state.lastHeading.x = self.state.heading.x
+            self.state.lastHeading.y = self.state.heading.y
         end
-        self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
-        -- so the first arg there is a Vec3, or just a [3] array
-        -- cx, cy are the coordinates to rotate around
-
-		local oldR = self.widgets.current:Rect()
-		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])			
-		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
-		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
-		line.state = self:CreateState("mark_line_v")
-		table.insert(self.widgets.lines,line)
-		self.widgets.current = line
-		self.widgets.root:AddChild(line)
-
-        line.state.lastCell = nextCell
-		line.state.startPos = currentPos
-		line.state.endPos = line.state.startPos
-		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
-		
-		self.state.lastHeading.x = self.state.heading.x
-		self.state.lastHeading.y = self.state.heading.y
     end
 
     self.state.lineTimerEnabledTimer = self.state.lineTimerEnabledTimer - dt

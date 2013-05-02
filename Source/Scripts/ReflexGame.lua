@@ -82,25 +82,25 @@ function ReflexGame.CreateLevel1x1(self)
 		-- row 0
 		-- row 1
 		{ x=0, y=1, img="mark_start" }	
-		, { x=0, y=0, img="cell_green" }
-		, { x=3, y=1, img="cell_green" }
-		, { x=11, y=1, img="cell_green" }		
+		, { x=0, y=0, img="blocker_green" }
+		, { x=3, y=1, img="blocker_green" }
+		, { x=11, y=1, img="blocker_green" }		
 		-- row 2
-		, { x=3, y=2, img="cell_green" }
+		, { x=3, y=2, img="blocker_green" }
 		, { x=4, y=2, img="cell_02" }
-		, { x=11, y=2, img="cell_green" }		
-		, { x=12, y=2, img="cell_green" }				
+		, { x=11, y=2, img="blocker_green" }		
+		, { x=12, y=2, img="blocker_green" }				
 		-- row 3
-		, { x=5, y=3, img="cell_green" }
+		, { x=5, y=3, img="blocker_green" }
 		-- row 4
-		, { x=12, y=4, img="cell_green" }
+		, { x=12, y=4, img="blocker_green" }
 		, { x=13, y=4, img="cell_04" }
 		-- row 5
-		, { x=6, y=5, img="cell_green" }
+		, { x=6, y=5, img="blocker_green" }
 		, { x=13, y=5, img="cell_03" }
 		-- row 6
-		, { x=2, y=6, img="cell_green" }
-		, { x=3, y=6, img="cell_green" }
+		, { x=2, y=6, img="blocker_green" }
+		, { x=3, y=6, img="blocker_green" }
 		-- row 7
 		, { x=3, y=7, img="cell_01" }		
 		, { x=16, y=7, img="mark_end" }
@@ -122,9 +122,9 @@ function ReflexGame.CreateLevel1x2(self)
 	
 	level.name = "1x2"	
 
-	level.board = {  { x=0, y=0, img="cell_green" }
-		, { x=9, y=3, img="cell_green" }
-		, { x=7, y=5, img="cell_green" }
+	level.board = {  { x=0, y=0, img="blocker_green" }
+		, { x=9, y=3, img="blocker_green" }
+		, { x=7, y=5, img="blocker_green" }
 		}
 	
 	return level
@@ -135,9 +135,9 @@ function ReflexGame.CreateLevel1x3(self)
 	
 	level.name = "1x3"	
 	
-	level.board = {  { x=0, y=0, img="cell_green" }
-		, { x=6, y=3, img="cell_green" }
-		, { x=3, y=5, img="cell_green" }
+	level.board = {  { x=0, y=0, img="blocker_green" }
+		, { x=6, y=3, img="blocker_green" }
+		, { x=3, y=5, img="blocker_green" }
 		}
 	
 	return level
@@ -325,7 +325,10 @@ function ReflexGame.InitUI(self)
 			current.state.endPos = current.state.startPos
 			table.insert(self.widgets.lines,current)
 			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
-			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)	
+			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)
+        end
+        if (string.find(b.state.architype,"cell_") ~= nil) then
+            table.insert(self.widgets.goals,b)
 		end
     end
 
@@ -365,7 +368,7 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.mark_line_h = self.gfx.mark_line_v
     self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
-    self.gfx.cell_green = World.Load("Puzzles/reflex-block1_M")
+    self.gfx.blocker_green = World.Load("Puzzles/reflex-block1_M")
 
     self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
     self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
@@ -617,6 +620,28 @@ function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	line:SetRect(r)
 end
 
+function ReflexGame.CollideWithSymbol(self,x,y)
+    local v2 = {}
+    v2.x = x
+    v2.y = y
+    local cell = self:GetGridCellFromVec2(v2)
+    local index = self:ConvertCoordToIndex(cell.x,cell.y)
+
+    local piece = self.widgets.grid[index]
+    if (piece ~= nil) then
+        if (string.find(piece.state.architype,"cell_") ~= nil) then
+            -- -djr do effect
+            table.remove(self.widgets.spiders,i)
+            self.widgets.grid[index] = nil
+            self.widgets.root:RemoveChild(piece)
+            self.state.goalCounter = self.state.goalCounter + 1
+            return true
+        end
+    end
+
+    return false
+end
+
 function ReflexGame.CollideWithHazard(self,x,y)
     local v2 = {}
     v2.x = x
@@ -689,12 +714,8 @@ function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
 		if (piece.state.architype == "mark_end" or piece.state.architype == "mark_start") then
 			return false
 		end
-		
-		if (piece.state.architype == "cell_01" 
-			or piece.state.architype == "cell_02" 
-			or piece.state.architype == "cell_03" 
-			or piece.state.architype == "cell_04" 
-		) then
+
+        if (string.find(piece.state.architype,"cell_") ~= nil) then
 			return false
 		end
 	end
@@ -780,9 +801,11 @@ function ReflexGame.Think(self,dt)
 	
 	if (self.widgets.current.heading == nil) then
 		self.widgets.current.heading = self.state.heading
-	end
+    end
 
 	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
+    self:CollideWithSymbol(currentPos.x,currentPos.y)
+
 	if (self:CollideWithBoard(currentPos.x,currentPos.y,true) or self:CollideWithHazard(currentPos.x,currentPos.y)) then
 		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)			
 		self.state.gameOver = true
@@ -848,8 +871,8 @@ function ReflexGame.Think(self,dt)
 
             local v = self.state.path[self.state.lineIndex]
             local index = self:ConvertCoordToIndex(v.x,v.y)
-            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.cell_green})
-            b.state = self:CreateState("cell_green")
+            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green})
+            b.state = self:CreateState("blocker_green")
             self.widgets.root:AddChild(b)
             self.widgets.grid[index] = b
             self:SetPositionByGrid(b,v.x,v.y)
@@ -867,20 +890,10 @@ function ReflexGame.Think(self,dt)
 
 	local pieceAtPlayer = self.widgets.grid[playerIndex]	
 	if (pieceAtPlayer or self.state.timeLeft <= 0) then
-		if (self.state.goalCounter < #self.widgets.goals) then
-			local goalPiece = self.widgets.goals[self.state.goalCounter]
-			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
-				COutLine(kC_Debug,"Goal accomplished: x=%s",goalPiece.state.architype)	
-				self.state.goalCounter = self.state.goalCounter + 1
-				-- TODO: -djr Question: How do they want to indicate that you activated a box, just
-				-- swap out the cell with another cell?				
-			end
-		end		
-		
 		if (pieceAtPlayer.state.architype == "mark_end" and self.state.goalCounter >= #self.widgets.goals) then
 			COutLine(kC_Debug,"Game Over Detected")
 			self.state.gameOver = true
-			self.state.victory = true
+            self.state.victory = true
 			return
 		end
 
@@ -891,7 +904,6 @@ function ReflexGame.Think(self,dt)
             return
         end
     end
--- this isn't how it works now
 --	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
 --		COutLine(kC_Debug,"Game Over - collided with own line")
 --		self.state.gameOver = true

@@ -840,7 +840,7 @@ function ReflexGame.Think(self,dt)
             currentPos = self:GetPositionByGrid(nextCell.x,nextCell.y)
             self:SetPositionByGrid(self.widgets.player,currentPos.x,currentPos.y)
             self.widgets.current.state.endPos = currentPos
-            self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
+            -- self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
             local angle = 0
             if (self.state.heading.x < 0) then
                 angle = 180

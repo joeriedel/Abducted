@@ -366,6 +366,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\Shaders\F_1T.shader" />
+    <None Include="..\..\Shaders\F_1T_A.shader" />
+    <None Include="..\..\Shaders\F_1T_BLOOM.shader" />
+    <None Include="..\..\Shaders\F_1T_COLORIZE_BLEND.shader" />
+    <None Include="..\..\Shaders\F_1T_INVERT_POSTFX.shader" />
+    <None Include="..\..\Shaders\F_1T_SPRITE.shader" />
+    <None Include="..\..\Shaders\F_2T_ADD.shader" />
+    <None Include="..\..\Shaders\F_2T_ADD_MASK.shader" />
+    <None Include="..\..\Shaders\F_2T_ADD_POSTFX.shader" />
+    <None Include="..\..\Shaders\F_2T_ADD_SPRITE.shader" />
+    <None Include="..\..\Shaders\F_2T_BLEND.shader" />
+    <None Include="..\..\Shaders\F_2T_MASK.shader" />
+    <None Include="..\..\Shaders\F_2T_MUL.shader" />
+    <None Include="..\..\Shaders\F_2T_MUL_MASK.shader" />
+    <None Include="..\..\Shaders\F_2T_SCALE.shader" />
+    <None Include="..\..\Shaders\F_3T_ADD.shader" />
+    <None Include="..\..\Shaders\F_3T_ADD_MUL.shader" />
+    <None Include="..\..\Shaders\F_3T_ADD_SPRITE.shader" />
+    <None Include="..\..\Shaders\F_3T_BLEND.shader" />
+    <None Include="..\..\Shaders\F_3T_DETAIL.shader" />
+    <None Include="..\..\Shaders\F_3T_MUL.shader" />
+    <None Include="..\..\Shaders\F_4TA_DETAIL.shader" />
+    <None Include="..\..\Shaders\F_4T_ADD.shader" />
+    <None Include="..\..\Shaders\F_4T_BLEND.shader" />
+    <None Include="..\..\Shaders\F_4T_DETAIL.shader" />
+    <None Include="..\..\Shaders\F_4T_MUL.shader" />
+    <None Include="..\..\Shaders\F_5TA_DETAIL.shader" />
+    <None Include="..\..\Shaders\F_COLOR.shader" />
+    <None Include="..\..\Shaders\L_1T_DPHONG.shader" />
+    <None Include="..\..\Shaders\L_1T_DSPHONG.shader" />
+    <None Include="..\..\Shaders\L_COLOR_DPHONG.shader" />
+    <None Include="..\..\Shaders\L_COLOR_DSPHONG.shader" />
     <None Include="Abducted.ico" />
     <None Include="small.ico" />
   </ItemGroup>

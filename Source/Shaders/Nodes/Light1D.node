@@ -8,7 +8,7 @@ Node({
 
 	Inputs = 
 	{
-		lightDir = {t=HALF4, r=0},
+		lightVec = {t=HALF4, r=0},
 		lightDfColor = {t=HALF4, r=1},
 		normal = {t=FIXED3, r=2},
 		diffuseColor = {t=FIXED4, r=3}

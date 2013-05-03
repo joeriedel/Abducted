@@ -1,11 +1,11 @@
 FIXED4 Light1D(
-	HALF4 lightDir,
+	HALF4 lightVec,
 	HALF4 lightDfColor, 
 	FIXED3 normal,
 	FIXED4 diffuseColor
 ) {
 	return FIXED4(DiffuseLightPixel(
-		lightDir, 
+		lightVec, 
 		lightDfColor, 
 		normal, 
 		diffuseColor

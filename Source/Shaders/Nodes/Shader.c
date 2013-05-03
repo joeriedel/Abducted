@@ -17,7 +17,7 @@ BEGIN_UNIFORMS
 #if defined(_GLES) || defined(_HLSL)
 	GLSL(uniform) FIXED4 UDECL(color) HLSL(:COLOR0);
 #endif
-#if defined(GENREFLECT)
+#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)))
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
 #endif
 #if defined(SKIN_SPRITE)
@@ -65,18 +65,38 @@ END_VARYING
 #if defined(FRAGMENT)
 
 HALF4 DiffuseLightPixel(
-	HALF4 lightDir,  // w contains radius
+	HALF4 lightVec,  // w contains radius
 	HALF4 lightDfColor, // w contains brightness
 	FIXED3 normal, 
 	FIXED4 diffuseColor 
 ) {
-	HALF e = length(lightDir.xyz);
-	e = max(0, lightDir.w - e) / lightDir.w;
+	HALF e = length(lightVec.xyz);
+	e = max(0, lightVec.w - e) / lightVec.w;
 	e = e * lightDfColor.w;
-	FIXED3 l = normalize(lightDir.xyz);
+	FIXED3 l = normalize(lightVec.xyz);
 	FIXED3 n = normalize(normal);
 	HALF r = max(0, dot(l, n));
-	return HALF4(diffuseColor.xyz * r * e, diffuseColor.w);
+	return HALF4(lightDfColor.xyz * diffuseColor.xyz * r * e, diffuseColor.w);
+}
+
+HALF4 DiffuseSpecularLightPixel(
+	HALF4 lightVec,  // w contains radius
+	FIXED3 lightHalf,
+	HALF4 lightDfColor, // w contains brightness
+	HALF4 lightSpColor, // w contains power
+	FIXED3 normal, 
+	FIXED4 diffuseColor
+) {
+	HALF e = length(lightVec.xyz);
+	e = max(0, lightVec.w - e) / lightVec.w;
+	e = e * lightDfColor.w;
+	FIXED3 l = normalize(lightVec.xyz);
+	FIXED3 n = normalize(normal);
+	HALF r = max(0, dot(l, n));
+	HALF3 d = lightDfColor.xyz * diffuseColor.xyz * r;
+	r = max(0, dot(lightHalf, n));
+	HALF3 s = lightSpColor.xyz * pow(r, lightSpColor.w);
+	return HALF4((d+s) * e, diffuseColor.w);
 }
 
 #endif
@@ -95,7 +115,7 @@ MAIN
 	FIXED3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
-#if defined(GENREFLECT) || (defined(LIGHTS) && defined(SHADER_LIGHT_HALFDIR))
+#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)))
 	FIXED3 vn_eyevec = normalize(UNIFORM(eye) - IN(position).xyz);
 #endif
 
@@ -108,23 +128,33 @@ MAIN
 	TCMOD
 
 #if defined(LIGHTS)
-#if defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_HALFDIR)
+#if defined(SHADER_LIGHT_POS) || defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)
 	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - IN(position).xyz;
+#if defined(SHADER_LIGHT_HALFDIR) || defined(SHADER_LIGHT_HALFPOS)
 	FIXED3 vn_light0_dir = normalize(v_light0_dir);
+#endif
+#endif
+#if defined(SHADER_LIGHT_POS)
+	OUT(light0_cpos).xyz = v_light0_dir;
+	OUT(light0_cpos).w = UNIFORM(light0_pos).w;
 #endif
 #if defined(SHADER_LIGHT_DIR)
 	// should i pack tangent frame in a matrix?
-//	OUT(light0_dir).x = dot(v_light0_dir, HALF3(IN(tan0).xyz));
-//	OUT(light0_dir).y = dot(v_light0_dir, HALF3(v_bitan0));
-//	OUT(light0_dir).z = dot(v_light0_dir, HALF3(IN(nm0)));
-//	OUT(light0_dir).w = UNIFORM(light0_pos).w;
-	OUT(light0_dir) = HALF4(v_light0_dir, UNIFORM(light0_pos).w);
+	OUT(light0_dir).x = dot(v_light0_dir, HALF3(IN(tan0).xyz));
+	OUT(light0_dir).y = dot(v_light0_dir, HALF3(v_bitan0));
+	OUT(light0_dir).z = dot(v_light0_dir, HALF3(IN(nm0)));
+	OUT(light0_dir).w = UNIFORM(light0_pos).w;
+#endif
+#if defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)
+	FIXED3 v_light0_halfdir = (vn_light0_dir + vn_eyevec) * 0.5f;
+#if defined(SHADER_LIGHT_HALFPOS)
+	OUT(light0_chalfpos) = v_light0_halfdir;
 #endif
 #if defined(SHADER_LIGHT_HALFDIR)
-	FIXED3 v_light0_halfdir = (vn_light0_dir + vn_eyevec) * 0.5f;
 	OUT(light0_halfdir).x = dot(v_light0_halfdir, IN(tan0).xyz);
 	OUT(light0_halfdir).y = dot(v_light0_halfdir, v_bitan0);
 	OUT(light0_halfdir).z = dot(v_light0_halfdir, IN(nm0));
+#endif
 #endif
 #endif
 

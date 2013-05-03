@@ -610,23 +610,23 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 
 #if defined(LIGHTS)
 
-#if defined(SHADER_LIGHT_DIR)
-#if SHADER_LIGHT_DIR == 4
+#if defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_POS)
+#if (SHADER_LIGHT_DIR == 4) || (SHADER_LIGHT_POS == 4)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
 		GLSL(uniform) FLOAT4 UDECL(light2_pos);
 		GLSL(uniform) FLOAT4 UDECL(light3_pos);
-#elif SHADER_LIGHT_DIR == 3
+#elif (SHADER_LIGHT_DIR == 3) || (SHADER_LIGHT_POS == 3)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
 		GLSL(uniform) FLOAT4 UDECL(light2_pos);
-#elif SHADER_LIGHT_DIR == 2
+#elif (SHADER_LIGHT_DIR == 2) || (SHADER_LIGHT_POS == 2)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
-#elif SHADER_LIGHT_DIR == 1
+#elif (SHADER_LIGHT_DIR == 1) || (SHADER_LIGHT_POS == 1)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 #endif
@@ -681,6 +681,30 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #else
 #define ULIGHTSPCOLORREGS
 #endif
+
+#if defined(SHADER_LIGHT_POS)
+#if SHADER_LIGHT_POS == 4
+	#define OUT_LIGHTPOS \
+		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
+		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
+		GLSL(varying) HALF4 SEL(light2_cpos, OUT(light2_cpos));
+		GLSL(varying) HALF4 SEL(light3_cpos, OUT(light3_cpos));
+#elif SHADER_LIGHT_POS == 3
+	#define OUT_LIGHTPOS \
+		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
+		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
+		GLSL(varying) HALF4 SEL(light2_cpos, OUT(light2_cpos));
+#elif SHADER_LIGHT_POS == 2
+	#define OUT_LIGHTPOS \
+		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
+		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
+#elif SHADER_LIGHT_POS == 1
+	#define OUT_LIGHTPOS \
+		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
+#endif
+#else
+#define OUT_LIGHTPOS
+#endif
 	
 #if defined(SHADER_LIGHT_DIR)
 #if SHADER_LIGHT_DIR == 4
@@ -704,6 +728,31 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #endif
 #else
 #define OUT_LIGHTDIR
+#endif
+
+
+#if defined(SHADER_LIGHT_HALFPOS)
+#if SHADER_LIGHT_HALFPOS == 4
+	#define OUT_LIGHTHALFPOS \
+		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
+		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
+		GLSL(varying) FIXED3 SEL(light2_chalfpos, OUT(light2_chalfpos));
+		GLSL(varying) FIXED3 SEL(light3_chalfpos, OUT(light3_chalfpos));
+#elif SHADER_LIGHT_HALFPOS == 3
+	#define OUT_LIGHTHALFPOS \
+		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
+		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
+		GLSL(varying) FIXED3 SEL(light2_chalfpos, OUT(light2_chalfpos));
+#elif SHADER_LIGHT_HALFPOS == 2
+	#define OUT_LIGHTHALFPOS \
+		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
+		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
+#elif SHADER_LIGHT_HALFPOS == 1
+	#define OUT_LIGHTHALFPOS \
+		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
+#endif
+#else
+#define OUT_LIGHTHALFPOS
 #endif
 
 #if defined(SHADER_LIGHT_HALFDIR)
@@ -731,7 +780,9 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #endif
 
 #define OUT_LIGHTREGS \
+	OUT_LIGHTPOS \
 	OUT_LIGHTDIR \
+	OUT_LIGHTHALFPOS \
 	OUT_LIGHTHALFDIR
 
 #define ULIGHTREGS \

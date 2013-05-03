@@ -17,6 +17,9 @@
     <Filter Include="Source\Game\Lua">
       <UniqueIdentifier>{7c44e8a2-e7f6-4cd7-a2dc-1f62124e15b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{e91b24cc-d385-405e-9d83-0d16d65c66c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -24,6 +27,102 @@
     </None>
     <None Include="Abducted.ico">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T_A.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T_BLOOM.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T_COLORIZE_BLEND.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T_INVERT_POSTFX.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_1T_SPRITE.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_ADD.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_ADD_MASK.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_ADD_POSTFX.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_ADD_SPRITE.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_BLEND.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_MASK.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_MUL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_MUL_MASK.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_2T_SCALE.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_ADD.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_ADD_MUL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_ADD_SPRITE.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_BLEND.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_DETAIL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_3T_MUL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_4T_ADD.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_4T_BLEND.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_4T_DETAIL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_4T_MUL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_4TA_DETAIL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_5TA_DETAIL.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\F_COLOR.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\L_1T_DPHONG.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\L_COLOR_DPHONG.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\L_1T_DSPHONG.shader">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Shaders\L_COLOR_DSPHONG.shader">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -40,18 +40,12 @@
 #if defined(_GLES)
 #define GLES(_x) _x
 #define MVP U_mvp
-#if defined(VERTEX)
-#define DCOLOR0 U_color
-#else
-#define DCOLOR0 frag_color
-#endif
 #else
 #define GLES(_x)
 #define highp
 #define mediump
 #define lowp
 #define MVP gl_ModelViewProjectionMatrix
-#define DCOLOR0 gl_Color
 #endif
 
 #define FLOAT highp float

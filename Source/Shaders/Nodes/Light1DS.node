@@ -11,9 +11,10 @@ Node({
 		lightVec = {t=HALF4, r=0},
 		lightHalf = {t=FIXED3, r=1},
 		lightDfColor = {t=HALF4, r=2},
-		lightSpColor = {t=HALF4, r=3},
+		lightSpColor = {t=HALF3, r=3},
 		normal = {t=FIXED3, r=4},
-		diffuseColor = {t=FIXED4, r=5}
+		diffuseColor = {t=FIXED4, r=5},
+		specularColor = {t=HALF4, r=6}
 	}
 	
 })

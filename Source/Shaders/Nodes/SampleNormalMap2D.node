@@ -1,0 +1,15 @@
+
+Node({
+
+	Outputs = 
+	{
+		rgb = {t=FIXED3, r=-1, s="color"}
+	},
+
+	Inputs = 
+	{
+		t = {t=sampler2D, s="texture", r=0},
+		tc = {t=FLOAT4,  s="texcoords", r=1}
+	}
+	
+})

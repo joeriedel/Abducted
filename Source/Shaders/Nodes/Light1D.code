@@ -4,10 +4,10 @@ FIXED4 Light1D(
 	FIXED3 normal,
 	FIXED4 diffuseColor
 ) {
-	return FIXED4(DiffuseLightPixel(
+	return DiffuseLightPixel(
 		lightVec, 
 		lightDfColor, 
 		normal, 
 		diffuseColor
-	));
+	);
 }

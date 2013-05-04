@@ -14,8 +14,11 @@ BEGIN_UNIFORMS
 #elif defined(_GLES)
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);
 #endif
-#if defined(_GLES) || defined(_HLSL)
+#if defined(SHADER_COLOR) || defined(SHADER_VERTEX_COLOR)
 	GLSL(uniform) FIXED4 UDECL(color) HLSL(:COLOR0);
+#endif
+#if defined(SHADER_SPECULAR_COLORS)
+	GLSL(uniform) HALF4 UDECL(scolor) HLSL(:COLOR1);
 #endif
 #if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)))
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
@@ -32,7 +35,7 @@ END_UNIFORMS
 BEGIN_ATTRIBUTES
 // -> Per vertex attributes (used only by VertexShader)
 	GLSL(attribute) FLOAT4 IN(position) HLSL(:POSITION);
-#if defined(VERTEX_COLOR)
+#if defined(SHADER_VERTEX_COLOR)
 	GLSL(attribute) FIXED4 IN(vertexColor) HLSL(:POSITION1);
 #endif
 #if defined(SKIN_SPRITE)
@@ -46,25 +49,20 @@ END_ATTRIBUTES
 
 BEGIN_VARYING
 // -> FShader
-#if defined(SHADER_VERTEX)
+#if defined(SHADER_POSITION)
 	GLSL(varying) FLOAT4 OUT(position) HLSL(:POSITON);
 #endif
-#if defined(VERTEX_COLOR)
-	GLSL(varying) FIXED4 OUT(vertexColor) HLSL(:POSITION1);
-#endif
-#if defined(_GLES)
-	varying FIXED4 frag_color;
+#if defined(SHADER_VERTEX_COLOR)
+	varying FIXED4 vertexColor;
 #endif
 	OUT_TCREGS
 	OUT_NMREGS
-	OUT_TANREGS
-	OUT_BITANREGS
 	OUT_LIGHTREGS
 END_VARYING
 
 #if defined(FRAGMENT)
 
-HALF4 DiffuseLightPixel(
+FIXED4 DiffuseLightPixel(
 	HALF4 lightVec,  // w contains radius
 	HALF4 lightDfColor, // w contains brightness
 	FIXED3 normal, 
@@ -76,16 +74,17 @@ HALF4 DiffuseLightPixel(
 	FIXED3 l = normalize(lightVec.xyz);
 	FIXED3 n = normalize(normal);
 	HALF r = max(0, dot(l, n));
-	return HALF4(lightDfColor.xyz * diffuseColor.xyz * r * e, diffuseColor.w);
+	return FIXED4(lightDfColor.xyz * diffuseColor.xyz * r * e, diffuseColor.w);
 }
 
-HALF4 DiffuseSpecularLightPixel(
+FIXED4 DiffuseSpecularLightPixel(
 	HALF4 lightVec,  // w contains radius
 	FIXED3 lightHalf,
 	HALF4 lightDfColor, // w contains brightness
-	HALF4 lightSpColor, // w contains power
+	HALF3 lightSpColor, // w contains power
 	FIXED3 normal, 
-	FIXED4 diffuseColor
+	FIXED4 diffuseColor,
+	HALF4 specularColor
 ) {
 	HALF e = length(lightVec.xyz);
 	e = max(0, lightVec.w - e) / lightVec.w;
@@ -95,8 +94,8 @@ HALF4 DiffuseSpecularLightPixel(
 	HALF r = max(0, dot(l, n));
 	HALF3 d = lightDfColor.xyz * diffuseColor.xyz * r;
 	r = max(0, dot(lightHalf, n));
-	HALF3 s = lightSpColor.xyz * pow(r, lightSpColor.w);
-	return HALF4((d+s) * e, diffuseColor.w);
+	HALF3 s = lightSpColor * specularColor.xyz * pow(r, specularColor.w);
+	return FIXED4((d+s) * e, diffuseColor.w);
 }
 
 #endif
@@ -158,27 +157,16 @@ MAIN
 #endif
 #endif
 
-#if defined(VERTEX_COLOR)
-	OUT(vertexColor) = IN(vertexColor);
-#endif
-
-#if defined(_GLES)
-	frag_color = DCOLOR0;
-#elif defined(_GLSL)
-	gl_FrontColor = DCOLOR0;
-#endif
 #include <vertex>
+
+#if defined(SHADER_VERTEX_COLOR)
+	OUT(vertexColor) = IN(vertexColor) * UNIFORM(color);
+#endif
 #if defined(SHADER_POSITION)
 	OUT(position) = IN(position);
 #endif
 #if defined(NUM_SHADER_NORMALS)
 	OUT(nm0) = IN(nm0);
-#endif
-#if defined(NUM_SHADER_TANGENTS)
-	OUT(tan0) = IN(tan0);
-#endif
-#if defined(NUM_SHADER_BITANGENTS)
-	OUT(bitan0) = v_bitan0;
 #endif
 #if defined(SKIN_SPRITE)
 	int idx = int(IN(spriteSkin).w);

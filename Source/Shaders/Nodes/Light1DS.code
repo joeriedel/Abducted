@@ -2,16 +2,18 @@ FIXED4 Light1DS(
 	HALF4 lightVec,
 	FIXED3 lightHalf,
 	HALF4 lightDfColor, 
-	HALF4 lightSpColor,
+	HALF3 lightSpColor,
 	FIXED3 normal,
-	FIXED4 diffuseColor
+	FIXED4 diffuseColor,
+	HALF4 specularColor
 ) {
-	return FIXED4(DiffuseSpecularLightPixel(
+	return DiffuseSpecularLightPixel(
 		lightVec,
 		lightHalf,
 		lightDfColor,
 		lightSpColor, 
 		normal, 
-		diffuseColor
-	));
+		diffuseColor,
+		specularColor
+	);
 }

@@ -661,22 +661,22 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #if defined(SHADER_LIGHT_SPECULAR_COLOR)
 #if SHADER_LIGHT_SPECULAR_COLOR == 4
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_specularColor);
-		GLSL(uniform) HALF4 UDECL(light1_specularColor);
-		GLSL(uniform) HALF4 UDECL(light2_specularColor);
-		GLSL(uniform) HALF4 UDECL(light3_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor);
+		GLSL(uniform) HALF3 UDECL(light1_specularColor);
+		GLSL(uniform) HALF3 UDECL(light2_specularColor);
+		GLSL(uniform) HALF3 UDECL(light3_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 3
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_specularColor);
-		GLSL(uniform) HALF4 UDECL(light1_specularColor);
-		GLSL(uniform) HALF4 UDECL(light2_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor);
+		GLSL(uniform) HALF3 UDECL(light1_specularColor);
+		GLSL(uniform) HALF3 UDECL(light2_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 2
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_specularColor);
-		GLSL(uniform) HALF4 UDECL(light1_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor);
+		GLSL(uniform) HALF3 UDECL(light1_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 1
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor);
 #endif
 #else
 #define ULIGHTSPCOLORREGS

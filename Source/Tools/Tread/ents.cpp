@@ -660,9 +660,7 @@ void CEntity::SetProp( CTreadDoc* pDoc, CObjProp* prop )
 			}
 		}
 
-		if( !stricmp( t->GetName(), "light_size" ) ||
-			!stricmp( t->GetName(), "function_range" ) ||
-			!stricmp( t->GetName(), "light_flags" ) )
+		if( !stricmp( t->GetName(), "radius" ) )
 		{
 			SetupLightBoxMesh();
 		}
@@ -900,7 +898,7 @@ bool CEntity::CanAddToTree()
 
 void CEntity::SetupLightBoxMesh()
 {
-	if( !m_pDef || stricmp( m_pDef->GetClassName(), "light" ) )
+	if( !m_pDef || stricmp( m_pDef->GetClassName(), "info_dynlight" ) )
 		return;
 
 	m_bLightBoxMesh = false;
@@ -910,19 +908,14 @@ void CEntity::SetupLightBoxMesh()
 	//
 	// get the light size.
 	//
-	CObjProp* p = CObjProp::FindProp( &m_props, "light_size" );
-	CObjProp* p2 = CObjProp::FindProp( &m_props, "function_range" );
-	CObjProp* p3 = CObjProp::FindProp( &m_props, "light_flags" );
+	CObjProp* p = CObjProp::FindProp( &m_props, "radius" );
+	CObjProp* p3 = CObjProp::FindProp( &m_props, "flags" );
 
-	if( p && p2 && p3 )
+	if( p && p3 )
 	{
-		vec3 v, mn, mx;
-		float maxi, temp;
-
-		sscanf( p2->GetString(), "%f %f", &temp, &maxi );
-
-		v = p->GetVector();
-		v *= maxi*0.5f;
+		vec3 mn, mx;
+		
+		float v = p->GetFloat();
 		mn = m_pos - v;
 		mx = m_pos + v;
 
@@ -931,7 +924,7 @@ void CEntity::SetupLightBoxMesh()
 		//
 		// no shadows?
 		//
-		if( p3->GetInt() & 1 )
+		if( p3->GetInt() & 4 )
 		{
 			m_lightbox_mesh.color2d = 0x2000228F;
 			m_lightbox_mesh.color3d = 0x2000228F;

@@ -7,6 +7,10 @@
 
 // Uniform/Varying/Attributes mean what they mean in GLSL
 
+#if defined(_GLSL) && defined(VERTEX)
+invariant gl_Position;
+#endif
+
 BEGIN_UNIFORMS
 #if defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(mv);

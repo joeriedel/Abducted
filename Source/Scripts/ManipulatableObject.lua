@@ -11,6 +11,8 @@ function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
 	Entity.Spawn(self)
 	
+	self:SetClassBits(kEntityClass_Object)
+	
 	-- setup auto-face smoothing
 	local angleVertex = self:Angles()
 	angleVertex.mass = 5

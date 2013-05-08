@@ -24,7 +24,13 @@ local Shader = function()
 	mul.In.x = MColor(0)
 	mul.In.y = light1ds
 		
-	return { Preview = { color = diffuseTexture }, Diffuse1 = { color = mul } }
+	local black = Node("VecZero", "black")
+
+	return { 
+		Default = { color = black },
+		Preview = { color = diffuseTexture }, 
+		Diffuse1 = { color = mul } 
+	}
 
 end
 

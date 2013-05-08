@@ -11,8 +11,14 @@ local Shader = function()
 	light1ds.In.normal = MNormal(0)
 	light1ds.In.diffuseColor = MColor(0)
 	light1ds.In.specularColor = MSpecularColor(0)
+	
+	local black = Node("VecZero", "black")
 		
-	return { Preview = { color = MColor(0) }, Diffuse1 = { color = light1ds } }
+	return { 
+		Default = { color = back },
+		Preview = { color = MColor(0) }, 
+		Diffuse1 = { color = light1ds } 
+	}
 
 end
 

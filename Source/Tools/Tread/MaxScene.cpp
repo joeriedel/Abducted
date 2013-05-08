@@ -29,7 +29,8 @@ namespace
 		Version3 = 3,
 		Version4 = 4,
 		Version5 = 5,
-		Version = 6,
+		Version6 = 6,
+		Version = 7,
 		MaxUVChannels = 1,
 
 		HasMaterialFlag = 0x80000000,
@@ -711,6 +712,25 @@ bool MaxScene::Load(const char *filename)
 					ReadString(fp);
 				}
 			}
+		}
+	}
+
+	if (version > Version6) { // load omni lights (discard)
+		fread(&n, sizeof(U32), 1, fp);
+
+		for (U32 i = 0; i < n; ++i) {
+			ReadString(fp);
+			ReadVec3(fp);
+
+			U32 z;
+			fread(&z, sizeof(U32), 1, fp);
+
+			ReadVec3(fp);
+			ReadVec3(fp);
+
+			float f;
+			fread(&f, sizeof(float), 1, fp);
+			fread(&f, sizeof(float), 1, fp);
 		}
 	}
 

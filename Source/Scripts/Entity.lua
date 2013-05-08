@@ -7,6 +7,7 @@
 
 kEntityClass_Monster = 1
 kEntityClass_Player  = 2
+kEntityClass_Object  = 4
 
 Entity = Class:New()
 

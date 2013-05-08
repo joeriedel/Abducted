@@ -1,0 +1,9 @@
+
+Node({
+
+	Outputs = 
+	{
+		rgba = {t=FIXED4, r=-1, s="color"}
+	}
+	
+})

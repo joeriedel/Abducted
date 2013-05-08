@@ -50,6 +50,9 @@ function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
 	Entity.Spawn(self)
 	
+	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	self:SetLightInteractionFlags(kLightInteractionFlag_Player)
+	
 	MakeAnimatable(self)
 	
 	self.animState = StringForString(self.keys.initial_state, "default")

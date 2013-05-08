@@ -24,7 +24,7 @@ BEGIN_UNIFORMS
 #if defined(SHADER_SPECULAR_COLORS)
 	GLSL(uniform) HALF4 UDECL(scolor) HLSL(:COLOR1);
 #endif
-#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)))
+#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
 #endif
 #if defined(SKIN_SPRITE)
@@ -54,10 +54,10 @@ END_ATTRIBUTES
 BEGIN_VARYING
 // -> FShader
 #if defined(SHADER_POSITION)
-	GLSL(varying) FLOAT4 OUT(position) HLSL(:POSITON);
+	GLSL(varying) FLOAT4 OUT(position) HLSL(:POSITION);
 #endif
 #if defined(SHADER_VERTEX_COLOR)
-	varying FIXED4 vertexColor;
+	GLSL(varying) FIXED4 OUT(vertexColor) HLSL(:POSITION1);
 #endif
 	OUT_TCREGS
 	OUT_NMREGS
@@ -67,22 +67,25 @@ END_VARYING
 #if defined(FRAGMENT)
 
 FIXED4 DiffuseLightPixel(
-	HALF4 lightVec,  // w contains radius
+	FLOAT4 lightPos,  // w contains radius
+	FLOAT4 fragPos,
+	FIXED3 lightVec,
 	HALF4 lightDfColor, // w contains brightness
-	FIXED3 normal, 
-	FIXED4 diffuseColor 
+	FIXED3 normal,
+	FIXED4 diffuseColor
 ) {
-	HALF e = length(lightVec.xyz);
-	e = max(0, lightVec.w - e) / lightVec.w;
+	HALF3 dx = lightPos.xyz - fragPos.xyz;
+	HALF e = length(dx);
+	e = max(0, HALF(lightPos.w) - e) / HALF(lightPos.w);
 	e = e * lightDfColor.w;
-	FIXED3 l = normalize(lightVec.xyz);
-	FIXED3 n = normalize(normal);
-	HALF r = max(0, dot(l, n));
+	HALF r = max(0, dot(lightVec, normal));
 	return FIXED4(lightDfColor.xyz * diffuseColor.xyz * r * e, diffuseColor.w);
 }
 
 FIXED4 DiffuseSpecularLightPixel(
-	HALF4 lightVec,  // w contains radius
+	FLOAT4 lightPos, // w contains radius
+	FLOAT4 fragPos,
+	FIXED3 lightVec,  
 	FIXED3 lightHalf,
 	HALF4 lightDfColor, // w contains brightness
 	HALF3 lightSpColor, // w contains power
@@ -90,14 +93,13 @@ FIXED4 DiffuseSpecularLightPixel(
 	FIXED4 diffuseColor,
 	HALF4 specularColor
 ) {
-	HALF e = length(lightVec.xyz);
-	e = max(0, lightVec.w - e) / lightVec.w;
+	HALF3 dx = lightPos.xyz - fragPos.xyz;
+	HALF e = length(dx);
+	e = max(0, HALF(lightPos.w) - e) / HALF(lightPos.w);
 	e = e * lightDfColor.w;
-	FIXED3 l = normalize(lightVec.xyz);
-	FIXED3 n = normalize(normal);
-	HALF r = max(0, dot(l, n));
+	HALF r = max(0, dot(lightVec, normal));
 	HALF3 d = lightDfColor.xyz * diffuseColor.xyz * r;
-	r = max(0, dot(lightHalf, n));
+	r = max(0, dot(lightHalf, normal));
 	HALF3 s = lightSpColor * specularColor.xyz * pow(r, specularColor.w);
 	return FIXED4((d+s) * e, diffuseColor.w);
 }
@@ -118,7 +120,7 @@ MAIN
 	FIXED3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
-#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)))
+#if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
 	FIXED3 vn_eyevec = normalize(UNIFORM(eye) - IN(position).xyz);
 #endif
 
@@ -131,32 +133,28 @@ MAIN
 	TCMOD
 
 #if defined(LIGHTS)
-#if defined(SHADER_LIGHT_POS) || defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)
+#if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - IN(position).xyz;
-#if defined(SHADER_LIGHT_HALFDIR) || defined(SHADER_LIGHT_HALFPOS)
-	FIXED3 vn_light0_dir = normalize(v_light0_dir);
+	FIXED3 v_light0_vec = normalize(v_light0_dir);
 #endif
+#if defined(SHADER_LIGHT_VEC)
+	OUT(light0_vec) = v_light0_vec;
 #endif
-#if defined(SHADER_LIGHT_POS)
-	OUT(light0_cpos).xyz = v_light0_dir;
-	OUT(light0_cpos).w = UNIFORM(light0_pos).w;
-#endif
-#if defined(SHADER_LIGHT_DIR)
+#if defined(SHADER_LIGHT_TANVEC)
 	// should i pack tangent frame in a matrix?
-	OUT(light0_dir).x = dot(v_light0_dir, HALF3(IN(tan0).xyz));
-	OUT(light0_dir).y = dot(v_light0_dir, HALF3(v_bitan0));
-	OUT(light0_dir).z = dot(v_light0_dir, HALF3(IN(nm0)));
-	OUT(light0_dir).w = UNIFORM(light0_pos).w;
+	OUT(light0_tanvec).x = dot(v_light0_vec, FIXED3(IN(tan0).xyz));
+	OUT(light0_tanvec).y = dot(v_light0_vec, FIXED3(v_bitan0));
+	OUT(light0_tanvec).z = dot(v_light0_vec, FIXED3(IN(nm0)));
 #endif
-#if defined(SHADER_LIGHT_HALFPOS) || defined(SHADER_LIGHT_HALFDIR)
-	FIXED3 v_light0_halfdir = (vn_light0_dir + vn_eyevec) * 0.5f;
-#if defined(SHADER_LIGHT_HALFPOS)
-	OUT(light0_chalfpos) = v_light0_halfdir;
+#if defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+	FIXED3 v_light0_halfvec = (v_light0_vec + vn_eyevec) * 0.5f;
+#if defined(SHADER_LIGHT_HALFVEC)
+	OUT(light0_halfvec) = v_light0_halfvec;
 #endif
-#if defined(SHADER_LIGHT_HALFDIR)
-	OUT(light0_halfdir).x = dot(v_light0_halfdir, IN(tan0).xyz);
-	OUT(light0_halfdir).y = dot(v_light0_halfdir, v_bitan0);
-	OUT(light0_halfdir).z = dot(v_light0_halfdir, IN(nm0));
+#if defined(SHADER_LIGHT_TANHALFVEC)
+	OUT(light0_tanhalfvec).x = dot(v_light0_halfvec, IN(tan0).xyz);
+	OUT(light0_tanhalfvec).y = dot(v_light0_halfvec, v_bitan0);
+	OUT(light0_tanhalfvec).z = dot(v_light0_halfvec, IN(nm0));
 #endif
 #endif
 #endif

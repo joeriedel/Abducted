@@ -11,25 +11,27 @@ local Shader = function()
 	bumpMap.In.t = MTexture(1)
 	bumpMap.In.tc = MTexCoord(1)
 
-	local light1ds = Node("Light1DS", "light1d")
-	light1ds.In.lightVec = MLightDir(0)
-	light1ds.In.lightHalf = MLightHalfDir(0)
-	light1ds.In.lightDfColor = MLightDiffuseColor(0)
-	light1ds.In.lightSpColor = MLightSpecularColor(0)
-	light1ds.In.normal = bumpMap
-	light1ds.In.diffuseColor = diffuseTexture
-	light1ds.In.specularColor = MSpecularColor(0)
+	local light = Node("LightDiffuseSpecular", "light")
+	light.In.lightPos = MLightPos(0)
+	light.In.fragPos = MVertex(0)
+	light.In.lightVec = MLightTanVec(0)
+	light.In.lightHalf = MLightTanHalfVec(0)
+	light.In.lightDfColor = MLightDiffuseColor(0)
+	light.In.lightSpColor = MLightSpecularColor(0)
+	light.In.normal = bumpMap
+	light.In.diffuseColor = diffuseTexture
+	light.In.specularColor = MSpecularColor(0)
 
 	local mul = Node("Mul", "mul")
 	mul.In.x = MColor(0)
-	mul.In.y = light1ds
+	mul.In.y = light
 		
 	local black = Node("VecZero", "black")
 
 	return { 
 		Default = { color = black },
 		Preview = { color = diffuseTexture }, 
-		Diffuse1 = { color = mul } 
+		DiffuseSpecular1 = { color = mul } 
 	}
 
 end

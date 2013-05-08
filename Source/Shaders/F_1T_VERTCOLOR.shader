@@ -1,10 +1,10 @@
+-- F_1T_VERTCOLOR.shader
 -- Flat Single Textured Pixel
--- Muls by Material Color
+-- Muls by Material and Vertex Color
 -- Alpha output
 
 local Shader = function()
-	SkinMode("Sprite")
-
+	
 	local a = Node("SampleTexture2D", "Texture1")
 	local mul = Node("Mul", "Mul")
 	local mul2 = Node("Mul", "Mul2")
@@ -19,7 +19,7 @@ local Shader = function()
 	mul2.In.x = mul
 	mul2.In.y = MVertexColor(0)
 		
-	return { Default = { color = mul2 }, Preview = { color = mul } }
+	return { Default = { color = mul2 } }
 end
 
 Compile(Shader())

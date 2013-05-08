@@ -3,18 +3,20 @@
 
 local Shader = function()
 	
-	local light1d = Node("Light1D", "light1d")
-	light1d.In.lightVec = MLightPos(0)
-	light1d.In.lightDfColor = MLightDiffuseColor(0)
-	light1d.In.normal = MNormal(0)
-	light1d.In.diffuseColor = MColor(0)
+	local light = Node("LightDiffuse", "light")
+	light.In.lightPos = MLightPos(0)
+	light.In.fragPos = MVertex(0)
+	light.In.lightVec = MLightVec(0)
+	light.In.lightDfColor = MLightDiffuseColor(0)
+	light.In.normal = MNormal(0)
+	light.In.diffuseColor = MColor(0)
 	
 	local black = Node("VecZero", "black")
 		
 	return { 
 		Default = { color = black },
 		Preview = { color = MColor(0) }, 
-		Diffuse1 = { color = light1d } 
+		Diffuse1 = { color = light } 
 	}
 
 end

@@ -88,6 +88,9 @@
     <filename>Source\Scripts\Library.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Light.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\MainMenu.lua</filename>
   </file>
   <file>

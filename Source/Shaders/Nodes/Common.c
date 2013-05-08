@@ -610,23 +610,23 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 
 #if defined(LIGHTS)
 
-#if defined(SHADER_LIGHT_DIR) || defined(SHADER_LIGHT_POS)
-#if (SHADER_LIGHT_DIR == 4) || (SHADER_LIGHT_POS == 4)
+#if defined(SHADER_LIGHT_POS) || defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_POS == 4) || (SHADER_LIGHT_VEC == 4) || (SHADER_LIGHT_HALFVEC == 4) || (SHADER_LIGHT_TANVEC == 4) || (SHADER_LIGHT_TANHALFVEC == 4)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
 		GLSL(uniform) FLOAT4 UDECL(light2_pos);
 		GLSL(uniform) FLOAT4 UDECL(light3_pos);
-#elif (SHADER_LIGHT_DIR == 3) || (SHADER_LIGHT_POS == 3)
+#elif (SHADER_LIGHT_POS == 3) || (SHADER_LIGHT_VEC == 3) || (SHADER_LIGHT_HALFVEC == 3) || (SHADER_LIGHT_TANVEC == 3) || (SHADER_LIGHT_TANHALFVEC == 3)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
 		GLSL(uniform) FLOAT4 UDECL(light2_pos);
-#elif (SHADER_LIGHT_DIR == 2) || (SHADER_LIGHT_POS == 2)
+#elif (SHADER_LIGHT_POS == 2) || (SHADER_LIGHT_VEC == 2) || (SHADER_LIGHT_HALFVEC == 2) || (SHADER_LIGHT_TANVEC == 2) || (SHADER_LIGHT_TANHALFVEC == 2)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
-#elif (SHADER_LIGHT_DIR == 1) || (SHADER_LIGHT_POS == 1)
+#elif (SHADER_LIGHT_POS == 1) || (SHADER_LIGHT_VEC == 1) || (SHADER_LIGHT_HALFVEC == 1) || (SHADER_LIGHT_TANVEC == 1) || (SHADER_LIGHT_TANHALFVEC == 1)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
 #endif
@@ -681,109 +681,108 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 #else
 #define ULIGHTSPCOLORREGS
 #endif
-
-#if defined(SHADER_LIGHT_POS)
-#if SHADER_LIGHT_POS == 4
-	#define OUT_LIGHTPOS \
-		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
-		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
-		GLSL(varying) HALF4 SEL(light2_cpos, OUT(light2_cpos));
-		GLSL(varying) HALF4 SEL(light3_cpos, OUT(light3_cpos));
-#elif SHADER_LIGHT_POS == 3
-	#define OUT_LIGHTPOS \
-		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
-		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
-		GLSL(varying) HALF4 SEL(light2_cpos, OUT(light2_cpos));
-#elif SHADER_LIGHT_POS == 2
-	#define OUT_LIGHTPOS \
-		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
-		GLSL(varying) HALF4 SEL(light1_cpos, OUT(light1_cpos));
-#elif SHADER_LIGHT_POS == 1
-	#define OUT_LIGHTPOS \
-		GLSL(varying) HALF4 SEL(light0_cpos, OUT(light0_cpos));
-#endif
-#else
-#define OUT_LIGHTPOS
-#endif
 	
-#if defined(SHADER_LIGHT_DIR)
-#if SHADER_LIGHT_DIR == 4
-	#define OUT_LIGHTDIR \
-		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
-		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
-		GLSL(varying) HALF4 SEL(light2_dir, OUT(light2_dir));
-		GLSL(varying) HALF4 SEL(light3_dir, OUT(light3_dir));
-#elif SHADER_LIGHT_DIR == 3
-	#define OUT_LIGHTDIR \
-		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
-		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
-		GLSL(varying) HALF4 SEL(light2_dir, OUT(light2_dir));
-#elif SHADER_LIGHT_DIR == 2
-	#define OUT_LIGHTDIR \
-		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
-		GLSL(varying) HALF4 SEL(light1_dir, OUT(light1_dir));
-#elif SHADER_LIGHT_DIR == 1
-	#define OUT_LIGHTDIR \
-		GLSL(varying) HALF4 SEL(light0_dir, OUT(light0_dir));
+#if defined(SHADER_LIGHT_VEC)
+#if SHADER_LIGHT_VEC == 4
+	#define OUT_LIGHTVEC \
+		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
+		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
+		GLSL(varying) FIXED3 SEL(light2_vec, OUT(light2_vec));
+		GLSL(varying) FIXED3 SEL(light3_vec, OUT(light3_vec));
+#elif SHADER_LIGHT_VEC == 3
+	#define OUT_LIGHTVEC \
+		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
+		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
+		GLSL(varying) FIXED3 SEL(light2_vec, OUT(light2_vec));
+#elif SHADER_LIGHT_VEC == 2
+	#define OUT_LIGHTVEC \
+		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
+		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
+#elif SHADER_LIGHT_VEC == 1
+	#define OUT_LIGHTVEC \
+		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
 #endif
 #else
-#define OUT_LIGHTDIR
+#define OUT_LIGHTVEC
 #endif
 
-
-#if defined(SHADER_LIGHT_HALFPOS)
-#if SHADER_LIGHT_HALFPOS == 4
-	#define OUT_LIGHTHALFPOS \
-		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
-		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
-		GLSL(varying) FIXED3 SEL(light2_chalfpos, OUT(light2_chalfpos));
-		GLSL(varying) FIXED3 SEL(light3_chalfpos, OUT(light3_chalfpos));
-#elif SHADER_LIGHT_HALFPOS == 3
-	#define OUT_LIGHTHALFPOS \
-		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
-		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
-		GLSL(varying) FIXED3 SEL(light2_chalfpos, OUT(light2_chalfpos));
-#elif SHADER_LIGHT_HALFPOS == 2
-	#define OUT_LIGHTHALFPOS \
-		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
-		GLSL(varying) FIXED3 SEL(light1_chalfpos, OUT(light1_chalfpos));
-#elif SHADER_LIGHT_HALFPOS == 1
-	#define OUT_LIGHTHALFPOS \
-		GLSL(varying) FIXED3 SEL(light0_chalfpos, OUT(light0_chalfpos));
+#if defined(SHADER_LIGHT_HALFVEC)
+#if SHADER_LIGHT_HALFVEC == 4
+	#define OUT_LIGHTHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
+		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
+		GLSL(varying) FIXED3 SEL(light2_halfvec, OUT(light2_halfvec));
+		GLSL(varying) FIXED3 SEL(light3_halfvec, OUT(light3_halfvec));
+#elif SHADER_LIGHT_HALFVEC == 3
+	#define OUT_LIGHTHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
+		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
+		GLSL(varying) FIXED3 SEL(light2_halfvec, OUT(light2_halfvec));
+#elif SHADER_LIGHT_HALFVEC == 2
+	#define OUT_LIGHTHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
+		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
+#elif SHADER_LIGHT_HALFVEC == 1
+	#define OUT_LIGHTHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
 #endif
 #else
-#define OUT_LIGHTHALFPOS
+#define OUT_LIGHTHALFVEC
 #endif
 
-#if defined(SHADER_LIGHT_HALFDIR)
-#if SHADER_LIGHT_HALFDIR == 4
-	#define OUT_LIGHTHALFDIR \
-		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
-		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
-		GLSL(varying) FIXED3 SEL(light2_halfdir, OUT(light2_halfdir));
-		GLSL(varying) FIXED3 SEL(light3_halfdir, OUT(light3_halfdir));
-#elif SHADER_LIGHT_HALFDIR == 3
-	#define OUT_LIGHTHALFDIR \
-		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
-		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
-		GLSL(varying) FIXED3 SEL(light2_halfdir, OUT(light2_halfdir));
-#elif SHADER_LIGHT_HALFDIR == 2
-	#define OUT_LIGHTHALFDIR \
-		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
-		GLSL(varying) FIXED3 SEL(light1_halfdir, OUT(light1_halfdir));
-#elif SHADER_LIGHT_HALFDIR == 1
-	#define OUT_LIGHTHALFDIR \
-		GLSL(varying) FIXED3 SEL(light0_halfdir, OUT(light0_halfdir));
+#if defined(SHADER_LIGHT_TANVEC)
+#if SHADER_LIGHT_TANVEC == 4
+	#define OUT_LIGHTTANVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
+		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
+		GLSL(varying) FIXED3 SEL(light2_tanvec, OUT(light2_tanvec));
+		GLSL(varying) FIXED3 SEL(light3_tanvec, OUT(light3_tanvec));
+#elif SHADER_LIGHT_TANVEC == 3
+	#define OUT_LIGHTTANVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
+		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
+		GLSL(varying) FIXED3 SEL(light2_tanvec, OUT(light2_tanvec));
+#elif SHADER_LIGHT_TANVEC == 2
+	#define OUT_LIGHTTANVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
+		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
+#elif SHADER_LIGHT_TANVEC == 1
+	#define OUT_LIGHTTANVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
 #endif
 #else
-#define OUT_LIGHTHALFDIR
+#define OUT_LIGHTTANVEC
+#endif
+
+#if defined(SHADER_LIGHT_TANHALFVEC)
+#if SHADER_LIGHT_TANHALFVEC == 4
+	#define OUT_LIGHTTANHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light3_tanhalfvec, OUT(light3_tanhalfvec));
+#elif SHADER_LIGHT_TANHALFVEC == 3
+	#define OUT_LIGHTTANHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec));
+#elif SHADER_LIGHT_TANHALFVEC == 2
+	#define OUT_LIGHTTANHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
+		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
+#elif SHADER_LIGHT_TANHALFVEC == 1
+	#define OUT_LIGHTTANHALFVEC \
+		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
+#endif
+#else
+#define OUT_LIGHTTANHALFVEC
 #endif
 
 #define OUT_LIGHTREGS \
-	OUT_LIGHTPOS \
-	OUT_LIGHTDIR \
-	OUT_LIGHTHALFPOS \
-	OUT_LIGHTHALFDIR
+	OUT_LIGHTVEC \
+	OUT_LIGHTTANVEC \
+	OUT_LIGHTHALFVEC \
+	OUT_LIGHTTANHALFVEC
 
 #define ULIGHTREGS \
 	ULIGHTPOSREGS \

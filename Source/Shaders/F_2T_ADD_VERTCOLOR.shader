@@ -7,8 +7,7 @@
 -- before you will see it in the list.
 
 local Shader = function()
-	SkinMode("Sprite")
-
+	
 	-- First argument to Node() is the type of Node
 	-- Do not reuse instances of a node, make a new one
 	-- for each operation
@@ -41,9 +40,14 @@ local Shader = function()
 	-- Multiply by the materials diffuse color
 	mulByMaterialColor.In.x = addTextures -- take output from diffuse+diffuse2
 	mulByMaterialColor.In.y = MColor(0)
+
+	local mul2 = Node("Mul", "Mul2")
+	-- mul by vertex color
+	mul2.In.x = mulByMaterialColor
+	mul2.In.y = MVertexColor(0)
 	
 	-- Output final value
-	return { Default = { color = mulByMaterialColor } }
+	return { Default = { color = mul2 } }
 	
 end
 

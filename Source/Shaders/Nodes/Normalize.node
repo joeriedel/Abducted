@@ -1,0 +1,15 @@
+
+Node({
+
+	Outputs = 
+	{
+		r = {t=FIXED3, r=-1}
+	},
+
+	Inputs = 
+	{
+		x = {t=FIXED3, r=0}
+	},
+	
+	Alias = "normalize"
+})

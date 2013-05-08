@@ -11,15 +11,17 @@ local Shader = function()
 	bumpMap.In.t = MTexture(1)
 	bumpMap.In.tc = MTexCoord(1)
 
-	local light1d = Node("Light1D", "light1d")
-	light1d.In.lightVec = MLightDir(0)
-	light1d.In.lightDfColor = MLightDiffuseColor(0)
-	light1d.In.normal = bumpMap
-	light1d.In.diffuseColor = diffuseTexture
+	local light = Node("LightDiffuse", "light")
+	light.In.lightPos = MLightPos(0)
+	light.In.fragPos = MVertex(0)
+	light.In.lightVec = MLightTanVec(0)
+	light.In.lightDfColor = MLightDiffuseColor(0)
+	light.In.normal = bumpMap
+	light.In.diffuseColor = diffuseTexture
 
 	local mul = Node("Mul", "mul")
 	mul.In.x = MColor(0)
-	mul.In.y = light1d
+	mul.In.y = light
 
 	local black = Node("VecZero", "black")
 		

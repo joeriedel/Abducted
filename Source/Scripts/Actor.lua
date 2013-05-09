@@ -14,6 +14,9 @@ function Actor.Spawn(self)
     COutLine(kC_Debug, "Actor:Spawn")
     Entity.Spawn(self)
     
+	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+    
     if (self.keys.model) then
         self.model = LoadModel(self.keys.model)
         self.model.dm = self:AttachDrawModel(self.model)

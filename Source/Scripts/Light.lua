@@ -41,7 +41,7 @@ function Light.Spawn(self)
 	
 	self.light:SetPos(self:WorldPos())
 	
-	local radius = NumberForString(self.keys.radius, 400) * 0.5
+	local radius = NumberForString(self.keys.radius, 400)
 	self.light:SetRadius(radius)
 	
 	local brightness = NumberForString(self.keys.brightness, 2)

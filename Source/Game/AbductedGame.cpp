@@ -67,7 +67,7 @@ private:
 			return;
 		int r = m_mat->Process(
 			xtime::TimeSlice::Infinite,
-			pkg::P_Load
+			pkg::P_Load|pkg::P_FastPath
 		);
 
 		if (r < pkg::SR_Success)

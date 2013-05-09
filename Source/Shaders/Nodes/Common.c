@@ -561,7 +561,7 @@ FLOAT4 TCTurb(FLOAT4 turb, FLOAT4 turb2, FLOAT4 tc, FLOAT PI) {
 ///////////////////////////////////////////////////////////////////////////////
  // 1 Normal channel supported
 
-#if defined(NORMALS)
+#if defined(NORMALS) || defined(GENREFLECT)
 	#define IN_NMREGS \
 		GLSL(attribute) FIXED3 SEL(nm0, IN(nm0)) HLSL(:NORMAL);
 

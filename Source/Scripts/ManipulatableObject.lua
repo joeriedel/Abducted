@@ -12,6 +12,8 @@ function ManipulatableObject.Spawn(self)
 	Entity.Spawn(self)
 	
 	self:SetClassBits(kEntityClass_Object)
+	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
 	-- setup auto-face smoothing
 	local angleVertex = self:Angles()

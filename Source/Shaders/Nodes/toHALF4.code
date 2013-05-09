@@ -1,0 +1,3 @@
+HALF4 toHALF4(FIXED4 a GLOBALS) {
+	return HALF4(a);
+}

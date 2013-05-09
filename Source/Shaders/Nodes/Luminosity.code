@@ -1,0 +1,4 @@
+FIXED4 Luminosity(FIXED4 a GLOBALS) {
+	FIXED l = (0.2989*a.x) + (0.5870*a.y) + (0.1140*a.z);
+	return FIXED4(l, l, l, 1);
+}

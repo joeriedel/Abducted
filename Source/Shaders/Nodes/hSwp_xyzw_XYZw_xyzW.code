@@ -1,0 +1,4 @@
+HALF4 hSwp_xyzw_XYZw_xyzW(HALF4 a, HALF4 b GLOBALS)
+{
+	return HALF4(a.xyz, b.w);
+}

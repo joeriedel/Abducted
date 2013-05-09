@@ -38,6 +38,10 @@ function DebugUI.Spawn(self)
 	self.widgets.rspeeds:AddChild(self.widgets.models)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
 	
+	self.widgets.lights = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
+	self.widgets.rspeeds:AddChild(self.widgets.lights)
+	pos[2] = pos[2] + h + DebugUI.LineSpace
+	
 	self.widgets.misc = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
 	self.widgets.rspeeds:AddChild(self.widgets.misc)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
@@ -74,6 +78,9 @@ function DebugUI.Think(self)
 	)
 	width = math.max(UI:SizeLabelToContents(self.widgets.models)[3])
 	
+	self.widgets.lights:SetText(string.format("%d/%d/%d Light(s)", counters.drawnLights, counters.visLights, counters.testedLights))
+	width = math.max(UI:SizeLabelToContents(self.widgets.lights)[3])
+	
 	self.widgets.misc:SetText(string.format("%d Tri(s), %d Batch(s), %d Material(s)", 
 		counters.numTris, counters.numBatches, counters.numMaterials
 	))
@@ -83,6 +90,7 @@ function DebugUI.Think(self)
 	UI:MoveWidget(self.widgets.fps, left)
 	UI:MoveWidget(self.widgets.portals, left)
 	UI:MoveWidget(self.widgets.models, left)
+	UI:MoveWidget(self.widgets.lights, left)
 	UI:MoveWidget(self.widgets.misc, left)
 		
 	self.widgets.rspeeds:SetVisible(true)

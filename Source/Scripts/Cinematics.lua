@@ -21,6 +21,11 @@ function Cinematics.Play(self, args, time, originEntity)
 		flags = bit.bor(flags, kCinematicFlag_AnimateCamera)
 	end
 	
+	if (looping and playForever) then
+		COutLine(kC_Debug, "WARNING: playing a cinematic with loop=true and forever=true makes no sense, ignoring.")
+		return
+	end
+	
 	if (playForever) then
 		flags = bit.bor(flags, kCinematicFlag_CanPlayForever)
 	end
@@ -98,12 +103,17 @@ function Cinematics.Stop(self, name)
 	
 		if (item.name == name) then
 			item = LL_Remove(Cinematics.Active, item)
+			if (item.persistent) then
+				LL_Remove(Cinematics.Persistent, item.persistent)
+			end
 			break
 		else
 			item = LL_Next(item)
 		end
 	
 	end
+	
+	World.StopCinematic(name)
 
 end
 

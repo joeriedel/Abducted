@@ -9,6 +9,10 @@ pak0 {
 	Ep1/ep1_eaten
 	Ep1/testroom2_manipulate
 	Ep1/testroom2_bugtest
+	Ep1/miniature_eve
+	Ep1/miniature_tormentor
+	Ep1/testroom3_dynlight1
+	Ep1/testroom3_dynlight2
 
 	Ep1/Falling
 	Ep1/Ep1Crushed
@@ -20,6 +24,7 @@ pak0 {
 	Objects/big_tentacle3
 	Objects/podshield1
 	Characters/Eve
+	Characters/Tormentor_test
 	Characters/Buggroup12
 	Characters/Bugtestmesh1
 	Characters/TentacleMedium1

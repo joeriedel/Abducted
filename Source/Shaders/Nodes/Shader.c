@@ -125,8 +125,8 @@ MAIN
 #endif
 
 #if defined(GENREFLECT)
-	FLOAT3 genReflectTC_ = reflect(FLOAT3(IN(nm0)), FLOAT3(vn_eyevec));
-	FLOAT4 genReflectTC = FLOAT4(genReflectTC_.x, genReflectTC_.y, genReflectTC_.z, 1.f);
+	HALF3 genReflectTC_ = reflect(HALF3(IN(nm0)), HALF3(vn_eyevec));
+	HALF4 genReflectTC = HALF4(genReflectTC_.x, genReflectTC_.y, genReflectTC_.z, 1.f);
 #endif
 
 	TCGEN

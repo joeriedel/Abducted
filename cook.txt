@@ -15,6 +15,7 @@ pak0 {
 	Ep1/testroom3_dynlight2
 
 	Ep1/Falling
+	Ep1/Ep1Crushed
 	UI/ArmTestChat
 
 	// Shared

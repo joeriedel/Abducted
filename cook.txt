@@ -11,6 +11,7 @@ pak0 {
 	Ep1/testroom2_bugtest
 
 	Ep1/Falling
+	Ep1/Ep1Crushed
 	UI/ArmTestChat
 
 	// Shared

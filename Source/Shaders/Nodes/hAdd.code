@@ -1,0 +1,3 @@
+HALF4 Add(HALF4 a, FIXED4 b GLOBALS) {
+	return a + b;
+}

@@ -3,7 +3,7 @@ Node({
 
 	Outputs = 
 	{
-		rgb = {t=FIXED3, r=-1, s="color"}
+		rgb = {t=HALF3, r=-1, s="color"}
 	},
 
 	Inputs = 

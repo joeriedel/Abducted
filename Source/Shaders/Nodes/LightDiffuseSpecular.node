@@ -3,20 +3,20 @@ Node({
 
 	Outputs = 
 	{
-		r = {t=FIXED4, r=-1}
+		r = {t=HALF4, r=-1}
 	},
 
 	Inputs = 
 	{
-		lightPos = {t=FLOAT4, r=0},
-		fragPos = {t=FLOAT4, r=1},
-		lightVec = {t=FIXED3, r=2},
-		lightHalf = {t=FIXED3, r=3},
-		lightDfColor = {t=HALF4, r=4},
-		lightSpColor = {t=HALF3, r=5},
-		normal = {t=FIXED3, r=6},
-		diffuseColor = {t=FIXED4, r=7},
-		specularColor = {t=HALF4, r=8}
+		lightVertex = {t=HALF4, r=0},
+		lightVec = {t=HALF3, r=1},
+		lightHalf = {t=HALF3, r=2},
+		lightDfColor = {t=HALF4, r=3},
+		lightSpColor = {t=HALF3, r=4},
+		normal = {t=HALF3, r=5},
+		diffuseColor = {t=HALF4, r=6},
+		specularColor = {t=HALF4, r=7},
+		specularExponent = {t=HALF, r=8}
 	}
 	
 })

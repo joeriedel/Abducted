@@ -1,0 +1,3 @@
+HALF4 hSampleTexture2D(HLSL(uniform) sampler2D t, HALF4 st GLOBALS) {
+	return tex2D(t, st.xy);
+}

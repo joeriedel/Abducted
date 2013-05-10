@@ -10,37 +10,37 @@
 #if defined(TEXTURES)
 #if TEXTURES==6
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
-		GLSL(uniform lowp) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
-		GLSL(uniform lowp) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
-		GLSL(uniform lowp) T3TYPE UDECL(t3) HLSL(:TEXUNIT3); \
-		GLSL(uniform lowp) T4TYPE UDECL(t4) HLSL(:TEXUNIT4); \
-		GLSL(uniform lowp) T5TYPE UDECL(t5) HLSL(:TEXUNIT5);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
+		GLSL(uniform T1PRECISION) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
+		GLSL(uniform T2PRECISION) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
+		GLSL(uniform T3PRECISION) T3TYPE UDECL(t3) HLSL(:TEXUNIT3); \
+		GLSL(uniform T4PRECISION) T4TYPE UDECL(t4) HLSL(:TEXUNIT4); \
+		GLSL(uniform T5PRECISION) T5TYPE UDECL(t5) HLSL(:TEXUNIT5);
 #elif TEXTURES==5
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
-		GLSL(uniform lowp) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
-		GLSL(uniform lowp) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
-		GLSL(uniform lowp) T3TYPE UDECL(t3) HLSL(:TEXUNIT3); \
-		GLSL(uniform lowp) T4TYPE UDECL(t4) HLSL(:TEXUNIT4);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
+		GLSL(uniform T1PRECISION) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
+		GLSL(uniform T2PRECISION) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
+		GLSL(uniform T3PRECISION) T3TYPE UDECL(t3) HLSL(:TEXUNIT3); \
+		GLSL(uniform T4PRECISION) T4TYPE UDECL(t4) HLSL(:TEXUNIT4);
 #elif TEXTURES==4
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
-		GLSL(uniform lowp) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
-		GLSL(uniform lowp) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
-		GLSL(uniform lowp) T3TYPE UDECL(t3) HLSL(:TEXUNIT3);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
+		GLSL(uniform T1PRECISION) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
+		GLSL(uniform T2PRECISION) T2TYPE UDECL(t2) HLSL(:TEXUNIT2); \
+		GLSL(uniform T3PRECISION) T3TYPE UDECL(t3) HLSL(:TEXUNIT3);
 #elif TEXTURES==3
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
-		GLSL(uniform lowp) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
-		GLSL(uniform lowp) T2TYPE UDECL(t2) HLSL(:TEXUNIT2);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
+		GLSL(uniform T1PRECISION) T1TYPE UDECL(t1) HLSL(:TEXUNIT1); \
+		GLSL(uniform T2PRECISION) T2TYPE UDECL(t2) HLSL(:TEXUNIT2);
 #elif TEXTURES==2
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
-		GLSL(uniform lowp) T1TYPE UDECL(t1) HLSL(:TEXUNIT1);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0); \
+		GLSL(uniform T1PRECISION) T1TYPE UDECL(t1) HLSL(:TEXUNIT1);
 #elif TEXTURES==1
 	#define UTXREGS \
-		GLSL(uniform lowp) T0TYPE UDECL(t0) HLSL(:TEXUNIT0);
+		GLSL(uniform T0PRECISION) T0TYPE UDECL(t0) HLSL(:TEXUNIT0);
 #endif
 #else
 #define UTXREGS
@@ -66,7 +66,7 @@ HALF4 TCScroll(HALF4 wave, HALF4 tc) {
 }
 
 HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
-	return tc + sin(tc.yxwz*PI*turb2.xyxy+turb.xyxy) * turb.zwzw;
+	return tc + sin(((tc.yxwz*turb2.xyxy)*PI)+turb.xyxy) * turb.zwzw;
 }
 
 #if defined(TEXCOORDS)
@@ -563,11 +563,11 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 
 #if defined(NORMALS) || defined(GENREFLECT)
 	#define IN_NMREGS \
-		GLSL(attribute) FIXED3 SEL(nm0, IN(nm0)) HLSL(:NORMAL);
+		GLSL(attribute) HALF3 SEL(nm0, IN(nm0)) HLSL(:NORMAL);
 
 	#if defined(NUM_SHADER_NORMALS)
 		#define OUT_NMREGS \
-			GLSL(varying) FIXED3 SEL(nm0, OUT(nm0)) HLSL(:NORMAL);
+			GLSL(varying) HALF3 SEL(nm0, OUT(nm0)) HLSL(:NORMAL);
 	#else // !defined(NUM_SHADER_NORMALS)
 		#define OUT_NMREGS
 	#endif
@@ -581,10 +581,10 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 
 #if defined(TANGENTS)
 	#define IN_TANREGS \
-		GLSL(attribute) FIXED4 SEL(tan0, IN(tan0)) HLSL(:TANGENT);
+		GLSL(attribute) HALF4 SEL(tan0, IN(tan0)) HLSL(:TANGENT);
 	#if defined(NUM_SHADER_TANGENTS)
 		#define OUT_TANREGS \
-			GLSL(varying) FIXED4 SEL(tan0, OUT(tan0)) HLSL(:TANGENT);
+			GLSL(varying) HALF4 SEL(tan0, OUT(tan0)) HLSL(:TANGENT);
 	#else // !defined(NUM_SHADER_TANGENTS)
 		#define OUT_TANREGS
 	#endif
@@ -598,7 +598,7 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(BITANGENTS)
 	#if defined(NUM_SHADER_BITANGENTS)
 		#define OUT_BITANREGS \
-			GLSL(varying) FIXED3 SEL(bitan0, OUT(bitan0)) HLSL(:BITANGENT);
+			GLSL(varying) HALF4 SEL(bitan0, OUT(bitan0)) HLSL(:BITANGENT);
 	#else // !defined(NUM_SHADER_BITANGENTS)
 		#define OUT_BITANREGS
 	#endif
@@ -610,28 +610,55 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 
 #if defined(LIGHTS)
 
-#if defined(SHADER_LIGHT_POS) || defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_TANHALFVEC)
-#if (SHADER_LIGHT_POS == 4) || (SHADER_LIGHT_VEC == 4) || (SHADER_LIGHT_HALFVEC == 4) || (SHADER_LIGHT_TANVEC == 4) || (SHADER_LIGHT_TANHALFVEC == 4)
+#if defined(SHADER_LIGHT_POS) || defined(SHADER_LIGHT_VERTEXPOS) || defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_POS == 4) || (SHADER_LIGHT_VERTEXPOS == 4) || (SHADER_LIGHT_VEC == 4) || (SHADER_LIGHT_HALFVEC == 4) || (SHADER_LIGHT_TANVEC == 4) || (SHADER_LIGHT_TANHALFVEC == 4)
 	#define ULIGHTPOSREGS \
-		GLSL(uniform) FLOAT4 UDECL(light0_pos);
-		GLSL(uniform) FLOAT4 UDECL(light1_pos);
-		GLSL(uniform) FLOAT4 UDECL(light2_pos);
+		GLSL(uniform) FLOAT4 UDECL(light0_pos); \
+		GLSL(uniform) FLOAT4 UDECL(light1_pos); \
+		GLSL(uniform) FLOAT4 UDECL(light2_pos); \
 		GLSL(uniform) FLOAT4 UDECL(light3_pos);
-#elif (SHADER_LIGHT_POS == 3) || (SHADER_LIGHT_VEC == 3) || (SHADER_LIGHT_HALFVEC == 3) || (SHADER_LIGHT_TANVEC == 3) || (SHADER_LIGHT_TANHALFVEC == 3)
+#elif (SHADER_LIGHT_POS == 3) || (SHADER_LIGHT_VERTEXPOS == 3) || (SHADER_LIGHT_VEC == 3) || (SHADER_LIGHT_HALFVEC == 3) || (SHADER_LIGHT_TANVEC == 3) || (SHADER_LIGHT_TANHALFVEC == 3)
 	#define ULIGHTPOSREGS \
-		GLSL(uniform) FLOAT4 UDECL(light0_pos);
-		GLSL(uniform) FLOAT4 UDECL(light1_pos);
+		GLSL(uniform) FLOAT4 UDECL(light0_pos); \
+		GLSL(uniform) FLOAT4 UDECL(light1_pos); \
 		GLSL(uniform) FLOAT4 UDECL(light2_pos);
-#elif (SHADER_LIGHT_POS == 2) || (SHADER_LIGHT_VEC == 2) || (SHADER_LIGHT_HALFVEC == 2) || (SHADER_LIGHT_TANVEC == 2) || (SHADER_LIGHT_TANHALFVEC == 2)
+#elif (SHADER_LIGHT_POS == 2) || (SHADER_LIGHT_VERTEXPOS == 2) || (SHADER_LIGHT_VEC == 2) || (SHADER_LIGHT_HALFVEC == 2) || (SHADER_LIGHT_TANVEC == 2) || (SHADER_LIGHT_TANHALFVEC == 2)
 	#define ULIGHTPOSREGS \
-		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+		GLSL(uniform) FLOAT4 UDECL(light0_pos); \
 		GLSL(uniform) FLOAT4 UDECL(light1_pos);
-#elif (SHADER_LIGHT_POS == 1) || (SHADER_LIGHT_VEC == 1) || (SHADER_LIGHT_HALFVEC == 1) || (SHADER_LIGHT_TANVEC == 1) || (SHADER_LIGHT_TANHALFVEC == 1)
+#elif (SHADER_LIGHT_POS == 1) || (SHADER_LIGHT_VERTEXPOS == 1) || (SHADER_LIGHT_VEC == 1) || (SHADER_LIGHT_HALFVEC == 1) || (SHADER_LIGHT_TANVEC == 1) || (SHADER_LIGHT_TANHALFVEC == 1)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
+	#define OUT_LIGHTVERTEX_POS \
+		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos));
 #endif
 #else
 #define ULIGHTPOSREGS
+#define OUT_LIGHTVERTEX_POS
+#endif
+
+#if defined(SHADER_LIGHT_VERTEXPOS)
+#if (SHADER_LIGHT_VERTEXPOS == 4)
+	#define OUT_LIGHTVERTEXPOS \
+		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos)); \
+		GLSL(varying) HALF4 SEL(light1_vpos, OUT(light1_vpos)); \
+		GLSL(varying) HALF4 SEL(light2_vpos, OUT(light2_vpos)); \
+		GLSL(varying) HALF4 SEL(light3_vpos, OUT(light3_vpos));
+#elif (SHADER_LIGHT_VERTEXPOS == 3)
+	#define OUT_LIGHTVERTEXPOS \
+		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos)); \
+		GLSL(varying) HALF4 SEL(light1_vpos, OUT(light1_vpos)); \
+		GLSL(varying) HALF4 SEL(light2_vpos, OUT(light2_vpos));
+#elif (SHADER_LIGHT_VERTEXPOS == 2)
+	#define OUT_LIGHTVERTEXPOS \
+		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos)); \
+		GLSL(varying) HALF4 SEL(light1_vpos, OUT(light1_vpos));
+#elif (SHADER_LIGHT_VERTEXPOS == 1)
+	#define OUT_LIGHTVERTEXPOS \
+		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos));
+#endif
+#else
+#define OUT_LIGHT_VERTEX_POS
 #endif
 
 #if defined(SHADER_LIGHT_DIFFUSE_COLOR)
@@ -661,18 +688,18 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_SPECULAR_COLOR)
 #if SHADER_LIGHT_SPECULAR_COLOR == 4
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF3 UDECL(light0_specularColor);
-		GLSL(uniform) HALF3 UDECL(light1_specularColor);
-		GLSL(uniform) HALF3 UDECL(light2_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor); \
+		GLSL(uniform) HALF3 UDECL(light1_specularColor); \
+		GLSL(uniform) HALF3 UDECL(light2_specularColor); \
 		GLSL(uniform) HALF3 UDECL(light3_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 3
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF3 UDECL(light0_specularColor);
-		GLSL(uniform) HALF3 UDECL(light1_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor); \
+		GLSL(uniform) HALF3 UDECL(light1_specularColor); \
 		GLSL(uniform) HALF3 UDECL(light2_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 2
 	#define ULIGHTSPCOLORREGS \
-		GLSL(uniform) HALF3 UDECL(light0_specularColor);
+		GLSL(uniform) HALF3 UDECL(light0_specularColor); \
 		GLSL(uniform) HALF3 UDECL(light1_specularColor);
 #elif SHADER_LIGHT_SPECULAR_COLOR == 1
 	#define ULIGHTSPCOLORREGS \
@@ -685,22 +712,22 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_VEC)
 #if SHADER_LIGHT_VEC == 4
 	#define OUT_LIGHTVEC \
-		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
-		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
-		GLSL(varying) FIXED3 SEL(light2_vec, OUT(light2_vec));
-		GLSL(varying) FIXED3 SEL(light3_vec, OUT(light3_vec));
+		GLSL(varying) HALF3 SEL(light0_vec, OUT(light0_vec)); \
+		GLSL(varying) HALF3 SEL(light1_vec, OUT(light1_vec)); \
+		GLSL(varying) HALF3 SEL(light2_vec, OUT(light2_vec)); \
+		GLSL(varying) HALF3 SEL(light3_vec, OUT(light3_vec));
 #elif SHADER_LIGHT_VEC == 3
 	#define OUT_LIGHTVEC \
-		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
-		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
-		GLSL(varying) FIXED3 SEL(light2_vec, OUT(light2_vec));
+		GLSL(varying) HALF3 SEL(light0_vec, OUT(light0_vec)); \
+		GLSL(varying) HALF3 SEL(light1_vec, OUT(light1_vec)); \
+		GLSL(varying) HALF3 SEL(light2_vec, OUT(light2_vec));
 #elif SHADER_LIGHT_VEC == 2
 	#define OUT_LIGHTVEC \
-		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
-		GLSL(varying) FIXED3 SEL(light1_vec, OUT(light1_vec));
+		GLSL(varying) HALF3 SEL(light0_vec, OUT(light0_vec)); \
+		GLSL(varying) HALF3 SEL(light1_vec, OUT(light1_vec));
 #elif SHADER_LIGHT_VEC == 1
 	#define OUT_LIGHTVEC \
-		GLSL(varying) FIXED3 SEL(light0_vec, OUT(light0_vec));
+		GLSL(varying) HALF3 SEL(light0_vec, OUT(light0_vec));
 #endif
 #else
 #define OUT_LIGHTVEC
@@ -709,22 +736,22 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_HALFVEC)
 #if SHADER_LIGHT_HALFVEC == 4
 	#define OUT_LIGHTHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
-		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
-		GLSL(varying) FIXED3 SEL(light2_halfvec, OUT(light2_halfvec));
-		GLSL(varying) FIXED3 SEL(light3_halfvec, OUT(light3_halfvec));
+		GLSL(varying) HALF3 SEL(light0_halfvec, OUT(light0_halfvec)); \
+		GLSL(varying) HALF3 SEL(light1_halfvec, OUT(light1_halfvec)); \
+		GLSL(varying) HALF3 SEL(light2_halfvec, OUT(light2_halfvec)); \
+		GLSL(varying) HALF3 SEL(light3_halfvec, OUT(light3_halfvec));
 #elif SHADER_LIGHT_HALFVEC == 3
 	#define OUT_LIGHTHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
-		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
-		GLSL(varying) FIXED3 SEL(light2_halfvec, OUT(light2_halfvec));
+		GLSL(varying) HALF3 SEL(light0_halfvec, OUT(light0_halfvec)); \
+		GLSL(varying) HALF3 SEL(light1_halfvec, OUT(light1_halfvec)); \
+		GLSL(varying) HALF3 SEL(light2_halfvec, OUT(light2_halfvec));
 #elif SHADER_LIGHT_HALFVEC == 2
 	#define OUT_LIGHTHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
-		GLSL(varying) FIXED3 SEL(light1_halfvec, OUT(light1_halfvec));
+		GLSL(varying) HALF3 SEL(light0_halfvec, OUT(light0_halfvec)); \
+		GLSL(varying) HALF3 SEL(light1_halfvec, OUT(light1_halfvec));
 #elif SHADER_LIGHT_HALFVEC == 1
 	#define OUT_LIGHTHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_halfvec, OUT(light0_halfvec));
+		GLSL(varying) HALF3 SEL(light0_halfvec, OUT(light0_halfvec));
 #endif
 #else
 #define OUT_LIGHTHALFVEC
@@ -733,22 +760,22 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_TANVEC)
 #if SHADER_LIGHT_TANVEC == 4
 	#define OUT_LIGHTTANVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
-		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
-		GLSL(varying) FIXED3 SEL(light2_tanvec, OUT(light2_tanvec));
-		GLSL(varying) FIXED3 SEL(light3_tanvec, OUT(light3_tanvec));
+		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanvec, OUT(light1_tanvec)); \
+		GLSL(varying) HALF3 SEL(light2_tanvec, OUT(light2_tanvec)); \
+		GLSL(varying) HALF3 SEL(light3_tanvec, OUT(light3_tanvec));
 #elif SHADER_LIGHT_TANVEC == 3
 	#define OUT_LIGHTTANVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
-		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
-		GLSL(varying) FIXED3 SEL(light2_tanvec, OUT(light2_tanvec));
+		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanvec, OUT(light1_tanvec)); \
+		GLSL(varying) HALF3 SEL(light2_tanvec, OUT(light2_tanvec));
 #elif SHADER_LIGHT_TANVEC == 2
 	#define OUT_LIGHTTANVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
-		GLSL(varying) FIXED3 SEL(light1_tanvec, OUT(light1_tanvec));
+		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanvec, OUT(light1_tanvec));
 #elif SHADER_LIGHT_TANVEC == 1
 	#define OUT_LIGHTTANVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanvec, OUT(light0_tanvec));
+		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec));
 #endif
 #else
 #define OUT_LIGHTTANVEC
@@ -757,22 +784,22 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_TANHALFVEC)
 #if SHADER_LIGHT_TANHALFVEC == 4
 	#define OUT_LIGHTTANHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light3_tanhalfvec, OUT(light3_tanhalfvec));
+		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec)); \ 
+		GLSL(varying) HALF3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec)); \
+		GLSL(varying) HALF3 SEL(light3_tanhalfvec, OUT(light3_tanhalfvec)); 
 #elif SHADER_LIGHT_TANHALFVEC == 3
 	#define OUT_LIGHTTANHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec));
+		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec)); \
+		GLSL(varying) HALF3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec));
 #elif SHADER_LIGHT_TANHALFVEC == 2
 	#define OUT_LIGHTTANHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
-		GLSL(varying) FIXED3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
+		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec)); \
+		GLSL(varying) HALF3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec));
 #elif SHADER_LIGHT_TANHALFVEC == 1
 	#define OUT_LIGHTTANHALFVEC \
-		GLSL(varying) FIXED3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
+		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec));
 #endif
 #else
 #define OUT_LIGHTTANHALFVEC
@@ -782,7 +809,8 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 	OUT_LIGHTVEC \
 	OUT_LIGHTTANVEC \
 	OUT_LIGHTHALFVEC \
-	OUT_LIGHTTANHALFVEC
+	OUT_LIGHTTANHALFVEC \
+	OUT_LIGHTVERTEXPOS
 
 #define ULIGHTREGS \
 	ULIGHTPOSREGS \
@@ -801,9 +829,11 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #undef FOG
 #define FOG(_x) _x
 
+#if defined(FRAGMENT)
 struct M {
-	FIXED4 color;
+	PRECISION_COLOR_TYPE color;
 #if defined(DEPTH)
 	FLOAT depth;
 #endif
 };
+#endif

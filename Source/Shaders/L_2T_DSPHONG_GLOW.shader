@@ -3,24 +3,26 @@
 
 local Shader = function()
 
-	local diffuseTexture = Node("SampleTexture2D", "diffuseTexture")
+	SetPrecisionMode("medium")
+	SetSamplerPrecision("medium")
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
 	diffuseTexture.In.t = MTexture(0)
 	diffuseTexture.In.tc = MTexCoord(0)
 
-	local glowMap = Node("SampleTexture2D", "glowMap")
+	local glowMap = Node("hSampleTexture2D", "glowMap")
 	glowMap.In.t = MTexture(1)
 	glowMap.In.tc = MTexCoord(1)
 
-	local invGlowMap = Node("OneMinus", "invGlowMap")
+	local invGlowMap = Node("hOneMinus", "invGlowMap")
 	invGlowMap.In.x = glowMap
 
-	local diffuseLight = Node("Mul", "diffuseBlend")
+	local diffuseLight = Node("hMul", "diffuseBlend")
 	diffuseLight.In.x = diffuseTexture
 	diffuseLight.In.y = invGlowMap
 
 	local light = Node("LightDiffuseSpecular", "light")
-	light.In.lightPos = MLightPos(0)
-	light.In.fragPos = MVertex(0)
+	light.In.lightVertex MLightVertex(0)
 	light.In.lightVec = MLightVec(0)
 	light.In.lightHalf = MLightHalfVec(0)
 	light.In.lightDfColor = MLightDiffuseColor(0)
@@ -29,11 +31,11 @@ local Shader = function()
 	light.In.diffuseColor = diffuseLight
 	light.In.specularColor = MSpecularColor(0)
 
-	local mul = Node("Mul", "mul")
+	local mul = Node("hMul", "mul")
 	mul.In.x = MColor(0)
 	mul.In.y = light
 
-	local glowBlend = Node("Mul", "glowBlend")
+	local glowBlend = Node("hMul", "glowBlend")
 	glowBlend.In.x = glowMap
 	glowBlend.In.y = diffuseTexture
 		

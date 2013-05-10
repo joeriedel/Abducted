@@ -1,0 +1,455 @@
+-- GenLight.import
+-- Lighting helper code
+
+kMaxLights = 4
+kLightTypes = {
+	Diffuse = "LightDiffuse",
+	DiffuseSpecular = "LightDiffuseSpecular"
+}
+
+function GenLight(
+	numLights,  -- number of simultaneous lights to generate a shader graph for
+	type,       -- the type of lighting node "DiffuseLight", "SpecularLight", "DiffuseSpecularLight"
+	normal,     -- normal data (could be bump map)
+	diffuseColor, -- diffuse pixel
+	specularColor, -- specular color (also contains specular exponent in .w)
+	materialDiffuseColor, -- optional material colors
+	materialSpecularColor,
+	lightVecFn, -- MLightVec or MLightTanVec
+	halfVecFn -- MLightHalfVec, or MLightTanHalfVec
+)
+	local prevNode = nil
+
+	if (specularColor and materialSpecularColor) then
+		local blend = Node("hMul", "blendWithMaterialSpecularColor")
+		blend.In.x = specularColor
+		blend.In.y = materialSpecularColor
+		specularColor = blend
+	end
+
+	if (materialDiffuseColor) then
+		local blend = Node("hMul", "blendWithMaterialDiffuseColor")
+		blend.In.x = diffuseColor
+		blend.In.y = materialDiffuseColor
+		diffuseColor = blend
+	end
+
+	for i = 1,numLights do
+		local idx = i-1
+		local light = Node(type, "light"..i)
+		
+		light.In.lightVertex = MLightVertex(idx)
+		light.In.lightVec = lightVecFn(idx)
+		light.In.normal = normal
+		light.In.lightDfColor = MLightDiffuseColor(idx)
+		light.In.diffuseColor = diffuseColor
+
+		if (specularColor) then
+			light.In.lightSpColor = MLightSpecularColor(idx)
+			light.In.specularColor = specularColor
+			light.In.specularExponent = MSpecularExponent(0)
+			light.In.lightHalf = halfVecFn(idx)
+		end
+
+		if (prevNode) then
+			-- sum lights
+			local sum = Node("hAdd", "sumLight"..i)
+			sum.In.x = prevNode
+			sum.In.y = light
+			prevNode = sum
+		else
+			prevNode = light
+		end
+	end
+
+	if (numLights > 1) then
+		-- set alpha to diffuse color
+		local alphaMask = Node("hSwp_xyzw_XYZw_xyzW", "alphaMask")
+		alphaMask.In.XYZw = prevNode
+		alphaMask.In.xyzW = diffuseColor
+		prevNode = alphaMask
+	end
+
+	return prevNode	
+
+end
+
+function GenBumpLight(
+	numLights,
+	type,
+	normal,
+	diffuseColor,
+	specularColor,
+	materialDiffuseColor,
+	materialSpecularColor
+)
+
+	return GenLight(
+		numLights, 
+		type, 
+		normal, 
+		diffuseColor, 
+		specularColor, 
+		materialDiffuseColor,
+		materialSpecularColor,
+		MLightTanVec, 
+		MLightTanHalfVec
+	)
+
+end
+
+function GenPhongLight(
+	numLights,
+	type,
+	normal,
+	diffuseColor,
+	specularColor,
+	materialDiffuseColor,
+	materialSpecularColor
+)
+
+	return GenLight(
+		numLights,
+		type,
+		normal,
+		diffuseColor,
+		specularColor,
+		materialDiffuseColor,
+		materialSpecularColor,
+		MLightVec,
+		MLightHalfVec
+	)
+
+end
+
+function GenGlow(glowSlot, diffuseColor)
+
+	local glowMap = Node("hSampleTexture2D", "glowMap")
+	glowMap.In.t = MTexture(glowSlot)
+	glowMap.In.tc = MTexCoord(glowSlot)
+
+	local invGlowMap = Node("hOneMinus", "invGlowMap")
+	invGlowMap.In.x = glowMap
+
+	local diffuseGlow = Node("hMul", "diffuseGlow")
+	diffuseGlow.In.x = diffuseColor
+	diffuseGlow.In.y = invGlowMap
+
+	local glowBlend = Node("hMul", "glowBlend")
+	glowBlend.In.x = glowMap
+	glowBlend.In.y = diffuseColor
+
+	return {
+		diffuseColor = diffuseGlow,
+		glowColor = glowBlend
+	}
+	
+end
+
+function GenLightShader(
+	passes, 
+	maxLights, 
+	genLightFn, 
+	normal, 
+	diffuseColor, 
+	specularColor,
+	materialDiffuseColor,
+	materialSpecularColor,
+	glowSlot
+)
+
+	SetPrecisionMode("medium")
+	SetSamplerPrecision("medium")
+
+	local defaultPass = nil
+
+	if (glowSlot) then
+		local glow = GenGlow(glowSlot, diffuseColor)
+		defaultPass = glow.glowColor
+		diffuseColor = glow.diffuseColor
+	else
+		defaultPass = Node("hVecZero", "defaultPassVecZero")
+	end
+
+	local shader = {
+		Default = { color = defaultPass },
+		Preview = { color = diffuseColor }
+	}
+
+	for k,v in pairs(passes) do
+
+		local sColor = nil
+		if (v == "DiffuseSpecular") then
+			sColor = specularColor
+		end
+
+		for i = 1,maxLights do
+		
+			local lightShader = genLightFn(
+				i, 
+				kLightTypes[v], 
+				normal, 
+				diffuseColor, 
+				sColor, 
+				materialDiffuseColor,
+				materialSpecularColor
+			)
+			shader[v..i] = { color = lightShader }
+
+		end
+	end
+	
+	return shader
+end
+
+function GenDPhongShader()
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		MColor(0)
+	)
+
+end
+
+function GenDSPhongShader()
+	
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		MColor(0),
+		MSpecularColor(0)
+	)
+
+end
+
+function GenDTexPhongShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		nil,
+		MColor(0)
+	)
+
+end
+
+function GenDSTexPhongShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0)
+	)
+
+end
+
+function GenDSTexPhongSpecMaskShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local specularTexture = Node("hSampleTexture2D", "diffuseTexture")
+	specularTexture.In.t = MTexture(1)
+	specularTexture.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		specularTexture,
+		MColor(0),
+		MSpecularColor(0)
+	)
+
+end
+
+function GenDTexPhongGlowShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+	
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenBumpLight,
+		MNormal(0),
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		1
+	)
+
+end
+
+function GenDBumpShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		nil,
+		MColor(0)
+	)
+
+end
+
+function GenDBumpGlowShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		2
+	)
+
+end
+
+function GenDSBumpShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0)
+	)
+
+end
+
+function GenDSBumpGlowShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		2
+	)
+
+end
+
+function GenDSBumpSpecMaskShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	local specularTexture = Node("hSampleTexture2D", "diffuseTexture")
+	specularTexture.In.t = MTexture(2)
+	specularTexture.In.tc = MTexCoord(2)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		specularTexture,
+		MColor(0),
+		MSpecularColor(0)
+	)
+
+end
+
+function GenDSBumpSpecMaskGlowShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	local specularTexture = Node("hSampleTexture2D", "diffuseTexture")
+	specularTexture.In.t = MTexture(2)
+	specularTexture.In.tc = MTexCoord(2)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		specularTexture,
+		MColor(0),
+		MSpecularColor(0),
+		3
+	)
+
+end
+

@@ -1,14 +1,12 @@
-FIXED4 LightDiffuse(
-	FLOAT4 lightPos,
-	FLOAT4 fragPos,
-	FIXED3 lightVec,
+HALF4 LightDiffuse(
+	HALF4 lightVertex,
+	HALF3 lightVec,
 	HALF4 lightDfColor, 
-	FIXED3 normal,
-	FIXED4 diffuseColor
+	HALF3 normal,
+	HALF4 diffuseColor
 ) {
 	return DiffuseLightPixel(
-		lightPos,
-		fragPos,
+		lightVertex,
 		lightVec, 
 		lightDfColor, 
 		normal, 

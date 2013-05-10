@@ -1,0 +1,4 @@
+HALF4 hOneMinus(HALF4 rgba GLOBALS)
+{
+	return HALF4(1.0, 1.0, 1.0, 1.0) - rgba;
+}

@@ -1,4 +1,3 @@
-FIXED4 VecZero(GLOBALS)
-{
+FIXED4 VecZero(GLOBALS) {
 	return FIXED4(0, 0, 0, 0);
 }

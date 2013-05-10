@@ -631,7 +631,7 @@ function PlayerPawn.EnterArm(self)
 	self.state = nil
 	self.disableAnimTick = true
 	self.model:BlendToState(anim)
-	
+	self:Stop()
 	HUD:SetVisible(false)
 end
 

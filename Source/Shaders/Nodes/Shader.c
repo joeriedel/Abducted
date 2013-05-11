@@ -114,15 +114,16 @@ MAIN
 	float HALF_PI = 3.14159265358979323846264/2.0;
 	
 #if defined(TANGENT_FRAME) || defined(NUM_SHADER_BITANGENTS)
-	FIXED3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
+	HALF3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
 #if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
-	FIXED3 vn_eyevec = normalize(UNIFORM(eye) - IN(position).xyz);
+	HALF3 vn_eyevec = UNIFORM(eye) - IN(position).xyz;
+	vn_eyevec = normalize(vn_eyevec);
 #endif
 
 #if defined(GENREFLECT)
-	HALF3 genReflectTC_ = reflect(HALF3(IN(nm0)), HALF3(vn_eyevec));
+	HALF3 genReflectTC_ = reflect(IN(nm0), vn_eyevec);
 	HALF4 genReflectTC = HALF4(genReflectTC_.x, genReflectTC_.y, genReflectTC_.z, 1.f);
 #endif
 

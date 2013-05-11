@@ -629,8 +629,6 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #elif (SHADER_LIGHT_POS == 1) || (SHADER_LIGHT_VERTEXPOS == 1) || (SHADER_LIGHT_VEC == 1) || (SHADER_LIGHT_HALFVEC == 1) || (SHADER_LIGHT_TANVEC == 1) || (SHADER_LIGHT_TANHALFVEC == 1)
 	#define ULIGHTPOSREGS \
 		GLSL(uniform) FLOAT4 UDECL(light0_pos);
-	#define OUT_LIGHTVERTEX_POS \
-		GLSL(varying) HALF4 SEL(light0_vpos, OUT(light0_vpos));
 #endif
 #else
 #define ULIGHTPOSREGS
@@ -664,18 +662,18 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(SHADER_LIGHT_DIFFUSE_COLOR)
 #if SHADER_LIGHT_DIFFUSE_COLOR == 4
 	#define ULIGHTDFCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
-		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
-		GLSL(uniform) HALF4 UDECL(light2_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor); \
+		GLSL(uniform) HALF4 UDECL(light1_diffuseColor); \
+		GLSL(uniform) HALF4 UDECL(light2_diffuseColor); \
 		GLSL(uniform) HALF4 UDECL(light3_diffuseColor);
 #elif SHADER_LIGHT_DIFFUSE_COLOR == 3
 	#define ULIGHTDFCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
-		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor); \
+		GLSL(uniform) HALF4 UDECL(light1_diffuseColor); \
 		GLSL(uniform) HALF4 UDECL(light2_diffuseColor);
 #elif SHADER_LIGHT_DIFFUSE_COLOR == 2
 	#define ULIGHTDFCOLORREGS \
-		GLSL(uniform) HALF4 UDECL(light0_diffuseColor);
+		GLSL(uniform) HALF4 UDECL(light0_diffuseColor); \
 		GLSL(uniform) HALF4 UDECL(light1_diffuseColor);
 #elif SHADER_LIGHT_DIFFUSE_COLOR == 1
 	#define ULIGHTDFCOLORREGS \
@@ -757,13 +755,17 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #define OUT_LIGHTHALFVEC
 #endif
 
+// light_3_tanvec:
+// there is a very strange bug in the glsl_optimizer (mesa) preprocessor).
+// naming this light3_tanvec causes it to fail with a preprocessing error:
+// error: syntax error, unexpected $undefined, expecting $end
 #if defined(SHADER_LIGHT_TANVEC)
 #if SHADER_LIGHT_TANVEC == 4
 	#define OUT_LIGHTTANVEC \
 		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec)); \
 		GLSL(varying) HALF3 SEL(light1_tanvec, OUT(light1_tanvec)); \
 		GLSL(varying) HALF3 SEL(light2_tanvec, OUT(light2_tanvec)); \
-		GLSL(varying) HALF3 SEL(light3_tanvec, OUT(light3_tanvec));
+		GLSL(varying) HALF3 SEL(light_3_tanvec, OUT(light_3_tanvec));
 #elif SHADER_LIGHT_TANVEC == 3
 	#define OUT_LIGHTTANVEC \
 		GLSL(varying) HALF3 SEL(light0_tanvec, OUT(light0_tanvec)); \
@@ -785,9 +787,9 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if SHADER_LIGHT_TANHALFVEC == 4
 	#define OUT_LIGHTTANHALFVEC \
 		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec)); \
-		GLSL(varying) HALF3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec)); \ 
+		GLSL(varying) HALF3 SEL(light1_tanhalfvec, OUT(light1_tanhalfvec)); \
 		GLSL(varying) HALF3 SEL(light2_tanhalfvec, OUT(light2_tanhalfvec)); \
-		GLSL(varying) HALF3 SEL(light3_tanhalfvec, OUT(light3_tanhalfvec)); 
+		GLSL(varying) HALF3 SEL(light3_tanhalfvec, OUT(light3_tanhalfvec));
 #elif SHADER_LIGHT_TANHALFVEC == 3
 	#define OUT_LIGHTTANHALFVEC \
 		GLSL(varying) HALF3 SEL(light0_tanhalfvec, OUT(light0_tanhalfvec)); \

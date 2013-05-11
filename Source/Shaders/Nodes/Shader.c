@@ -132,29 +132,117 @@ MAIN
 
 #if defined(LIGHTS)
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHTVERTEXPOS) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_POS >= 4) || (SHADER_LIGHT_VERTEXPOS >= 4) || (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
+	HALF3 v_light3_dir = UNIFORM(light3_pos).xyz - IN(position).xyz;
+#endif
+#if (SHADER_LIGHT_POS >= 3) || (SHADER_LIGHT_VERTEXPOS >= 3) || (SHADER_LIGHT_VEC >= 3) || (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
+	HALF3 v_light2_dir = UNIFORM(light2_pos).xyz - IN(position).xyz;
+#endif
+#if (SHADER_LIGHT_POS >= 2) || (SHADER_LIGHT_VERTEXPOS >= 2) || (SHADER_LIGHT_VEC >= 2) || (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
+	HALF3 v_light1_dir = UNIFORM(light1_pos).xyz - IN(position).xyz;
+#endif
 	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - IN(position).xyz;
 #endif
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
+	HALF3 v_light3_vec = normalize(v_light3_dir);
+#endif
+#if (SHADER_LIGHT_VEC >= 3) || (SHADER_LIGHT_TANVEC >= 3) || (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
+	HALF3 v_light2_vec = normalize(v_light2_dir);
+#endif
+#if (SHADER_LIGHT_VEC >= 2) || (SHADER_LIGHT_TANVEC >= 2) || (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
+	HALF3 v_light1_vec = normalize(v_light1_dir);
+#endif
 	HALF3 v_light0_vec = normalize(v_light0_dir);
 #endif
 #if defined(SHADER_LIGHT_VEC)
+#if (SHADER_LIGHT_VEC >= 4)
+	OUT(light3_vec) = v_light3_vec;
+#endif
+#if (SHADER_LIGHT_VEC >= 3)
+	OUT(light2_vec) = v_light2_vec;
+#endif
+#if (SHADER_LIGHT_VEC >= 2)
+	OUT(light1_vec) = v_light1_vec;
+#endif
 	OUT(light0_vec) = v_light0_vec;
 #endif
 #if defined(SHADER_LIGHT_VERTEXPOS)
+#if (SHADER_LIGHT_VERTEXPOS >= 4)
+	OUT(light3_vpos).xyz = -v_light3_dir;
+	OUT(light3_vpos).w = HALF(UNIFORM(light3_pos).w);
+#endif
+#if (SHADER_LIGHT_VERTEXPOS >= 3)
+	OUT(light2_vpos).xyz = -v_light2_dir;
+	OUT(light2_vpos).w = HALF(UNIFORM(light2_pos).w);
+#endif
+#if (SHADER_LIGHT_VERTEXPOS >= 2)
+	OUT(light1_vpos).xyz = -v_light1_dir;
+	OUT(light1_vpos).w = HALF(UNIFORM(light1_pos).w);
+#endif
 	OUT(light0_vpos).xyz = -v_light0_dir;
 	OUT(light0_vpos).w = HALF(UNIFORM(light0_pos).w);
 #endif
 #if defined(SHADER_LIGHT_TANVEC)
+// NOTE use of light_3_tanvec, see Common.c comments.
+#if (SHADER_LIGHT_TANVEC >= 4)
+	OUT(light_3_tanvec).x = dot(v_light3_vec, IN(tan0).xyz);
+	OUT(light_3_tanvec).y = dot(v_light3_vec, v_bitan0);
+	OUT(light_3_tanvec).z = dot(v_light3_vec, IN(nm0));
+#endif
+#if (SHADER_LIGHT_TANVEC >= 3)
+	OUT(light2_tanvec).x = dot(v_light2_vec, IN(tan0).xyz);
+	OUT(light2_tanvec).y = dot(v_light2_vec, v_bitan0);
+	OUT(light2_tanvec).z = dot(v_light2_vec, IN(nm0));
+#endif
+#if (SHADER_LIGHT_TANVEC >= 2)
+	OUT(light1_tanvec).x = dot(v_light1_vec, IN(tan0).xyz);
+	OUT(light1_tanvec).y = dot(v_light1_vec, v_bitan0);
+	OUT(light1_tanvec).z = dot(v_light1_vec, IN(nm0));
+#endif
 	OUT(light0_tanvec).x = dot(v_light0_vec, IN(tan0).xyz);
 	OUT(light0_tanvec).y = dot(v_light0_vec, v_bitan0);
 	OUT(light0_tanvec).z = dot(v_light0_vec, IN(nm0));
 #endif
 #if defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
+	HALF3 v_light3_halfvec = (v_light3_vec + vn_eyevec) * 0.5f;
+#endif
+#if (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
+	HALF3 v_light2_halfvec = (v_light2_vec + vn_eyevec) * 0.5f;
+#endif
+#if (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
+	HALF3 v_light1_halfvec = (v_light1_vec + vn_eyevec) * 0.5f;
+#endif
 	HALF3 v_light0_halfvec = (v_light0_vec + vn_eyevec) * 0.5f;
 #if defined(SHADER_LIGHT_HALFVEC)
+#if (SHADER_LIGHT_HALFVEC >= 4)
+	OUT(light3_halfvec) = v_light3_halfvec;
+#endif
+#if (SHADER_LIGHT_HALFVEC >= 3)
+	OUT(light2_halfvec) = v_light2_halfvec;
+#endif
+#if (SHADER_LIGHT_HALFVEC >= 2)
+	OUT(light1_halfvec) = v_light1_halfvec;
+#endif
 	OUT(light0_halfvec) = v_light0_halfvec;
 #endif
 #if defined(SHADER_LIGHT_TANHALFVEC)
+#if (SHADER_LIGHT_TANHALFVEC >= 4)
+	OUT(light3_tanhalfvec).x = dot(v_light3_halfvec, IN(tan0).xyz);
+	OUT(light3_tanhalfvec).y = dot(v_light3_halfvec, v_bitan0);
+	OUT(light3_tanhalfvec).z = dot(v_light3_halfvec, IN(nm0));
+#endif
+#if (SHADER_LIGHT_TANHALFVEC >= 3)
+	OUT(light2_tanhalfvec).x = dot(v_light2_halfvec, IN(tan0).xyz);
+	OUT(light2_tanhalfvec).y = dot(v_light2_halfvec, v_bitan0);
+	OUT(light2_tanhalfvec).z = dot(v_light2_halfvec, IN(nm0));
+#endif
+#if (SHADER_LIGHT_TANHALFVEC >= 2)
+	OUT(light1_tanhalfvec).x = dot(v_light1_halfvec, IN(tan0).xyz);
+	OUT(light1_tanhalfvec).y = dot(v_light1_halfvec, v_bitan0);
+	OUT(light1_tanhalfvec).z = dot(v_light1_halfvec, IN(nm0));
+#endif
 	OUT(light0_tanhalfvec).x = dot(v_light0_halfvec, IN(tan0).xyz);
 	OUT(light0_tanhalfvec).y = dot(v_light0_halfvec, v_bitan0);
 	OUT(light0_tanhalfvec).z = dot(v_light0_halfvec, IN(nm0));

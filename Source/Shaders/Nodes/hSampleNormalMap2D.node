@@ -9,7 +9,7 @@ Node({
 	Inputs = 
 	{
 		t = {t=sampler2D, s="texture", r=0},
-		tc = {t=HALF4,  s="texcoords", r=1}
+		tc = {t=HALF2,  s="texcoords", r=1}
 	}
 	
 })

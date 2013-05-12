@@ -48,25 +48,25 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-HALF4 TCScale(HALF4 wave, HALF4 tc) {
-	return ((tc.xyxy-HALF4(0.5, 0.5, 0.0, 0.0))*wave.xyxy) + HALF4(0.5, 0.5, 0, 0);
+HALF2 TCScale(HALF4 wave, HALF2 tc) {
+	return ((tc.xy-HALF2(0.5, 0.5))*wave.xy) + HALF2(0.5, 0.5);
 }
 
-HALF4 TCRotate(HALF4 sincos, HALF4 tc) {
+HALF2 TCRotate(HALF4 sincos, HALF2 tc) {
 	HALF4 t = (tc.xyxy-HALF4(0.5, 0.5, 0.5, 0.5))*sincos;
-	return HALF4(t.z-t.y, t.w+t.x, tc.z, tc.w) + HALF4(0.5, 0.5, 0.0, 0.0);
+	return HALF2(t.z-t.y, t.w+t.x) + HALF2(0.5, 0.5);
 }
 
-HALF4 TCShift(HALF4 wave, HALF4 tc) {
-	return tc+wave.xyxy;
+HALF2 TCShift(HALF4 wave, HALF2 tc) {
+	return tc+wave.xy;
 }
 
-HALF4 TCScroll(HALF4 wave, HALF4 tc) {
-	return tc+wave.xyxy+wave.zwzw;
+HALF2 TCScroll(HALF4 wave, HALF2 tc) {
+	return tc+wave.xy+wave.zw;
 }
 
-HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
-	return tc + sin(((tc.yxwz*turb2.xyxy)*PI)+turb.xyxy) * turb.zwzw;
+HALF2 TCTurb(HALF4 turb, HALF4 turb2, HALF2 tc, HALF PI) {
+	return tc + (sin(((tc.yx*turb2.xy)*PI)+turb.xy) * turb.zw);
 }
 
 #if defined(TEXCOORDS)
@@ -76,37 +76,37 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 #if defined(TCINPUTS)
 	#if TCINPUTS==6
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
-			GLSL(attribute) HALF4 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
-			GLSL(attribute) HALF4 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
-			GLSL(attribute) HALF4 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3); \
-			GLSL(attribute) HALF4 SEL(tc4, IN(tc4)) HLSL(:TEXCOORD4); \
-			GLSL(attribute) HALF4 SEL(tc5, IN(tc5)) HLSL(:TEXCOORD5);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
+			GLSL(attribute) HALF2 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
+			GLSL(attribute) HALF2 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
+			GLSL(attribute) HALF2 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3); \
+			GLSL(attribute) HALF2 SEL(tc4, IN(tc4)) HLSL(:TEXCOORD4); \
+			GLSL(attribute) HALF2 SEL(tc5, IN(tc5)) HLSL(:TEXCOORD5);
 	#elif TCINPUTS==5
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
-			GLSL(attribute) HALF4 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
-			GLSL(attribute) HALF4 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
-			GLSL(attribute) HALF4 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3); \
-			GLSL(attribute) HALF4 SEL(tc4, IN(tc4)) HLSL(:TEXCOORD4);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
+			GLSL(attribute) HALF2 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
+			GLSL(attribute) HALF2 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
+			GLSL(attribute) HALF2 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3); \
+			GLSL(attribute) HALF2 SEL(tc4, IN(tc4)) HLSL(:TEXCOORD4);
 	#elif TCINPUTS==4
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
-			GLSL(attribute) HALF4 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
-			GLSL(attribute) HALF4 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
-			GLSL(attribute) HALF4 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
+			GLSL(attribute) HALF2 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
+			GLSL(attribute) HALF2 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2); \
+			GLSL(attribute) HALF2 SEL(tc3, IN(tc3)) HLSL(:TEXCOORD3);
 	#elif TCINPUTS==3
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
-			GLSL(attribute) HALF4 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
-			GLSL(attribute) HALF4 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
+			GLSL(attribute) HALF2 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1); \
+			GLSL(attribute) HALF2 SEL(tc2, IN(tc2)) HLSL(:TEXCOORD2);
 	#elif TCINPUTS==2
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
-			GLSL(attribute) HALF4 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0); \
+			GLSL(attribute) HALF2 SEL(tc1, IN(tc1)) HLSL(:TEXCOORD1);
 	#else
 		#define IN_TCREGS \
-			GLSL(attribute) HALF4 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0);
+			GLSL(attribute) HALF2 SEL(tc0, IN(tc0)) HLSL(:TEXCOORD0);
 	#endif // TCINPUTS
 #else
 	#define IN_TCREGS
@@ -114,12 +114,12 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 
 #if TEXCOORDS==6
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
-		GLSL(varying) HALF4 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
-		GLSL(varying) HALF4 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
-		GLSL(varying) HALF4 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3); \
-		GLSL(varying) HALF4 SEL(tc4, OUT(tc4)) HLSL(:TEXCOORD4); \
-		GLSL(varying) HALF4 SEL(tc5, OUT(tc5)) HLSL(:TEXCOORD5);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
+		GLSL(varying) HALF2 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
+		GLSL(varying) HALF2 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
+		GLSL(varying) HALF2 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3); \
+		GLSL(varying) HALF2 SEL(tc4, OUT(tc4)) HLSL(:TEXCOORD4); \
+		GLSL(varying) HALF2 SEL(tc5, OUT(tc5)) HLSL(:TEXCOORD5);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8); \
 		GLSL(uniform) HALF4 UDECL(tcmod1)[6] HLSL(:C14); \
@@ -129,11 +129,11 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 		GLSL(uniform) HALF4 UDECL(tcmod5)[6] HLSL(:C38);
 #elif TEXCOORDS==5
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
-		GLSL(varying) HALF4 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
-		GLSL(varying) HALF4 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
-		GLSL(varying) HALF4 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3); \
-		GLSL(varying) HALF4 SEL(tc4, OUT(tc4)) HLSL(:TEXCOORD4);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
+		GLSL(varying) HALF2 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
+		GLSL(varying) HALF2 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
+		GLSL(varying) HALF2 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3); \
+		GLSL(varying) HALF2 SEL(tc4, OUT(tc4)) HLSL(:TEXCOORD4);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8); \
 		GLSL(uniform) HALF4 UDECL(tcmod1)[6] HLSL(:C14); \
@@ -142,10 +142,10 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 		GLSL(uniform) HALF4 UDECL(tcmod4)[6] HLSL(:C32);
 #elif TEXCOORDS==4
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
-		GLSL(varying) HALF4 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
-		GLSL(varying) HALF4 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
-		GLSL(varying) HALF4 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
+		GLSL(varying) HALF2 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
+		GLSL(varying) HALF2 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2); \
+		GLSL(varying) HALF2 SEL(tc3, OUT(tc3)) HLSL(:TEXCOORD3);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8); \
 		GLSL(uniform) HALF4 UDECL(tcmod1)[6] HLSL(:C14); \
@@ -153,23 +153,23 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 		GLSL(uniform) HALF4 UDECL(tcmod3)[6] HLSL(:C26);
 #elif TEXCOORDS==3
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
-		GLSL(varying) HALF4 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
-		GLSL(varying) HALF4 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
+		GLSL(varying) HALF2 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1); \
+		GLSL(varying) HALF2 SEL(tc2, OUT(tc2)) HLSL(:TEXCOORD2);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8); \
 		GLSL(uniform) HALF4 UDECL(tcmod1)[6] HLSL(:C14); \
 		GLSL(uniform) HALF4 UDECL(tcmod2)[6] HLSL(:C20);
 #elif TEXCOORDS==2
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
-		GLSL(varying) HALF4 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0); \
+		GLSL(varying) HALF2 SEL(tc1, OUT(tc1)) HLSL(:TEXCOORD1);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8); \
 		GLSL(uniform) HALF4 UDECL(tcmod1)[6] HLSL(:C14);
 #else
 	#define OUT_TCREGS \
-		GLSL(varying) HALF4 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0);
+		GLSL(varying) HALF2 SEL(tc0, OUT(tc0)) HLSL(:TEXCOORD0);
 	#define UTCMODREGS \
 		GLSL(uniform) HALF4 UDECL(tcmod0)[6] HLSL(:C8);
 #endif // TEXCOORDS

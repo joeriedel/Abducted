@@ -123,8 +123,7 @@ MAIN
 #endif
 
 #if defined(GENREFLECT)
-	HALF3 genReflectTC_ = reflect(IN(nm0), vn_eyevec);
-	HALF4 genReflectTC = HALF4(genReflectTC_.x, genReflectTC_.y, genReflectTC_.z, 1.f);
+	HALF2 genReflectTC = reflect(IN(nm0), vn_eyevec).xy;
 #endif
 
 	TCGEN
@@ -260,6 +259,12 @@ MAIN
 #endif
 #if defined(NUM_SHADER_NORMALS)
 	OUT(nm0) = IN(nm0);
+#endif
+#if defined(NUM_SHADER_TANGENTS)
+	OUT(tan0) = IN(tan0);
+#endif
+#if defined(NUM_SHADER_BITANGENTS)
+	OUT(bitan0) = v_bitan0;
 #endif
 #if defined(SKIN_SPRITE)
 	int idx = int(IN(spriteSkin).w);

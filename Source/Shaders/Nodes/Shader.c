@@ -73,7 +73,8 @@ HALF4 DiffuseLightPixel(
 	HALF3 normal,
 	HALF4 diffuseColor
 ) {
-	HALF e = length(lightVertex.xyz);
+	FLOAT3 _lightVertex = lightVertex.xyz; // optimizer converts length to dot(x, x) which overflows mediump
+	HALF e = length(_lightVertex);
 	e = max(HALF(0.0), lightVertex.w - e) / lightVertex.w;
 	e = e * lightDfColor.w;
 	HALF r = max(HALF(0.0), dot(lightVec, normal));
@@ -91,7 +92,8 @@ HALF4 DiffuseSpecularLightPixel(
 	HALF4 specularColor,
 	HALF specularExponent
 ) {
-	HALF e = length(lightVertex.xyz);
+	FLOAT3 _lightVertex = lightVertex.xyz; // optimizer converts length to dot(x, x) which overflows mediump
+	HALF e = length(_lightVertex);
 	e = max(HALF(0.0), lightVertex.w - e) / lightVertex.w;
 	e = e * lightDfColor.w;
 	HALF r = max(HALF(0.0), dot(lightVec, normal));

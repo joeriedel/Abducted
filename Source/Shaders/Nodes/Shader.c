@@ -120,8 +120,8 @@ MAIN
 #endif
 
 #if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
-	HALF3 vn_eyevec = UNIFORM(eye) - IN(position).xyz;
-	vn_eyevec = normalize(vn_eyevec);
+	FLOAT3 v_eyevec = UNIFORM(eye) - IN(position).xyz;
+	HALF3 vn_eyevec = normalize(v_eyevec);
 #endif
 
 #if defined(GENREFLECT)

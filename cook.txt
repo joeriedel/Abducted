@@ -30,6 +30,10 @@ pak0 {
 	Characters/TentacleMedium1
 	Characters/TentacleFalling1
 	Characters/TentacleFalling2
+	Characters/TentacleFalling3A
+	Characters/TentacleFalling3B
+	Characters/TentacleFalling3C
+	Characters/TentacleFalling3D
 	Characters/tentacleskin1_M_manipulate
 	Characters/tentaclewings1_M_manipulate
 	Shared/alienskin1_M_manipulate

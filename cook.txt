@@ -254,5 +254,11 @@ pak0 {
 	Sys/DebugEntityBBox_M
 	Sys/DebugWorldBBox_M
 	Sys/DebugWaypoint_M
+	Sys/DebugLight0_M
+	Sys/DebugLight1_M
+	Sys/DebugLight2_M
+	Sys/DebugLight3_M
+	Sys/DebugLight4_M
+	Sys/DebugLight5_M
 
 } // pak0

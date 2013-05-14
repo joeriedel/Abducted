@@ -13,6 +13,10 @@ end
 
 function World.OnInputEvent(e)
 	
+	if (FlyCam:HandleInput(e)) then
+		return true
+	end
+	
 	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
 		if (Game.entity:OnInputEvent(e)) then
 			return true

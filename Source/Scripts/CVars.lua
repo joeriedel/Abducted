@@ -67,6 +67,7 @@ cv_load = CVarFunc("load", "_cv_load_func")
 cv_loadcheckpoint = CVarFunc("loadcheckpoint", "_cv_loadcheckpoint_func")
 cv_savechecpoint = CVarFunc("savecheckpoint", "_cv_savecheckpoint_func")
 cv_postevent = CVarFunc("postevent", "_cv_postevent_func")
+cv_r_fly = CVarBool("r_fly", false)
 
 -------------------------------------------------------------------------------
 

@@ -29,7 +29,7 @@ function Game.Initialize(self, type)
 end
 
 
-function Game.Think(self)
+function Game.Think(self, dt)
 	Game.time = World.GameTime()
 	Game.sysTime = World.SysTime()
 	
@@ -38,6 +38,8 @@ function Game.Think(self)
 	end
 	
 	World.globalTimers:Tick(Game.sysTime)
+	
+	FlyCam:Think(dt)
 end
 
 function Game.PostSpawn(self)

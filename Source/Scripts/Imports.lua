@@ -26,6 +26,7 @@ Import("Cinematics")
 Import("Markup")
 Import("GameDB")
 Import("EventLog")
+Import("FlyCam")
 
 -- // Entities // --
 Import("Entity")

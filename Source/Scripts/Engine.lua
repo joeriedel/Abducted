@@ -37,6 +37,7 @@ kSolidType_All = 0xff
 kOccupantType_None = 0
 kOccupantType_BBox = 1
 kOccupantType_Volume = 2
+kOccupantType_Sky = 3
 
 -- ClassBits
 kEntityClass_Any = 0

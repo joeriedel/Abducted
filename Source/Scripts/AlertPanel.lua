@@ -173,7 +173,7 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 		doButtonB = true
 	else
 		UI:MoveWidget(self.widgets.buttonA, 0, yButtonPos)
-		UI:CenterWidget(self.widgets.buttonA, {0,0,panelRect[3],panelRect[4]})
+		UI:HCenterWidget(self.widgets.buttonA, {0,0,panelRect[3],panelRect[4]})
 		local r = self.widgets.buttonA:Rect()
 		self.widgets.buttonAbk:SetRect(r)
 	end

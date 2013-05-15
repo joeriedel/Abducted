@@ -42,11 +42,15 @@ function MainMenu.LoadGame.Layout(self)
 	
 	self.widgets.controls = {}
 	
+	if (self.widgets.vlist) then
+		self.widgets.vlist:Clear()
+	end
+	
+	collectgarbage()
+	
 	if (MainMenu.saves == nil) then
 		return
 	end
-	
-	self.widgets.vlist:Clear()
 	
 	local parentRect = self.widgets.panel:Rect()
 
@@ -81,7 +85,7 @@ function MainMenu.LoadGame.Layout(self)
 			
 			if (not first) then
 				w,r = self:CreateLineBorder(height, parentRect[3])
-				self.widgets.vlist:AddChild(w)
+				self.widgets.vlist:AddItem(w)
 				table.insert(widgets, w)
 				table.insert(self.widgets.controls, w)
 				height = height + 7

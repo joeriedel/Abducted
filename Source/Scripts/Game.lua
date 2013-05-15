@@ -28,7 +28,6 @@ function Game.Initialize(self, type)
 	end
 end
 
-
 function Game.Think(self, dt)
 	Game.time = World.GameTime()
 	Game.sysTime = World.SysTime()
@@ -44,6 +43,22 @@ end
 
 function Game.PostSpawn(self)
 	
+end
+
+function Game.LoadLevel(self, level)
+
+	Game.entity.eatInput = true
+	UI:BlendTo({0,0,0,1}, 1)
+	World.SoundFadeMasterVolume(0, 1)
+	Persistence.WriteBool(Session, "loadCheckpoint", false)
+	Session:Save()
+	
+	local f = function()
+		World.RequestLoad(level, kUnloadDisposition_Slot)
+	end
+	
+	World.globalTimers:Add(f, 1, true)
+
 end
 
 function Game.OnEvent(self, cmd, args)
@@ -133,6 +148,9 @@ function Game.OnEvent(self, cmd, args)
 		if (self.OnMainMenuCommand) then
 			self:OnMainMenuCommand(cmds, args)
 		end
+		return true
+	elseif (cmd == "load") then
+		self:LoadLevel(args)
 		return true
 	end
 end

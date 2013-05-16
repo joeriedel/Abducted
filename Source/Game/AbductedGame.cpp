@@ -85,7 +85,7 @@ private:
 	}
 
 	void Draw(Game &game) {
-		if (!m_mat)
+		if (!m_mat || !m_parser)
 			return;
 		
 		int vpx, vpy, vpw, vph;

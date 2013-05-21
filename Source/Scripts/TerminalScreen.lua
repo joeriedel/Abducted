@@ -16,6 +16,8 @@ TerminalScreen.Skip = false
 function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)
 	
+	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+	
 	self.model = LoadModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.dm:ScaleTo(Vec3ForString(self.keys.scale, {1,1,1}), 0)

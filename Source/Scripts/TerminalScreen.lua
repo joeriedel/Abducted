@@ -20,10 +20,12 @@ function TerminalScreen.Spawn(self)
 	
 	self.model = LoadModel(self.keys.model)
 	self.model.dm = self:AttachDrawModel(self.model)
-	self.model.dm:ScaleTo(Vec3ForString(self.keys.scale, {1,1,1}), 0)
+	
+	local scale = Vec3ForString(self.keys.scale, {1,1,1})
+	self.model.dm:ScaleTo(scale, 0)
 
-	self:SetMins({-24, -24, -48+64})
-	self:SetMaxs({ 24,  24,  48+64})
+	self:SetMins({-200*scale[1], -200*scale[2], 0*scale[3]})
+	self:SetMaxs({ 200*scale[1],  200*scale[2], 282*scale[3]})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	self:SetOccupantType(kOccupantType_BBox)

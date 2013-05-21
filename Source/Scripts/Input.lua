@@ -4,6 +4,9 @@
 -- See Abducted/LICENSE for licensing terms
 
 function World.InputEventFilter(e)
+	if (cv_r_fly:Get()) then
+		return false
+	end
 	return Game.entity:InputEventFilter(e)
 end
 

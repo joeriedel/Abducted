@@ -34,8 +34,24 @@ function ManipulatableObject.Spawn(self)
 	self.model.vision:BlendTo({1,1,1,0}, 0)
 	self:SetFacing(NumberForString(self.keys.angle, 0))
 	
-	self.model.dm:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
-	self.model.vision:ScaleTo(Vec3ForString(self.keys.scale, {1, 1, 1}), 0)
+	local scale = Vec3ForString(self.keys.scale, {1, 1, 1})
+	self.model.dm:ScaleTo(scale, 0)
+	self.model.vision:ScaleTo(scale, 0)
+	
+	local mins = Vec3ForString(self.keys.mins, {-24, -24, -48})
+	local maxs = Vec3ForString(self.keys.maxs, { 24,  24,  48})
+	
+	if (BoolForString(self.keys.autoscalebounds, false)) then
+		mins = VecMul(mins, scale)
+		maxs = VecMul(maxs, scale)
+	end
+	
+	self:SetMins( mins)
+	self:SetMaxs(maxs)
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
+	self.model.vision:SetBounds(self:Mins(), self:Maxs())
+	self.manipulateShift = Vec3ForString(self.keys.manipulate_shift, {0,0,0})
+	self.shakeCamera = BoolForString(self.keys.shake_camera, true)
 	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
@@ -277,6 +293,28 @@ function ManipulatableObject.Dormant(self)
 	end
 end
 
+function ManipulatableObject.Dormant2(self)
+	COutLine(kC_Debug, "ManipulatableObject.Dormant2")
+	
+	self.awake = false
+	
+	self.think = nil
+	
+	if (BoolForString(self.keys.idle_while_dormant, false)) then
+		self:PlayAnim("idle", self.model)
+		if (self.sounds.Idle) then
+			self.sounds.Idle:Play(kSoundChannel_FX, 0)
+		end
+	else
+		if (self:PlayAnim("dormant2", self.model) == nil) then
+			self:PlayAnim("dormant", self.model)
+		end
+		if (self.sounds.Dormant) then
+			self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+		end
+	end
+end
+
 function ManipulatableObject.Sleep(self)
 	COutLine(kC_Debug, "ManipulatableObject.Sleep")
 	
@@ -301,9 +339,9 @@ function ManipulatableObject.Sleep(self)
 	end
 	
 	if (blend) then
-		blend.Seq(ManipulatableObject.Dormant)
+		blend.Seq(ManipulatableObject.Dormant2)
 	else
-		self:Dormant()
+		self:Dormant2()
 	end
 end
 
@@ -816,68 +854,13 @@ function ManipulatableObject.LoadState(self, state)
 
 end
 
---[[---------------------------------------------------------------------------
-	Tentacles
------------------------------------------------------------------------------]]
+StdManipulatable = ManipulatableObject:New()
 
-Tentacle = ManipulatableObject:New()
-
-function Tentacle.Spawn(self)
+function StdManipulatable.Spawn(self)
 	ManipulatableObject.Spawn(self)
-	
-	self:SetMins({-24, -24, -48+64})
-	self:SetMaxs({ 24,  24,  48+64})
-	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self.model.vision:SetBounds(self:Mins(), self:Maxs())
-	
-	self.manipulateShift = {0,0,64}
-	
 	self:Link() -- kMoveType_None
 end
 
-info_tentacle = Tentacle
-
---[[---------------------------------------------------------------------------
-	Pylon
------------------------------------------------------------------------------]]
-
-Pylon = ManipulatableObject:New()
-
-function Pylon.Spawn(self)
-	ManipulatableObject.Spawn(self)
-	
-	self:SetMins({-24, -24, -48+64})
-	self:SetMaxs({ 24,  24,  48+64})
-	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self.model.vision:SetBounds(self:Mins(), self:Maxs())
-	self.manipulateShift = {0,0,64}
-	self.shakeCamera = true
-	
-	self:Link() -- kMoveType_None
-end
-
-info_pylon = Pylon
-
---[[---------------------------------------------------------------------------
-	CustomManipulatableObject
------------------------------------------------------------------------------]]
-
-CustomManipulatableObject = ManipulatableObject:New()
-
-function CustomManipulatableObject.Spawn(self)
-	ManipulatableObject.Spawn(self)
-	
-	local mins = Vec3ForString(self.keys.mins, {-24, -24, -48})
-	local maxs = Vec3ForString(self.keys.maxs, { 24,  24,  48})
-	
-	self:SetMins( mins)
-	self:SetMaxs(maxs)
-	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self.model.vision:SetBounds(self:Mins(), self:Maxs())
-	self.manipulateShift = Vec3ForString(self.keys.manipulate_shift, {0,0,0})
-	self.shakeCamera = BoolForString(self.keys.shake_camera, true)
-	
-	self:Link() -- kMoveType_None
-end
-
-info_custom_manipulatable = CustomManipulatableObject
+info_tentacle = StdManipulatable
+info_pylon = StdManipulatable
+info_custom_manipulatable = StdManipulatable

@@ -67,13 +67,14 @@ function DebugUI.Think(self)
 	self.widgets.fps:SetText(string.format("%.3f fps", counters.fps))
 	local width = UI:SizeLabelToContents(self.widgets.fps)
 	
-	self.widgets.portals:SetText(string.format("%d Area(s), %d/%d portal(s)", counters.drawnAreas, counters.drawnPortals, counters.testedPortals))
+	self.widgets.portals:SetText(string.format("Area %d, %d Area(s), %d/%d portal(s)", counters.area, counters.drawnAreas, counters.drawnPortals, counters.testedPortals))
 	width = math.max(UI:SizeLabelToContents(self.widgets.portals)[3])
 	
 	self.widgets.models:SetText(
-		string.format("%d/%d World, %d/%d/%d Entities", 
+		string.format("%d/%d World, %d/%d/%d Entities, %d/%d/%d Actors", 
 			counters.drawnWorldModels, counters.testedWorldModels, 
-			counters.drawnEntityModels, counters.testedEntityModels, counters.drawnEntities
+			counters.drawnEntityModels, counters.testedEntityModels, counters.drawnEntities,
+			counters.drawnActorModels, counters.testedActorModels, counters.drawnActors
 		)
 	)
 	width = math.max(UI:SizeLabelToContents(self.widgets.models)[3])

@@ -117,13 +117,13 @@ function ScriptNode.Emit(self)
 	
 	self.busy = true
 	
-	if self.delay[2] > 0 then
+	if (self.delay[2] > 0) then
 		local delay = FloatRand(self.delay[1], self.delay[2])
 		self:SetNextThink(delay)
 		self.think = ScriptNode.Post
 		self.thinkTime = GameDB.realTime + delay
 		self.thinkFunc = "post"
-		COutLine(kC_Debug, "ScriptNode(%s).Emit(Delayed - %dms)", self.name, delay)
+		COutLine(kC_Debug, "ScriptNode(%s).Emit(Delayed - %ds)", self.name, delay)
 	else
 		self:Post()
 	end
@@ -144,7 +144,7 @@ function ScriptNode.Post(self)
 	end
 	
 	if self.autorepeat > -1 then
-		COutLine(kC_Debug, "ScriptNode(%s) - AutoRepeatDelay(%f)", self.name, self.autorepeat)
+		COutLine(kC_Debug, "ScriptNode(%s) - AutoRepeatDelay(%fs)", self.name, self.autorepeat)
 		self.think = ScriptNode.Emit
 		self.thinkTime = GameDB.realTime + self.autorepeat
 		self.thinkFunc = "emit"

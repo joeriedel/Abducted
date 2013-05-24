@@ -200,7 +200,7 @@ BOOL CMainFrame::InitStuff(void)
 #if 0
 	MaxMemSize = 0xFFFFFFFF;
 #else
-	MaxMemSize = 8*1024*1024;
+	MaxMemSize = 64*1024*1024;
 #endif
 	DebugTraceFlag = DEBUGTRACE_THEWORKS;
 	InitMemory();

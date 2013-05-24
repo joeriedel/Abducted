@@ -113,7 +113,7 @@ OS_FNEXP void R_glUploadTexture_CubeMap( int target, RTex_t* tex, int width, int
 // change this OPT_ to 0. This also means that after the UploadProc of a texture
 // has been called, the app is free to dispose of it's texture.
 //
-#define OPT_GL_PURGE			1
+#define OPT_GL_PURGE			0
 
 //
 // this state system uses active state committing.

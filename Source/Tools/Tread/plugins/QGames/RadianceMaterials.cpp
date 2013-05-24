@@ -71,7 +71,7 @@ private:
 
 	void Free() {
 		if (m_image.ImagePtr) {
-			DeallocAPointer(m_image.ImagePtr);
+			free(m_image.ImagePtr);
 			m_image.ImagePtr = 0;
 		}
 	}
@@ -182,6 +182,8 @@ public:
 		
 		free(data);
 
+		OS_ASSERT(src.ImagePtr);
+
 		// too big?
 		if ((src.Width > 1024) || (src.Height > 1024)) {
 			int w, h;
@@ -200,10 +202,17 @@ public:
 			h = (h<1) ? 1 : h;
 
 			// gluScale image has overrun problems, so allocate some extra space
+			// also move this out of burger mem.
 
 			Image_t dst;
-			ImageInit(&dst, w, h + 8, src.DataType);
+			memset(&dst, 0, sizeof(dst));
+			dst.DataType = src.DataType;
+			dst.Width = w;
 			dst.Height = h;
+			dst.RowBytes = w * ((dst.DataType==IMAGE888) ? 3 : 4);
+			dst.ImagePtr = (Byte*)malloc(dst.RowBytes * (h+8));
+
+			OS_ASSERT(dst.ImagePtr);
 
 			if (src.DataType == IMAGE888) {
 				ImageStore888(&dst, &src);
@@ -213,7 +222,11 @@ public:
 
 			std::swap(src, dst);
 			ImageDestroy(&dst);
-
+		} else {
+			Byte *nonBurgerMem = (Byte*)malloc(src.RowBytes*src.Height);
+			memcpy(nonBurgerMem, src.ImagePtr, src.RowBytes*src.Height);
+			DeallocAPointer(src.ImagePtr);
+			src.ImagePtr = nonBurgerMem;
 		}
 
 		TextureShader *shader = new TextureShader(

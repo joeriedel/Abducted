@@ -549,12 +549,18 @@ function PlayerPawn.Teleport(self, userId, facing)
 	if (waypoints) then
 		self:Stop()
 		local fp = World.WaypointFloorPosition(waypoints[1])
-		self:SetFloorPosition(fp)
-		self:SetDesiredMove(nil)
-		
-		if (facing) then
-			self:SetFacing(facing)
+		if (fp) then
+			self:SetFloorPosition(fp)
+			self:SetDesiredMove(nil)
+			
+			if (facing) then
+				self:SetFacing(facing)
+			end
+		else
+			COutLine(kC_Debug, "ERROR: PlayerPawn, waypoint '%s' doesn't have a valid floor position.", userId)
 		end
+	else
+		COutLine(kC_Debug, "ERROR: PlayerPawn(teleport) there is no waypoint with a userid of '%s'.", userId)
 	end
 end
 

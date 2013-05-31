@@ -16,14 +16,14 @@ PlayerSkills.MaxShieldTime = 30
 PlayerSkills.ShieldRechargeMultipliers = {
 	1,
 	0.66,
-	0.5
+	0.4
 }
 
 PlayerSkills.PulseExplodeTime = {8, 10}
 PlayerSkills.PulseRechargeTimes = {
-	10,
 	7,
-	5
+	5,
+	3
 }
 
 function PlayerSkills.Load(self)

@@ -144,6 +144,8 @@ function Bug.Spawn(self)
 	COutLine(kC_Debug, "Bug:Spawn")
 	Entity.Spawn(self)
 	
+	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+	
 	if (BoolForString(self.keys.group, false)) then
 		self.model = LoadModel("Characters/Buggroup12")
 	else

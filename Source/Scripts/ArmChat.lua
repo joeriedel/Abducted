@@ -127,13 +127,13 @@ function Arm.StartConversation(self)
 	
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
 	
-	if (self.requiredTopic) then
-		self.changeConversationCount = 0
-		self.topic = Arm.Chats.Loaded[self.requiredTopic]
-	elseif (self.requestedTopic) then
+	if (self.requestedTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.requestedTopic]
 		self.requestedTopic = nil
+	elseif (self.requiredTopic) then
+		self.changeConversationCount = 0
+		self.topic = Arm.Chats.Loaded[self.requiredTopic]
 	else
 		self.changeConversationCount = self.changeConversationCount + 1
 		self.topic = self:SelectChatRoot()

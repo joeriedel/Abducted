@@ -23,7 +23,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_TENTACLES_TITLE",
 		text = "ARM_DISCOVERY_TENTACLES",
 		index = 3,
-		chat = "Genesis3"
+		chat = "Tentacles"
 	},
 	Terminals = {
 		picture = "UI/discovery_terminals_M",

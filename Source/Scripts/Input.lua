@@ -40,7 +40,14 @@ function World.OnInputGesture(g)
 
 end
 
-Input = {}
+Input = Class:New()
+
+function Input.Spawn(self)
+
+--	self.ManipulateUpKey = Persistence.ReadNumber(Globals, "inputMapping/manup", 
+
+end
+
 function Input.IsTouchBegin(e)
 	return (e.type == kI_TouchBegin)
 end

@@ -166,7 +166,14 @@ bool AbductedApp::RunAutoExec() {
 	
 	String token;
 	if (script.GetToken(token, Tokenizer::kTokenMode_SameLine)) {
-		m_game = Game::New();
+#if defined(RAD_OPT_PC)
+		const GameUIMode kUIMode = kGameUIMode_PC;
+#elif defined(RAD_OPT_IOS)
+		const GameUIMode kUIMode = kGameUIMode_Mobile;
+#else
+	#error RAD_ERROR_UNSUP_PLAT
+#endif
+		m_game = Game::New(kUIMode);
 		const r::VidMode *vidMode = activeDisplay->curVidMode;
 		m_game->SetViewport(0, 0, vidMode->w, vidMode->h);
 		if (!(m_game->LoadEntry() && m_game->LoadMapSeq(token.c_str, 0, world::kUD_Slot, true))) {

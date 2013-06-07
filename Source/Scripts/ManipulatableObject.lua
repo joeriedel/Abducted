@@ -475,6 +475,8 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		time = 0.15
 	end
 	
+	ManipulatableObjectUI:Notify(enabled)
+	
 	local f = function (x)
 		local rgba
 		if (enabled) then
@@ -484,6 +486,7 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		end
 		
 		x.entity.model.vision:BlendTo(rgba, time)
+		ManipulatableObjectUI:NotifyObject(x.entity, enabled)
 	end
 	
 	LL_Do(ManipulatableObject.Objects, f)

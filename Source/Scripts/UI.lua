@@ -21,6 +21,8 @@ UI.kLayer_Debug = 11
 function UI.Spawn(self)
 	UI.entity = self
 	
+	UI.mode = System.UIMode()
+	
 	StringTable.Global = World.Load("UI/Globals")
 	
 	UI.systemScreen = System.ScreenSize()

@@ -11,7 +11,7 @@
 class AbductedGame : public Game {
 public:
 
-	AbductedGame();
+	AbductedGame(GameUIMode uiMode);
 
 	virtual bool LoadEntry();
 };

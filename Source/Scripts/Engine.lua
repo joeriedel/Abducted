@@ -164,6 +164,12 @@ kHTTP_OpStatus_ResponseError = -2
 kHTTP_OpStatus_UnknownHostError = -3
 kHTTP_OpStatus_BusyError = -4
 
+-- UIMode
+
+kGameUIMode_PC = 0
+kGameUIMode_Mobile = 1
+kGameUIMode_Console = 2
+
 -- Input Helpers
 
 function I_IsMouse(event)

@@ -16,6 +16,7 @@ function Abducted.Initialize(self)
 	PlayerInput:Spawn()
 	HUD:Spawn()
 	Arm:Spawn()
+	ManipulatableObjectUI:Spawn()
 	TerminalScreen.StaticInit()
 	
 	self.think = Abducted.Think
@@ -138,14 +139,8 @@ function Abducted.OnInputEvent(self, e)
         return false
     end
 	if (self.manipulate) then
-		return false
+		return ManipulatableObjectUI:HandleInputEvent(e)
 	end
-	if (MemoryGame.active) then
-		return false
-    end
-    if (ReflexGame.active) then
-        return false
-    end
 	if (TerminalScreen.Touch(e)) then
 		return true
     end
@@ -191,7 +186,11 @@ function Abducted.BeginManipulate(self)
 	self.manipulate = true
 	ManipulatableObject.NotifyManipulate(true)
 	World.playerPawn:NotifyManipulate(true)
-	World.SetEnabledGestures(kIG_Line)
+	
+	if (UI.mode == kGameUIMode_Mobile) then
+		World.SetEnabledGestures(kIG_Line)
+	end
+	
 	World.FlushInput(true)
 	
 	local f = function ()
@@ -330,5 +329,6 @@ function Abducted.Think(self, dt)
 		Arm:think(dt)
 	end
 	
+	ManipulatableObjectUI:UpdateUI()
 	TerminalScreen.UpdateUI()
 end

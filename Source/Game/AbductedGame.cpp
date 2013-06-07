@@ -236,11 +236,11 @@ Game::Tickable::Ref GSPlay::New() {
 	return Game::Tickable::Ref(new (ZWorld) GSPlay());
 }
 
-Game::Ref Game::New() {
-	return Game::Ref(new AbductedGame());
+Game::Ref Game::New(GameUIMode uiMode) {
+	return Game::Ref(new AbductedGame(uiMode));
 }
 
-AbductedGame::AbductedGame() {
+AbductedGame::AbductedGame(GameUIMode uiMode) : Game(uiMode) {
 }
 
 bool AbductedGame::LoadEntry() {

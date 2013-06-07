@@ -50,7 +50,10 @@ function ReflexGame.StartGame(self, gameCompleteCallback)
 	self.think = ReflexGame.Think
 	self:SetNextThink(0)
 	
-	World.SetEnabledGestures(kIG_Line)
+	if (UI.mode == kGameUIMode_Mobile) then
+		World.SetEnabledGestures(kIG_Line)
+	end
+	
 	World.FlushInput(true)
 end
 

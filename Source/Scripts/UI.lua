@@ -135,10 +135,7 @@ function UI.Spawn(self)
 	UI:CreateFXLayer()
 	UI:CreateFeedbackLayer()
 	AlertPanel:Create()
-	
---	self.think = UI.Think
---	self:SetNextThink(1/30)
-	
+		
 	UI:BlendTo({0, 0, 0, 1}, 0) -- start black
 	
 end
@@ -164,10 +161,15 @@ end
 
 function UI.InitMap(self)
 	UI:CreateInteractiveLayer()
-	self.gfx.TerminalHack = World.Load("UI/terminal_hack_M")
-	self.gfx.TerminalHackPressed = World.Load("UI/terminal_hack_pressed_M")
-	self.gfx.TerminalSolve = World.Load("UI/terminal_solve_M")
-	self.gfx.TerminalSolvePressed = World.Load("UI/terminal_solve_pressed_M")
+	self.gfx.Glyphs = {}
+	
+	for i=1,27 do
+		local s = string.format("Puzzles/glyph%02d_M", i)
+		self.gfx.Glyphs[i] = World.Load(s)
+	end
+	
+	self.gfx.AnimatedGlpyh = World.Load("Puzzles/+0glyph_M")
+	self.gfx.AnimatedGlpyhPressed = World.Load("Puzzles/+0glyphPressed_M")
 end
 
 function UI.CreateInteractiveLayer(self)

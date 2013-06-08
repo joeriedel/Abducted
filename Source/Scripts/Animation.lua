@@ -24,7 +24,7 @@ end
 
 function LoadSkModel(name)
 	local m = World.Load(name)
-	m:SetRootController("BlendToController") -- no check: must be SkModel
+	m:SetRootController("BlendToController") -- no check: must be SkModel or VtModel
 	return m
 end
 

@@ -6,15 +6,18 @@
 TerminalScreen = Entity:New()
 TerminalScreen.MaxTouchDistancePct = 1/8
 TerminalScreen.TouchPosShift = {0,0,48}
-TerminalScreen.ButtonPosShift = {1/10, 1/10}
-TerminalScreen.ButtonSize = {1/15, 1/15}
+TerminalScreen.ButtonPosShift = {1.5/10, 1/10}
+TerminalScreen.ButtonSize = {1.5/15, 1.5/15}
 TerminalScreen.PopupEntity = nil
 TerminalScreen.Objects = {}
 TerminalScreen.Widgets = {}
 TerminalScreen.Skip = false
+TerminalScreen.DT = 0
+TerminalScreen.Active = nil
 
 function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)
+	MakeAnimatable(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
@@ -28,27 +31,38 @@ function TerminalScreen.Spawn(self)
 	self:SetMaxs({ 200*scale[1],  200*scale[2], 282*scale[3]})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
+	self.model.glow1 = self.model.dm:CreateInstance()
+	self:AttachDrawModel(self.model.glow1)
+	self.model.glow1:ScaleTo(scale, 0)
+	self.model.glow1:SetBounds(self:Mins(), self:Maxs())
+	self.model.glow1:BlendTo({1,1,1,0}, 0)
+	
+	self.model.glow2 = self.model.dm:CreateInstance()
+	self:AttachDrawModel(self.model.glow2)
+	self.model.glow2:ScaleTo(scale, 0)
+	self.model.glow2:SetBounds(self:Mins(), self:Maxs())
+	self.model.glow2:BlendTo({1,1,1,0}, 0)
+	
+	self.alienSkin1 = World.Load("Shared/alienskin1_M")
+	self.terminalFlash1 = World.Load("Objects/terminalglow1_M")
+	self.terminalFlash2 = World.Load("Objects/terminalglow2_M")
+	
+	self.model.glow1:ReplaceMaterial(self.alienSkin1, self.terminalFlash1)
+	self.model.glow2:ReplaceMaterial(self.alienSkin1, self.terminalFlash2)
+	
 	self:SetOccupantType(kOccupantType_BBox)
 	self:Link()
 	
 	self.enabled = BoolForString(self.keys.enabled, false)
+	self.activateRadius = NumberForString(self.keys.activate_radius, 200)
 	self.active = false
 	self.popup = false
+	self.size = "small"
+	self.state = "none"
+	
+	self:PlayAnim("idle", self.model)
 	
 	table.insert(TerminalScreen.Objects, self)
-end
-
-function TerminalScreen.CheckTouch(self, x, y)
-	if (not (self.enabled and self.active)) then
-		return false
-	end
-	
-	return CheckWorldTouch(
-		VecAdd(self:WorldPos(), TerminalScreen.TouchPosShift), 
-		x, 
-		y, 
-		(TerminalScreen.MaxTouchDistancePct * UI.systemScreen.diagonal)
-	)
 end
 
 function TerminalScreen.CheckProximity(self, playerPos)
@@ -59,7 +73,7 @@ function TerminalScreen.CheckProximity(self, playerPos)
 	local dd = VecSub(playerPos, self:WorldPos())
 	dd = VecMag(dd)
 	
-	return (dd <= TerminalScreen.MaxActivateDistance)
+	return (dd <= self.activateRadius)
 end
 
 function TerminalScreen.CheckActive(self, playerPos)
@@ -72,32 +86,86 @@ end
 function TerminalScreen.Activate(self, activate)
 
 	if (self.active == activate) then
+		if (activate) then
+			self:UpdateActivated()
+		end
 		return
 	end
 	
 	self.active = activate
 
-	if (not self.active) then
-		if (self.popup) then
-			TerminalScreen.CancelUI()
-		end
+	if (self.active) then
+		self:BeginActivated()
+	else
+		self:EndActivated()
+		
 	end
 end
 
-function TerminalScreen.Touched(self)
+function TerminalScreen.BeginActivated(self)
+
+	if (self.size == "big") then
+		self:PopupUI()
+	else
+		self.activateTime = Game.time
+	end
+
+end
+
+function TerminalScreen.EndActivated(self)
 	if (self.popup) then
+		TerminalScreen.CancelUI()
+	end
+	
+	self.model.glow1:BlendTo({1,1,1,0}, 0.1)
+	self.model.glow2:BlendTo({1,1,1,0}, 0.1)
+	
+	if (self.size == "small") then
+		self:PlayAnim("idle", self.model)
+	end
+	
+end
+
+function TerminalScreen.UpdateActivated(self)
+
+	if (self.size == "big") then
 		return
 	end
 	
-	self:PopupUI()
+	local dt = Game.time - self.activateTime
+	
+	if ((self.state == "none") and (dt > 1)) then
+		self.state = "wiggle"
+		self:PlayAnim("wiggle1", self.model)
+	elseif ((self.state == "wiggle") and (dt > 3)) then
+		self.state = "flash1"
+		self.model.glow1:BlendTo({1,1,1,1}, 0.1)
+	elseif ((self.state == "flash1") and (dt > 5)) then
+		self.state = "flash2"
+		self.model.glow2:BlendTo({1,1,1,1}, 0.1)
+		self.model.glow1:BlendTo({1,1,1,0}, 0.1)
+	elseif ((self.state == "flash2") and (dt > 7)) then
+		self.state = "grow"
+		self.model.glow2:BlendTo({1,1,1,0}, 2)
+		self.size = "big"
+		local f = function()
+			if (self.active) then
+				self:PopupUI()
+			end
+			self:PlayAnim("grown", self.model)
+		end
+		self:PlayAnim("grow", self.model).Seq(f)
+	end
 end
 
 function TerminalScreen.OnEvent(self, cmd, args)
 	COutLineEvent("TerminalScreen", cmd, args)
 	
-	if (cmd == "activate") then
-		self:Activate(true)
-	elseif (cmd == "deactivate") then
+	if (cmd == "enable") then
+		self.enabled = true
+		return true
+	elseif (cmd == "disable") then
+		self.enabled = false
 		self:Activate(false)
 	end
 
@@ -111,61 +179,26 @@ function TerminalScreen.PopupUI(self)
 end
 
 function TerminalScreen.ExecutePopup(self)
-	if (TerminalScreen.Widgets.Hack.label) then
-		TerminalScreen.Widgets.Hack.disableGfxChanges = false
-		TerminalScreen.Widgets.Solve.disableGfxChanges = false
-		TerminalScreen.Widgets.Hack.class:SetEnabled(TerminalScreen.Widgets.Hack, true)
-		TerminalScreen.Widgets.Solve.class:SetEnabled(TerminalScreen.Widgets.Solve, true)
-		TerminalScreen.Widgets.Hack.label:FadeTo({1,1,1,1}, 0.1)
-		TerminalScreen.Widgets.Solve.label:Fadeto({1,1,1,1}, 0.1)
-	end	
-	
-	local f = function ()
-		TerminalScreen.PopupEntity = self
-		self.popup = true
-		TerminalScreen.Widgets.Hack:ScaleTo({1, 1}, {0.2,0.2})
-		TerminalScreen.Widgets.Solve:ScaleTo({1, 1}, {0.2,0.2})
-	end
-	
-	if (TerminalScreen.Widgets.Hack.label) then
-		World.gameTimers:Add(f, 0.1, true)
-	else
-		f()
-	end
+	TerminalScreen.PopupEntity = self
+	self.popup = true
+	TerminalScreen.Widgets.Glyph:ScaleTo({1, 1}, {0.2,0.2})
 end
 
 function TerminalScreen.CancelUI(callback)
 	if (TerminalScreen.PopupEntity) then
-		if (TerminalScreen.Widgets.Hack.label) then
-			TerminalScreen.Widgets.Hack.disableGfxChanges = true
-			TerminalScreen.Widgets.Solve.disableGfxChanges = true
-			TerminalScreen.Widgets.Hack.class:SetEnabled(TerminalScreen.Widgets.Hack, false)
-			TerminalScreen.Widgets.Solve.class:SetEnabled(TerminalScreen.Widgets.Solve, false)
-			TerminalScreen.Widgets.Hack.label:FadeTo({0,0,0,0}, 0.1)
-			TerminalScreen.Widgets.Solve.label:Fadeto({0,0,0,0}, 0.1)
-		end
-		
-		
+		Abducted.entity.eatInput = true
+		TerminalScreen.Widgets.Glyph:ScaleTo({0, 0}, {0.2,0.2})
 		local f = function ()
-			TerminalScreen.Widgets.Hack:ScaleTo({0, 0}, {0.2,0.2})
-			TerminalScreen.Widgets.Solve:ScaleTo({0, 0}, {0.2,0.2})
-			local f = function ()
-				if (TerminalScreen.PopupEntity) then
-					TerminalScreen.PopupEntity.popup = false
-					TerminalScreen.PopupEntity = nil
-				end
-				if (callback) then
-					callback()
-				end
+			Abducted.entity.eatInput = false
+			if (TerminalScreen.PopupEntity) then
+				TerminalScreen.PopupEntity.popup = false
+				TerminalScreen.PopupEntity = nil
 			end
-			World.gameTimers:Add(f, 0.2, true)
+			if (callback) then
+				callback()
+			end
 		end
-		
-		if (TerminalScreen.Widgets.Hack.label) then
-			World.gameTimers:Add(f, 0.1, true)
-		else
-			f()
-		end
+		World.gameTimers:Add(f, 0.2, true)
 	else
 		if (callback) then
 			callback()
@@ -178,74 +211,92 @@ function TerminalScreen.UpdateUI()
 		return
 	end
 	if (TerminalScreen.PopupEntity) then
-		local worldPos = TerminalScreen.PopupEntity:WorldPos()
+		local worldPos = World.playerPawn:WorldPos()
 		local p, r = World.Project(VecAdd(worldPos, TerminalScreen.TouchPosShift))
 		p = UI:MapToUI(p)
 		
 		local shiftX = TerminalScreen.ButtonPosShift[1] * UI.identityScale[1] * UI.screenWidth
 		local shiftY = TerminalScreen.ButtonPosShift[2] * UI.identityScale[2] * UI.screenHeight
 		
-		local wpos = {p[1]-shiftX, p[2]-shiftY}
-		r = TerminalScreen.Widgets.Hack:Rect()
+		local wpos = {p[1]+shiftX, p[2]-shiftY}
+		r = TerminalScreen.Widgets.Glyph:Rect()
 		r[1] = wpos[1] - r[3]
 		r[2] = wpos[2] - r[4]
 		BoundRect(r, TerminalScreen.ScreenBounds)
-		TerminalScreen.Widgets.Hack:SetRect(r)
-		
-		wpos[1] = p[1] + shiftX
-		wpos[2] = p[2] + shiftY
-		r = TerminalScreen.Widgets.Solve:Rect()
-		r[1] = wpos[1]
-		r[2] = wpos[2]
-		BoundRect(r, TerminalScreen.ScreenBounds)
-		TerminalScreen.Widgets.Solve:SetRect(r)
+		TerminalScreen.Widgets.Glyph:SetRect(r)
 	end
 end
 
-function TerminalScreen.Touch(e)
+function TerminalScreen.CheckActivate(dt)
 
-	if (not Input.IsTouchBegin(e)) then
-		return false
-	end
-
-	local best
-	local bestDist
-	
-	for k,v in pairs(TerminalScreen.Objects) do
-		local r, dd = v:CheckTouch(e.data[1], e.data[2])
-		if (r) then
-			if ((bestDist==nil) or (dd < bestDist)) then
-				best = v
-				bestDist = dd
-			end
-		end
+	TerminalScreen.DT = TerminalScreen.DT + dt
+	if (TerminalScreen.DT < 0.25) then
+		return
 	end
 	
-	if (best) then
-		e = UI:MapInputEvent(e)
-		UI:AckFinger(e.data)
-		best:Touched()
-	end
+	TerminalScreen.DT = TerminalScreen.DT - 0.25
+
+	local playerPos = World.playerPawn:WorldPos()
 	
-	return (best ~= nil)
-end
-
-function TerminalScreen.CheckActivate(playerPos)
-
 	for k,v in pairs(TerminalScreen.Objects) do
 		v:CheckActive(playerPos)
 	end
 
 end
 
+function TerminalScreen.GlyphPressed()
+	local target = TerminalScreen.PopupEntity
+	World.playerPawn:Stop()
+	TerminalScreen.Active = target
+	local f = function()
+		World.playerPawn:EnterTerminal(target)
+	end
+	TerminalScreen.CancelUI(f)
+end
+
+function TerminalScreen.SolvePressed()
+	local f = function()
+		World.playerPawn:EnterSolveGame(TerminalScreen.Active)
+	end
+	TerminalScreen.HideUI(f)
+end
+
 function TerminalScreen.HackPressed()
-	Abducted.entity.eatInput = true -- during transition
+	local f = function()
+		World.playerPawn:EnterHackGame(TerminalScreen.Active)
+	end
+	TerminalScreen.HideUI(f)
+end
+
+function TerminalScreen.ShowUI()
+
+	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
+	TerminalScreen.Widgets.Hack.bkg:BlendTo({0,0,0,1}, 0.2)
+	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
+	TerminalScreen.Widgets.Solve.bkg:BlendTo({0,0,0,1}, 0.2)
+
+end
+
+function TerminalScreen.HideUI(callback)
+
+	TerminalScreen.Widgets.Hack:BlendTo({0,0,0,0}, 0.2)
+	TerminalScreen.Widgets.Hack.bkg:BlendTo({0,0,0,0}, 0.2)
+	TerminalScreen.Widgets.Solve:BlendTo({0,0,0,0}, 0.2)
+	TerminalScreen.Widgets.Solve.bkg:BlendTo({0,0,0,0}, 0.2)
+	
+	if (callback) then
+		World.gameTimers:Add(callback, 0.2, true)
+	end
+
+end
+
+function TerminalScreen.DoHackGame()
+	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
-	ReflexGame:InitGame("hack", 1, 1)
+	ReflexGame:InitGame(1, 1)
 	
-	local entity = TerminalScreen.PopupEntity
-	TerminalScreen.CancelUI()
-	
+	local entity = TerminalScreen.Active
+		
 	if (TerminalScreen.Skip) then
 		TerminalScreen.GameComplete(entity, "hack", true)
 	else
@@ -268,51 +319,67 @@ function TerminalScreen.HackPressed()
 	end
 end
 
-function TerminalScreen.SolvePressed()
-	Abducted.entity.eatInput = true -- during transition
+function TerminalScreen.DoSolveGame()
+	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
-	TerminalPuzzles:InitGame("solve", 1, 1)
+	MemoryGame:InitGame(1, 1)
 	
-	local entity = TerminalScreen.PopupEntity
-	TerminalScreen.CancelUI()
-	
-	TerminalScreen.GameComplete(entity, "solve", true)
+	local entity = TerminalScreen.Active
+		
+	if (TerminalScreen.Skip) then
+		TerminalScreen.GameComplete(entity, "solve", true)
+	else
+		local f = function ()
+			UI:BlendTo({0,0,0,0}, 0.3)
+			MemoryGame:ShowBoard(true)
+			
+			local f = function ()
+				local f = function(result)
+					TerminalScreen.GameComplete(entity, "solve", result)
+				end
+				Abducted.entity.eatInput = false
+				MemoryGame:StartGame(f)
+			end
+			
+			World.globalTimers:Add(f, 0.3, true)
+		end
+		
+		World.globalTimers:Add(f, 0.3, true)
+	end
 end
 
 function TerminalScreen.GameComplete(self, mode, result)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
 	local f = function()
-		Abducted.entity.eatInput = false
 		UI:BlendTo({0,0,0,0}, 0.3)
         ReflexGame:ShowBoard(false)
         ReflexGame:ResetGame()
+        MemoryGame:ShowBoard(false)
+        MemoryGame:ResetGame()
 		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.3, true)
 	
 	if (mode == "hack") then
-		if (result) then
-			if (self.keys.hack_success) then
-				World.PostEvent(self.keys.hack_success)
-			end
-		else
-			if (self.keys.hack_fail) then
-				World.PostEvent(self.keys.hack_fail)
-			end
+		World.playerPawn:LeaveHackGame(self, result)
+	else
+		World.playerPawn:LeaveSolveGame(self, result)
+	end
+end
+
+function TerminalScreen.PostHackEvents(self, result)
+
+	if (result) then
+		if (self.keys.hack_success) then
+			World.PostEvent(self.keys.hack_success)
 		end
 	else
-		if (result) then
-			if (self.keys.solve_success) then
-				World.PostEvent(self.keys.solve_success)
-			end
-		else
-			if (self.keys.solve_fail) then
-				World.PostEvent(self.keys.solve_fail)
-			end
+		if (self.keys.hack_fail) then
+			World.PostEvent(self.keys.hack_fail)
 		end
 	end
-	
+		
 	if (result) then
 		if (self.keys.success) then
 			World.PostEvent(self.keys.success)
@@ -322,10 +389,37 @@ function TerminalScreen.GameComplete(self, mode, result)
 			World.PostEvent(self.keys.fail)
 		end
 	end
+
+end
+
+function TerminalScreen.PostSolveEvents(self, result)
+
+	if (result) then
+		if (self.keys.solve_success) then
+			World.PostEvent(self.keys.solve_success)
+		end
+	else
+		if (self.keys.solve_fail) then
+			World.PostEvent(self.keys.solve_fail)
+		end
+	end
+
+	if (result) then
+		if (self.keys.success) then
+			World.PostEvent(self.keys.success)
+		end
+	else
+		if (self.keys.fail) then
+			World.PostEvent(self.keys.fail)
+		end
+	end
+
 end
 
 function TerminalScreen.StaticInit()
 
+	local typeface = World.Load("UI/TerminalScreenButtons_TF")
+		
 	-- Create buttons
 	local rect = {
 		0,
@@ -337,14 +431,14 @@ function TerminalScreen.StaticInit()
 	local w = UIPushButton:Create(
 		rect,
 		{
-			enabled = UI.gfx.TerminalHack,
-			pressed = UI.gfx.TerminalHackPressed
+			enabled = UI.gfx.AnimatedGlpyh,
+			pressed = UI.gfx.AnimatedGlpyhPressed
 		},
 		{
 			pressed = UI.sfx.Command
 		},
 		{
-			pressed = TerminalScreen.HackPressed
+			pressed = TerminalScreen.GlyphPressed
 		},
 		nil,
 		UI.widgets.interactive.Root
@@ -352,31 +446,9 @@ function TerminalScreen.StaticInit()
 	
 	w:SetHAlign(kHorizontalAlign_Center)
 	w:SetVAlign(kVerticalAlign_Center)
-	TerminalScreen.Widgets.Hack = w
-	
-	w = UIPushButton:Create(
-		rect,
-		{
-			enabled = UI.gfx.TerminalSolve,
-			pressed = UI.gfx.TerminalSolvePressed
-		},
-		{
-			pressed = UI.sfx.Command
-		},
-		{
-			pressed = TerminalScreen.SolvePressed
-		},
-		nil,
-		UI.widgets.interactive.Root
-	)
-	
-	w:SetHAlign(kHorizontalAlign_Center)
-	w:SetVAlign(kVerticalAlign_Center)
-	TerminalScreen.Widgets.Solve = w
-	
-	TerminalScreen.Widgets.Hack:ScaleTo({0, 0}, {0,0})
-	TerminalScreen.Widgets.Solve:ScaleTo({0, 0}, {0,0})
-	
+	w:ScaleTo({0,0}, {0,0})
+	TerminalScreen.Widgets.Glyph = w
+		
 	local bounds = 0.1
 	
 	TerminalScreen.ScreenBounds = {
@@ -386,14 +458,13 @@ function TerminalScreen.StaticInit()
 		UI.screenHeight - (bounds * UI.screenHeight)
 	}
 	
---[[	local w = UI:CreateStylePushButton(
+	local w = UI:CreateStylePushButton(
 		{0, 0, 8, 8},
-		TerminalScreen.HackPressed,
-		{ fontSize = "small" },
-		UI.widgets.interactive.Root
+		TerminalScreen.SolvePressed,
+		{ typeface=typeface, highlight={on={0,0,0,0}} }
 	)
 	
-	local text = StringTable.Get("TERMINAL_HACK")
+	local text = StringTable.Get("TERMINAL_SOLVE")
 	UI:SetLabelText(w.label, text)
 	local r = UI:SizeLabelToContents(w.label)
 	local buttonRect = ExpandRect(
@@ -402,19 +473,29 @@ function TerminalScreen.StaticInit()
 		12 * UI.identityScale[2]
 	)
 	
+	buttonRect[1] = UI.screenWidth * 0.46
+	buttonRect[2] = UI.screenHeight * 0.27
+	
 	w:SetRect(buttonRect)
-	w:SetHAlign(kHorizontalAlign_Center)
-	w:SetVAlign(kVerticalAlign_Center)
-	TerminalScreen.Widgets.Hack = w
+	w.highlight:SetRect({0,0,buttonRect[3], buttonRect[4]})
+	UI:CenterLabel(w.label, {0,0,buttonRect[3], buttonRect[4]})
+	w:BlendTo({0,0,0,0}, 0)
+	TerminalScreen.Widgets.Solve = w
+	
+	w = UI:CreateWidget("MatWidget", {rect=buttonRect, material=UI.gfx.Solid})
+	w:BlendTo({0,0,0,0}, 0)
+	w:SetBlendWithParent(true)
+	UI.widgets.interactive.Root:AddChild(w)
+	UI.widgets.interactive.Root:AddChild(TerminalScreen.Widgets.Solve)
+	TerminalScreen.Widgets.Solve.bkg = w
 	
 	w = UI:CreateStylePushButton(
 		{0, 0, 8, 8},
 		TerminalScreen.HackPressed,
-		{ fontSize = "small" },
-		UI.widgets.interactive.Root
+		{ typeface=typeface, highlight={on={0,0,0,0}} }
 	)
 	
-	text = StringTable.Get("TERMINAL_SOLVE")
+	text = StringTable.Get("TERMINAL_HACK")
 	UI:SetLabelText(w.label, text)
 	r = UI:SizeLabelToContents(w.label)
 	buttonRect = ExpandRect(
@@ -423,11 +504,22 @@ function TerminalScreen.StaticInit()
 		12 * UI.identityScale[2]
 	)
 	
-	w:SetRect(buttonRect)
-	w:SetHAlign(kHorizontalAlign_Center)
-	w:SetVAlign(kVerticalAlign_Center)
+	buttonRect[1] = UI.screenWidth * 0.41
+	buttonRect[2] = UI.screenHeight * 0.65
 	
-	TerminalScreen.Widgets.Solve = w--]]
+	w:SetRect(buttonRect)
+	w.highlight:SetRect({0,0,buttonRect[3], buttonRect[4]})
+	UI:CenterLabel(w.label, {0,0,buttonRect[3], buttonRect[4]})
+	w:BlendTo({0,0,0,0}, 0)
+	TerminalScreen.Widgets.Hack = w
+	
+	w = UI:CreateWidget("MatWidget", {rect=buttonRect, material=UI.gfx.Solid})
+	w:BlendTo({0,0,0,0}, 0)
+	w:SetBlendWithParent(true)
+	UI.widgets.interactive.Root:AddChild(w)
+	UI.widgets.interactive.Root:AddChild(TerminalScreen.Widgets.Hack)
+	TerminalScreen.Widgets.Hack.bkg = w
 end
+
 
 info_terminal = TerminalScreen

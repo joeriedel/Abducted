@@ -40,7 +40,7 @@ function MemoryGame.ShowBoard(self, show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function MemoryGame.InitGame(self, gameType, playerSkill, terminalSkill)
+function MemoryGame.InitGame(self, playerSkill, terminalSkill)
 	self = MemoryGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.

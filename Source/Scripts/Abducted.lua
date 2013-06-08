@@ -138,12 +138,12 @@ function Abducted.OnInputEvent(self, e)
     if (ReflexGame.active) then
         return false
     end
+    if (TerminalScreen.Active) then
+		return false
+	end
 	if (self.manipulate) then
 		return ManipulatableObjectUI:HandleInputEvent(e)
 	end
-	if (TerminalScreen.Touch(e)) then
-		return true
-    end
 	local handled, action = PlayerInput:OnInputEvent(e)
 	return handled
 end
@@ -152,14 +152,15 @@ function Abducted.OnInputGesture(self, g)
 	if (Arm.active) then
 		return false
 	end
-	
 	if (MemoryGame.active) then
 		return false
     end
-
     if (ReflexGame.active) then
         return false
     end
+	if (TerminalScreen.Active) then
+		return false
+	end
 	
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then
@@ -331,4 +332,5 @@ function Abducted.Think(self, dt)
 	
 	ManipulatableObjectUI:UpdateUI()
 	TerminalScreen.UpdateUI()
+	TerminalScreen.CheckActivate(dt)
 end

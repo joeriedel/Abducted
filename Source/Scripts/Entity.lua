@@ -24,8 +24,9 @@ end
 
 function Entity.SetRotation(self, angles)
 	local angleVertex = self:Angles()
-	angleVertex.pos = angles
+	angleVertex.pos = WrapAngles(angles)
 	self:SetAngles(angleVertex)
+	self:SetTargetAngles(angles)
 end
 
 function Entity.EnableFlags(self, flags, enable)
@@ -41,8 +42,9 @@ end
 
 function Entity.SetFacing(self, zAngle)
 	local angleVertex = self:Angles()
-	angleVertex.pos = {0, 0,  zAngle}
+	angleVertex.pos = {0, 0,  WrapAngle(zAngle)}
 	self:SetAngles(angleVertex)
+	self:SetTargetAngles(angleVertex.pos)
 end
 
 function Entity.SpawnFloorPosition(self)
@@ -55,9 +57,9 @@ function Entity.SpawnFloorPosition(self)
 	return fp
 end
 
-function Entity.FindFloor(self)
+function Entity.FindFloor(self, pos)
 
-	local a = self:WorldPos()
+	local a = pos or self:WorldPos()
 	return World.ClipToFloor(
 		{a[1], a[2], a[3] - 32},
 		{a[1], a[2], a[3] + 32}

@@ -22,7 +22,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		bbox = {mins = {-24, -24, -48}, maxs = {24, 24, 64}}
+		bbox = {mins = {-24, -24, 0}, maxs = {24, 24, 128}}
 	},
 	limp = {
 		idle = "limpidle",
@@ -36,9 +36,10 @@ PlayerPawn.AnimationStates = {
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
+		puzzle_default_choice = "puzzle_limp_choice",
 		speedScale = 0.7,
 		tapAdjust = -20, -- CheckTappedOn
-		bbox = {mins = {-28, -28, -48}, maxs = {28, 28, 16}},
+		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 96}},
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})
@@ -61,7 +62,7 @@ function PlayerPawn.Spawn(self)
 	self.model = World.Load("Characters/Eve")
 	self.model:SetRootController("BlendToController")
 	self.model.dm = self:AttachDrawModel(self.model)
-	self.model.dm:SetPos({0, 0, -48}) -- on floor
+	self.model.dm:SetPos({0, 0, 0}) -- on floor
 	self.model.handBone = self.model.dm:FindBone(PlayerPawn.HandBone)
 	
 	if (self.model.handBone == -1) then
@@ -83,7 +84,7 @@ function PlayerPawn.Spawn(self)
 	-- shield mesh
 	self.shield = World.Load("FX/shield1mesh")
 	self.shield.dm = self:AttachDrawModel(self.shield)
-	self.shield.dm:SetPos({0, 0, -48}) -- on floor
+	self.shield.dm:SetPos({0, 0, 0}) -- on floor
 	self.shield.dm:BlendTo({0,0,0,0}, 0)
 	self.shield.dm:ScaleTo({0,0,0}, 0)
 	self.shield.dm:SetBounds(self:Mins(), self:Maxs())
@@ -498,7 +499,7 @@ function PlayerPawn.CheckTappedOn(self, e)
 		local dx = screen[1] - e.data[1]
 		local dy = screen[2] - e.data[2]
 		local dd = math.sqrt(dx*dx + dy*dy)
-		local maxDist = UI.systemScreen.diagonal * 1/20
+		local maxDist = UI.systemScreen.diagonal * 0.7/20
 		if (dd <= maxDist) then
 			return true
 		end
@@ -580,9 +581,9 @@ function PlayerPawn.PlayCinematicAnim(self, args)
 				if (fp) then
 					self.validFloorPosition = true
 					self:SetFloorPosition(fp)
-					error("PlayerPawn.PlayCinematicAnim: walked off the floor.")
 				else
 					self.validFloorPosition = false
+					error("PlayerPawn.PlayCinematicAnim: walked off the floor.")
 				end
 			end
 			
@@ -657,6 +658,126 @@ function PlayerPawn.ExitArm(self)
 	local cameraMove = self:LookupAnimation("arm_default_flyout")
 	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
 
+end
+
+function PlayerPawn.EnterTerminal(self, terminal)
+
+	local fp = self:FloorPosition()
+	
+	if (fp.floor == -1) then
+		COutLine(kC_Debug, "ERROR: PlayerPawn.EngageTerminal: player must be on a floor!")
+		return
+	end
+	
+	-- move us relative to the terminal
+	local terminalPos = terminal:WorldPos()
+	local angle = terminal:Angles().pos[3]
+	local targetPos = RotateVecZ({140,0,0}, angle - 90)
+	
+	targetPos = VecAdd(targetPos, terminalPos)
+	fp = self:FindFloor(targetPos)
+	if (fp == nil) then
+		COutLine(kC_Debug, "ERROR: PlayerPawn.EngageTerminal: terminal->player position is not on a floor!")
+		return
+	end
+	
+	self:SetFloorPosition(fp)
+	self.validFloorPosition = true
+	
+	self:SetFacing(angle + 180 - 90)
+	
+	local anim = self:LookupAnimation("arm_pose_standing")
+	local cameraMove = self:LookupAnimation("puzzle_default_choice")
+	
+	World.PlayCinematic(cameraMove, bit.bor(kCinematicFlag_Loop, kCinematicFlag_AnimateCamera), 0, self)
+	
+	self.state = nil
+	self.disableAnimTick = true
+	self.model:BlendToState(anim)
+	self:Stop()
+	HUD:SetVisible(false)
+	
+	local f = function()
+		TerminalScreen.ShowUI()
+	end
+	
+	World.gameTimers:Add(f, 0.2, true)
+end
+
+function PlayerPawn.EnterHackGame(self, terminal)
+	local cameraMove = self:LookupAnimation("puzzle_default_choice")
+	World.StopCinematic(cameraMove)
+	
+	local callbacks = {
+		OnTag = function(self, tag)
+			if (tag == "@puzzle_transition") then
+				terminal:DoHackGame()
+			else
+				World.PostEvent(tag)
+			end
+		end
+	}
+	
+	cameraMove = self:LookupAnimation("puzzle_default_hack_flyin")
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
+	
+end
+
+function PlayerPawn.LeaveHackGame(self, terminal, result)
+
+	local callbacks = {
+		OnTag = function(self, tag)
+			World.PostEvent(tag)
+		end,
+		OnComplete = function()
+			self.disableAnimTick = false
+			TerminalScreen.Active = nil
+			Abducted.entity.eatInput = false
+			HUD:SetVisible(true)
+			terminal:PostHackEvents(result)
+		end
+	}
+
+	cameraMove = self:LookupAnimation("puzzle_default_hack_flyout")
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
+end
+
+function PlayerPawn.EnterSolveGame(self, terminal)
+	local cameraMove = self:LookupAnimation("puzzle_default_choice")
+	World.StopCinematic(cameraMove)
+	
+	local callbacks = {
+		OnTag = function(self, tag)
+			if (tag == "@puzzle_transition") then
+				terminal:DoSolveGame()
+			else
+				World.PostEvent(tag)
+			end
+		end
+	}
+	
+	cameraMove = self:LookupAnimation("puzzle_default_solve_flyin")
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
+	
+end
+
+function PlayerPawn.LeaveSolveGame(self, terminal)
+
+	local callbacks = {
+		OnTag = function(self, tag)
+			World.PostEvent(tag)
+		end,
+		OnComplete = function()
+			self.disableAnimTick = false
+			TerminalScreen.Active = nil
+			Abducted.entity.eatInput = false
+			HUD:SetVisible(true)
+			terminal:PostSolveEvents(terminal)
+		end
+	}
+
+	cameraMove = self:LookupAnimation("puzzle_default_solve_flyout")
+	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
 end
 
 function PlayerPawn.ShowShield(self, show)

@@ -98,6 +98,10 @@ function WrapAngles(angles)
 	return wrap
 end
 
+function WrapAngle(angle)
+	return math.fmod(angle, 360)
+end
+
 function DeltaAngles(x, y) -- returns shortest path
 	local delta = { 0, 0, 0 }
 	for i=1,3 do
@@ -196,6 +200,11 @@ function RotateVec(v, angles)
 	x = rotate(qy, x)
 	x = rotate(qz, x)
 	return x
+end
+
+function RotateVecZ(v, zAngles)
+	local q = QuatFromAxis({0,0,1}, zAngles)
+	return QuatRotateVec(q, v)
 end
 
 function ForwardVecFromAngles(angles)

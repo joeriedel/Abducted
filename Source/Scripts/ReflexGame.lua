@@ -35,7 +35,7 @@ function ReflexGame.ShowBoard(self, show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function ReflexGame.InitGame(self, gameType, playerSkill, terminalSkill)
+function ReflexGame.InitGame(self, playerSkill, terminalSkill)
 	self = ReflexGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.

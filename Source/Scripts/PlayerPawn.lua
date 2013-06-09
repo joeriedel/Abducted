@@ -806,7 +806,6 @@ function PlayerPawn.CustomAnimMove(self, name)
 		self.disableAnimTick = true
 		self.customMove = true
 		self.state = nil
-		self:EnableFlags(kPhysicsFlag_Friction, true)
 		local blend = self:PlayAnim(anim, self.model)
 		if (blend) then
 			blend.Seq(f)

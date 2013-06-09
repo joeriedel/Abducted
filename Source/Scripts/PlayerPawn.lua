@@ -96,7 +96,7 @@ function PlayerPawn.Spawn(self)
 	self.shieldSprite.dm:SetSpriteData(
 		self.shieldSprite.sprite,
 		{
-			pos = {0, 0, 18}, -- relative to drawmodel
+			pos = {0, 0, 68}, -- relative to drawmodel
 			size = {148, 158},
 			rgba = {1, 1, 1, 1},
 			rot = 0

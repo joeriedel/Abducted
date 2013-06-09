@@ -322,7 +322,7 @@ end
 function TerminalScreen.DoSolveGame()
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
-	MemoryGame:InitGame(1, 1)
+	ReflexGame:InitGame(1, 1)
 	
 	local entity = TerminalScreen.Active
 		
@@ -331,14 +331,14 @@ function TerminalScreen.DoSolveGame()
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
-			MemoryGame:ShowBoard(true)
+			ReflexGame:ShowBoard(true)
 			
 			local f = function ()
 				local f = function(result)
 					TerminalScreen.GameComplete(entity, "solve", result)
 				end
 				Abducted.entity.eatInput = false
-				MemoryGame:StartGame(f)
+				ReflexGame:StartGame(f)
 			end
 			
 			World.globalTimers:Add(f, 0.3, true)

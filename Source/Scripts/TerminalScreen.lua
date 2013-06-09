@@ -55,6 +55,8 @@ function TerminalScreen.Spawn(self)
 	
 	self.enabled = BoolForString(self.keys.enabled, false)
 	self.activateRadius = NumberForString(self.keys.activate_radius, 200)
+	self.hackDifficulty = NumberForString(self.keys.hack_difficulty, 1)
+	self.solveDifficulty = NumberForString(self.keys.solve_difficulty, 1)
 	self.active = false
 	self.popup = false
 	self.size = "small"
@@ -268,22 +270,21 @@ function TerminalScreen.HackPressed()
 	TerminalScreen.HideUI(f)
 end
 
-function TerminalScreen.ShowUI()
+function TerminalScreen.ShowUI(self)
 
-	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
-	TerminalScreen.Widgets.Hack.bkg:BlendTo({0,0,0,1}, 0.2)
+	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, self.solveDifficulty)
+	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Hack, self.hackDifficulty)
+	
 	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
-	TerminalScreen.Widgets.Solve.bkg:BlendTo({0,0,0,1}, 0.2)
-
+	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
+	
 end
 
 function TerminalScreen.HideUI(callback)
 
-	TerminalScreen.Widgets.Hack:BlendTo({0,0,0,0}, 0.2)
-	TerminalScreen.Widgets.Hack.bkg:BlendTo({0,0,0,0}, 0.2)
-	TerminalScreen.Widgets.Solve:BlendTo({0,0,0,0}, 0.2)
-	TerminalScreen.Widgets.Solve.bkg:BlendTo({0,0,0,0}, 0.2)
-	
+	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,0}, 0.2)
+	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,0}, 0.2)
+			
 	if (callback) then
 		World.gameTimers:Add(callback, 0.2, true)
 	end
@@ -419,7 +420,17 @@ end
 function TerminalScreen.StaticInit()
 
 	local typeface = World.Load("UI/TerminalScreenButtons_TF")
-		
+	
+	TerminalScreen.gfx = {}
+	TerminalScreen.gfx.Difficulty = {
+		World.Load("UI/puzzle_level1_M"),
+		World.Load("UI/puzzle_level2_M"),
+		World.Load("UI/puzzle_level3_M"),
+		World.Load("UI/puzzle_level4_M")
+	}
+	TerminalScreen.gfx.Button = World.Load("UI/puzzle_button_background1_M")
+	TerminalScreen.gfx.ButtonPressed = World.Load("UI/puzzle_button_background_pressed1_M")
+	
 	-- Create buttons
 	local rect = {
 		0,
@@ -458,67 +469,118 @@ function TerminalScreen.StaticInit()
 		UI.screenHeight - (bounds * UI.screenHeight)
 	}
 	
-	local w = UI:CreateStylePushButton(
+	local pos = nil
+	
+	pos = {
+		UI.screenWidth * 0.46,
+		UI.screenHeight * 0.27
+	}
+	
+	TerminalScreen.Widgets.Solve = TerminalScreen.CreateButton(
+		pos,
+		"TERMINAL_SOLVE",
+		typeface,
+		{ pressed = TerminalScreen.gfx.ButtonPressed, enabled = TerminalScreen.gfx.Button },
+		TerminalScreen.SolvePressed
+	)
+	
+	pos = {
+		UI.screenWidth * 0.41,
+		UI.screenHeight * 0.65
+	}
+	
+	TerminalScreen.Widgets.Hack = TerminalScreen.CreateButton(
+		pos,
+		"TERMINAL_HACK",
+		typeface,
+		{ pressed = TerminalScreen.gfx.ButtonPressed, enabled = TerminalScreen.gfx.Button },
+		TerminalScreen.HackPressed
+	)
+end
+
+function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
+
+	local bkgSize = { 315*0.8, 183*0.8 }
+	local inset = { 53*0.8, 47*0.8 }
+	local iconSize = (32*0.8)+8
+	
+	local content = {bkgSize[1]-(inset[1]*2), bkgSize[2]-(inset[2]*2)-iconSize}
+	
+	text = StringTable.Get(text)
+
+	local w = UIPushButton:Create(
 		{0, 0, 8, 8},
-		TerminalScreen.SolvePressed,
-		{ typeface=typeface, highlight={on={0,0,0,0}} }
+		{
+			enabled = gfx.enabled,
+			pressed = gfx.pressed
+		},
+		{
+			pressed = UI.sfx.Command
+		},
+		{
+			pressed=handler
+		},
+		{
+			highlight = {on={0,0,0,0}, off = {0,0,0,0}, overbright = {1,1,1,1}, time = 0.1, overbrightTime = 0.1},
+			label = {typeface=typeface}
+		},
+		UI.widgets.interactive.Root
 	)
 	
-	local text = StringTable.Get("TERMINAL_SOLVE")
 	UI:SetLabelText(w.label, text)
-	local r = UI:SizeLabelToContents(w.label)
-	local buttonRect = ExpandRect(
-		r, 
-		12 * UI.identityScale[1],
-		12 * UI.identityScale[2]
-	)
+	local r, d = UI:SizeLabelToContents(w.label)
 	
-	buttonRect[1] = UI.screenWidth * 0.46
-	buttonRect[2] = UI.screenHeight * 0.27
+	d[3] = d[3] - d[1]
+	d[4] = d[4] - d[2]
 	
-	w:SetRect(buttonRect)
-	w.highlight:SetRect({0,0,buttonRect[3], buttonRect[4]})
-	UI:CenterLabel(w.label, {0,0,buttonRect[3], buttonRect[4]})
-	w:BlendTo({0,0,0,0}, 0)
-	TerminalScreen.Widgets.Solve = w
+	-- expand button rect around text
+	r[1] = 0
+	r[2] = 0
 	
-	w = UI:CreateWidget("MatWidget", {rect=buttonRect, material=UI.gfx.Solid})
-	w:BlendTo({0,0,0,0}, 0)
-	w:SetBlendWithParent(true)
-	UI.widgets.interactive.Root:AddChild(w)
-	UI.widgets.interactive.Root:AddChild(TerminalScreen.Widgets.Solve)
-	TerminalScreen.Widgets.Solve.bkg = w
+	if (d[3] > content[1]) then
+		local z = d[3]/content[1]
+		bkgSize[1] = bkgSize[1] * z
+		inset[1] = inset[1] * z
+	end
 	
-	w = UI:CreateStylePushButton(
-		{0, 0, 8, 8},
-		TerminalScreen.HackPressed,
-		{ typeface=typeface, highlight={on={0,0,0,0}} }
-	)
+	r[3] = bkgSize[1]
 	
-	text = StringTable.Get("TERMINAL_HACK")
-	UI:SetLabelText(w.label, text)
-	r = UI:SizeLabelToContents(w.label)
-	buttonRect = ExpandRect(
-		r, 
-		12 * UI.identityScale[1],
-		12 * UI.identityScale[2]
-	)
+	if (d[4] > content[2]) then
+		local z = d[4]/content[2]
+		bkgSize[2] = bkgSize[2] * z
+		inset[2] = inset[2] * z
+	end
 	
-	buttonRect[1] = UI.screenWidth * 0.41
-	buttonRect[2] = UI.screenHeight * 0.65
+	r[4] = bkgSize[2]
+		
+	w:SetRect(r)
+	UI:MoveWidgetByCenter(w, center[1], center[2])
+	UI:MoveLabelNoPadd(w.label, nil, inset[2])
+	UI:HCenterLabel(w.label, r)
 	
-	w:SetRect(buttonRect)
-	w.highlight:SetRect({0,0,buttonRect[3], buttonRect[4]})
-	UI:CenterLabel(w.label, {0,0,buttonRect[3], buttonRect[4]})
-	w:BlendTo({0,0,0,0}, 0)
-	TerminalScreen.Widgets.Hack = w
+	local icon = UI:CreateWidget("MatWidget", {rect={0,0,8,8}})
+	icon:SetBlendWithParent(true)
+	w.icon = icon
+	w.iconPos = { r[3] / 2, r[4] - inset[2] - 4 }
+	w:AddChild(icon)
 	
-	w = UI:CreateWidget("MatWidget", {rect=buttonRect, material=UI.gfx.Solid})
-	w:BlendTo({0,0,0,0}, 0)
-	w:SetBlendWithParent(true)
-	UI.widgets.interactive.Root:AddChild(w)
-	UI.widgets.interactive.Root:AddChild(TerminalScreen.Widgets.Hack)
-	TerminalScreen.Widgets.Hack.bkg = w
+	w:BlendTo({1,1,1,0}, 0)
+	return w
+end
+
+function TerminalScreen.SetButtonDifficulty(button, difficulty)
+	
+	difficulty = Clamp(difficulty, 1, 4)
+	
+	local material = TerminalScreen.gfx.Difficulty[difficulty]
+	local d = material:Dimensions()
+	d[1] = d[1] * 0.8
+	d[2] = d[2] * 0.8
+	
+	button.icon:SetMaterial(material)
+	button.icon:SetRect({0,0,d[1],d[2]})
+	UI:MoveWidgetByCenter(button.icon, button.iconPos[1], button.iconPos[2])
+	
 end
 
 

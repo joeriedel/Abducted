@@ -61,8 +61,8 @@ function Entity.FindFloor(self, pos)
 
 	local a = pos or self:WorldPos()
 	return World.ClipToFloor(
-		{a[1], a[2], a[3] - 32},
-		{a[1], a[2], a[3] + 32}
+		{a[1], a[2], a[3] + 32},
+		{a[1], a[2], a[3] - 32}
 	)
 	
 end

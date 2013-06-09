@@ -698,7 +698,7 @@ function PlayerPawn.EnterTerminal(self, terminal)
 	HUD:SetVisible(false)
 	
 	local f = function()
-		TerminalScreen.ShowUI()
+		terminal:ShowUI()
 	end
 	
 	World.gameTimers:Add(f, 0.2, true)

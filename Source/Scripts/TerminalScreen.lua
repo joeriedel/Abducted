@@ -124,6 +124,7 @@ function TerminalScreen.EndActivated(self)
 	
 	if (self.size == "small") then
 		self:PlayAnim("idle", self.model)
+		self.state = "none"
 	end
 	
 end
@@ -136,17 +137,17 @@ function TerminalScreen.UpdateActivated(self)
 	
 	local dt = Game.time - self.activateTime
 	
-	if ((self.state == "none") and (dt > 1)) then
+	if ((self.state == "none") and (dt > 2)) then
 		self.state = "wiggle"
 		self:PlayAnim("wiggle1", self.model)
-	elseif ((self.state == "wiggle") and (dt > 3)) then
+	elseif ((self.state == "wiggle") and (dt > 5)) then
 		self.state = "flash1"
 		self.model.glow1:BlendTo({1,1,1,1}, 0.1)
-	elseif ((self.state == "flash1") and (dt > 5)) then
+	elseif ((self.state == "flash1") and (dt > 7)) then
 		self.state = "flash2"
 		self.model.glow2:BlendTo({1,1,1,1}, 0.1)
 		self.model.glow1:BlendTo({1,1,1,0}, 0.1)
-	elseif ((self.state == "flash2") and (dt > 7)) then
+	elseif ((self.state == "flash2") and (dt > 8)) then
 		self.state = "grow"
 		self.model.glow2:BlendTo({1,1,1,0}, 2)
 		self.size = "big"
@@ -469,28 +470,48 @@ function TerminalScreen.StaticInit()
 		UI.screenHeight - (bounds * UI.screenHeight)
 	}
 	
-	local pos = nil
+	local solvePos = nil
+	local hackPos = nil
 	
-	pos = {
-		UI.screenWidth * 0.46,
-		UI.screenHeight * 0.27
-	}
+	if (UI.systemScreen.aspect == "16x9") then
+		solvePos = {
+			677,
+			206
+		}
+		hackPos = {
+			587,
+			499
+		}
+	elseif (UI.systemScreen.aspect == "4x3") then
+		solvePos = {
+			543,
+			278
+		}
+		hackPos = {
+			474,
+			495
+		}
+	else
+		solvePos = {
+			523,
+			216
+		}
+		hackPos = {
+			447,
+			428
+		}
+	end
 	
 	TerminalScreen.Widgets.Solve = TerminalScreen.CreateButton(
-		pos,
+		solvePos,
 		"TERMINAL_SOLVE",
 		typeface,
 		{ pressed = TerminalScreen.gfx.ButtonPressed, enabled = TerminalScreen.gfx.Button },
 		TerminalScreen.SolvePressed
 	)
 	
-	pos = {
-		UI.screenWidth * 0.41,
-		UI.screenHeight * 0.65
-	}
-	
 	TerminalScreen.Widgets.Hack = TerminalScreen.CreateButton(
-		pos,
+		hackPos,
 		"TERMINAL_HACK",
 		typeface,
 		{ pressed = TerminalScreen.gfx.ButtonPressed, enabled = TerminalScreen.gfx.Button },
@@ -500,9 +521,9 @@ end
 
 function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
 
-	local bkgSize = { 315*0.8, 183*0.8 }
-	local inset = { 53*0.8, 47*0.8 }
-	local iconSize = (32*0.8)+8
+	local bkgSize = { 315*0.8*UI.identityScale[1], 183*0.8*UI.identityScale[2] }
+	local inset = { 53*0.8*UI.identityScale[1], 47*0.8*UI.identityScale[2] }
+	local iconSize = (32*0.8*UI.identityScale[1])+8
 	
 	local content = {bkgSize[1]-(inset[1]*2), bkgSize[2]-(inset[2]*2)-iconSize}
 	
@@ -537,20 +558,16 @@ function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
 	r[1] = 0
 	r[2] = 0
 	
-	if (d[3] > content[1]) then
-		local z = d[3]/content[1]
-		bkgSize[1] = bkgSize[1] * z
-		inset[1] = inset[1] * z
-	end
-	
+	local z = d[3]/content[1]
+	bkgSize[1] = bkgSize[1] * z
+	inset[1] = inset[1] * z
+		
 	r[3] = bkgSize[1]
 	
-	if (d[4] > content[2]) then
-		local z = d[4]/content[2]
-		bkgSize[2] = bkgSize[2] * z
-		inset[2] = inset[2] * z
-	end
-	
+	z = d[4]/content[2]
+	bkgSize[2] = bkgSize[2] * z
+	inset[2] = inset[2] * z
+		
 	r[4] = bkgSize[2]
 		
 	w:SetRect(r)

@@ -547,10 +547,6 @@ end
 function UI.HCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.invIdentityScale[1]
-	d[3] = d[3] * UI.invIdentityScale[1]
-	d[4] = d[4] * UI.invIdentityScale[2]
-	
 	local r = label:Rect()
 	
 	r[1] = rect[1] + ((rect[3]-(d[3]-d[1])) / 2) - d[1]
@@ -564,10 +560,6 @@ end
 function UI.VCenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[2] = d[2] * UI.invIdentityScale[2]
-	d[3] = d[3] * UI.invIdentityScale[1]
-	d[4] = d[4] * UI.invIdentityScale[2]
-	
 	local r = label:Rect()
 	
 	r[2] = rect[2] + ((rect[4]-(d[4]-d[2])) / 2) - d[2]
@@ -581,10 +573,6 @@ end
 function UI.CenterLabel(self, label, rect)
 
 	local d = label:Dimensions()
-	d[1] = d[1] * UI.invIdentityScale[1]
-	d[2] = d[2] * UI.invIdentityScale[2]
-	d[3] = d[3] * UI.invIdentityScale[1]
-	d[4] = d[4] * UI.invIdentityScale[2]
 	
 	local r = {
 		rect[1] + ((rect[3]-(d[3]-d[1])) / 2) - d[1],
@@ -602,11 +590,11 @@ function UI.MoveLabelNoPadd(self, label, x, y)
 	local r = label:Rect()
 	
 	if (x) then
-		r[1] = x - (d[1] * UI.invIdentityScale[1])
+		r[1] = x - d[1]
 	end
 	
 	if (y) then
-		r[2] = y - (d[2] * UI.invIdentityScale[2])
+		r[2] = y - d[2]
 	end
 	
 	label:SetRect(r)
@@ -871,12 +859,11 @@ function UI.SizeLabelToContents(self, label, x, y)
 	
 	r[1] = x
 	r[2] = y
-	r[3] = (d[3] + d[1]) * UI.invIdentityScale[1]
-	r[4] = (d[4] + d[2]) * UI.invIdentityScale[2]
+	r[3] = (d[3] + d[1])
+	r[4] = (d[4] + d[2])
 	
 	label:SetRect(r)
-	return r, {d[1]*UI.invIdentityScale[1], d[2]*UI.invIdentityScale[2], d[3]*UI.invIdentityScale[1], d[4]*UI.invIdentityScale[2]}
-
+	return r, {d[1], d[2], d[3], d[4]}
 end
 
 function UI.SetLabelText(self, label, text, fontScale)

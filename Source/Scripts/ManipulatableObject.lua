@@ -496,12 +496,12 @@ end
 function ManipulatableObject.SelectColor(self)
 		
 	if (self.skillRequired > PlayerSkills.Manipulate+1) then
-		return {1,0,0,1}
+		return {1,0.5,0.5,1}
 	elseif (self.skillRequired <= PlayerSkills.Manipulate) then
-		return {0,1,0,1}
+		return {0.5,1,0.5,1}
 	end
 	
-	return {1,1,0,1}
+	return {1,1,0.5,1}
 end
 
 function ManipulatableObject.FindSwipeTarget(g)

@@ -174,7 +174,7 @@ end
 
 function UI.CreateInteractiveLayer(self)
 	self.widgets.interactive = {}
-	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive)
+	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive, UI.InteractiveLayerOnInputEvent)
 end
 
 function UI.CreateFeedbackLayer(self)
@@ -289,6 +289,20 @@ function UI.CreateWidget(self, type, parms)
 	end
 	
 	return w
+end
+
+function UI.InteractiveLayerOnInputEvent(widget, e)
+	if (TerminalScreen.Active) then
+		if (e.type == kI_KeyDown) then
+			if (e.data[1] == kKeyCode_Escape) then
+				UI.sfx.Command:Play(kSoundChannel_UI, 0)
+				TerminalScreen.ReturnPressed()
+				return true
+			end
+		end
+	end
+	
+	return false
 end
 
 --[[---------------------------------------------------------------------------

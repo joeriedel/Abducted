@@ -271,6 +271,13 @@ function TerminalScreen.HackPressed()
 	TerminalScreen.HideUI(f)
 end
 
+function TerminalScreen.ReturnPressed()
+	local f = function()
+		World.playerPawn:LeaveTerminal()
+	end
+	TerminalScreen.HideUI(f)
+end
+
 function TerminalScreen.ShowUI(self)
 
 	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, self.solveDifficulty)
@@ -278,6 +285,7 @@ function TerminalScreen.ShowUI(self)
 	
 	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
 	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
+	TerminalScreen.Widgets.Return:BlendTo({1,1,1,1}, 0.2)
 	
 end
 
@@ -285,6 +293,7 @@ function TerminalScreen.HideUI(callback)
 
 	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,0}, 0.2)
 	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,0}, 0.2)
+	TerminalScreen.Widgets.Return:BlendTo({1,1,1,0}, 0.2)
 			
 	if (callback) then
 		World.gameTimers:Add(callback, 0.2, true)
@@ -517,6 +526,9 @@ function TerminalScreen.StaticInit()
 		{ pressed = TerminalScreen.gfx.ButtonPressed, enabled = TerminalScreen.gfx.Button },
 		TerminalScreen.HackPressed
 	)
+	
+	TerminalScreen.Widgets.Return = TerminalScreen.CreateReturnArrow(TerminalScreen.ReturnPressed)
+	
 end
 
 function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
@@ -583,6 +595,31 @@ function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
 	
 	w:BlendTo({1,1,1,0}, 0)
 	return w
+end
+
+function TerminalScreen.CreateReturnArrow(handler)
+
+	local w = UIPushButton:Create(
+		{0, 0, 125*UI.identityScale[1], 62.5*UI.identityScale[2]},
+		{
+			enabled = World.Load("UI/return_arrow_M"),
+			pressed = World.Load("UI/return_arrow_pressed_M")
+		},
+		{
+			pressed = UI.sfx.Command
+		},
+		{
+			pressed=handler
+		},
+		{
+			highlight = {on={0,0,0,0}, off = {0,0,0,0}, overbright = {1,1,1,1}, time = 0.1, overbrightTime = 0.1},
+		},
+		UI.widgets.interactive.Root
+	)
+	w:BlendTo({1,1,1,0}, 0)
+	
+	return w
+
 end
 
 function TerminalScreen.SetButtonDifficulty(button, difficulty)

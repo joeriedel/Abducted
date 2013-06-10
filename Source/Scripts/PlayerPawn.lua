@@ -780,6 +780,16 @@ function PlayerPawn.LeaveSolveGame(self, terminal)
 	World.PlayCinematic(cameraMove, kCinematicFlag_AnimateCamera, 0, self, Game.entity, callbacks)
 end
 
+function PlayerPawn.LeaveTerminal(self)
+	local cameraMove = self:LookupAnimation("puzzle_default_choice")
+	World.StopCinematic(cameraMove)
+	self.disableAnimTick = false
+	TerminalScreen.Active:PopupUI()
+	TerminalScreen.Active = nil
+	Abducted.entity.eatInput = false
+	HUD:SetVisible(true)
+end
+
 function PlayerPawn.ShowShield(self, show)
 	if (show and self.shieldActive) then
 		self.shield.dm:SetVisbile(show)

@@ -63,6 +63,6 @@ function Input.IsTouchMove(e, touch)
 end
 
 function Input.IsTouchEvent(e)
-	return I_IsTouch(e)
+	return I_IsTouch(e) or I_IsMouse(e)
 end
 

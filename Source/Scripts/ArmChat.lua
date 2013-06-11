@@ -214,7 +214,7 @@ function Arm.ChatPrompt(self)
 	-- how many lines?
 	self.promptState = {}
 	self.promptState.line = 1
-	self.promptState.char = 1 -- always start with actual prompt text
+	self.promptState.char = 0 -- utf32
 	self.promptState.lines = UI:WordWrap(
 		self.typefaces.Chat, 
 		self.promptText, 
@@ -240,6 +240,9 @@ function Arm.ChatPrompt(self)
 		w:AllocateText(v)
 		table.insert(self.promptState.labels, w)
 		self.chatPos[2] = self.chatPos[2] + promptLineSize
+		
+		-- convert prompt text to UTF32 so we can reveal character by character in extended character sets
+		self.promptState.lines[k] = System.UTF8To32(v)
 	end
 
 	self.widgets.chat.ChatList:RecalcLayout()
@@ -289,17 +292,17 @@ function Arm.AnimatePrompt(self)
 end
 
 function Arm.TickPrompt(self)
-	local str = self.promptState.lines[self.promptState.line]
+	local utf32 = self.promptState.lines[self.promptState.line]
 	local w = self.promptState.labels[self.promptState.line]
 	
-	self.promptState.char = self.promptState.char + 1
+	self.promptState.char = self.promptState.char + 4 -- utf32
 		
-	if (self.promptState.char > str:len()) then
+	if (self.promptState.char > utf32:len()) then
 		w:Unmap() -- mark for gc
 		self.promptState.labels[self.promptState.line] = nil
 		
 		-- next line
-		self.promptState.char = 1
+		self.promptState.char = 4 -- utf32
 		self.promptState.line = self.promptState.line + 1
 		
 		if (self.promptState.line > #self.promptState.lines) then
@@ -321,12 +324,13 @@ function Arm.TickPrompt(self)
 			return
 		end
 		
-		str = self.promptState.lines[self.promptState.line]
+		utf32 = self.promptState.lines[self.promptState.line]
 		w = self.promptState.labels[self.promptState.line]
 	end
 	
-	str = str:sub(1, self.promptState.char)
-	UI:SetLabelText(w, str)
+	utf32 = utf32:sub(1, self.promptState.char)
+	local utf8 = System.UTF32To8(utf32)
+	UI:SetLabelText(w, utf8)
 end
 
 function Arm.DisplayChatLockout(self)

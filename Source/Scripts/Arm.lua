@@ -48,7 +48,7 @@ function Arm.SpawnShared(self)
 	self.gfx.LogTab = World.Load("UI/tab-selection-log_M")
 	self.gfx.LogTabPressed = World.Load("UI/tab-selection-log-pressed_M")
 	self.gfx.CharPortrait = World.Load(GameDB.portrait)
-	self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
+--self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
 	
 	self.typefaces = {}
 	

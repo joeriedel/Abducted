@@ -152,6 +152,20 @@ function UI.LoadShared(self)
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
 	
+	if (UI.mode == kGameUIMode_PC) then
+		self.gfx.VScrollBar = {
+			Arrow = World.Load("UI/scroll_arrow_M"),
+			ArrowPressed = World.Load("UI/scroll_arrow_pressed_M"),
+			Track = World.Load("UI/scroll_track_M"),
+			Thumb = World.Load("UI/scroll_thumb_M"),
+			ThumbPressed = World.Load("UI/scroll_thumb_pressed_M"),
+			ThumbTop = World.Load("UI/scroll_thumb_top_M"),
+			ThumbTopPressed = World.Load("UI/scroll_thumb_top_pressed_M"),
+			ThumbBottom = World.Load("UI/scroll_thumb_bottom_M"),
+			ThumbBottomPressed = World.Load("UI/scroll_thumb_bottom_pressed_M")
+		}
+	end
+	
 	self.typefaces.StandardButton = World.Load("UI/StandardButton_TF")
 	self.typefaces.StandardButtonDark = World.Load("UI/StandardButtonDark_TF")
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
@@ -848,11 +862,29 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 	return r
 end
 
+function UI.CreateVListWidgetScrollBar(self, widget, width, arrowHeight, minThumbSize)
+	widget:CreateVerticalScrollBar(
+		width,
+		arrowHeight,
+		minThumbSize,
+		UI.gfx.VScrollBar.Arrow,
+		UI.gfx.VScrollBar.ArrowPressed,
+		UI.gfx.VScrollBar.Track,
+		UI.gfx.VScrollBar.ThumbTop,
+		UI.gfx.VScrollBar.ThumbTopPressed,
+		UI.gfx.VScrollBar.Thumb,
+		UI.gfx.VScrollBar.ThumbPressed,
+		UI.gfx.VScrollBar.ThumbBottom,
+		UI.gfx.VScrollBar.ThumbBottomPressed
+	)
+	widget:SetWheelDelta(32)
+	widget:SetAutoScrollSpeed(32)
+	widget:SetAutoFadeScrollBar(true)
+end
+
 --[[---------------------------------------------------------------------------
 	Fonts are unaware of our UI scaling
 -----------------------------------------------------------------------------]]
-
-
 function UI.SizeLabelToContents(self, label, x, y)
 
 	local d = label:Dimensions()

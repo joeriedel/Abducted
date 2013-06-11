@@ -20,7 +20,7 @@ function World.OnInputEvent(e)
 		return true
 	end
 	
-	if Input.IsTouchEvent(e) or (e.type == kI_MouseDown or e.type == kI_MouseUp) or (e.type == kI_KeyDown) then
+	if Input.IsTouchEvent(e) or (e.type == kI_KeyDown) then
 		if (Game.entity:OnInputEvent(e)) then
 			return true
 		end
@@ -49,19 +49,20 @@ function Input.Spawn(self)
 end
 
 function Input.IsTouchBegin(e)
-	return (e.type == kI_TouchBegin)
+	return (e.type == kI_TouchBegin) or ((e.type == kI_MouseDown) and (e.data[3] == kMouseButton_LMask))
 end
 
 function Input.IsTouchEnd(e, touch)
 	return ((touch == nil) or (e.touch == touch)) and 
-		((e.type == kI_TouchEnd) or (e.type == kI_TouchCancelled))
+		((e.type == kI_TouchEnd) or (e.type == kI_TouchCancelled) or 
+		 ((e.type == kI_MouseUp) and (e.data[3] == kMouseButton_LMask)))
 end
 
 function Input.IsTouchMove(e, touch)
-	return  (e.touch == touch) and (e.type == kI_TouchMoved)
+	return  (e.touch == touch) and ((e.type == kI_TouchMoved) or ((e.type == kI_MouseMove) and (e.data[3] == kMouseButton_LMask)))
 end
 
 function Input.IsTouchEvent(e)
-	return (e.type == kI_TouchBegin) or (e.type == kI_TouchEnd) or (e.type == kI_TouchMoved) or (e.type == kI_TouchStationary) or (e.type == kI_TouchCancelled)	
+	return I_IsTouch(e)
 end
 

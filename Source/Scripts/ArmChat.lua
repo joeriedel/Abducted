@@ -17,7 +17,7 @@ function Arm.SpawnChat(self)
 
 	self.widgets.chat = {}
 	self.widgets.chat.Root = UI:CreateWidget("Widget", {rect=self.workspaceLeftSize})
-	self.widgets.chat.Root:SetVisible(false)
+	self.widgets.chat.Root:BlendTo({1,1,1,0},0)
 	self.widgets.WorkspaceLeft:AddChild(self.widgets.chat.Root)
 	
 	self.chatRect = {
@@ -28,6 +28,18 @@ function Arm.SpawnChat(self)
 	}
 	
 	self.widgets.chat.ChatList = UI:CreateWidget("VListWidget", {rect=self.chatRect})
+	
+	if (UI.mode == kGameUIMode_PC) then
+		UI:CreateVListWidgetScrollBar(
+			self.widgets.chat.ChatList,
+			24,
+			24,
+			8
+		)
+		
+		self.chatRect[3] = self.chatRect[3] - 24
+	end
+	
 	self.widgets.chat.ChatList:SetClipRect({
 		self.chatRect[1] + (Arm.ChatClipAdjust[1]*UI.identityScale[1]), 
 		self.chatRect[2] + (Arm.ChatClipAdjust[2]*UI.identityScale[2]), 
@@ -43,15 +55,13 @@ end
 
 function Arm.ResetChat(self)
 	GameDB:CheckChatLockout()
-	self.widgets.chat.Root:SetVisible(false)
-	self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
+	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0)
 end
 
 function Arm.StartChat(self)
 	if (not GameDB.chatLockout) then
 		Arm:SwapToChange()
-		self.widgets.chat.Root:SetVisible(true)
-		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0)
+		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0.2)
 		self.changeConversationCount = 0
 		Arm:StartConversation()
 	else
@@ -62,7 +72,7 @@ end
 function Arm.EndChat(self, callback)
 	Arm:SwapToTalk()
 	
-	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.2)
+	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0.2)
 	
 	if (GameDB.chatLockout) then
 		Arm:ShowSymbol(false, 0.2)
@@ -70,7 +80,6 @@ function Arm.EndChat(self, callback)
 	
 	local f = function()
 		Arm:ClearChat()
-		self.widgets.chat.Root:SetVisible(false)
 		callback()
 	end
 	
@@ -321,7 +330,7 @@ function Arm.TickPrompt(self)
 end
 
 function Arm.DisplayChatLockout(self)
-	self.widgets.chat.Root:BlendTo({0,0,0,0}, 0.5)
+	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0.5)
 		
 	local f = function()
 		self.armLockTimer = nil

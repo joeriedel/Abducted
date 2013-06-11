@@ -57,7 +57,7 @@ function Arm.SpawnDiscoveriesDB(self)
 	self.widgets.db.Root:AddChild(self.widgets.db.DiscoveriesRoot)
 	self.widgets.db.DiscoveriesRoot:SetBlendWithParent(true)
 	
-	local rect = UI:MaterialSize(self.gfx.DiscoveriesScrollBar)
+--[[	local rect = UI:MaterialSize(self.gfx.DiscoveriesScrollBar)
 	local h = self.discoveriesDBWorkspaceSize[4]
 	local scale = h / rect[4]
 	rect[4] = h
@@ -68,17 +68,29 @@ function Arm.SpawnDiscoveriesDB(self)
 	self.widgets.db.DiscoveriesScrollBar = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.DiscoveriesScrollBar})
 	self.widgets.db.DiscoveriesRoot:AddChild(self.widgets.db.DiscoveriesScrollBar)
 	self.widgets.db.DiscoveriesScrollBar:SetBlendWithParent(true)
+]]
 	
 	self.discoveriesDBArea = {
 		0,
 		0,
-		rect[1] - (4 * UI.identityScale[1]),
+		self.discoveriesDBWorkspaceSize[3] - (4 * UI.identityScale[1]),
 		self.discoveriesDBWorkspaceSize[4]
 	}
 	
 	self.widgets.db.Discoveries = UI:CreateWidget("VListWidget", {rect=self.discoveriesDBArea})
 	self.widgets.db.DiscoveriesRoot:AddChild(self.widgets.db.Discoveries)
 	self.widgets.db.Discoveries:SetBlendWithParent(true)
+	
+	if (UI.mode == kGameUIMode_PC) then
+		UI:CreateVListWidgetScrollBar(
+			self.widgets.db.Discoveries,
+			24,
+			24,
+			8
+		)
+		self.discoveriesDBArea[3] = self.discoveriesDBArea[3] - 24
+	end
+	
 	self.widgets.db.Discoveries:SetClipRect(self.discoveriesDBArea)
 	self.widgets.db.Discoveries:SetEndStops({0, self.discoveriesDBArea[4]*0.1})
 	

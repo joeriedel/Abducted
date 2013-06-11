@@ -53,6 +53,7 @@ function PlayerPawn.Spawn(self)
 	
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	self:SetLightInteractionFlags(kLightInteractionFlag_Player)
+	self:SetCameraShift({0,0,64})
 	
 	MakeAnimatable(self)
 	

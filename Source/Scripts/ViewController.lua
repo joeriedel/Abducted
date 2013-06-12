@@ -56,9 +56,9 @@ function ViewController.HandleCameraCmd(self, args)
 		
 	local camera = x[1]
 	local distance = tonumber(x[2])
-	local strict = not FindArrayElement(x, "strict=false")
+	local strict = FindArrayElement(x, "strict=true")
 	local useFOV = not FindArrayElement(x, "fov=false")
-	local forceBehind = not FindArrayElement(x, "behind=false")
+	local forceBehind = FindArrayElement(x, "behind=true")
 	local angles = {0, 180, 180}
 	
 	local fixedLook = FindArrayElement(x, "look=fixed")

@@ -91,7 +91,7 @@ function HUD.Load(self)
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
 		{pressed = self.gfx.ArmPressed, enabled = self.gfx.Arm},
 		nil,
-		{pressed=function (widget) HUD:ArmPressed(widget) end},
+		{pressed=function (widget) HUD:ArmPressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -104,7 +104,7 @@ function HUD.Load(self)
 			pressed = self.gfx.ManipulateDisabled
 		},
 		nil,
-		{pressed=function (widget) HUD:ManipulatePressed(widget) end},
+		{pressed=function (widget) HUD:ManipulatePressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -127,7 +127,7 @@ function HUD.Load(self)
 			pressed = self.gfx.ShieldDisabled
 		},
 		nil,
-		{pressed=function (widget) HUD:ShieldPressed(widget) end},
+		{pressed=function (widget) HUD:ShieldPressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -148,7 +148,7 @@ function HUD.Load(self)
 			pressed = self.gfx.PulseDisabled
 		},
 		nil,
-		{pressed=function (widget) HUD:PulsePressed(widget) end},
+		{pressed=function (widget) HUD:PulsePressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -178,6 +178,7 @@ function HUD.Load(self)
 	
 	self.widgets.Pulse.flashing = false
 	
+	self.visible = true
 	self.armEnabled = false
 	self.manipulateEnabled = false
 	self.shieldEnabled = false
@@ -225,7 +226,7 @@ function HUD.Load(self)
 	self.widgets.Root:AddChild(self.widgets.PulseShimmer)
 end
 
-function HUD.ArmPressed(self, widget)
+function HUD.ArmPressed(self)
 	COutLine(kC_Debug, "Arm Pressed!")
 	if (Game.entity.manipulate or Game.entity.pulse) then
 		return
@@ -233,20 +234,30 @@ function HUD.ArmPressed(self, widget)
 	World.playerPawn:EnterArm()
 end
 
-function HUD.ManipulatePressed(self, widget)
+function HUD.ManipulatePressed(self)
+	COutLine(kC_Debug, "Manipulate Pressed!")
 	if (Game.entity.pulse) then
 		return
 	end
 	Game.entity:BeginManipulate()
 end
 
-function HUD.ShieldPressed(self, widget)
+function HUD.ShieldPressed(self)
+	COutLine(kC_Debug, "Shield Pressed!")
 	if (World.playerPawn.shieldActive) then
 		HUD:ExpireShield()
 		return
 	end
 	
 	HUD:BeginShield()
+end
+
+function HUD.PulsePressed(self)
+	COutLine(kC_Debug, "Pulse Pressed!")
+	if (Game.entity.manipulate) then
+		return
+	end
+	Game.entity:BeginPulse()
 end
 
 function HUD.BeginShield(self, gameTime)
@@ -283,14 +294,6 @@ function HUD.BeginShield(self, gameTime)
 	
 	self.shieldTimer = World.globalTimers:Add(f, 0)
 	
-end
-
-function HUD.PulsePressed(self, widget)
-	COutLine(kC_Debug, "Pulse Pressed!")
-	if (Game.entity.manipulate) then
-		return
-	end
-	Game.entity:BeginPulse()
 end
 
 -- djr, not sure if this is right or will work
@@ -990,6 +993,38 @@ function HUD.Disable(self)
 	HUD:EnableShield(false)
 	HUD:EnablePulse(false)
 	
+end
+
+function HUD.HandleAction(self, action)
+	if (action == kAction_Arm) then
+		if (HUD.enabled and HUD.visible and self.armEnabled and self.widgets.Arm.enabled) then
+			self:ArmPressed()
+		end
+		return true
+	end
+	
+	if (action == kAction_Manipulate) then
+		if (HUD.enabled and HUD.visible and self.manipulateEnabled and self.widgets.Manipulate.enabled) then
+			self:ManipulatePressed()
+		end
+		return true
+	end
+	
+	if (action == kAction_Shield) then
+		if (HUD.enabled and HUD.visible and self.shieldEnabled and self.widgets.Shield.enabled) then
+			self:ShieldPressed()
+		end
+		return true
+	end
+	
+	if (action == kAction_Pulse) then
+		if (HUD.enabled and HUD.visible and self.pulseEnabled and self.widgets.Pulse.enabled) then
+			self:PulsePressed()
+		end
+		return true
+	end
+	
+	return false
 end
 
 function HUD.SaveManipulateState(self)

@@ -33,10 +33,8 @@ function ManipulatableObjectUI.NotifyObject(self, object, enabled)
 	
 end
 
-function ManipulatableObjectUI.HandleInputEvent(self, e)
-	if (UI.mode == kGameUIMode_Mobile) then
-		return false
-	end
+function ManipulatableObjectUI.HandleAction(self, action)
+	
 	
 end
 

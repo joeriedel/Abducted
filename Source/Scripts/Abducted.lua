@@ -142,11 +142,11 @@ function Abducted.OnInputEvent(self, e)
     if (TerminalScreen.Active) then
 		return false
 	end
-	local handled, action = self:InputKeyAction(e)
-	if (action) then
-		return handled
+	local handled = self:InputKeyAction(e)
+	if (handled) then
+		return true
 	end
-	handled, action = PlayerInput:OnInputEvent(e)
+	local handled, action = PlayerInput:OnInputEvent(e)
 	return handled
 end
 
@@ -177,8 +177,37 @@ function Abducted.OnInputGesture(self, g)
 	return PlayerInput:OnInputGesture(g)
 end
 
-function Abducted.InputKeyAction(e)
-	return false, false
+function Abducted.InputKeyAction(self, e)
+	if (UI.mode == kGameUIMode_Mobile) then
+		return false
+	end
+	
+	if (e.type == kI_KeyUp) then
+		return true
+	end
+	if (e.type ~= kI_KeyDown) then
+		return false
+	end
+	
+	local action = Abducted.KeyBindings.KeyToAction[e.data[1]]
+	if (action == nil) then
+		return false
+	end
+	
+	if (action == kAction_Stop) then
+		World.playerPawn:Stop()
+		return true
+	end
+	
+	if (ManipulatableObjectUI:HandleAction(action)) then
+		return true
+	end
+	
+	if (HUD:HandleAction(action)) then
+		return true
+	end
+
+	return true
 end
 
 function Abducted.BeginManipulate(self)

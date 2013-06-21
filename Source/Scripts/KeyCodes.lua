@@ -3,6 +3,12 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
+--[[
+NOTES: Not all the keys here are physical keys, this list contains physical keys and translated keys
+(i.e. keys that are generated via modifiers). Only physical keys are contained in the string table for
+UI display of the key-name. The OS generates the actual unicode text for the key when pressed (i.e WM_CHAR)
+]]--
+
 kKeyCode_None        = 0
 kKeyCode_Backspace   = 8
 kKeyCode_Tab         = 9
@@ -147,5 +153,116 @@ kKeyCode_Break      = 318
 kKeyCode_Menu       = 319
 kKeyCode_Max 		= 320
 
+PhysicalKeyToStringIdTable = {
+	[kKeyCode_Backspace] = "VKEY_BACKSPACE",
+	[kKeyCode_Tab] = "VKEY_TAB",
+	[kKeyCode_Clear] = "VKEY_CLEAR",
+	[kKeyCode_Return] = "VKEY_RETURN",
+	[kKeyCode_Pause] = "VKEY_PAUSE",
+	[kKeyCode_Escape] = "VKEY_ESCAPE",
+	[kKeyCode_Space] = "VKEY_SPACE",
+	[kKeyCode_Period] = "VKEY_PERIOD",
+	[kKeyCode_Slash] = "VKEY_FORWARDSLASH",
+	[kKeyCode_Semicolon] = "VKEY_SEMICOLON",
+	[kKeyCode_BracketLeft] = "VKEY_BRACKETLEFT",
+	[kKeyCode_BackSlash] = "VKEY_BACKSLASH",
+	[kKeyCode_BracketRight] = "VKEY_BRACKETRIGHT",
+	[kKeyCode_BackQuote] = "VKEY_BACKQUOTE",
+	[kKeyCode_A] = "VKEY_A",
+	[kKeyCode_B] = "VKEY_B",
+	[kKeyCode_C] = "VKEY_C",
+	[kKeyCode_D] = "VKEY_D",
+	[kKeyCode_E] = "VKEY_E",
+	[kKeyCode_F] = "VKEY_F",
+	[kKeyCode_G] = "VKEY_G",
+	[kKeyCode_H] = "VKEY_H",
+	[kKeyCode_I] = "VKEY_I",
+	[kKeyCode_J] = "VKEY_J",
+	[kKeyCode_K] = "VKEY_K",
+	[kKeyCode_L] = "VKEY_L",
+	[kKeyCode_M] = "VKEY_M",
+	[kKeyCode_N] = "VKEY_N",
+	[kKeyCode_O] = "VKEY_O",
+	[kKeyCode_P] = "VKEY_P",
+	[kKeyCode_Q] = "VKEY_Q",
+	[kKeyCode_R] = "VKEY_R",
+	[kKeyCode_S] = "VKEY_S",
+	[kKeyCode_T] = "VKEY_T",
+	[kKeyCode_U] = "VKEY_U",
+	[kKeyCode_V] = "VKEY_V",
+	[kKeyCode_W] = "VKEY_W",
+	[kKeyCode_X] = "VKEY_X",
+	[kKeyCode_Y] = "VKEY_Y",
+	[kKeyCode_Z] = "VKEY_Z",
+	[kKeyCode_Delete] = "VKEY_DELETE",
+	[kKeyCode_KP0] = "VKEY_KP0",
+	[kKeyCode_KP1] = "VKEY_KP1",
+	[kKeyCode_KP2] = "VKEY_KP2",
+	[kKeyCode_KP3] = "VKEY_KP3",
+	[kKeyCode_KP3] = "VKEY_KP4",
+	[kKeyCode_KP4] = "VKEY_KP5",
+	[kKeyCode_KP5] = "VKEY_KP6",
+	[kKeyCode_KP6] = "VKEY_KP7",
+	[kKeyCode_KP7] = "VKEY_KP8",
+	[kKeyCode_KP8] = "VKEY_KP9",
+	[kKeyCode_KP_Period] = "VKEY_KP_PERIOD",
+	[kKeyCode_KP_Divide] = "VKEY_KP_SLASH",
+	[kKeyCode_KP_Multiply] = "VKEY_KP_MULTIPLY",
+	[kKeyCode_KP_Plus] = "VKEY_KP_PLUS",
+	[kKeyCode_KP_Enter] = "VKEY_KP_ENTER",
+	[kKeyCode_KP_Equals] = "VKEY_KP_EQUALS",
+	[kKeyCode_Up] = "VKEY_UP",
+	[kKeyCode_Down] = "VKEY_DOWN",
+	[kKeyCode_Right] = "VKEY_RIGHT",
+	[kKeyCode_Left] = "VKEY_LEFT",
+	[kKeyCode_Insert] = "VKEY_INSERT",
+	[kKeyCode_Home] = "VKEY_HOME",
+	[kKeyCode_End] = "VKEY_END",
+	[kKeyCode_PageUp] = "VKEY_PAGEUP",
+	[kKeyCode_PageDown] = "VKEY_PAGEDOWN",
+	[kKeyCode_F1] = "VKEY_F1",
+	[kKeyCode_F2] = "VKEY_F2",
+	[kKeyCode_F3] = "VKEY_F3",
+	[kKeyCode_F4] = "VKEY_F4",
+	[kKeyCode_F5] = "VKEY_F5",
+	[kKeyCode_F6] = "VKEY_F6",
+	[kKeyCode_F7] = "VKEY_F7",
+	[kKeyCode_F8] = "VKEY_F8",
+	[kKeyCode_F9] = "VKEY_F9",
+	[kKeyCode_F10] = "VKEY_F10",
+	[kKeyCode_F11] = "VKEY_F11",
+	[kKeyCode_F12] = "VKEY_F12",
+	[kKeyCode_F13] = "VKEY_F13",
+	[kKeyCode_F14] = "VKEY_F14",
+	[kKeyCode_F15] = "VKEY_F15",
+	[kKeyCode_NumLock] = "VKEY_NUMLOCK",
+	[kKeyCode_CapsLock] = "VKEY_CAPSLOCK",
+	[kKeyCode_ScrollLock] = "VKEY_SCROLLLOCK",
+	[kKeyCode_RShift] = "VKEY_RSHIFT",
+	[kKeyCode_LShift] = "VKEY_LSHIFT",
+	[kKeyCode_RCtrl] = "VKEY_RCTRL",
+	[kKeyCode_LCtrl] = "VKEY_LCTRL",
+	[kKeyCode_RAlt] = "VKEY_RALT",
+	[kKeyCode_LAlt] = "VKEY_LATL",
+	[kKeyCode_PrintScreen] = "VKEY_PRINTSCREEN"
+}
 
-		
+-- Returns the "name" of a physical key
+function PhysicalKeyToStringId(key)
+
+	local id = PhysicalKeyToStringIdTable[key]
+	if (id == nil) then
+		return "<!!!NULL!!!>"
+	end
+
+	if (StringTable.Language == kLangId_EN) then
+		return StringTable.Get(id)
+	end
+	
+	local s = StringTable.Get(id, nil, true, nil)
+	if ((s == nil) or (s == "")) then
+		return StringTable.Get(id, nil, false, nil, kLangId_EN) -- try english
+	end
+	
+	return s
+end

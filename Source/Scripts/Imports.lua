@@ -4,6 +4,7 @@
 -- // System Stuff First // --
 Import("CVars")
 Import("KeyCodes")
+Import("KeyMapping")
 Import("Class")
 Import("Engine")
 Import("System")

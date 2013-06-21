@@ -85,7 +85,7 @@ function UI.Spawn(self)
 	local upscaleFonts = false
 	if (System.Platform() == kPlatIPhone) then
 		upscaleFonts = true
-	elseif (DebugUI.Enabled and (System.Platform() == kPlatPC)) then
+	elseif ((UI.mode == kGameUIMode_Mobile) and (System.Platform() == kPlatPC)) then
 	-- iPhone emulation
 		if (((UI.systemScreen.width == 960) and (UI.systemScreen.height == 640)) or
 		    ((UI.systemScreen.width == 1136) and (UI.systemScreen.height == 640))) then
@@ -582,7 +582,7 @@ function UI.HCenterLabel(self, label, rect)
 	r[4] = d[4]
 	
 	label:SetRect(r)
-	return r
+	return r, d
 end
 
 function UI.VCenterLabel(self, label, rect)
@@ -595,7 +595,7 @@ function UI.VCenterLabel(self, label, rect)
 	r[4] = d[4]
 	
 	label:SetRect(r)
-	return r
+	return r, d
 end
 
 function UI.CenterLabel(self, label, rect)
@@ -610,7 +610,7 @@ function UI.CenterLabel(self, label, rect)
 	}
 	
 	label:SetRect(r)
-	return r
+	return r, d
 end
 
 function UI.MoveLabelNoPadd(self, label, x, y)
@@ -644,9 +644,9 @@ function UI.RAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x-d[3], y, d[3], d[4]}
+	local r = {x-d[3], y-d[2], d[3], d[4]}
 	label:SetRect(r)
-	return r
+	return r, d
 
 end
 
@@ -666,9 +666,9 @@ function UI.VAlignLabel(self, label, x, y)
 		end
 	end
 	
-	local r = {x, y-d[4], d[3], d[4]}
+	local r = {x-d[1], y-d[4], d[3], d[4]}
 	label:SetRect(r)
-	return r
+	return r, d
 
 end
 
@@ -689,7 +689,7 @@ function UI.RVAlignLabel(self, label, x, y)
 	
 	local r = {x-d[3], y-d[4], d[3], d[4]}
 	label:SetRect(r)
-	return r
+	return r, d
 
 end
 
@@ -905,11 +905,11 @@ function UI.SizeLabelToContents(self, label, x, y)
 	
 	r[1] = x
 	r[2] = y
-	r[3] = (d[3] + d[1])
-	r[4] = (d[4] + d[2])
+	r[3] = d[3]-d[1]
+	r[4] = d[4]-d[2]
 	
 	label:SetRect(r)
-	return r, {d[1], d[2], d[3], d[4]}
+	return r, d
 end
 
 function UI.SetLabelText(self, label, text, fontScale)

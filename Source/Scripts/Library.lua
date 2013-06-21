@@ -565,7 +565,7 @@ StringTable = {}
 
 StringTable.Language = System.SystemLanguage()
 
-function StringTable.Get(name, stringTable, useDefault, default)
+function StringTable.Get(name, stringTable, useDefault, default, language)
 	
 	if (useDefault == nil) then
 		useDefault = false
@@ -575,9 +575,13 @@ function StringTable.Get(name, stringTable, useDefault, default)
 	    stringTable = StringTable.Global
 	end
 	
+	if (language == nil) then
+		language = StringTable.Language
+	end
+	
 	local x = default
 	if name then
-		local z = stringTable:Find(name, StringTable.Language)
+		local z = stringTable:Find(name, language)
 		if (z == nil) then
 			if (not useDefault) then
 				x = "??? ("..name..") ???"

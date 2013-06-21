@@ -8,6 +8,7 @@ Abducted.PulseTargets = LL_New()
 
 function Abducted.Initialize(self)
 	self.eatInput = false
+	Abducted.KeyBindings = LoadKeyBindings()
 	
 	UI:InitMap()
 	GameDB:Load()
@@ -141,10 +142,11 @@ function Abducted.OnInputEvent(self, e)
     if (TerminalScreen.Active) then
 		return false
 	end
-	if (self.manipulate) then
-		return ManipulatableObjectUI:HandleInputEvent(e)
+	local handled, action = self:InputKeyAction(e)
+	if (action) then
+		return handled
 	end
-	local handled, action = PlayerInput:OnInputEvent(e)
+	handled, action = PlayerInput:OnInputEvent(e)
 	return handled
 end
 
@@ -173,6 +175,10 @@ function Abducted.OnInputGesture(self, g)
 	end
 	
 	return PlayerInput:OnInputGesture(g)
+end
+
+function Abducted.InputKeyAction(e)
+	return false, false
 end
 
 function Abducted.BeginManipulate(self)

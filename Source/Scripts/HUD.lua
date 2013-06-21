@@ -83,6 +83,8 @@ function HUD.Load(self)
 		)
 		
 		self.widgets.Root:AddChild(self.widgets.ActionBar)
+		self.widgets.ActionBar:SetVisible(false)
+		self.actionBarVisible = false
 	end
 	
 	self.widgets.Arm = UIPushButton:Create(
@@ -588,12 +590,16 @@ function HUD.AnimateUnlockMobile(self, items)
 end
 
 function HUD.AnimateUnlockPC(self, items)
+
+	local actionBarVisible = self.actionBarVisible
+	
 	if (PlayerSkills:ArmUnlocked()) then
 		if (items.arm) then
 			self.armEnabled = true
 			self.widgets.Arm.class:SetEnabled(self.widgets.Arm, true)
 			self.widgets.Arm:SetVisible(true)
-			self.widgets.Arm:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({self.widgets.Arm})
+			actionBarVisible = true
 		end
 	end
 
@@ -602,9 +608,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.ManipulateLabel:SetVisible(true)
 		self.widgets.ManipulateLabelBkg:SetVisible(true)
 		if (items.manipulate) then
-			self.widgets.Manipulate:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ManipulateLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ManipulateLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Manipulate, 
+				self.widgets.ManipulateLabel, 
+				self.widgets.ManipulateLabelBkg
+			})
+			actionBarVisible = true
 			if (self.manipulateEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ManipulateShimmer)
@@ -619,9 +628,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.ShieldLabel:SetVisible(true)
 		self.widgets.ShieldLabelBkg:SetVisible(true)
 		if (items.shield) then
-			self.widgets.Shield:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ShieldLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ShieldLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Shield, 
+				self.widgets.ShieldLabel, 
+				self.widgets.ShieldLabelBkg
+			})
+			actionBarVisible = true
 			if (self.shieldEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
@@ -636,9 +648,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.PulseLabel:SetVisible(true)
 		self.widgets.PulseLabelBkg:SetVisible(true)
 		if (items.pulse) then
-			self.widgets.Pulse:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.PulseLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.PulseLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Pulse, 
+				self.widgets.PulseLabel, 
+				self.widgets.PulseLabelBkg
+			})
+			actionBarVisible = true
 			if (self.pulseEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
@@ -647,6 +662,33 @@ function HUD.AnimateUnlockPC(self, items)
 			end
 		end
 	end
+	
+	if ((self.actionBarVisible ~= actionBarVisible) and actionBarVisible) then
+		self.widgets.ActionBar:SetVisible(true)
+		self:AnimatePCActionBarItems({self.widgets.ActionBar})
+		self.actionBarVisible = true
+	end
+end
+
+function HUD.AnimatePCActionBarItems(self, widgets)
+
+	if (self.actionBarVisible) then
+		for k,v in pairs(widgets) do
+			v:BlendTo({1,1,1,1}, 0.3)
+		end
+		return
+	end
+
+	-- widget is translated off bottom of the screen?
+	for k,v in pairs(widgets) do
+		local r = v:Rect()
+		local x = {r[1], r[2], r[3], r[4]}
+		x[2] = x[2] + self.ActionBarRect[4]
+		v:SetRect(x)
+		v:MoveTo({r[1], r[2]}, {0, 0.3})
+		v:BlendTo({1,1,1,1}, 0)
+	end
+	
 end
 
 function HUD.Think(self)

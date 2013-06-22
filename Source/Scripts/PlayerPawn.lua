@@ -140,6 +140,14 @@ function PlayerPawn.Spawn(self)
 	self.pulse.beam:BlendTo({0,0,0,0}, 0)
 	self.pulse.impact:BlendTo({0,0,0,0}, 0)
 	
+	self.pulseSounds = {
+		Hum = World.LoadSound("Audio/AFX_PulseCycleLoop"),
+		Explode = World.LoadSound("Audio/AFX_ShieldImpactAggressive"),
+		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact")
+	}
+	
+	self.pulseSounds.Hum:SetLoop(true)
+	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.
 	self:SetSnapTurnAngles({360, 360, 160})
@@ -400,10 +408,14 @@ function PlayerPawn.BeginPulse(self)
 	local anim = self:LookupAnimation("pulse_idle")
 	self:PlayAnim(anim, self.model)
 	self:Stop()
+	self.pulseSounds.Hum:FadeVolume(0, 0)
+	self.pulseSounds.Hum:FadeVolume(1, 0.1)
+	self.pulseSounds.Hum:Play(kSoundChannel_FX, 0)
 end
 
 function PlayerPawn.EndPulse(self)
 	self.disableAnimTick = false
+	self.pulseSounds.Hum:FadeOutAndStop(0.1)
 end
 
 function PlayerPawn.FirePulse(self, target, normal)
@@ -447,6 +459,8 @@ function PlayerPawn.FirePulse(self, target, normal)
 	end
 	
 	self.pulseActive = false
+	self.pulseSounds.Hum:Stop()
+	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
 	
 	local anim = self:LookupAnimation("pulse_fire")
 	self:PlayAnim(anim , self.model).Seq(f)
@@ -486,6 +500,8 @@ end
 
 function PlayerPawn.PulseExplode(self)
 	self.pulseActive = false
+	self.pulseSounds.Hum:Stop()
+	self.pulseSounds.Explode:Play(kSoundChannel_FX, 0)
 	self:Kill()
 end
 
@@ -980,6 +996,8 @@ function PlayerPawn.LoadState(self, state)
 	self.dead = false
 	self.disableAnimTick = false
 	self.state = "idle"
+	
+	self.pulseSounds.Hum:Stop()
 	
 	if (self.activeShieldSound) then
 		self.activeShieldSound:Stop()

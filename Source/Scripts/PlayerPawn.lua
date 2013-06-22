@@ -112,6 +112,17 @@ function PlayerPawn.Spawn(self)
 	)
 	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	
+	self.shieldSounds = {
+		Activate = World.LoadSound("Audio/AFX_ShieldActivate"),
+		Hum = World.LoadSound("Audio/AFX_ShieldHum"),
+		Deactivate = World.LoadSound("Audio/AFX_ShieldDeactivate"),
+		Spark = World.LoadSound("Audio/AFX_ShieldImpactLight", 3)
+	}
+	
+	self.shieldSounds.Hum:SetLoop(true)
+	
+	self.shieldSoundPaused = false
+	
 	-- pulse shot
 	self.pulse = {
 		World.Load("FX/pulsecone1mesh"),
@@ -357,7 +368,7 @@ function PlayerPawn.BeginShield(self)
 	World.gameTimers:Add(f, 0.05, true)
 	
 	self:SetSpeeds()
-
+	self:PlayShieldSound()
 end
 
 function PlayerPawn.EndShield(self)
@@ -374,7 +385,7 @@ function PlayerPawn.EndShield(self)
 	World.gameTimers:Add(f, 0.1, true)
 	
 	self:SetSpeeds()
-	
+	self:StopShieldSound()
 end
 
 function PlayerPawn.Stop(self)
@@ -802,9 +813,115 @@ function PlayerPawn.ShowShield(self, show)
 	if (show and self.shieldActive) then
 		self.shield.dm:SetVisbile(show)
 		self.shieldSprite.dm:SetVisible(show)
+		self:PauseShieldSound(false)
 	elseif (not show) then
 		self.shield.dm:SetVisible(false)
 		self.shieldSprite.dm:SetVisible(false)
+		self:PauseShieldSound(true)
+	end
+end
+
+function PlayerPawn.PlayShieldSound(self)
+
+	self.activeShieldSound = self.shieldSounds.Hum
+	self.activeShieldSound:FadeVolume(0, 0)
+	self.activeShieldSound:Play(kSoundChannel_FX, 0)
+	self.activeShieldSound:FadeVolume(1, 0.3)
+	
+	self.shieldSounds.Activate:Play(kSoundChannel_FX, 0)
+	self:ActivateShieldSpark()
+	self:ActivateShieldHum2()
+end
+
+function PlayerPawn.ActivateShieldSpark(self)
+	local f = function()
+		self:DoShieldSpark()
+	end
+	
+	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(1, 10), true)
+end
+
+function PlayerPawn.DoShieldSpark(self)
+	local f = function()
+		self:DoShieldSpark()
+	end
+	
+	local num = IntRand(1, 3)
+	self.shieldSounds.Spark:Play(kSoundChannel_FX, 0)
+	
+	if (num > 1) then
+		local spark = function()
+			if (self.shieldActive) then
+				self.shieldSounds.Spark:Play(kSoundChannel_FX, 0)
+			end
+		end
+		
+		local t = 0
+		
+		for i=2,num do
+			local x = FloatRand(0.2, 0.7)
+			World.gameTimers:Add(spark, x+t, true)
+			t = t + x
+		end
+	end
+	
+	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(num, 7), true)
+end
+
+function PlayerPawn.ActivateShieldHum2(self)
+	local f = function()
+		self:DoShieldHum2()
+	end
+	
+	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10), true)
+end
+
+function PlayerPawn.DoShieldHum2(self)
+	local f = function()
+		self:DoShieldHum2()
+	end
+	self.shieldSounds.Deactivate:Play(kSoundChannel_FX, 0)
+	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10), true)
+end
+
+function PlayerPawn.PauseShieldSound(self, pause)
+	if (self.shieldSoundPaused == pause) then
+		return
+	end
+	
+	if (self.activeShieldSound) then
+		if (self.shieldFlavorTimer) then
+			self.shieldFlavorTimer:Clean()
+			self.shieldFlavorTimer = nil
+		end
+		if (self.shieldFlavorTimer2) then
+			self.shieldFlavorTimer2:Clean()
+			self.shieldFlavorTimer2 = nil
+		end
+		self.shieldSoundPaused = pause
+		self.activeShieldSound:Pause(pause)
+		self.shieldSounds.Deactivate:Stop()
+		if (not pause) then
+			self:ActivateShieldSpark()
+			self:ActivateShieldHum2()
+		end
+	end
+end
+
+function PlayerPawn.StopShieldSound(self)
+	self.shieldSoundPaused = false
+	if (self.shieldFlavorTimer) then
+		self.shieldFlavorTimer:Clean()
+		self.shieldFlavorTimer = nil
+	end
+	if (self.shieldFlavorTimer2) then
+		self.shieldFlavorTimer2:Clean()
+		self.shieldFlavorTimer2 = nil
+	end
+	if (self.activeShieldSound) then
+		self.activeShieldSound:Stop()
+		self.activeShieldSound = nil
+		self.shieldSounds.Deactivate:Play(kSoundChannel_FX, 0)
 	end
 end
 
@@ -863,8 +980,21 @@ function PlayerPawn.LoadState(self, state)
 	self.disableAnimTick = false
 	self.state = "idle"
 	
-	self:Show(state.visible == "true")
+	if (self.activeShieldSound) then
+		self.activeShieldSound:Stop()
+		self.activeshieldSound = nil
+	end
+	self.shieldSoundPaused = false
 	
+	if (self.shieldFlavorTimer) then
+		self.shieldFlavorTimer:Clean()
+		self.shieldFlavorTimer = nil
+	end
+	if (self.shieldFlavorTimer2) then
+		self.shieldFlavorTimer2:Clean()
+		self.shieldFlavorTimer2 = nil
+	end
+		
 	if (state.shieldActive == "true") then
 		self:BeginShield()
 	else
@@ -872,6 +1002,8 @@ function PlayerPawn.LoadState(self, state)
 		self.shield.dm:BlendTo({0,0,0,0}, 0)
 		self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	end
+	
+	self:Show(state.visible == "true")
 	
 	local pos = Vec3ForString(state.pos)
 	local fp  = World.ClipToFloor(

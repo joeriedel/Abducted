@@ -43,6 +43,13 @@ PlayerPawn.AnimationStates = {
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})
+		end,
+	},
+	walkfast = {
+		walk = "walkfast",
+		speedScale = 2,
+		OnSelect = function()
+			HUD:EnableAll()
 		end
 	}
 }
@@ -124,7 +131,7 @@ function PlayerPawn.Spawn(self)
 	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.
-	self:SetSnapTurnAngles({360, 360, 60})
+	self:SetSnapTurnAngles({360, 360, 180})
 
 	local angle = NumberForString(self.keys.angle, 0)
 	local angleVertex = self:Angles()
@@ -136,7 +143,7 @@ function PlayerPawn.Spawn(self)
 	self:SetAngles(angleVertex)
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 160 -- <-- larger numbers means she turns faster
+	spring.elasticity = 240 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	self:SetGroundFriction(PlayerPawn.kFriction)
 	self:SetAutoDecelDistance(PlayerPawn.kAutoDecelDistance)

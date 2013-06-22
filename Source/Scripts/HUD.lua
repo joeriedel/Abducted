@@ -56,12 +56,8 @@ function HUD.Load(self)
 			PulseFlashing = "UI/pulse_button_flashing_pc_M",
 			ShieldDisabled = "UI/shield_button_charging_pc_M",
 			ShieldEnabled = "UI/shield_button_pc_M",
-			ActionBar = "UI/action_bar_pc_M",
-			LabelBackground = "UI/MMItemBackground2_M"
+			ActionBar = "UI/action_bar_pc_M"
 		}
-		
-		self.typefaces = {}
-		self.typefaces.ActionBar = World.Load("UI/ActionBarLabel_TF")
 	end
 	map(self.gfx, World.Load)
 	
@@ -83,13 +79,15 @@ function HUD.Load(self)
 		)
 		
 		self.widgets.Root:AddChild(self.widgets.ActionBar)
+		self.widgets.ActionBar:SetVisible(false)
+		self.actionBarVisible = false
 	end
 	
 	self.widgets.Arm = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
 		{pressed = self.gfx.ArmPressed, enabled = self.gfx.Arm},
-		nil,
-		{pressed=function (widget) HUD:ArmPressed(widget) end},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:ArmPressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -101,8 +99,8 @@ function HUD.Load(self)
 			disabled = self.gfx.ManipulateDisabled,
 			pressed = self.gfx.ManipulateDisabled
 		},
-		nil,
-		{pressed=function (widget) HUD:ManipulatePressed(widget) end},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:ManipulatePressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -124,8 +122,8 @@ function HUD.Load(self)
 			disabled = self.gfx.ShieldDisabled,
 			pressed = self.gfx.ShieldDisabled
 		},
-		nil,
-		{pressed=function (widget) HUD:ShieldPressed(widget) end},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:ShieldPressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -145,8 +143,8 @@ function HUD.Load(self)
 			disabled = self.gfx.PulseDisabled,
 			pressed = self.gfx.PulseDisabled
 		},
-		nil,
-		{pressed=function (widget) HUD:PulsePressed(widget) end},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:PulsePressed() end},
 		nil,
 		self.widgets.Root
 	)
@@ -176,6 +174,7 @@ function HUD.Load(self)
 	
 	self.widgets.Pulse.flashing = false
 	
+	self.visible = true
 	self.armEnabled = false
 	self.manipulateEnabled = false
 	self.shieldEnabled = false
@@ -194,19 +193,19 @@ function HUD.Load(self)
 		self.widgets.Shield:BlendTo({1,1,1,0}, 0)
 		self.widgets.Pulse:BlendTo({1,1,1,0}, 0)
 		
-		self.widgets.ManipulateLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.ManipulateLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.ManipulateLabelBkg)
-		self.widgets.ManipulateLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.ManipulateLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.ManipulateLabel)
 		
-		self.widgets.ShieldLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.ShieldLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material==UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.ShieldLabelBkg)
-		self.widgets.ShieldLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.ShieldLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.ShieldLabel)
 		
-		self.widgets.PulseLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.PulseLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.PulseLabelBkg)
-		self.widgets.PulseLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.PulseLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.PulseLabel)
 		
 		self.widgets.ManipulateLabel:BlendTo({1,1,1,0}, 0)
@@ -223,7 +222,7 @@ function HUD.Load(self)
 	self.widgets.Root:AddChild(self.widgets.PulseShimmer)
 end
 
-function HUD.ArmPressed(self, widget)
+function HUD.ArmPressed(self)
 	COutLine(kC_Debug, "Arm Pressed!")
 	if (Game.entity.manipulate or Game.entity.pulse) then
 		return
@@ -231,20 +230,30 @@ function HUD.ArmPressed(self, widget)
 	World.playerPawn:EnterArm()
 end
 
-function HUD.ManipulatePressed(self, widget)
+function HUD.ManipulatePressed(self)
+	COutLine(kC_Debug, "Manipulate Pressed!")
 	if (Game.entity.pulse) then
 		return
 	end
 	Game.entity:BeginManipulate()
 end
 
-function HUD.ShieldPressed(self, widget)
+function HUD.ShieldPressed(self)
+	COutLine(kC_Debug, "Shield Pressed!")
 	if (World.playerPawn.shieldActive) then
 		HUD:ExpireShield()
 		return
 	end
 	
 	HUD:BeginShield()
+end
+
+function HUD.PulsePressed(self)
+	COutLine(kC_Debug, "Pulse Pressed!")
+	if (Game.entity.manipulate) then
+		return
+	end
+	Game.entity:BeginPulse()
 end
 
 function HUD.BeginShield(self, gameTime)
@@ -281,14 +290,6 @@ function HUD.BeginShield(self, gameTime)
 	
 	self.shieldTimer = World.globalTimers:Add(f, 0)
 	
-end
-
-function HUD.PulsePressed(self, widget)
-	COutLine(kC_Debug, "Pulse Pressed!")
-	if (Game.entity.manipulate) then
-		return
-	end
-	Game.entity:BeginPulse()
 end
 
 -- djr, not sure if this is right or will work
@@ -398,7 +399,7 @@ function HUD.LayoutPC(self)
 	self.widgets.ManipulateCharging:SetRect(r)
 	self.widgets.ManipulateShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.ManipulateLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Manipulate]))
+	UI:SetLabelText(self.widgets.ManipulateLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Manipulate]))
 	local unused, d = UI:RAlignLabel(
 		self.widgets.ManipulateLabel, 
 		self.ActionBarRect[1]+266*UI.identityScale[1],
@@ -431,7 +432,7 @@ function HUD.LayoutPC(self)
 	self.widgets.ShieldCharging:SetRect(r)
 	self.widgets.ShieldShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.ShieldLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Shield]))
+	UI:SetLabelText(self.widgets.ShieldLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Shield]))
 	unused, d = UI:RAlignLabel(
 		self.widgets.ShieldLabel, 
 		self.ActionBarRect[1]+324*UI.identityScale[1],
@@ -464,7 +465,7 @@ function HUD.LayoutPC(self)
 	self.widgets.PulseCharging:SetRect(r)
 	self.widgets.PulseShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.PulseLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Pulse]))
+	UI:SetLabelText(self.widgets.PulseLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Pulse]))
 	unused, d = UI:RAlignLabel(
 		self.widgets.PulseLabel, 
 		self.ActionBarRect[1]+382*UI.identityScale[1],
@@ -588,12 +589,16 @@ function HUD.AnimateUnlockMobile(self, items)
 end
 
 function HUD.AnimateUnlockPC(self, items)
+
+	local actionBarVisible = self.actionBarVisible
+	
 	if (PlayerSkills:ArmUnlocked()) then
 		if (items.arm) then
 			self.armEnabled = true
 			self.widgets.Arm.class:SetEnabled(self.widgets.Arm, true)
 			self.widgets.Arm:SetVisible(true)
-			self.widgets.Arm:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({self.widgets.Arm})
+			actionBarVisible = true
 		end
 	end
 
@@ -602,9 +607,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.ManipulateLabel:SetVisible(true)
 		self.widgets.ManipulateLabelBkg:SetVisible(true)
 		if (items.manipulate) then
-			self.widgets.Manipulate:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ManipulateLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ManipulateLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Manipulate, 
+				self.widgets.ManipulateLabel, 
+				self.widgets.ManipulateLabelBkg
+			})
+			actionBarVisible = true
 			if (self.manipulateEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ManipulateShimmer)
@@ -619,9 +627,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.ShieldLabel:SetVisible(true)
 		self.widgets.ShieldLabelBkg:SetVisible(true)
 		if (items.shield) then
-			self.widgets.Shield:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ShieldLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.ShieldLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Shield, 
+				self.widgets.ShieldLabel, 
+				self.widgets.ShieldLabelBkg
+			})
+			actionBarVisible = true
 			if (self.shieldEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
@@ -636,9 +647,12 @@ function HUD.AnimateUnlockPC(self, items)
 		self.widgets.PulseLabel:SetVisible(true)
 		self.widgets.PulseLabelBkg:SetVisible(true)
 		if (items.pulse) then
-			self.widgets.Pulse:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.PulseLabel:BlendTo({1,1,1,1}, 0.3)
-			self.widgets.PulseLabelBkg:BlendTo({1,1,1,1}, 0.3)
+			self:AnimatePCActionBarItems({
+				self.widgets.Pulse, 
+				self.widgets.PulseLabel, 
+				self.widgets.PulseLabelBkg
+			})
+			actionBarVisible = true
 			if (self.pulseEnabled) then
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
@@ -647,6 +661,33 @@ function HUD.AnimateUnlockPC(self, items)
 			end
 		end
 	end
+	
+	if ((self.actionBarVisible ~= actionBarVisible) and actionBarVisible) then
+		self.widgets.ActionBar:SetVisible(true)
+		self:AnimatePCActionBarItems({self.widgets.ActionBar})
+		self.actionBarVisible = true
+	end
+end
+
+function HUD.AnimatePCActionBarItems(self, widgets)
+
+	if (self.actionBarVisible) then
+		for k,v in pairs(widgets) do
+			v:BlendTo({1,1,1,1}, 0.3)
+		end
+		return
+	end
+
+	-- widget is translated off bottom of the screen?
+	for k,v in pairs(widgets) do
+		local r = v:Rect()
+		local x = {r[1], r[2], r[3], r[4]}
+		x[2] = x[2] + self.ActionBarRect[4]
+		v:SetRect(x)
+		v:MoveTo({r[1], r[2]}, {0, 0.3})
+		v:BlendTo({1,1,1,1}, 0)
+	end
+	
 end
 
 function HUD.Think(self)
@@ -948,6 +989,50 @@ function HUD.Disable(self)
 	HUD:EnableShield(false)
 	HUD:EnablePulse(false)
 	
+end
+
+function HUD.HandleAction(self, action)
+	if (action == kAction_Arm) then
+		if (HUD.enabled and HUD.visible and self.armEnabled and self.widgets.Arm.enabled) then
+			self:ArmPressed()
+			if (self.widgets.Arm.sfx.pressed) then
+				self.widgets.Arm.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
+		end
+		return true
+	end
+	
+	if (action == kAction_Manipulate) then
+		if (HUD.enabled and HUD.visible and self.manipulateEnabled and self.widgets.Manipulate.enabled) then
+			self:ManipulatePressed()
+			if (self.widgets.Manipulate.sfx.pressed) then
+				self.widgets.Manipulate.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
+		end
+		return true
+	end
+	
+	if (action == kAction_Shield) then
+		if (HUD.enabled and HUD.visible and self.shieldEnabled and self.widgets.Shield.enabled) then
+			self:ShieldPressed()
+			if (self.widgets.Shield.sfx.pressed) then
+				self.widgets.Shield.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
+		end
+		return true
+	end
+	
+	if (action == kAction_Pulse) then
+		if (HUD.enabled and HUD.visible and self.pulseEnabled and self.widgets.Pulse.enabled) then
+			self:PulsePressed()
+			if (self.widgets.Pulse.sfx.pressed) then
+				self.widgets.Pulse.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
+		end
+		return true
+	end
+	
+	return false
 end
 
 function HUD.SaveManipulateState(self)

@@ -168,6 +168,16 @@ PhysicalKeyToStringIdTable = {
 	[kKeyCode_BackSlash] = "VKEY_BACKSLASH",
 	[kKeyCode_BracketRight] = "VKEY_BRACKETRIGHT",
 	[kKeyCode_BackQuote] = "VKEY_BACKQUOTE",
+	[kKeyCode_0] = "VKEY_0",
+	[kKeyCode_1] = "VKEY_1",
+	[kKeyCode_2] = "VKEY_2",
+	[kKeyCode_3] = "VKEY_3",
+	[kKeyCode_4] = "VKEY_4",
+	[kKeyCode_5] = "VKEY_5",
+	[kKeyCode_6] = "VKEY_6",
+	[kKeyCode_7] = "VKEY_7",
+	[kKeyCode_8] = "VKEY_8",
+	[kKeyCode_9] = "VKEY_9",
 	[kKeyCode_A] = "VKEY_A",
 	[kKeyCode_B] = "VKEY_B",
 	[kKeyCode_C] = "VKEY_C",
@@ -248,7 +258,7 @@ PhysicalKeyToStringIdTable = {
 }
 
 -- Returns the "name" of a physical key
-function PhysicalKeyToStringId(key)
+function PhysicalKeyName(key)
 
 	local id = PhysicalKeyToStringIdTable[key]
 	if (id == nil) then

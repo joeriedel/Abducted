@@ -61,7 +61,7 @@ function Arm.SpawnShared(self)
 	
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")
-	self.sfx.Button = World.Load("Audio/armbutton")
+	self.sfx.Button = UI.sfx.Command2
 	self.sfx.HeartBeat = World.Load("Audio/heartbeat1")
 	
 	self.sfx.HeartBeat:SetLoop(true)

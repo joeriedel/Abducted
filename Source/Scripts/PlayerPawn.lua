@@ -38,7 +38,7 @@ PlayerPawn.AnimationStates = {
 		arm_pose_standing = "arm_pose_limp",
 		puzzle_default_choice = "puzzle_limp_choice",
 		speedScale = 0.7,
-		tapAdjust = -20, -- CheckTappedOn
+		tapAdjust = 48, -- CheckTappedOn
 		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 96}},
 		canRun = false,
 		OnSelect = function()
@@ -499,7 +499,7 @@ function PlayerPawn.CheckTappedOn(self, e)
 	if (set.tapAdjust) then
 		pos = VecAdd(pos, {0, 0, set.tapAdjust})
 	else
-		pos = VecAdd(pos, {0, 0, 50})
+		pos = VecAdd(pos, {0, 0, 64})
 	end
 	
 	local screen, r = World.Project(pos)

@@ -35,7 +35,7 @@ function PlayerInput.OnInputEvent(self, e)
 			if (Game.entity.pulse) then
 				action = self:TapPulse(e.original.data[1], e.original.data[2])
 			else
-				if (World.playerPawn:CheckTappedOn(e.original)) then
+				if ((UI.mode == kGameUIMode_Mobile) and World.playerPawn:CheckTappedOn(e.original)) then
 					World.playerPawn:Stop()
 					action = true
 				else

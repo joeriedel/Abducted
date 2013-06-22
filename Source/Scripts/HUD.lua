@@ -56,12 +56,8 @@ function HUD.Load(self)
 			PulseFlashing = "UI/pulse_button_flashing_pc_M",
 			ShieldDisabled = "UI/shield_button_charging_pc_M",
 			ShieldEnabled = "UI/shield_button_pc_M",
-			ActionBar = "UI/action_bar_pc_M",
-			LabelBackground = "UI/MMItemBackground2_M"
+			ActionBar = "UI/action_bar_pc_M"
 		}
-		
-		self.typefaces = {}
-		self.typefaces.ActionBar = World.Load("UI/ActionBarLabel_TF")
 	end
 	map(self.gfx, World.Load)
 	
@@ -90,7 +86,7 @@ function HUD.Load(self)
 	self.widgets.Arm = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.Arm, {0, 0}),
 		{pressed = self.gfx.ArmPressed, enabled = self.gfx.Arm},
-		nil,
+		{ pressed = UI.sfx.Command },
 		{pressed=function (widget) HUD:ArmPressed() end},
 		nil,
 		self.widgets.Root
@@ -103,7 +99,7 @@ function HUD.Load(self)
 			disabled = self.gfx.ManipulateDisabled,
 			pressed = self.gfx.ManipulateDisabled
 		},
-		nil,
+		{ pressed = UI.sfx.Command },
 		{pressed=function (widget) HUD:ManipulatePressed() end},
 		nil,
 		self.widgets.Root
@@ -126,7 +122,7 @@ function HUD.Load(self)
 			disabled = self.gfx.ShieldDisabled,
 			pressed = self.gfx.ShieldDisabled
 		},
-		nil,
+		{ pressed = UI.sfx.Command },
 		{pressed=function (widget) HUD:ShieldPressed() end},
 		nil,
 		self.widgets.Root
@@ -147,7 +143,7 @@ function HUD.Load(self)
 			disabled = self.gfx.PulseDisabled,
 			pressed = self.gfx.PulseDisabled
 		},
-		nil,
+		{ pressed = UI.sfx.Command },
 		{pressed=function (widget) HUD:PulsePressed() end},
 		nil,
 		self.widgets.Root
@@ -197,19 +193,19 @@ function HUD.Load(self)
 		self.widgets.Shield:BlendTo({1,1,1,0}, 0)
 		self.widgets.Pulse:BlendTo({1,1,1,0}, 0)
 		
-		self.widgets.ManipulateLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.ManipulateLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.ManipulateLabelBkg)
-		self.widgets.ManipulateLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.ManipulateLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.ManipulateLabel)
 		
-		self.widgets.ShieldLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.ShieldLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material==UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.ShieldLabelBkg)
-		self.widgets.ShieldLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.ShieldLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.ShieldLabel)
 		
-		self.widgets.PulseLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.LabelBackground})
+		self.widgets.PulseLabelBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=UI.gfx.KeyLabelBackground})
 		self.widgets.Root:AddChild(self.widgets.PulseLabelBkg)
-		self.widgets.PulseLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ActionBar})
+		self.widgets.PulseLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=UI.typefaces.ActionBar})
 		self.widgets.Root:AddChild(self.widgets.PulseLabel)
 		
 		self.widgets.ManipulateLabel:BlendTo({1,1,1,0}, 0)
@@ -403,7 +399,7 @@ function HUD.LayoutPC(self)
 	self.widgets.ManipulateCharging:SetRect(r)
 	self.widgets.ManipulateShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.ManipulateLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Manipulate]))
+	UI:SetLabelText(self.widgets.ManipulateLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Manipulate]))
 	local unused, d = UI:RAlignLabel(
 		self.widgets.ManipulateLabel, 
 		self.ActionBarRect[1]+266*UI.identityScale[1],
@@ -436,7 +432,7 @@ function HUD.LayoutPC(self)
 	self.widgets.ShieldCharging:SetRect(r)
 	self.widgets.ShieldShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.ShieldLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Shield]))
+	UI:SetLabelText(self.widgets.ShieldLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Shield]))
 	unused, d = UI:RAlignLabel(
 		self.widgets.ShieldLabel, 
 		self.ActionBarRect[1]+324*UI.identityScale[1],
@@ -469,7 +465,7 @@ function HUD.LayoutPC(self)
 	self.widgets.PulseCharging:SetRect(r)
 	self.widgets.PulseShimmer:SetRect(ExpandRect(r, 32*UI.identityScale[1], 32*UI.identityScale[1]))
 	
-	UI:SetLabelText(self.widgets.PulseLabel, PhysicalKeyToStringId(Abducted.KeyBindings.ActionToKey[kAction_Pulse]))
+	UI:SetLabelText(self.widgets.PulseLabel, PhysicalKeyName(Abducted.KeyBindings.ActionToKey[kAction_Pulse]))
 	unused, d = UI:RAlignLabel(
 		self.widgets.PulseLabel, 
 		self.ActionBarRect[1]+382*UI.identityScale[1],
@@ -999,6 +995,9 @@ function HUD.HandleAction(self, action)
 	if (action == kAction_Arm) then
 		if (HUD.enabled and HUD.visible and self.armEnabled and self.widgets.Arm.enabled) then
 			self:ArmPressed()
+			if (self.widgets.Arm.sfx.pressed) then
+				self.widgets.Arm.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
 		end
 		return true
 	end
@@ -1006,6 +1005,9 @@ function HUD.HandleAction(self, action)
 	if (action == kAction_Manipulate) then
 		if (HUD.enabled and HUD.visible and self.manipulateEnabled and self.widgets.Manipulate.enabled) then
 			self:ManipulatePressed()
+			if (self.widgets.Manipulate.sfx.pressed) then
+				self.widgets.Manipulate.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
 		end
 		return true
 	end
@@ -1013,6 +1015,9 @@ function HUD.HandleAction(self, action)
 	if (action == kAction_Shield) then
 		if (HUD.enabled and HUD.visible and self.shieldEnabled and self.widgets.Shield.enabled) then
 			self:ShieldPressed()
+			if (self.widgets.Shield.sfx.pressed) then
+				self.widgets.Shield.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
 		end
 		return true
 	end
@@ -1020,6 +1025,9 @@ function HUD.HandleAction(self, action)
 	if (action == kAction_Pulse) then
 		if (HUD.enabled and HUD.visible and self.pulseEnabled and self.widgets.Pulse.enabled) then
 			self:PulsePressed()
+			if (self.widgets.Pulse.sfx.pressed) then
+				self.widgets.Pulse.sfx.pressed:Play(kSoundChannel_UI, 0)
+			end
 		end
 		return true
 	end

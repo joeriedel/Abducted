@@ -91,6 +91,10 @@ function BoundRect(rect, bounds)
 	
 end
 
+function MoveRectByCenter(rect, x, y)
+	return {x - (rect[3]/2), y - (rect[4]/2), rect[3], rect[4]}
+end
+
 --[[---------------------------------------------------------------------------
 	split string
 	http://lua-users.org/wiki/SplitJoin

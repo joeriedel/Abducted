@@ -171,6 +171,7 @@ function UI.LoadShared(self)
 	self.typefaces.StandardButtonSmall = World.Load("UI/StandardButtonSmall_TF")
 	
 	self.sfx.Command = World.LoadSound("Audio/ui_command", 2)
+	self.sfx.Command2 = World.Load("Audio/armbutton")
 end
 
 function UI.InitMap(self)
@@ -184,6 +185,11 @@ function UI.InitMap(self)
 	
 	self.gfx.AnimatedGlpyh = World.Load("Puzzles/+0glyph_M")
 	self.gfx.AnimatedGlpyhPressed = World.Load("Puzzles/+0glyphPressed_M")
+	
+	if (UI.mode == kGameUIMode_PC) then
+		self.typefaces.ActionBar = World.Load("UI/ActionBarLabel_TF")
+		self.gfx.KeyLabelBackground = World.Load("UI/MMItemBackground2_M")
+	end
 end
 
 function UI.CreateInteractiveLayer(self)
@@ -459,11 +465,9 @@ end
 
 function UI.MoveWidgetByCenter(self, widget, x, y)
 	local r = widget:Rect()
-	
-	r[1] = x - r[3]/2
-	r[2] = y - r[4]/2
-	
+	r = MoveRectByCenter(r, x, y)
 	widget:SetRect(r)
+	return r
 end
 
 
@@ -478,24 +482,31 @@ function UI.MoveWidget(self, widget, x, y)
 	end
 	
 	widget:SetRect(r)
+	return r
 end
 
-function UI.HCenterWidget(self, widget, rect)
+function UI.HCenterWidget(self, widget, rect, y)
 
 	local r = widget:Rect()
 	
 	r[1] = rect[1] + ((rect[3]-r[3]) / 2)
+	if (y) then
+		r[2] = y
+	end
 	
 	widget:SetRect(r)
 	
 	return r
 end
 
-function UI.VCenterWidget(self, widget, rect)
+function UI.VCenterWidget(self, widget, rect, x)
 
 	local r = widget:Rect()
 		
 	r[2] = rect[2] + ((rect[4]-r[4]) / 2)
+	if (x) then
+		r[1] = x
+	end
 	
 	widget:SetRect(r)
 	return r
@@ -905,8 +916,8 @@ function UI.SizeLabelToContents(self, label, x, y)
 	
 	r[1] = x
 	r[2] = y
-	r[3] = d[3]-d[1]
-	r[4] = d[4]-d[2]
+	r[3] = d[3]
+	r[4] = d[4]
 	
 	label:SetRect(r)
 	return r, d

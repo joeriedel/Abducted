@@ -38,8 +38,8 @@ function ManipulatableObject.Spawn(self)
 	self.model.dm:ScaleTo(scale, 0)
 	self.model.vision:ScaleTo(scale, 0)
 	
-	local mins = Vec3ForString(self.keys.mins, {-24, -24, -48})
-	local maxs = Vec3ForString(self.keys.maxs, { 24,  24,  48})
+	local mins = Vec3ForString(self.keys.mins, {-24, -24, 0})
+	local maxs = Vec3ForString(self.keys.maxs, { 24,  24, 128})
 	
 	if (BoolForString(self.keys.autoscalebounds, false)) then
 		mins = VecMul(mins, scale)
@@ -90,11 +90,7 @@ function ManipulatableObject.Spawn(self)
 	if (not self.lookScale) then
 		self.lookScale = 20
 	end
-	
-	if (not self.manipulateOffset) then
-		self.manipulateOffset = {0,0,0}
-	end
-	
+		
 	self:LoadAndSwapManipulateMaterials()
 	self:LoadSounds()
 	
@@ -359,7 +355,7 @@ function ManipulatableObject.Awaken(self)
 		if (fov <= 0) then
 			fov = nil
 		end
-		World.viewController:AddLookTarget(self.manipulateTarget, fov)
+		World.viewController:AddLookTarget(self.manipulateTarget, self.manipulateShift, fov)
 	end
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
@@ -486,7 +482,7 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		end
 		
 		x.entity.model.vision:BlendTo(rgba, time)
-		ManipulatableObjectUI:NotifyObject(x.entity, enabled)
+		ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
 	end
 	
 	LL_Do(ManipulatableObject.Objects, f)
@@ -630,6 +626,10 @@ function ManipulatableObject.ManipulateGesture(g)
 
 end
 
+function ManipulatableObject.CanManipulateDir(self, dir)
+	return self.model:HasState("manipulate_"..dir)
+end
+
 function ManipulatableObject.ManipulateLeftRight(target, g)
 
 	-- may need to flip direction if we are facing towards the object
@@ -644,11 +644,21 @@ function ManipulatableObject.ManipulateLeftRight(target, g)
 
 end
 
-function ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, observerFwd, g)
+function ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, observerFwd, g, dir)
 	local flip = false
 	
 	if (VecDot(observerFwd, targetFwd) < 0) then
 		flip = true -- facing eachother
+		
+		if (dir == "left") then
+			return "right"
+		elseif (dir) then
+			return "left"
+		end
+	end
+	
+	if (dir) then
+		return dir
 	end
 	
 	local sign = g.args[1]
@@ -657,15 +667,31 @@ function ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, observerFwd
 		sign = -sign
 	end
 	
-	local dir
+	local d
 	
 	if (sign >= 0) then
-		dir = "right"
+		d = "right"
 	else
-		dir = "left"
+		d = "left"
 	end
 	
-	return dir
+	return d
+end
+
+function ManipulatableObject.DoManipulateCommand(target, dir)
+
+	if ((dir == "up") or (dir == "down")) then
+		return target:Manipulate(dir, dir)
+	end
+
+	local targetFwd = ForwardVecFromAngles(target:WorldAngles())
+	local playerFwd = ForwardVecFromAngles(World.playerPawn:WorldAngles())
+	local cameraFwd = World.CameraFwd()
+	
+	local objDir = ManipulatableObject.GetObserverOrientedLeftRight(targetFwd, cameraFwd, nil, dir)
+	local playerDir = ManipulatableObject.GetObserverOrientedLeftRight(playerFwd, cameraFwd, nil, dir)
+	
+	return target:Manipulate(objDir, playerDir)
 end
 
 function ManipulatableObject.ManipulateUpDown(target, g)
@@ -736,6 +762,9 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	if (self.keys.on_manipulated) then
 		World.PostEvent(self.keys.on_manipulated)
 	end
+	
+	Abducted.entity:EndManipulate()
+	HUD:RechargeManipulate()
 	
 	return true
 
@@ -844,7 +873,7 @@ function ManipulatableObject.LoadState(self, state)
 				if (fov <= 0) then
 					fov = nil
 				end
-				World.viewController:AddLookTarget(self.manipulateTarget, fov)
+				World.viewController:AddLookTarget(self.manipulateTarget, self.manipulateShift, fov)
 			end
 		end
 	else

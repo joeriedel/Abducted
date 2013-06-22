@@ -197,7 +197,7 @@ function ViewController.Defaults(self)
 	)
 end
 
-function ViewController.AddLookTarget(self, target, fov)
+function ViewController.AddLookTarget(self, target, shift, fov)
 	for k,v in pairs(ViewController.Targets) do
 		if (v.target.id == target.id) then
 			return
@@ -205,7 +205,7 @@ function ViewController.AddLookTarget(self, target, fov)
 	end
 	
 	local id = self:BlendToLookTarget(
-		target:WorldPos(),
+		VecAdd(target:WorldPos(), shift),
 		1,
 		1,
 		-1,

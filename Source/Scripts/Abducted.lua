@@ -146,6 +146,9 @@ function Abducted.OnInputEvent(self, e)
 	if (handled) then
 		return true
 	end
+	if (self.manipulate) then
+		return false
+	end
 	local handled, action = PlayerInput:OnInputEvent(e)
 	return handled
 end
@@ -166,10 +169,7 @@ function Abducted.OnInputGesture(self, g)
 	
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then
-			if (ManipulatableObject.ManipulateGesture(g)) then
-				self:EndManipulate()
-				HUD:RechargeManipulate()
-			end
+			ManipulatableObject.ManipulateGesture(g)
 		end
 		return true
 	end

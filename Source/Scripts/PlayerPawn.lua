@@ -131,7 +131,7 @@ function PlayerPawn.Spawn(self)
 	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.
-	self:SetSnapTurnAngles({360, 360, 180})
+	self:SetSnapTurnAngles({360, 360, 160})
 
 	local angle = NumberForString(self.keys.angle, 0)
 	local angleVertex = self:Angles()

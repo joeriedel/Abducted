@@ -152,6 +152,7 @@ function PlayerPawn.Spawn(self)
 	angleVertex.drag[2] = 7
 	angleVertex.friction = 0.5
 	self:SetAngles(angleVertex)
+	self:SetTargetAngles(angleVertex.pos)
 	
 	local spring = self:AngleSpring()
 	spring.elasticity = 240 -- <-- larger numbers means she turns faster

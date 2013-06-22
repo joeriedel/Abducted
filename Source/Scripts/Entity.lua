@@ -18,6 +18,7 @@ function Entity.Spawn(self)
 		local angleVertex = self:Angles()
 		angleVertex.pos = {0, 0, angle}
 		self:SetAngles(angleVertex)
+		self:SetTargetAngles(angleVertex.pos)
 	end
 	
 end

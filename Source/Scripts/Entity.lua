@@ -23,6 +23,73 @@ function Entity.Spawn(self)
 	
 end
 
+function Entity.TraceMove(self, distance, zangle, currentFloorOnly, stepSize)
+
+	local fwd = nil
+
+	if (type(zangle) == "table") then
+		fwd = zangle
+	else
+		fwd = RotateVecZ({1,0,0}, zangle)
+	end
+		
+	local curFP = nil
+	
+	if (currentFloorOnly) then
+		curFP = self:FloorPosition()
+		if (curFP.floor == -1) then
+			curFP = nil
+		end
+	end
+	
+	local fp = Entity.TraceFloorDir(self, distance, fwd, curFP)
+	
+	if (fp) then
+		return fp, distance
+	end
+	
+	-- slow path
+	if (stepSize == nil) then
+		stepSize = 10
+	end
+	
+	local d = distance - stepSize
+	while (true) do
+		if (d < stepSize) then
+			break
+		end
+		
+		fp = Entity.TraceFloorDir(self, d, fwd, curFP)
+		if (fp) then
+			return fp, d
+		end
+		
+		d = d - stepSize
+	end
+	
+	return nil
+end
+
+function Entity.TraceFloorDir(self, distance, dir, curFP)
+
+	local testPos = VecAdd(self:WorldPos(), VecScale(dir, distance))
+
+	if (curFP) then
+		fp = World.ClipToFloor(
+			curFP.floor, 
+			{testPos[1], testPos[2], testPos[3]+512},
+			{testPos[1], testPos[2], testPos[3]-512}
+		)
+	else
+		fp = World.ClipToFloor(
+			{testPos[1], testPos[2], testPos[3]+512},
+			{testPos[1], testPos[2], testPos[3]-512}
+		)
+	end
+	
+	return fp
+end
+
 function Entity.SetRotation(self, angles)
 	local angleVertex = self:Angles()
 	angleVertex.pos = WrapAngles(angles)

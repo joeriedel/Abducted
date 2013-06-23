@@ -133,9 +133,6 @@ info_bug_spawner = BugSpawner
 -----------------------------------------------------------------------------]]
 
 Bug = Entity:New()
-Bug.kMoveSpeed = 70
-Bug.kAccel = 50
-Bug.kFriction = 300
 Bug.kZigZagSize = {0, 10}
 Bug.kZigZagDist = {50, 100} -- (min, min+d)
 
@@ -146,25 +143,47 @@ function Bug.Spawn(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
+	self.seekPlayerDistance = 250
+	
 	if (BoolForString(self.keys.group, false)) then
-		self.model = LoadModel("Characters/Buggroup12")
+		self.model = LoadModel("Characters/Buggroup10")
+		self.group = true
+		self.moveSpeed = 100
+		self.accel = 1000
+		self.friction = 1000
+		self.traceMoveStep = 10
+		self.moveRange = {150, 300}
+		self.turnRange = {-30, 30}
+		self.wanderHangOutTime = {0.2, 0.8}
+		self.playerDistance = {100, 250, 400}
+		self.playerSeekAttackDistance = 120
+		self.playerAttackDistance = 10
 	else
-		self.model = LoadModel("Characters/Bugtestmesh1")
+		self.model = LoadModel("Characters/Bug1")
+		self.moveSpeed = 200
+		self.accel = 1000
+		self.friction = 1000
+		self.traceMoveStep = 10
+		self.moveRange = {70, 200}
+		self.turnRange = {-60, 60}
+		self.wanderHangOutTime = {0.2, 0.8}
+		self.playerDistance = {100, 250, 400}
+		self.playerSeekAttackDistance = 120
+		self.playerAttackDistance = 10
 	end
 	
 	self.model.dm = self:AttachDrawModel(self.model)
-	self:SetMins({-24, -24, -16})
-	self:SetMaxs({ 24,  24,  16})
+	self:SetMins({-24, -24, 0})
+	self:SetMaxs({ 24,  24, 32})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
-	self.model.dm:SetPos({0, 0, -16}) -- on floor
+--	self.model.dm:SetPos({0, 0, -16}) -- on floor
 	
-	if (self.model.BlendToState) then
+	if (self.model.BlendToState and self.group) then
 		self.model:BlendToState("crawling")
-	else
-		self.model.dm:SetAngles({0,0,180})
 	end
 	
-	self:SetSnapTurnAngles({360, 360, 50})
+	self.model.dm:SetAngles({0,0,180})
+	self:SetSnapTurnAngles({360, 360, 180})
 	
 	local angle = NumberForString(self.keys.angle, 0)
 	local angleVertex = self:Angles()
@@ -174,9 +193,10 @@ function Bug.Spawn(self)
 	angleVertex.drag[2] = 7
 	angleVertex.friction = 0.5
 	self:SetAngles(angleVertex)
+	self.angle = angle
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 160 -- <-- larger numbers means she turns faster
+	spring.elasticity = 260 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	
 	self:SetClassBits(kEntityClass_Monster)
@@ -184,9 +204,9 @@ function Bug.Spawn(self)
 	self:EnableFlags(kPhysicsFlag_Friction, true)
 	self:SetMoveType(kMoveType_Floor)
 	
-	self:SetMaxGroundSpeed(Bug.kMoveSpeed)
-	self:SetAccel({Bug.kAccel, 0, 0}) -- <-- How fast the player accelerates (units per second).
-	self:SetGroundFriction(Bug.kFriction)
+	self:SetMaxGroundSpeed(self.moveSpeed)
+	self:SetAccel({self.accel, 0, 0}) -- <-- How fast the player accelerates (units per second).
+	self:SetGroundFriction(self.friction)
 	
 	self:SpawnFloorPosition()
 	
@@ -195,15 +215,267 @@ function Bug.Spawn(self)
 		self.waypoints = World.FindEntityTargets(self.keys.bug_waypoint)
 	end
 	
-	self.think = Bug.Wander
+	self.think = Bug.BugBrain
 	self:SetNextThink(0.1)
 	
 end
 
+function Bug.BugBrain(self)
+
+	self:SeekPlayer() -- keep player within range OR attack
+	self:AvoidOtherBugs()
+	
+	if (self.action == nil) then
+		self.busy = false
+		self.action = Bug.Wander
+	end
+	
+	self:action()
+end
+
 function Bug.Wander(self)
+
+	if (self.nextWanderTime and (self.nextWanderTime > Game.time)) then
+		return
+	end
+	
+	self.nextWanderTime = nil
+	self:UpdateRandomMove(Bug.WanderMoveFinished)
+
+end
+
+function Bug.WanderMoveFinished(self)
+	self.busy = false
+	self.action = Bug.Wander
+	if (not self.group) then
+		self.nextWanderTime = Game.time + FloatRand(self.wanderHangOutTime[1], self.wanderHangOutTime[2])
+	end
+end
+
+function Bug.UpdateRandomMove(self, moveCompleteCallback)
+	if (self.busy) then
+		return
+	end
+	
+	for i=1,5 do
+		local d = FloatRand(self.moveRange[1], self.moveRange[2])
+		local angle = FloatRand(self.angle+self.turnRange[1], self.angle+self.turnRange[2])
+		if (i > 1) then
+			angle = angle + 180 -- stuck
+		end
+		
+		angle = WrapAngle(angle)
+				
+		local fp, d = self:TraceMove(d, angle, true, self.traceMoveStep)
+		
+		if (fp) then
+			local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
+			if (moveCommand) then
+				self.angle = angle
+				self.busy = true
+				self.floorMoveCallback = moveCompleteCallback
+				self:SetDesiredMove(moveCommand)
+				self:EnableFlags(kPhysicsFlag_Friction, false)
+				COutLine(kC_Debug, "Bug.RandomMove")
+				return -- success
+			else
+				COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - CreateFloorMove() failed.")
+				break
+			end
+		end
+	end
+	
+	COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - can't find anywhere to go.")
+	self:Stop()
+	
+end
+
+function Bug.AvoidOtherBugs(self)
+
+end
+
+function Bug.SeekPlayer(self)
+
+	if (not self.group) then
+		if (self:SeekPlayerAttack()) then
+			return
+		end
+		
+		if (self:RunAwayFromPlayer()) then
+			return
+		end
+	end
+	
+	self:SeekPlayerDistance()
+	self:CheckAttack()
+end
+
+function Bug.SeekPlayerMoveFinished(self)
+	self.busy = false
+end
+
+function Bug.SeekPlayerDistance(self)
+
+	if (self.action == Bug.SeekPlayerDistanceAction) then
+		return true
+	end
+	
+	-- too far?
+	local selfPos = self:WorldPos()
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, selfPos)
+	local v, d = VecNorm(v)
+	
+	if (d < self.playerDistance[3]) then
+		return false
+	end
+	
+	-- we need to get closer, run at the player
+	
+	self.busy = false
+	
+	local runDistance = d - self.playerDistance[2]
+		
+	if (self:RunToDistance(runDistance, v)) then
+		self.angle = LookAngles(v)[3]
+		self.action = Bug.SeekPlayerDistanceAction
+		COutLine(kC_Debug, "Bug.SeekPlayerDistance")
+		return true
+	end
+	
+	return false
+end
+
+function Bug.SeekPlayerDistanceAction(self)
+	if (not self.busy) then
+		self.action = nil
+	end
+end
+
+function Bug.RunAwayFromPlayer(self)
+	if (self.action == Bug.RunAwayFromPlayerAction) then
+		return true
+	end
+	
+	-- too close?
+	local selfPos = self:WorldPos()
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, selfPos)
+	local v, d = VecNorm(v)
+	
+	if (d > self.playerDistance[1]) then
+		return false
+	end
+	
+	-- we need to run away, are we in front of the player?
+	local playerAngle = World.playerPawn:TargetAngles()[3]
+	local playerFwd = RotateVecZ({1,0,0}, playerAngle)
+	
+	self.busy = false
+	
+	local runAngle = nil
+	
+	if (VecDot(v, playerFwd) > 0) then
+		playerAngle = playerAngle + 180
+	end
+	
+	runAngle = FloatRand(playerAngle-25, playerAngle+25)
+	runAngle = WrapAngle(runAngle)
+	
+	local runDistance = self.playerDistance[2] - d
+	if (self:RunToDistance(runDistance, runAngle)) then
+		self.angle = runAngle
+		self.action = Bug.RunAwayFromPlayerAction
+		COutLine(kC_Debug, "Bug.RunAwayFromPlayer")
+		return true
+	end
+	
+	return false
+end
+
+function Bug.RunAwayFromPlayerAction(self)
+	if (not self.busy) then
+		self.action = nil
+	end
+end
+
+function Bug.RunToDistance(self, distance, zangle)
+	local fp = self:TraceMove(distance, zangle, true, self.traceMoveStep)
+	if (fp) then
+		local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
+		if (moveCommand) then
+			self.busy = true
+			self.floorMoveCallback = Bug.SeekPlayerMoveFinished
+			self:SetDesiredMove(moveCommand)
+			self:EnableFlags(kPhysicsFlag_Friction, false)
+			return true
+		end
+	end
+	
+	return false
+end
+
+function Bug.SeekPlayerAttack(self)
+	-- close enough to seek attack?
+	local selfPos = self:WorldPos()
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, selfPos)
+	local v, d = VecNorm(v)
+	
+	local playerAngle = World.playerPawn:TargetAngles()[3]
+	local playerFwd = RotateVecZ({1,0,0}, playerAngle)
+	
+	if (self.action ~= Bug.SeekPlayerAttackAction) then
+		if (d > self.playerSeekAttackDistance) then
+			return false
+		end
+		
+		if (VecDot(v, playerFwd) < 0.6) then -- mostly not really behind enough
+			return false
+		end
+	else
+		if (VecDot(v, playerFwd) < 0) then -- they turned to face us run away!
+			return false
+		end
+		
+		return true -- keep attacking
+	end
+	
+	-- attack!
+	
+	self.busy = false
+	
+	if (self:RunToDistance(d, v)) then
+		self.angle = LookAngles(v)[3]
+		self.action = Bug.SeekPlayerAttackAction
+		COutLine(kC_Debug, "Bug.SeekPlayerAttack")
+		return true
+	end
+	
+	
+	return false
+end
+
+function Bug.SeekPlayerAttackAction(self)
+	if (self.busy) then
+		self:CheckAttack()
+	else
+		self.action = nil
+	end
+end
+
+function Bug.CheckAttack(self)
+	
+end
+
+function Bug.SeekWaypoints(self)
 
 	self:SelectNode()
 	self.think = nil
+	self.floorMoveCallback = Bug.SelectNode
 	
 end
 
@@ -319,10 +591,13 @@ function Bug.ExecuteMove(self, targetPos)
 end
 
 function Bug.OnFloorMoveComplete(self)
-	self:SelectNode()
+	if (self.floorMoveCallback) then
+		self:floorMoveCallback()
+	end
 end
 
 function Bug.Stop(self)
+	self.busy = false
 	self:EnableFlags(kPhysicsFlag_Friction, true)
 end
 

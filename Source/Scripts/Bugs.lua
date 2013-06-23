@@ -133,8 +133,6 @@ info_bug_spawner = BugSpawner
 -----------------------------------------------------------------------------]]
 
 Bug = Entity:New()
-Bug.kZigZagSize = {0, 10}
-Bug.kZigZagDist = {50, 100} -- (min, min+d)
 
 function Bug.Spawn(self)
 
@@ -158,18 +156,22 @@ function Bug.Spawn(self)
 		self.playerDistance = {100, 250, 400}
 		self.playerSeekAttackDistance = 120
 		self.playerAttackDistance = 10
+		self.zigZagSize = {10, 25}
+		self.zigZagDist = {25, 50}
 	else
 		self.model = LoadModel("Characters/Bug1")
-		self.moveSpeed = 200
+		self.moveSpeed = 120
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
-		self.moveRange = {70, 200}
-		self.turnRange = {-60, 60}
-		self.wanderHangOutTime = {0.2, 0.8}
+		self.moveRange = {200, 400}
+		self.turnRange = {-30, 30}
+		self.wanderHangOutTime = {0.1, 0.2}
 		self.playerDistance = {100, 250, 400}
 		self.playerSeekAttackDistance = 120
 		self.playerAttackDistance = 10
+		self.zigZagSize = {15, 25}
+		self.zigZagDist = {40, 80}
 	end
 	
 	self.model.dm = self:AttachDrawModel(self.model)
@@ -269,13 +271,10 @@ function Bug.UpdateRandomMove(self, moveCompleteCallback)
 		local fp, d = self:TraceMove(d, angle, true, self.traceMoveStep)
 		
 		if (fp) then
-			local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
-			if (moveCommand) then
+			if (self:ZigZagToTarget(fp)) then
 				self.angle = angle
 				self.busy = true
 				self.floorMoveCallback = moveCompleteCallback
-				self:SetDesiredMove(moveCommand)
-				self:EnableFlags(kPhysicsFlag_Friction, false)
 				COutLine(kC_Debug, "Bug.RandomMove")
 				return -- success
 			else
@@ -401,22 +400,6 @@ function Bug.RunAwayFromPlayerAction(self)
 	end
 end
 
-function Bug.RunToDistance(self, distance, zangle)
-	local fp = self:TraceMove(distance, zangle, true, self.traceMoveStep)
-	if (fp) then
-		local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
-		if (moveCommand) then
-			self.busy = true
-			self.floorMoveCallback = Bug.SeekPlayerMoveFinished
-			self:SetDesiredMove(moveCommand)
-			self:EnableFlags(kPhysicsFlag_Friction, false)
-			return true
-		end
-	end
-	
-	return false
-end
-
 function Bug.SeekPlayerAttack(self)
 	-- close enough to seek attack?
 	local selfPos = self:WorldPos()
@@ -437,16 +420,20 @@ function Bug.SeekPlayerAttack(self)
 			return false
 		end
 	else
-		if (VecDot(v, playerFwd) < 0) then -- they turned to face us run away!
-			return false
+		if (self.nextAttackCheck and (self.nextAttackCheck <= Game.time)) then
+			if (VecDot(v, playerFwd) < 0) then -- they turned to face us run away!
+				return false
+			end
 		end
 		
+		self.nextAttackCheck = Game.time + 1
 		return true -- keep attacking
 	end
 	
 	-- attack!
 	
 	self.busy = false
+	self.nextAttackCheck = Game.time + 1
 	
 	if (self:RunToDistance(d, v)) then
 		self.angle = LookAngles(v)[3]
@@ -465,6 +452,23 @@ function Bug.SeekPlayerAttackAction(self)
 	else
 		self.action = nil
 	end
+end
+
+
+function Bug.RunToDistance(self, distance, zangle)
+	local fp = self:TraceMove(distance, zangle, true, self.traceMoveStep)
+	if (fp) then
+--		local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
+		if (self:ZigZagToTarget(fp)) then
+			self.busy = true
+			self.floorMoveCallback = Bug.SeekPlayerMoveFinished
+--			self:SetDesiredMove(moveCommand)
+--			self:EnableFlags(kPhysicsFlag_Friction, false)
+			return true
+		end
+	end
+	
+	return false
 end
 
 function Bug.CheckAttack(self)
@@ -516,8 +520,8 @@ function Bug.ZigZagToTarget(self, targetPos)
 	local vecAdd = VecAdd
 	local rand = FloatRand
 	local min = Min
-	local zigZagDist = Bug.kZigZagDist
-	local zigZagSize = Bug.kZigZagSize
+	local zigZagDist = self.zigZagDist
+	local zigZagSize = self.zigZagSize
 	local clipToFloor = World.ClipToFloor
 	
 	seekVec, seekDist = VecNorm(seekVec)
@@ -569,7 +573,7 @@ function Bug.ZigZagToTarget(self, targetPos)
 	end
 	
 	table.insert(zigZags, targetPos)
-	self:ExecuteMove(zigZags)
+	return self:ExecuteMove(zigZags)
 end
 
 function Bug.ExecuteMove(self, targetPos)

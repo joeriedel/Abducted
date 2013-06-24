@@ -13,6 +13,7 @@ PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
+PlayerPawn.PulseKillRadius = 200
 PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {
@@ -147,6 +148,12 @@ function PlayerPawn.Spawn(self)
 	}
 	
 	self.pulseSounds.Hum:SetLoop(true)
+	
+	self.bugSounds = {
+		StompOne = World.LoadSound("Audio/EFX_SingleBugSquish_rev1"),
+		Stun = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
+		Kill = World.LoadSound("Audio/EFX_ManyBugSquish_rev1")
+	}
 	
 	-- Angles > than these get snapped immediately
 	-- The last number is Z angle, which is the player facing.
@@ -418,8 +425,68 @@ function PlayerPawn.EndPulse(self)
 	self.pulseSounds.Hum:FadeOutAndStop(0.1)
 end
 
-function PlayerPawn.FirePulse(self, target, normal)
+function PlayerPawn.PulseLight(self, pos)
 
+	local light = World.CreateDynamicLight()
+	light:SetDiffuseColor({0.5, 1, 1})
+	light:SetSpecularColor({0.5, 1, 1})
+	light:SetRadius(400)
+	light:SetIntensity(2)
+	light:SetStyle(bit.bor(kLightStyle_Diffuse, kLightStyle_Specular))
+	light:SetInteractionFlags(kLightInteractionFlag_All)
+	light:SetPos(pos)
+	light:Link()
+	
+	-- animate
+	local steps = {
+		{ intensity = 0, time = 0 },
+		{ intensity = 3, time = 0.05 },
+		{ intensity = 0, time = 0.05 }
+	}
+	
+	light:AnimateIntensity(steps, false)
+	
+	local f = function()
+		light:Unlink()
+	end
+	
+	World.gameTimers:Add(f, 0.5, true)
+	
+end
+
+function PlayerPawn.PulseDamage(self, pos)
+
+	-- kill in a radius
+	local radiusBox = {PlayerPawn.PulseKillRadius, PlayerPawn.PulseKillRadius, PlayerPawn.PulseKillRadius}
+	local mins = VecSub(pos, radiusBox) 
+	local maxs = VecAdd(pos, radiusBox)
+	
+	local targets = World.BBoxTouching(mins, maxs, kEntityClass_Monster)
+	
+	local bugs = false
+	
+	if (targets) then
+		for k,v in pairs(targets) do
+			if (v.PulseKill) then
+				if (not bugs) then
+					if (v.keys.classname == "info_bug") then
+						bugs = true
+					end
+				end
+				v:PulseKill()
+			end
+		end
+	end
+	
+	if (bugs) then
+		self.bugSounds.Kill:Play(kSoundChannel_FX, 0)
+	end
+end
+
+function PlayerPawn.FirePulse(self, target, normal)
+	self:PulseLight(VecAdd(target, VecScale(normal, 32)))
+	self:PulseDamage(target)
+	
 	local localPos = self.model.dm:BonePos(self.model.handBone)
 	local start = self.model.dm:WorldBonePos(self.model.handBone)
 	local ray = VecSub(target, start)
@@ -502,6 +569,14 @@ function PlayerPawn.PulseExplode(self)
 	self.pulseActive = false
 	self.pulseSounds.Hum:Stop()
 	self.pulseSounds.Explode:Play(kSoundChannel_FX, 0)
+	
+	local angle = self:TargetAngles()[3]
+	local fwd = RotateVecZ({0,0,1}, angle)
+	local pos = VecAdd(self:WorldPos(), VecAdd(VecScale(fwd, 64), {0,0,72}))
+	
+	self:PulseLight(pos)
+	self:PulseDamage(self:WorldPos())
+	
 	self:Kill()
 end
 
@@ -510,11 +585,15 @@ function PlayerPawn.Kill(self)
 		return
 	end
 	self.dead = true
+	
+	self.customAnim = false
+	self.disableAnimTick = false
+	
 	if (self.shieldActive) then
 		self:EndShield()
 	end
 	self:SetMoveType(kMoveType_None)
-	self:PlayAnim("death", self.model)
+	self:PlayAnim(self:LookupAnimation("death"), self.model)
 	Game.entity:PlayerDied()
 end
 
@@ -636,6 +715,105 @@ function PlayerPawn.PlayCinematicAnim(self, args)
 		else
 			f()
 		end
+	end
+end
+
+function PlayerPawn.BugStun(self, callback)
+
+	if (self.bugStun) then
+		return
+	end
+	
+	self:SetDesiredMove(nil)
+	
+	if (Abducted.entity.manipulate) then
+		Abducted.entity:EndManipulate()
+	end
+	
+	if (Abducted.entity.pulse) then
+		Abducted.entity:EndPulse()
+	end
+	
+	local anim = self:LookupAnimation("bug_stun")
+
+	self.disableAnimTick = true
+	self.customMove = true
+	self.state = nil
+	self.bugStun = true
+	self:Stop()
+	
+	self.bugSounds.Stun:Play(kSoundChannel_FX, 0)
+	
+	local blend = self:PlayAnim(anim, self.model)
+	if (blend) then
+		local f = function()
+			if (not self.dead) then
+				self.bugStun = false
+				self.disableAnimTick = false
+				self.customMove = false
+				self:EnableFlags(kPhysicsFlag_Friction, false) -- resume walking
+				self:TickPhysics()
+				if (callback) then
+					callback()
+				end
+			end
+		end
+		blend.Seq(f)
+	end
+end
+
+function PlayerPawn.BugStomp(self, callback)
+
+	if (self.stomping) then
+		if (self.stompChain) then
+			table.insert(self.stompChain, callback)
+		end
+		return
+	end
+	
+	if (Abducted.entity.manipulate) then
+		Abducted.entity:EndManipulate()
+		self:SetDesiredMove(nil)
+	end
+	
+	if (Abducted.entity.pulse) then
+		Abducted.entity:EndPulse()
+		self:SetDesiredMove(nil)
+	end
+
+	local anim = self:LookupAnimation("bug_squish")
+
+	self.disableAnimTick = true
+	self.customMove = true
+	self.state = nil
+	self:Stop()
+	
+	self.stomping = true
+	self.stompChain = {callback}
+	
+	local blend = self:PlayAnim(anim, self.model)
+	if (blend) then
+		local f = function()
+			if (not self.dead) then
+				self.stomping = false
+				self.disableAnimTick = false
+				self.customMove = false
+				self:EnableFlags(kPhysicsFlag_Friction, false) -- resume walking
+				self:TickPhysics()
+			end
+		end
+		blend.Seq(f)
+		
+		f = function(pawn, tag)
+			if (tag == "@squish") then
+				self.bugSounds.StompOne:Play(kSoundChannel_FX, 0)
+				for k,v in pairs(self.stompChain) do
+					v()
+				end
+				self.stompChain = nil
+			end
+		end
+		blend.OnTag = f
 	end
 end
 

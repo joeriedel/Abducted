@@ -140,45 +140,50 @@ function Bug.Spawn(self)
 	Entity.Spawn(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
-	
-	self.seekPlayerDistance = 250
-	
+		
 	if (BoolForString(self.keys.group, false)) then
 		self.model = LoadModel("Characters/Buggroup10")
+		self.guts = LoadModel("FX/bug_guts_group01")
 		self.group = true
-		self.moveSpeed = 100
+		self.moveSpeed = 90
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
 		self.moveRange = {150, 300}
 		self.turnRange = {-30, 30}
 		self.wanderHangOutTime = {0.2, 0.8}
-		self.playerDistance = {100, 250, 400}
-		self.playerSeekAttackDistance = 120
-		self.playerAttackDistance = 10
-		self.zigZagSize = {10, 25}
-		self.zigZagDist = {25, 50}
+		self.playerDistance = {180, 350, 600}
+		self.playerSeekAttackDistance = 210
+		self.playerAttackDistance = 15
+		self.zigZagSize = {10, 15}
+		self.zigZagDist = {40, 80}
 	else
 		self.model = LoadModel("Characters/Bug1")
-		self.moveSpeed = 120
+		self.guts = LoadModel("FX/bug_guts_lone01")
+		self.moveSpeed = 90
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
 		self.moveRange = {200, 400}
 		self.turnRange = {-30, 30}
 		self.wanderHangOutTime = {0.1, 0.2}
-		self.playerDistance = {100, 250, 400}
-		self.playerSeekAttackDistance = 120
-		self.playerAttackDistance = 10
+		self.playerDistance = {180, 350, 600}
+		self.playerSeekAttackDistance = 210
+		self.playerAttackDistance = 15
 		self.zigZagSize = {15, 25}
 		self.zigZagDist = {40, 80}
 	end
+	
+	self.stompDistance = 35
 	
 	self.model.dm = self:AttachDrawModel(self.model)
 	self:SetMins({-24, -24, 0})
 	self:SetMaxs({ 24,  24, 32})
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
---	self.model.dm:SetPos({0, 0, -16}) -- on floor
+
+	self.guts.dm = self:AttachDrawModel(self.guts)
+	self.guts.dm:SetBounds(VecAdd(self:Mins(), {0,0,2}), self:Maxs()) -- avoid clipping problems
+	self.guts.dm:SetVisible(false)
 	
 	if (self.model.BlendToState and self.group) then
 		self.model:BlendToState("crawling")
@@ -224,6 +229,10 @@ end
 
 function Bug.BugBrain(self)
 
+	if (self:CheckStomp()) then
+		return
+	end
+	
 	self:SeekPlayer() -- keep player within range OR attack
 	self:AvoidOtherBugs()
 	
@@ -296,7 +305,7 @@ end
 function Bug.SeekPlayer(self)
 
 	if (not self.group) then
-		if (self:SeekPlayerAttack()) then
+		if ((not (World.playerPawn.stomping or World.playerPawn.bugStun)) and self:SeekPlayerAttack()) then
 			return
 		end
 		
@@ -306,7 +315,6 @@ function Bug.SeekPlayer(self)
 	end
 	
 	self:SeekPlayerDistance()
-	self:CheckAttack()
 end
 
 function Bug.SeekPlayerMoveFinished(self)
@@ -416,17 +424,20 @@ function Bug.SeekPlayerAttack(self)
 			return false
 		end
 		
-		if (VecDot(v, playerFwd) < 0.6) then -- mostly not really behind enough
+		if (VecDot(v, playerFwd) < 0.85) then -- mostly not really behind enough
 			return false
 		end
 	else
+		local dd = VecDot(v, playerFwd)
+		
 		if (self.nextAttackCheck and (self.nextAttackCheck <= Game.time)) then
-			if (VecDot(v, playerFwd) < 0) then -- they turned to face us run away!
+			if (d < 0) then -- they turned to face us run away!
 				return false
 			end
 		end
 		
 		self.nextAttackCheck = Game.time + 1
+		self:CheckAttack(d, dd, playerPos, playerAngle)
 		return true -- keep attacking
 	end
 	
@@ -447,9 +458,7 @@ function Bug.SeekPlayerAttack(self)
 end
 
 function Bug.SeekPlayerAttackAction(self)
-	if (self.busy) then
-		self:CheckAttack()
-	else
+	if (not self.busy) then
 		self.action = nil
 	end
 end
@@ -471,8 +480,85 @@ function Bug.RunToDistance(self, distance, zangle)
 	return false
 end
 
-function Bug.CheckAttack(self)
+function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
+	if (World.playerPawn.stomping or World.playerPawn.bugStun) then
+		return false
+	end
+	
+	if (self.attackCooldown and (self.attackCooldown > Game.time)) then
+		return false
+	end
+	
+	if (d > self.playerAttackDistance) then
+		return false
+	end
+	
+	if (dd < 0.707) then
+		return false -- on front of player
+	end
+
+	local fp = self:FloorPosition()
+	
+	local callback = function()
+		self.think = Bug.BugBrain
+		self.attacking = false
+		self:SetNextThink(0.1)
+		self.attackCooldown = Game.time + 5
+		self:SetMoveType(kMoveType_Floor)
+		self:SetFloorPosition(fp)
+		self:EnableFlags(kPhysicsFlag_Friction, false)
+		self.model:BlendImmediate("idle")
+		self:SetFacing(180)
+		self:Link()
+	end
+
+	self.think = nil
+	self.attacking = true
+	self:Stop()
+	self:SetDesiredMove(nil)
+	self:SetMoveType(kMoveType_None)
+	self:SetOrigin(playerPos)
+	self:SetFacing(playerAngle)
+	self:Link()
+	
+	self.model:BlendToState("bug_stun", nil, true)
+	
+	World.playerPawn:BugStun(callback)
+	return true
+	
+end
+
+function Bug.CheckStomp(self)
+
+	-- stomp, ouchie!
+	local selfPos = self:WorldPos()
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, selfPos)
+	local v, d = VecNorm(v)
+	
+	if (d > self.stompDistance) then
+		return false
+	end
+	
+	local playerAngle = World.playerPawn:TargetAngles()[3]
+	local playerFwd = RotateVecZ({1,0,0}, playerAngle)
+	
+	if (VecDot(playerFwd, v) > 0) then
+		return false -- on back of player
+	end
+
+	local f = function()
+		self.model.dm:SetVisible(false)
+		self.guts.dm:SetVisible(true)
+	end
+
+	self.think = nil
+	self.dead = true
+	self:Stop()
+	World.playerPawn:BugStomp(f)
+	return true
 end
 
 function Bug.SeekWaypoints(self)
@@ -609,6 +695,23 @@ function Bug.Kill(self, instigator)
 	self:SetMoveType(kMoveType_None)
 	self.model.dm:SetVisible(false)
 	self.think = nil
+end
+
+function Bug.PulseKill(self)
+	-- messy!
+	self.dead = true
+	self.think = nil
+	self:Stop()
+	self:SetMoveType(kMoveType_None)
+	
+	if (self.group) then
+		self.model:BlendToState("pulsedeath")
+	else
+		self.model.dm:SetVisible(false)
+	end
+	
+	self.guts.dm:SetVisible(true)
+	
 end
 
 info_bug = Bug

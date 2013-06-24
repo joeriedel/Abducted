@@ -212,6 +212,10 @@ function Abducted.InputKeyAction(self, e)
 end
 
 function Abducted.BeginManipulate(self)
+	if (World.playerPawn.customMove) then
+		return -- busy
+	end
+	
 	if (self.manipulate) then
 		self:EndManipulate()
 		return
@@ -267,6 +271,10 @@ function Abducted.EndManipulate(self, immediate)
 end
 
 function Abducted.BeginPulse(self)
+	if (World.playerPawn.customMove) then
+		return -- busy
+	end
+	
 	if (self.pulse) then
 		self:EndPulse()
 		return

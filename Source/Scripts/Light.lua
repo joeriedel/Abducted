@@ -14,6 +14,7 @@ kLightInteractionFlag_None = 0
 kLightInteractionFlag_World = 1
 kLightInteractionFlag_Player = 2
 kLightInteractionFlag_Objects = 4
+kLightInteractionFlag_All = bit.bor(kLightInteractionFlag_World, kLightInteractionFlag_Player, kLightInteractionFlag_Objects)
 
 kLightEntityFlag_Diffuse = 1
 kLightEntityFlag_Specular = 2
@@ -21,6 +22,7 @@ kLightEntityFlag_CastShadows = 4
 kLightEntityFlag_AffectWorld = 8
 kLightEntityFlag_AffectPlayer = 16
 kLightEntityFlag_AffectObjects = 32
+kLightEntityFlag_AffectAll = bit.bor(kLightEntityFlag_AffectWorld, kLightEntityFlag_AffectPlayer, kLightEntityFlag_AffectObjects)
 
 Light = Entity:New()
 
@@ -44,8 +46,8 @@ function Light.Spawn(self)
 	local radius = NumberForString(self.keys.radius, 400)
 	self.light:SetRadius(radius)
 	
-	local brightness = NumberForString(self.keys.brightness, 2)
-	self.light:SetBrightness(brightness)
+	local intensity = NumberForString(self.keys.intensity, 1)
+	self.light:SetIntensity(intensity)
 	
 	local flags = NumberForString(self.keys.flags, 59)
 	local style = 0

@@ -13,7 +13,7 @@ PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 200
 PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
-PlayerPawn.PulseKillRadius = 200
+PlayerPawn.PulseKillRadius = 25
 PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {

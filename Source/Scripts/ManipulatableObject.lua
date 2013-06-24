@@ -51,7 +51,7 @@ function ManipulatableObject.Spawn(self)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	self.manipulateShift = Vec3ForString(self.keys.manipulate_shift, {0,0,0})
-	self.shakeCamera = BoolForString(self.keys.shake_camera, true)
+	self.shakeCamera = StringForString(self.keys.shake_camera, "false")
 	
 	MakeAnimatable(self)
 	self:SetOccupantType(kOccupantType_BBox)
@@ -202,6 +202,29 @@ function ManipulatableObject.LoadSounds(self)
 		self.sounds.Hit = World.LoadSound(self.keys.hit_sound)
 	end
 	
+	if (self.keys.manipulate_sound) then
+		self.sounds.Manipulate = World.LoadSound(self.keys.manipulate_sound)
+		if (self.keys.loop_manipulate_sound) then
+			self.sounds.Manipulate:SetLoop(true)
+		end
+	end
+	
+	if (self.keys.manipulate_endstop_sound) then
+		self.sounds.ManipulateEnd = World.LoadSound(self.keys.manipulate_endstop_sound)
+	end
+	
+	if (self.keys.reset_sound) then
+		if (self.keys.reset_sound == self.keys.manipulate_sound) then
+			-- don't make 2 emitters
+			self.sounds.Reset = self.sounds.Manipulate
+		else
+			self.sounds.Reset = World.LoadSound(self.keys.reset_sound)
+			if (self.keys.loop_manipulate_sound) then
+				self.sounds.Reset:SetLoop(true)
+			end
+		end
+	end
+	
 	if (self.keys.death_sound) then
 		self.sounds.Death = World.LoadSound(self.keys.death_sound)
 	end
@@ -248,6 +271,18 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "hide") then
 		self:Show(false)
+		return true
+	elseif (cmd == "manipulate_left") then
+		self:Manipulate("left", nil, args ~= "permanent")
+		return true
+	elseif (cmd == "manipulate_right") then
+		self:Manipulate("right", nil, args ~= "permanent")
+		return true
+	elseif (cmd == "manipulate_up") then
+		self:Manipulate("up", nil, args ~= "permanent")
+		return true
+	elseif (cmd == "manipulate_down") then
+		self:Manipulate("down", nil, args ~= "permanent")
 		return true
 	end
 	
@@ -482,22 +517,27 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		end
 		
 		x.entity.model.vision:BlendTo(rgba, time)
-		ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
+		
+		if (x.entity.skillRequired <= (PlayerSkills.Manipulate+1)) then
+			ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
+		end
 	end
 	
 	LL_Do(ManipulatableObject.Objects, f)
+	
+	ManipulatableObjectUI:NotifySingle()
 
 end
 
 function ManipulatableObject.SelectColor(self)
 		
 	if (self.skillRequired > PlayerSkills.Manipulate+1) then
-		return {1,0.5,0.5,1}
+		return {1,0,0,1}
 	elseif (self.skillRequired <= PlayerSkills.Manipulate) then
-		return {0.5,1,0.5,1}
+		return {0,1,0,1}
 	end
 	
-	return {1,1,0.5,1}
+	return {1,1,0,1}
 end
 
 function ManipulatableObject.FindSwipeTarget(g)
@@ -536,7 +576,7 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 	while (x) do
 	
-		if (x.entity.visible) then
+		if (x.entity.visible and (x.entity.skillRequired <= (PlayerSkills.Manipulate+1))) then
 			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
 			local screen,r = World.Project(world)
 			local dx, dy, dd
@@ -705,7 +745,7 @@ function ManipulatableObject.ManipulateUpDown(target, g)
 	return target:Manipulate(dir, dir)
 end
 
-function ManipulatableObject.Manipulate(self, objDir, playerDir)
+function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 
 	local state = "manipulate_"..objDir
 	local idle  = "manipulate_"..objDir.."_idle"
@@ -716,10 +756,28 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	end
 	
 	local f = function()
-		if (self.shakeCamera) then
+		if (self.shakeCamera == "EndOf") then
 			self:ShakeCamera()
 		end
+		if (self.sounds.ManipulateEnd) then
+			if (self.sounds.Manipulate) then
+				self.sounds.Manipulate:Stop()
+			end
+			self.sounds.ManipulateEnd:Play(kSoundChannel_FX, 0)
+		elseif (self.sounds.Manipulate) then
+			self.sounds.Manipulate:FadeOutAndStop(0.1)
+		end
+		
 		self:DoManipulateDamage(objDir)
+	end
+	
+	if (self.shakeCamera == "StartOf") then
+		self:ShakeCamera()
+	end
+	
+	if (self.sounds.Manipulate) then
+		self.sounds.Manipulate:FadeVolume(1, 0)
+		self.sounds.Manipulate:Play(kSoundChannel_FX, 0)
 	end
 	
 	self.manipulate = objDir
@@ -732,11 +790,26 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
-	if (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate)) then
+	if (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate) or forceReset) then
 		local f = function ()
 			self.manipulate = nil
 			local blend = self:PlayAnim(ret, self.model)
 			if (blend) then
+				if (self.sounds.Reset) then
+					local f = function()
+						if (self.sounds.ManipulateEnd) then
+							if (self.sounds.Reset) then
+								self.sounds.Reset:Stop()
+							end
+							self.sounds.ManipulateEnd:Play(kSoundChannel_FX, 0)
+						elseif (self.sounds.Reset) then
+							self.sounds.Reset:FadeOutAndStop(0.1)
+						end
+					end
+					self.sounds.Reset:FadeVolume(1, 0)
+					self.sounds.Reset:Play(kSoundChannel_FX, 0)
+					blend.Seq(f)
+				end
 				blend.Seq(ManipulatableObject.Idle)
 			else
 				self:Idle()
@@ -756,15 +829,16 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir)
 	end
 	
 	-- tell the player they moved us
-	World.playerPawn:ManipulateDir(playerDir)
-	self:LookInDir(objDir)
-	
-	if (self.keys.on_manipulated) then
-		World.PostEvent(self.keys.on_manipulated)
+	if (playerDir) then -- this indicates it was done by the player and not a scripted event
+		World.playerPawn:ManipulateDir(playerDir)
+		self:LookInDir(objDir)
+		if (self.keys.on_manipulated) then
+			World.PostEvent(self.keys.on_manipulated)
+		end
+		
+		Abducted.entity:EndManipulate()
+		HUD:RechargeManipulate()
 	end
-	
-	Abducted.entity:EndManipulate()
-	HUD:RechargeManipulate()
 	
 	return true
 

@@ -255,10 +255,10 @@ function World.LoadOptionalSound(path, numInstances, async, refDistance, maxDist
 	local sound = World.LoadOptional(path, numInstances, async)
 	if (sound) then
 		if (refDistance == nil) then
-			refDistance = 150
+			refDistance = 250
 		end
 		if (maxDistance == nil) then
-			maxDistance = 300
+			maxDistance = 500
 		end
 		
 		sound:SetRefDistance(refDistance)

@@ -7,6 +7,7 @@
 
 #include "G_ManipulatableObject.h"
 #include <Engine/World/World.h>
+#include <Engine/World/WorldDraw.h>
 #include <Engine/MathUtils.h>
 
 namespace world {
@@ -64,6 +65,10 @@ void G_ManipulatableObject::CheckEnter() {
 	BBox bounds;
 	GetTouchBounds(bounds);
 
+#if defined(WORLD_DEBUG_DRAW)
+	world->draw->DebugAddEntityBBox(bounds);
+#endif
+
 	Entity::Ref instigator = world->FirstBBoxTouching(bounds, m_touchClass);
 	if (instigator) {
 		m_instigator = instigator;
@@ -84,6 +89,11 @@ void G_ManipulatableObject::CheckExit() {
 
 		BBox touchBounds;
 		GetTouchBounds(touchBounds);
+
+#if defined(WORLD_DEBUG_DRAW)
+		world->draw->DebugAddEntityBBox(touchBounds);
+#endif
+
 		if (!bounds.Touches(touchBounds)) {
 			instigator.reset();
 		}

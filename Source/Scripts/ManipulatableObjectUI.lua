@@ -152,6 +152,28 @@ function ManipulatableObjectUI.NotifyObject(self, entity, enabled, time)
 	w.target = entity
 end
 
+function ManipulatableObjectUI.NotifySingle(self)
+
+	-- only one object?
+	if (self.nextPanel == 2) then
+		local w = ManipulatableObjectUI.Widgets[kAction_Select1]
+		-- select it by default
+		if (w) then
+			self.target = w
+			w.circle:SetMaterial(self.gfx.CenterPressed)
+			w.left.bkg:BlendTo({1,1,1,1}, 0.1)
+			w.left.label:BlendTo({1,1,1,1}, 0.1)
+			w.right.bkg:BlendTo({1,1,1,1}, 0.1)
+			w.right.label:BlendTo({1,1,1,1}, 0.1)
+			w.up.bkg:BlendTo({1,1,1,1}, 0.1)
+			w.up.label:BlendTo({1,1,1,1}, 0.1)
+			w.down.bkg:BlendTo({1,1,1,1}, 0.1)
+			w.down.label:BlendTo({1,1,1,1}, 0.1)
+		end
+	end
+
+end
+
 function ManipulatableObjectUI.HandleAction(self, action)
 	
 	if ((action ~= kAction_ManipulateLeft) and (action ~= kAction_ManipulateRight) and
@@ -166,30 +188,30 @@ function ManipulatableObjectUI.HandleAction(self, action)
 		if (action == kAction_ManipulateLeft) then
 			if (self.target.target:CanManipulateDir("left")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
-				self.target.target:DoManipulateCommand("left")
 				self.target.left.pressed = true
 				self.target.left.class:SetGfxState(self.target.left, true)
+				self.target.target:DoManipulateCommand("left")
 			end
 		elseif (action == kAction_ManipulateRight) then
 			if (self.target.target:CanManipulateDir("right")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
-				self.target.target:DoManipulateCommand("right")
 				self.target.right.pressed = true
 				self.target.right.class:SetGfxState(self.target.right, true)
+				self.target.target:DoManipulateCommand("right")
 			end
 		elseif (action == kAction_ManipulateUp) then
 			if (self.target.target:CanManipulateDir("up")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
-				self.target.target:DoManipulateCommand("up")
 				self.target.up.pressed = true
 				self.target.up.class:SetGfxState(self.target.up, true)
+				self.target.target:DoManipulateCommand("up")
 			end
 		elseif (action == kAction_ManipulateDown) then
 			if (self.target.target:CanManipulateDir("down")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
-				self.target.target:DoManipulateCommand("down")
 				self.target.down.pressed = true
 				self.target.down.class:SetGfxState(self.target.down, true)
+				self.target.target:DoManipulateCommand("down")
 			end
 		end
 	else

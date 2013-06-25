@@ -26,7 +26,10 @@ function BugSpawner.Spawn(self)
 	self.enabled = self.enabled
 	self.continuous = StringForString(self.keys.mode, "singleshot") == "continuous"
 	self.radiusTarget = self
-	self.aggression = Max(NumberForString(self.keys.aggression, 1), 1)
+	self.aggression = NumberForString(self.keys.aggression, 1)
+	if (self.aggression <= 0) then
+		self.aggression = 1
+	end
 	self.active = 0
 	self.total = 0
 	

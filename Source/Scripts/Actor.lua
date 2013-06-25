@@ -42,7 +42,7 @@ function Actor.Spawn(self)
 end
 
 function Actor.OnEvent(self, cmd, args)
-	COutLineEvent("Actor", cmd, args)
+	COutLineEvent("Actor", self.keys.targetname, cmd, args)
 	
 	if (cmd == "show") then
 		self.visible = true

@@ -187,7 +187,7 @@ end
 
 function ScriptNode.OnEvent(self, cmd, args)
 
-	COutLineEvent("ScriptNode", cmd, args)
+	COutLineEvent("ScriptNode", self.keys.targetname, cmd, args)
 
 	if cmd == "trigger" then
 		local input = 1
@@ -241,7 +241,7 @@ function ScriptNode.SaveState(self)
 	}
 	
 	if (self.think) then
-		state.think = self.thinkFunc
+		state.thinkFunc = self.thinkFunc
 		state.thinkTime = tostring(self.thinkTime)
 	end
 	
@@ -256,7 +256,7 @@ function ScriptNode.LoadState(self, state)
 	self.triggers[1] = tonumber(state.trigger1)
 	self.triggers[2] = tonumber(state.trigger2)
 	
-	if (state.think) then
+	if (state.thinkFunc) then
 		self.thinkFunc = state.thinkFunc
 		self.thinkTime = tonumber(state.thinkTime)
 		

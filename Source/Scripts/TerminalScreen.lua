@@ -162,7 +162,7 @@ function TerminalScreen.UpdateActivated(self)
 end
 
 function TerminalScreen.OnEvent(self, cmd, args)
-	COutLineEvent("TerminalScreen", cmd, args)
+	COutLineEvent("TerminalScreen", self.keys.targetname, cmd, args)
 	
 	if (cmd == "enable") then
 		self.enabled = true

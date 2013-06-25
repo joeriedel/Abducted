@@ -42,7 +42,7 @@ end
 
 function Sprite.OnEvent(self, cmd, args)
 
-	COutLineEvent("Sprite", cmd, args)
+	COutLineEvent("Sprite", self.keys.targetname, cmd, args)
 	
 	if (cmd == "fadein") then
 		if (not self.visible) then

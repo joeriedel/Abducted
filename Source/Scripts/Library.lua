@@ -7,11 +7,15 @@
 	Print
 -----------------------------------------------------------------------------]]
 
-function COutLineEvent(class, cmd, args)
+function COutLineEvent(class, targetname, cmd, args)
+	if (targetname == nil) then
+		targetname = "<unknown>"
+	end
+		
 	if (args) then
-		COutLine(kC_Debug, "%s.OnEvent(%s, %s)", class, cmd, args)
+		COutLine(kC_Debug, "%s.OnEvent(%s, %s, %s)", class, targetname, cmd, args)
 	else
-		COutLine(kC_Debug, "%s.OnEvent(%s)", class, cmd)
+		COutLine(kC_Debug, "%s.OnEvent(%s, %s)", class, targetname, cmd)
 	end
 end
 

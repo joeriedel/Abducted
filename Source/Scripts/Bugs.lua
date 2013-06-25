@@ -172,7 +172,7 @@ function BugSpawner.NotifyDead(self)
 end
 
 function BugSpawner.OnEvent(self, cmd, args)
-	COutLineEvent("BugSpawner", cmd, args)
+	COutLineEvent("BugSpawner", self.keys.targetname, cmd, args)
 	
 	if (cmd == "enable") then
 		self.enabled = true
@@ -296,7 +296,7 @@ function Bug.Spawn(self)
 				doBugBrain()
 			end
 		}
-		self.model.BlendImmediate(self.keys.intro_anim, nil, false, self, callbacks)
+		self.model:BlendImmediate(self.keys.intro_anim, nil, false, self, callbacks)
 	else
 		doBugBrain()
 	end

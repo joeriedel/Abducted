@@ -31,7 +31,7 @@ function ViewController.OnLevelStart(self)
 end
 
 function ViewController.OnEvent(self, cmd, args)
-	COutLineEvent("ViewController", cmd, args)
+	COutLineEvent("ViewController", "@view", cmd, args)
 	
 	if (cmd == "shake") then
 		self:HandleShakeCmd(cmd, args)

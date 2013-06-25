@@ -79,6 +79,8 @@ function ManipulatableObject.Spawn(self)
 	
 	self.enabled = false
 	self.canAttack = false
+	self.enableManipulateShimmer = false
+	self.didManipulateShimmer = false
 	self.swipePos = {0, 0, 0}
 	
 	self:Show(BoolForString(self.keys.visible, true))
@@ -268,7 +270,7 @@ function ManipulatableObject.Show(self, show)
 end
 
 function ManipulatableObject.OnEvent(self, cmd, args)
-	COutLineEvent("ManipulatableObject", cmd, args)
+	COutLineEvent("ManipulatableObject", self.keys.targetname, cmd, args)
 	
 	if (cmd == "activate") then
 		self:ManipulateShimmer()
@@ -393,7 +395,10 @@ function ManipulatableObject.Sleep(self)
 	if (self.sounds.Sleep) then
 		self.sounds.Sleep:Play(kSoundChannel_FX, 0)
 	end
-	
+	if (self.sounds.Idle) then
+		self.sounds.Idle:FadeOutAndStop(1)
+	end
+		
 	if (blend) then
 		blend.Seq(ManipulatableObject.Dormant2)
 	else
@@ -419,7 +424,7 @@ function ManipulatableObject.Awaken(self)
 	end
 	local blend = self:PlayAnim("awaken", self.model)
 	if (self.sounds.Dormant) then
-		self.sounds.Dormant:FadeVolume(0, 1)
+		self.sounds.Dormant:FadeOutAndStop(1)
 	end
 	if (blend) then
 		blend.Seq(ManipulatableObject.Idle)
@@ -942,7 +947,9 @@ function ManipulatableObject.SaveState(self)
 
 	local state = {
 		awake = tostring(self.awake),
-		visible = tostring(self.visible)
+		visible = tostring(self.visible),
+		enableManipulateShimmer = tostring(self.enableManipulateShimmer),
+		didManipulateShimmer = tostring(self.didManipulateShimmer)
 	}
 	
 	if (self.saveManipulateDir) then
@@ -957,6 +964,14 @@ function ManipulatableObject.LoadState(self, state)
 	self:Show(state.visible == "true")
 	self.think = nil
 	self.model.vision:BlendTo({1,1,1,0}, 0)
+	
+	if (self.manipulateShimmerTimer) then
+		self.manipulateShimmerTimer:Clean()
+		self.manipulateShimmerTimer = nil
+	end
+	
+	self.enableManipulateShimmer = state.enableManipulateShimmer == "true"
+	self.didManipulateShimmer = state.didManipulateShimmer == "true"
 	
 	if (state.awake == "true") then
 		self.awake = true

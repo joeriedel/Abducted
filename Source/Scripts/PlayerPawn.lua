@@ -628,7 +628,7 @@ function PlayerPawn.CheckTappedOn(self, e)
 end
 
 function PlayerPawn.OnEvent(self, cmd, args)
-	COutLineEvent("PlayerPawn", cmd, args)
+	COutLineEvent("PlayerPawn", "@player", cmd, args)
 	
 	if (cmd == "state") then
 		if (args == nil) then

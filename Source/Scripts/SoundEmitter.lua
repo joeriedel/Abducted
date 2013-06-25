@@ -75,7 +75,7 @@ function SoundEmitter.Enable(self, enable) -- callback from native code
 end
 
 function SoundEmitter.OnEvent(self, cmd, args)
-	COutLineEvent("SoundEmitter", cmd, args)
+	COutLineEvent("SoundEmitter", self.keys.targetname, cmd, args)
 	
 	if cmd == "start" or cmd == "play" then
 		self.on = true

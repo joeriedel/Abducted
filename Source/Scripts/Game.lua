@@ -64,7 +64,7 @@ end
 
 function Game.OnEvent(self, cmd, args)
 
-	COutLineEvent("Game", cmd, args)
+	COutLineEvent("Game", "@world", cmd, args)
 	
 	if cmd == "fadein" then
 		UI:FadeIn(tonumber(args))

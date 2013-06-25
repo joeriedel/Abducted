@@ -24,7 +24,7 @@ function ManipulatableObject.Spawn(self)
 	self:SetAngles(angleVertex)
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 160
+	spring.elasticity = 200
 	self:SetAngleSpring(spring)
 	
 	self.model = LoadSkModel(self.keys.model)
@@ -348,6 +348,9 @@ function ManipulatableObject.Dormant(self)
 		if (self.sounds.Dormant) then
 			self.sounds.Dormant:Play(kSoundChannel_FX, 0)
 		end
+		if (self.sounds.Idle) then
+			self.sounds.Idle:FadeOutAndStop(1)
+		end
 	end
 end
 
@@ -369,6 +372,9 @@ function ManipulatableObject.Dormant2(self)
 		end
 		if (self.sounds.Dormant) then
 			self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+		end
+		if (self.sounds.Idle) then
+			self.sounds.Idle:FadeOutAndStop(1)
 		end
 	end
 end
@@ -426,6 +432,9 @@ function ManipulatableObject.Awaken(self)
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeOutAndStop(1)
 	end
+	if (self.sounds.Idle) then
+		self.sounds.Idle:FadeOutAndStop(1)
+	end
 	if (blend) then
 		blend.Seq(ManipulatableObject.Idle)
 		if (self.sounds.Awaken) then
@@ -442,8 +451,16 @@ function ManipulatableObject.Idle(self)
 	self.awake = true
 	self.canAttack = true
 	self:PlayAnim("idle", self.model, false)
+	
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
+	end
+	if (self.sounds.Dormant) then
+		self.sounds.Dormant:FadeOutAndStop(1)
+	end
+	
+	if (self.autoFace) then
+		self:SetAutoFace(World.playerPawn)
 	end
 	
 	self:AddToManipulateList()
@@ -819,6 +836,8 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 	self.canAttack = false
 	self.enabled = false
 	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
+	self:SetAutoFace(nil)
+	self:EnableTouch(false)
 	
 	-- no longer manipulatable
 	self.model.vision:BlendTo({1,1,1,0}, 0.5)
@@ -982,6 +1001,19 @@ function ManipulatableObject.LoadState(self, state)
 			-- no longer manipulatable
 			self:RemoveFromManipulateList()
 			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
+			if (self.sounds.Idle) then
+				self.sounds.Idle:Stop()
+			end
+			if (self.sounds.Dormant) then
+				self.sounds.Dormant:Stop()
+			end
+			if (self.sounds.Sleep) then
+				self.sounds.Sleep:Stop()
+			end
+			if (self.sounds.Manipulate) then
+				self.sounds.Manipulate:FadeVolume(1, 0)
+				self.sounds.Manipulate:Play(kSoundChannel_FX, 0)
+			end
 		else
 			self.enabled = true
 			self.canAttack = true
@@ -994,6 +1026,18 @@ function ManipulatableObject.LoadState(self, state)
 				end
 				World.viewController:AddLookTarget(self.manipulateTarget, self.manipulateShift, fov)
 			end
+			if (self.sounds.Idle) then
+				self.sounds.Idle:Play()
+			end
+			if (self.sounds.Dormant) then
+				self.sounds.Dormant:Stop()
+			end
+			if (self.sounds.Sleep) then
+				self.sounds.Sleep:Stop()
+			end
+			if (self.sounds.Manipulate) then
+				self.sounds.Manipulate:Stop()
+			end
 		end
 	else
 		self.awake = false
@@ -1001,6 +1045,19 @@ function ManipulatableObject.LoadState(self, state)
 		self.canAttack = false
 		self:RemoveFromManipulateList()
 		self.model:BlendImmediate("dormant")
+		
+		if (self.sounds.Idle) then
+			self.sounds.Idle:Stop()
+		end
+		if (self.sounds.Dormant) then
+			self.sounds.Dormant:Play()
+		end
+		if (self.sounds.Sleep) then
+			self.sounds.Sleep:Stop()
+		end
+		if (self.sounds.Manipulate) then
+			self.sounds.Manipulate:Stop()
+		end
 	end
 
 end

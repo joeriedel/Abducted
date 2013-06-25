@@ -62,10 +62,10 @@ function ManipulatableObject.Spawn(self)
 			error(string.format("ManipulatableObject: bone named %s not found", self.keys.damage_bone))
 		end
 		local size = Vec3ForString(self.keys.damage_bone_size, {16, 16, 16})
-		VecScale(size, 0.5)
+		size = VecScale(size, 0.5)
 		self:SetTouchBone(self.model.dm, boneIdx)
 		self:SetTouchBoneBounds(VecNeg(size), size)
-		self:SetTouchClassBits(kEntityClass_Player)
+		self:SetTouchClassBits(bit.bor(kEntityClass_Player, kEntityClass_Monster))
 		self.canDamage = true
 	end
 	
@@ -451,6 +451,7 @@ function ManipulatableObject.Idle(self)
 	self.awake = true
 	self.canAttack = true
 	self:PlayAnim("idle", self.model, false)
+	self:EnableTouch(false)
 	
 	if (self.sounds.Idle) then
 		self.sounds.Idle:Play(kSoundChannel_FX, 0)
@@ -525,8 +526,7 @@ function ManipulatableObject.AttackFinish(self)
 	COutLine(kC_Debug, "ManipulatableObject.AttackFinish")
 	
 	self:Idle()
-	self:EnableTouch(false)
-	
+		
 	if (self.keys.on_attack_end) then
 		World.PostEvent(self.keys.on_attack_end)
 	end
@@ -821,6 +821,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 		end
 		
 		self:DoManipulateDamage(objDir)
+		self:EnableTouch(false)
 	end
 	
 	if (self.shakeCamera == "StartOf") then
@@ -837,8 +838,9 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 	self.enabled = false
 	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
 	self:SetAutoFace(nil)
-	self:EnableTouch(false)
 	
+	self:EnableTouch(self.canDamage)
+		
 	-- no longer manipulatable
 	self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	self:RemoveFromManipulateList()

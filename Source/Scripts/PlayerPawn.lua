@@ -150,7 +150,6 @@ function PlayerPawn.Spawn(self)
 	self.pulseSounds.Hum:SetLoop(true)
 	
 	self.bugSounds = {
-		StompOne = World.LoadSound("Audio/EFX_SingleBugSquish_rev1"),
 		Stun = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
 		Eaten = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
 		Kill = World.LoadSound("Audio/EFX_ManyBugSquish_rev1")
@@ -812,7 +811,6 @@ function PlayerPawn.BugStomp(self, callback)
 		
 		f = function(pawn, tag)
 			if (tag == "@squish") then
-				self.bugSounds.StompOne:Play(kSoundChannel_FX, 0)
 				for k,v in pairs(self.stompChain) do
 					v()
 				end
@@ -826,7 +824,6 @@ end
 function PlayerPawn.AbortBugAction(self)
 
 	if (self.stompChain) then
-		self.bugSounds.StompOne:Play(kSoundChannel_FX, 0)
 		for k,v in pairs(self.stompChain) do
 			v()
 		end

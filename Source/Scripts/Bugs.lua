@@ -194,6 +194,7 @@ info_bug_spawner = BugSpawner
 
 Bug = Entity:New()
 Bug.KillMessages = { "BUG_KILLED_MESSAGE1" }
+Bug.DebugMessages = false
 
 function Bug.Spawn(self)
 
@@ -238,6 +239,10 @@ function Bug.Spawn(self)
 	end
 	
 	self.stompDistance = 35
+	
+	self.sounds = {}
+	self.sounds.Squish = World.LoadSound("Audio/EFX_SingleBugSquish_rev1")
+	self:AttachSound(self.sounds.Squish)
 	
 	self.model.dm = self:AttachDrawModel(self.model)
 	self:SetMins({-24, -24, 0})
@@ -366,7 +371,9 @@ function Bug.UpdateRandomMove(self, moveCompleteCallback)
 				self.angle = angle
 				self.busy = true
 				self.floorMoveCallback = moveCompleteCallback
-				COutLine(kC_Debug, "Bug.RandomMove")
+				if (Bug.DebugMessages) then
+					COutLine(kC_Debug, "Bug.RandomMove")
+				end
 				return -- success
 			else
 				COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - CreateFloorMove() failed.")
@@ -386,6 +393,12 @@ end
 
 function Bug.PlayerInSpawnerRadius(self)
 
+	if ((World.playerPawn.floorPosition == nil) or 
+        (self.floorPosition == nil) or 
+        (self.playerPawn.floorPosition.floor ~= self.floorPosition.floor)) then
+		return false
+	end
+	
 	if (self.spawner.radius < 1) then
 		return true
 	end
@@ -447,7 +460,9 @@ function Bug.SeekSpawner(self)
 	if (self:RunToDistance(runDistance, v)) then
 		self.angle = LookAngles(v)[3]
 		self.action = Bug.SeekSpawnerAction
-		COutLine(kC_Debug, "Bug.SeekSpawner")
+		if (Bug.DebugMessages) then
+			COutLine(kC_Debug, "Bug.SeekSpawner")
+		end
 		return true
 	end
 	
@@ -491,7 +506,9 @@ function Bug.SeekPlayerDistance(self)
 	if (self:RunToDistance(runDistance, v)) then
 		self.angle = LookAngles(v)[3]
 		self.action = Bug.SeekPlayerDistanceAction
-		COutLine(kC_Debug, "Bug.SeekPlayerDistance")
+		if (Bug.DebugMessages) then
+			COutLine(kC_Debug, "Bug.SeekPlayerDistance")
+		end
 		return true
 	end
 	
@@ -548,7 +565,9 @@ function Bug.RunAwayFromPlayer(self)
 	if (self:RunToDistance(runDistance, runAngle)) then
 		self.angle = runAngle
 		self.action = Bug.RunAwayFromPlayerAction
-		COutLine(kC_Debug, "Bug.RunAwayFromPlayer")
+		if (Bug.DebugMessages) then
+			COutLine(kC_Debug, "Bug.RunAwayFromPlayer")
+		end
 		return true
 	end
 	
@@ -625,7 +644,9 @@ function Bug.SeekPlayerAttack(self)
 	if (self:RunToDistance(d, v)) then
 		self.angle = LookAngles(v)[3]
 		self.action = Bug.SeekPlayerAttackAction
-		COutLine(kC_Debug, "Bug.SeekPlayerAttack")
+		if (Bug.DebugMessages) then
+			COutLine(kC_Debug, "Bug.SeekPlayerAttack")
+		end
 		return true
 	end
 		
@@ -710,7 +731,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 end
 
 function Bug.CheckGroupAttack(self)
-	if (World.playerPawn.dead) then
+	if (World.playerPawn.dead or PlayerPawn.GodMode) then
 		return false
 	end
 	
@@ -919,6 +940,7 @@ function Bug.Kill(self, instigator)
 	self.guts.dm:SetVisible(true)
 	self.think = nil
 	self.dead = true
+	self.sounds.Squish:Play(kSoundChannel_FX, 0)
 	
 	if (self.spawner) then
 		self.spawner:NotifyDead()
@@ -931,7 +953,7 @@ function Bug.PulseKill(self)
 	self.think = nil
 	self:Stop()
 	self:SetMoveType(kMoveType_None)
-	
+	self.sounds.Squish:Play(kSoundChannel_FX, 0)
 	if (self.group) then
 		self.model:BlendToState("pulsedeath")
 	else

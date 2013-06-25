@@ -68,6 +68,7 @@ cv_loadcheckpoint = CVarFunc("loadcheckpoint", "_cv_loadcheckpoint_func")
 cv_savechecpoint = CVarFunc("savecheckpoint", "_cv_savecheckpoint_func")
 cv_postevent = CVarFunc("postevent", "_cv_postevent_func")
 cv_r_fly = CVarBool("r_fly", false)
+cv_godmode = CVarFunc("godmode", "_cv_godmode_func")
 
 -------------------------------------------------------------------------------
 
@@ -176,4 +177,13 @@ end
 
 function _cv_postevent_func(cmd)
 	World.PostEvent(cmd)
+end
+
+function _cv_godmode_func(cmd)
+	PlayerPawn.GodMode = not PlayerPawn.GodMode
+	if (PlayerPawn.GodMode) then
+		COutLine(kC_Debug, "godmode ON")
+	else
+		COutLine(kC_Debug, "godmode OFF")
+	end
 end

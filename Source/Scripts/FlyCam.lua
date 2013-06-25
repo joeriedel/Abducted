@@ -55,6 +55,9 @@ function FlyCam.HandleInput(self, e)
 	end
 	
 	if ((e.type == kI_KeyDown) or (e.type == kI_KeyUp)) then
+		if (Abducted.entity.manipulate) then
+			return false
+		end
 		return self:HandleKey(e)
 	elseif ((e.type == kI_MouseDown) or (e.type == kI_MouseUp) or (e.type == kI_MouseMove)) then
 		return self:HandleMouse(e)

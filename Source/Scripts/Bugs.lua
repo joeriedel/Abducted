@@ -18,22 +18,55 @@ function BugSpawner.Spawn(self)
 	
 	self.enabled = BoolForString(self.keys.enabled, false)
 	self.count = NumberForString(self.keys.count, 1)
-	self.radius = NumberForString(self.keys.radius, 25)
+	self.maxCount = NumberForString(self.keys.max_count, 0)
+	self.radius = NumberForString(self.keys.radius, 0)
+	self.spawn_radius = NumberForString(self.keys.spawn_radius, 25)
 	self.delay = NumberForString(self.keys.delay, 0)
 	self.probability = NumberForString(self.keys.probability, 0)
 	self.enabled = self.enabled
+	self.continuous = StringForString(self.keys.mode, "singleshot") == "continuous"
+	self.radiusTarget = self
+	self.aggression = Max(NumberForString(self.keys.aggression, 1), 1)
 	self.active = 0
-	self.targetLink = LL_Append(Abducted.PulseTargets, {entity=self})
+	self.total = 0
+	
+	self:Precache("Characters/Buggroup10")
+	self:Precache("FX/bug_guts_group01")
+	self:Precache("Characters/Bug1")
+	self:Precache("FX/bug_guts_lone01")
+	
+	self.sounds = {}
+	
+	if (self.keys.spawn_sound) then
+		self.sounds.Spawn = World.LoadSound(self.keys.spawn_sound)
+		self:AttachSound(self.sounds.Spawn)
+	end
+	
+	if (self.keys.respawn_sound) then
+		self.sounds.Respawn = World.LoadSound(self.keys.respawn_sound)
+		self:AttachSound(self.sounds.Respawn)
+	end
+	
+	if (self.enabled) then
+		if (self.sounds.Spawn) then
+			self.sounds.Spawn:Play(kSoundChannel_FX, 0)
+		end
+		self:Go()
+	end
+	
+end
 
-	self:Go()
+function BugSpawner.PostSpawn(self)
 
+	if (self.keys.radius_targetname) then
+		local target = World.FindEntityTargets(self.keys.radius_targetname)
+		if (target) then
+			self.radiusTarget = target[1]
+		end
+	end
 end
 
 function BugSpawner.Go(self)
-	if (not self.enabled) then
-		return
-	end
-	
 	if (not self.validFloorPosition) then
 		return
 	end
@@ -56,15 +89,27 @@ function BugSpawner.Think(self)
 	keys.origin = Vec3ToString(fp.pos)
 	keys.bug_waypoint = self.keys.bug_waypoint
 	keys.group = tostring(math.random() < self.probability)
+	keys.aggression = tostring(self.aggression)
 	
-	World.TempSpawn(keys)
+	if (self.keys.intro_anim) then
+		keys.intro_anim = self.keys.intro_anim
+	end
+	
+	if (self.keys.intro_angle) then
+		keys.intro_angle = self.keys.intro_angle
+	end
+	
+	local bug = World.TempSpawn(keys)
+	bug.spawner = self
 	
 	self.active = self.active + 1
+	self.total = self.total + 1
 	
-	if (self.active >= self.count) then
+	if (((self.maxCount > 0) and (self.total >= self.maxCount)) or (self.active >= self.count)) then
 		self.think = nil
 	end
 	
+	COutLine(kC_Debug, "Spawned Bug")
 end
 
 function BugSpawner.FindSpawnPosition(self)
@@ -73,7 +118,7 @@ function BugSpawner.FindSpawnPosition(self)
 		return self.floorPosition
 	end
 	
-	if (self.radius < 1) then
+	if (self.keys.intro_anim or (self.radius < 1)) then
 		return self.floorPosition
 	end
 	
@@ -110,15 +155,27 @@ end
 function BugSpawner.NotifyDead(self)
 
 	self.active = self.active - 1
-	if (self.active < self.count) then
-		self:Go()
+	if ((self.maxCount < 1) or (self.total < self.maxCount)) then
+		if (self.active < self.count) then
+			if (self.continuous and self.enabled) then
+				if (self.sounds.Respawn) then
+					self.sounds.Respawn:Play(kSoundChannel_FX, 0)
+				end
+				self:Go()
+			end
+		end
 	end
-
+	
 end
 
-function BugSpawner.OnEvent(cmd, args)
+function BugSpawner.OnEvent(self, cmd, args)
+	COutLineEvent("BugSpawner", cmd, args)
+	
 	if (cmd == "enable") then
 		self.enabled = true
+		if (self.sounds.Spawn) then
+			self.sounds.Spawn:Play(kSoundChannel_FX, 0)
+		end
 		self:Go()
 	elseif (cmd == "disable") then
 		self.enabled = false
@@ -133,6 +190,7 @@ info_bug_spawner = BugSpawner
 -----------------------------------------------------------------------------]]
 
 Bug = Entity:New()
+Bug.KillMessages = { "BUG_KILLED_MESSAGE1" }
 
 function Bug.Spawn(self)
 
@@ -141,6 +199,8 @@ function Bug.Spawn(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 		
+	self.aggression = NumberForString(self.keys.aggression, 1)
+	
 	if (BoolForString(self.keys.group, false)) then
 		self.model = LoadModel("Characters/Buggroup10")
 		self.guts = LoadModel("FX/bug_guts_group01")
@@ -149,14 +209,14 @@ function Bug.Spawn(self)
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
-		self.moveRange = {150, 300}
-		self.turnRange = {-30, 30}
+		self.moveRange = {600, 1000}
+		self.turnRange = {-15, 15}
 		self.wanderHangOutTime = {0.2, 0.8}
-		self.playerDistance = {180, 350, 600}
-		self.playerSeekAttackDistance = 210
-		self.playerAttackDistance = 15
+		self.playerDistance = {150, 250, 600}
+		self.playerSeekAttackDistance = 210 * self.aggression
+		self.playerAttackDistance = 75
 		self.zigZagSize = {10, 15}
-		self.zigZagDist = {40, 80}
+		self.zigZagDist = {100, 150}
 	else
 		self.model = LoadModel("Characters/Bug1")
 		self.guts = LoadModel("FX/bug_guts_lone01")
@@ -169,7 +229,7 @@ function Bug.Spawn(self)
 		self.wanderHangOutTime = {0.1, 0.2}
 		self.playerDistance = {180, 350, 600}
 		self.playerSeekAttackDistance = 210
-		self.playerAttackDistance = 15
+		self.playerAttackDistance = 30 * self.aggression
 		self.zigZagSize = {15, 25}
 		self.zigZagDist = {40, 80}
 	end
@@ -184,10 +244,6 @@ function Bug.Spawn(self)
 	self.guts.dm = self:AttachDrawModel(self.guts)
 	self.guts.dm:SetBounds(VecAdd(self:Mins(), {0,0,2}), self:Maxs()) -- avoid clipping problems
 	self.guts.dm:SetVisible(false)
-	
-	if (self.model.BlendToState and self.group) then
-		self.model:BlendToState("crawling")
-	end
 	
 	self.model.dm:SetAngles({0,0,180})
 	self:SetSnapTurnAngles({360, 360, 180})
@@ -222,18 +278,41 @@ function Bug.Spawn(self)
 		self.waypoints = World.FindEntityTargets(self.keys.bug_waypoint)
 	end
 	
-	self.think = Bug.BugBrain
-	self:SetNextThink(0.1)
+	local doBugBrain = function()
+		self.think = Bug.BugBrain
+		self:SetNextThink(0.1)
+		if (self.model.BlendImmediate and self.group) then
+			self.model:BlendImmediate("crawling")
+		end
+	end
 	
+	if (self.keys.intro_anim) then
+		self:SetFacing(NumberForString(self.keys.intro_angle, 0))
+		local callbacks = {
+			OnEndFrame = function()
+				doBugBrain()
+			end
+		}
+		self.model.BlendImmediate(self.keys.intro_anim, nil, false, self, callbacks)
+	else
+		doBugBrain()
+	end
 end
 
 function Bug.BugBrain(self)
+
+	if (not self.spawner) then
+		return -- spawner not set yet
+	end
 
 	if (self:CheckStomp()) then
 		return
 	end
 	
-	self:SeekPlayer() -- keep player within range OR attack
+	if (not self:SeekSpawner()) then
+		self:SeekPlayer() -- keep player within range OR attack
+	end
+	
 	self:AvoidOtherBugs()
 	
 	if (self.action == nil) then
@@ -302,19 +381,81 @@ function Bug.AvoidOtherBugs(self)
 
 end
 
+function Bug.PlayerInSpawnerRadius(self)
+
+	if (self.spawner.radius < 1) then
+		return true
+	end
+	
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, self.spawner.radiusTarget:WorldPos())
+	local v, d = VecNorm(v)
+
+	return d <= self.spawner.radius
+end
+
 function Bug.SeekPlayer(self)
 
-	if (not self.group) then
-		if ((not (World.playerPawn.stomping or World.playerPawn.bugStun)) and self:SeekPlayerAttack()) then
-			return
-		end
-		
+	if (not self:PlayerInSpawnerRadius()) then
+		self.action = nil
+		return
+	end
+	
+	if ((not (World.playerPawn.stomping or World.playerPawn.bugStun)) and self:SeekPlayerAttack()) then
+		return
+	end
+	
+	if (World.playerPawn.dead or (not self.group)) then	
 		if (self:RunAwayFromPlayer()) then
 			return
 		end
 	end
 	
 	self:SeekPlayerDistance()
+end
+
+function Bug.SeekSpawner(self)
+
+	if (self.spawner.radius < 1) then
+		return false
+	end
+	
+	if (self.action == Bug.SeekSpawnerAction) then
+		return true
+	end
+	
+	-- too far?
+	local selfPos = self:WorldPos()
+	
+	local v = VecSub(self.spawner.radiusTarget:WorldPos(), selfPos)
+	local v, d = VecNorm(v)
+	
+	if (d <= self.spawner.radius) then
+		return false
+	end
+	
+	-- we need to get closer, run at the spawner
+	
+	self.busy = false
+	
+	local runDistance = d - (self.spawner.radius * math.random(0.5, 0.7))
+		
+	if (self:RunToDistance(runDistance, v)) then
+		self.angle = LookAngles(v)[3]
+		self.action = Bug.SeekSpawnerAction
+		COutLine(kC_Debug, "Bug.SeekSpawner")
+		return true
+	end
+	
+	return false
+
+end
+
+function Bug.SeekSpawnerAction(self)
+	if (not self.busy) then
+		self.action = nil
+	end
 end
 
 function Bug.SeekPlayerMoveFinished(self)
@@ -331,7 +472,7 @@ function Bug.SeekPlayerDistance(self)
 	local selfPos = self:WorldPos()
 	local playerPos = World.playerPawn:WorldPos()
 	
-	local v = VecSub(playerPos, selfPos)
+	local v = VecSub(playerPos, self.spawner:WorldPos())
 	local v, d = VecNorm(v)
 	
 	if (d < self.playerDistance[3]) then
@@ -376,19 +517,28 @@ function Bug.RunAwayFromPlayer(self)
 		return false
 	end
 	
-	-- we need to run away, are we in front of the player?
-	local playerAngle = World.playerPawn:TargetAngles()[3]
-	local playerFwd = RotateVecZ({1,0,0}, playerAngle)
-	
-	self.busy = false
-	
-	local runAngle = nil
-	
-	if (VecDot(v, playerFwd) > 0) then
-		playerAngle = playerAngle + 180
+	-- are we already heading away?
+	local myForward = RotateVecZ({1,0,0}, self.angle)
+	if (VecDot(myForward, v) < 0.3) then
+		return false -- already moving away
 	end
 	
-	runAngle = FloatRand(playerAngle-25, playerAngle+25)
+	local runAngle = LookAngles(v)[3]
+	
+	if (World.playerPawn.dead) then
+		if (math.random() < 0.5) then
+			runAngle = runAngle - 90
+		else
+			runAngle = runAngle + 90
+		end
+	else
+		if (math.random() < 0.5) then
+			runAngle = runAngle - FloatRand(110, 140)
+		else
+			runAngle = runAngle + FloatRand(110, 140)
+		end
+	end
+	
 	runAngle = WrapAngle(runAngle)
 	
 	local runDistance = self.playerDistance[2] - d
@@ -409,6 +559,20 @@ function Bug.RunAwayFromPlayerAction(self)
 end
 
 function Bug.SeekPlayerAttack(self)
+	if (World.playerPawn.dead) then
+		if (self.action == nil) then	
+			self.eating = false
+		end
+		if (self.eating) then
+			return true
+		end
+		return false
+	end
+	
+	if (self.attackCooldown and (self.attackCooldown > Game.time)) then
+		return false
+	end
+	
 	-- close enough to seek attack?
 	local selfPos = self:WorldPos()
 	local playerPos = World.playerPawn:WorldPos()
@@ -424,20 +588,29 @@ function Bug.SeekPlayerAttack(self)
 			return false
 		end
 		
-		if (VecDot(v, playerFwd) < 0.85) then -- mostly not really behind enough
-			return false
-		end
-	else
-		local dd = VecDot(v, playerFwd)
-		
-		if (self.nextAttackCheck and (self.nextAttackCheck <= Game.time)) then
-			if (d < 0) then -- they turned to face us run away!
+		if (not self.group) then
+			if (VecDot(v, playerFwd) < 0.85) then -- mostly not really behind enough
 				return false
 			end
 		end
+	else
+		if (not self.group) then
+			local dd = VecDot(v, playerFwd)
+			
+			if (self.nextAttackCheck and (self.nextAttackCheck <= Game.time)) then
+				if (d < 0) then -- they turned to face us run away!
+					return false
+				end
+			end
+			
+			self.nextAttackCheck = Game.time + 1
+		end
 		
-		self.nextAttackCheck = Game.time + 1
-		self:CheckAttack(d, dd, playerPos, playerAngle)
+		if (self.group) then
+			self:CheckGroupAttack()
+		else
+			self:CheckAttack(d, dd, playerPos, playerAngle)
+		end
 		return true -- keep attacking
 	end
 	
@@ -445,21 +618,21 @@ function Bug.SeekPlayerAttack(self)
 	
 	self.busy = false
 	self.nextAttackCheck = Game.time + 1
-	
+		
 	if (self:RunToDistance(d, v)) then
 		self.angle = LookAngles(v)[3]
 		self.action = Bug.SeekPlayerAttackAction
 		COutLine(kC_Debug, "Bug.SeekPlayerAttack")
 		return true
 	end
-	
-	
+		
 	return false
 end
 
 function Bug.SeekPlayerAttackAction(self)
 	if (not self.busy) then
 		self.action = nil
+		self.eating = false
 	end
 end
 
@@ -482,6 +655,10 @@ end
 
 function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
+	if (World.playerPawn.dead) then
+		return false
+	end
+	
 	if (World.playerPawn.stomping or World.playerPawn.bugStun) then
 		return false
 	end
@@ -497,7 +674,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	if (dd < 0.707) then
 		return false -- on front of player
 	end
-
+	
 	local fp = self:FloorPosition()
 	
 	local callback = function()
@@ -529,7 +706,51 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
 end
 
+function Bug.CheckGroupAttack(self)
+	if (World.playerPawn.dead) then
+		return false
+	end
+	
+	-- close enough to seek attack?
+	local selfPos = self:WorldPos()
+	local playerPos = World.playerPawn:WorldPos()
+	
+	local v = VecSub(playerPos, selfPos)
+	local v, d = VecNorm(v)
+	
+	if (d > self.playerAttackDistance) then
+		return false
+	end
+	
+	local killMessage = Bug.KillMessages[IntRand(1, #Bug.KillMessages)]
+	World.playerPawn:Kill(killMessage)
+	World.playerPawn.bugSounds.Eaten:Play(kSoundChannel_FX, 0)
+	
+	-- crawl over her body
+	local callbacks = {
+		OnEndFrame = function()
+			self.model:BlendToState("crawling")
+		end
+	}
+	
+	self.model:BlendToState("eat_eve", nil, true, self, callbacks)
+	self.busy = true
+	self.eating = true
+	self.action = Bug.SeekPlayerAttackAction
+	self:RunToDistance(self.moveSpeed * 4, self.angle) -- keep going well past player
+		
+	return true
+end
+
 function Bug.CheckStomp(self)
+
+	if (World.playerPawn.dead) then
+		return false
+	end
+	
+	if (self.group) then
+		return false
+	end
 
 	-- stomp, ouchie!
 	local selfPos = self:WorldPos()
@@ -550,12 +771,10 @@ function Bug.CheckStomp(self)
 	end
 
 	local f = function()
-		self.model.dm:SetVisible(false)
-		self.guts.dm:SetVisible(true)
+		self:Kill()
 	end
 
 	self.think = nil
-	self.dead = true
 	self:Stop()
 	World.playerPawn:BugStomp(f)
 	return true
@@ -694,7 +913,13 @@ end
 function Bug.Kill(self, instigator)
 	self:SetMoveType(kMoveType_None)
 	self.model.dm:SetVisible(false)
+	self.guts.dm:SetVisible(true)
 	self.think = nil
+	self.dead = true
+	
+	if (self.spawner) then
+		self.spawner:NotifyDead()
+	end
 end
 
 function Bug.PulseKill(self)
@@ -711,6 +936,10 @@ function Bug.PulseKill(self)
 	end
 	
 	self.guts.dm:SetVisible(true)
+	
+	if (self.spawner) then
+		self.spawner:NotifyDead()
+	end
 	
 end
 

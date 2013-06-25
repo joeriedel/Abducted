@@ -13,7 +13,7 @@
 namespace world {
 
 G_ManipulatableObject::G_ManipulatableObject() : E_CONSTRUCT_BASE, 
-m_boneIdx(-1), m_enabled(false), m_touched(false), m_touchClass(kEntityClassBits_Any) {
+m_boneIdx(-1), m_enabled(false), m_touchClass(kEntityClassBits_Any) {
 }
 
 G_ManipulatableObject::~G_ManipulatableObject() {
@@ -50,18 +50,14 @@ void G_ManipulatableObject::TickDrawModels(float dt) {
 	Entity::TickDrawModels(dt);
 
 	if (!m_enabled || !m_model) {
-		m_instigator.reset();
+		m_touching.reset();
 		return;
 	}
 	
-	if (m_touched) {
-		CheckExit();
-	} else {
-		CheckEnter();
-	}
+	CheckDamage();
 }
 
-void G_ManipulatableObject::CheckEnter() {
+void G_ManipulatableObject::CheckDamage() {
 	BBox bounds;
 	GetTouchBounds(bounds);
 
@@ -69,42 +65,33 @@ void G_ManipulatableObject::CheckEnter() {
 	world->draw->DebugAddEntityBBox(bounds);
 #endif
 
-	Entity::Ref instigator = world->FirstBBoxTouching(bounds, m_touchClass);
-	if (instigator) {
-		m_instigator = instigator;
-		m_touched = true;
-		if (PushEntityCall("OnTouchEnter")) {
-			instigator->PushEntityFrame();
-			world->lua->Call("G_ManipulatableObject::CheckEnter", 2, 0, 0);
-		}
-	}
-}
+	Entity::Vec touching = world->BBoxTouching(bounds, m_touchClass);
+	EntityBits wasTouched(m_touching);
+	m_touching.reset();
 
-void G_ManipulatableObject::CheckExit() {
-	Entity::Ref instigator = m_instigator.lock();
-
-	if (instigator) {
-		BBox bounds(instigator->ps->bbox);
-		bounds.Translate(instigator->ps->worldPos);
-
-		BBox touchBounds;
-		GetTouchBounds(touchBounds);
-
-#if defined(WORLD_DEBUG_DRAW)
-		world->draw->DebugAddEntityBBox(touchBounds);
-#endif
-
-		if (!bounds.Touches(touchBounds)) {
-			instigator.reset();
+	for (Entity::Vec::iterator it = touching.begin(); it != touching.end();) {
+		const Entity::Ref &entity = *it;
+		m_touching.set(entity->id);
+		if (wasTouched.test(entity->id)) {
+			it = touching.erase(it);
+		} else {
+			++it;
 		}
 	}
 
-	if (!instigator) {
-		m_instigator.reset();
-		m_touched = false;
+	if (!touching.empty()) {
+		lua_State *L = world->lua->L;
+		if (PushEntityCall(L, "OnDamage")) {
+			
+			lua_createtable(L, touching.size(), 0);
+			for (Entity::Vec::const_iterator it = touching.begin(); it != touching.end(); ++it) {
+				const Entity::Ref &entity = *it;
+				lua_pushinteger(L, (it-touching.begin())+1);
+				entity->PushEntityFrame(L);
+				lua_settable(L, -3);
+			}
 
-		if (PushEntityCall("OnTouchExit")) {
-			world->lua->Call("G_ManipulatableObject::CheckExit", 1, 0, 0);
+			world->lua->Call(L, "G_ManipulatableObject::CheckDamage()", 2, 0, 0);
 		}
 	}
 }

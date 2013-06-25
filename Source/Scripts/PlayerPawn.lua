@@ -152,6 +152,7 @@ function PlayerPawn.Spawn(self)
 	self.bugSounds = {
 		StompOne = World.LoadSound("Audio/EFX_SingleBugSquish_rev1"),
 		Stun = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
+		Eaten = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
 		Kill = World.LoadSound("Audio/EFX_ManyBugSquish_rev1")
 	}
 	
@@ -580,7 +581,7 @@ function PlayerPawn.PulseExplode(self)
 	self:Kill()
 end
 
-function PlayerPawn.Kill(self)
+function PlayerPawn.Kill(self, killMessage)
 	if (self.dead or PlayerPawn.GodMode) then
 		return
 	end
@@ -594,7 +595,10 @@ function PlayerPawn.Kill(self)
 	end
 	self:SetMoveType(kMoveType_None)
 	self:PlayAnim(self:LookupAnimation("death"), self.model)
-	Game.entity:PlayerDied()
+	
+	self:AbortBugAction()
+	
+	Game.entity:PlayerDied(killMessage)
 end
 
 function PlayerPawn.CheckTappedOn(self, e)
@@ -740,6 +744,7 @@ function PlayerPawn.BugStun(self, callback)
 	self.customMove = true
 	self.state = nil
 	self.bugStun = true
+	self.bugStunCallback = callback
 	self:Stop()
 	
 	self.bugSounds.Stun:Play(kSoundChannel_FX, 0)
@@ -751,6 +756,7 @@ function PlayerPawn.BugStun(self, callback)
 				self.bugStun = false
 				self.disableAnimTick = false
 				self.customMove = false
+				self.bugStunCallback = nil
 				self:EnableFlags(kPhysicsFlag_Friction, false) -- resume walking
 				self:TickPhysics()
 				if (callback) then
@@ -815,6 +821,23 @@ function PlayerPawn.BugStomp(self, callback)
 		end
 		blend.OnTag = f
 	end
+end
+
+function PlayerPawn.AbortBugAction(self)
+
+	if (self.stompChain) then
+		self.bugSounds.StompOne:Play(kSoundChannel_FX, 0)
+		for k,v in pairs(self.stompChain) do
+			v()
+		end
+		self.stompChain = nil
+	end
+	
+	if (self.bugStunCallback) then
+		self.bugStunCallback()
+		self.bugStunCallback = nil
+	end
+
 end
 
 function PlayerPawn.Show(self, show)

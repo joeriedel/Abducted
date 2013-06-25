@@ -5,6 +5,7 @@
 
 Abducted = Game:New()
 Abducted.PulseTargets = LL_New()
+Abducted.KillMessages = { "DEFAULT_KILLED_MESSAGE1" }
 
 function Abducted.Initialize(self)
 	self.eatInput = false
@@ -332,7 +333,7 @@ function Abducted.PlayerDiedAlertPanelDone(self, result)
 	end
 end
 
-function Abducted.PlayerDied(self)
+function Abducted.PlayerDied(self, killMessage)
 	HUD:PlayerDied()
 	if (self.manipulate) then
 		self:EndManipulate()
@@ -341,10 +342,14 @@ function Abducted.PlayerDied(self)
 		self:EndPulse()
 	end
 	
+	if (killMessage == nil) then
+		killMessage = Abducted.KillMessages[IntRand(1, #Abducted.KillMessages)]
+	end
+	
 	local f = function()
 		AlertPanel:Run(
 			"ALERT_PANEL_DIED",
-			"DEFAULT_KILLED_MESSAGE",
+			killMessage,
 			{
 				{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
 				{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
@@ -355,7 +360,7 @@ function Abducted.PlayerDied(self)
 		)
 	end
 	
-	World.globalTimers:Add(f, 1, true)
+	World.globalTimers:Add(f, 2.5, true)
 end
 
 function Abducted.Think(self, dt)

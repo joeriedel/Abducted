@@ -23,6 +23,13 @@ function Entity.Spawn(self)
 	
 end
 
+function Entity.Precache(self, path, async)
+
+	self.precached = self.precached or {}
+	table.insert(self.precached, World.Precache(path, async))
+
+end
+
 function Entity.TraceMove(self, distance, zangle, currentFloorOnly, stepSize)
 
 	local fwd = nil

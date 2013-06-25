@@ -34,8 +34,7 @@ protected:
 
 private:
 
-	void CheckEnter();
-	void CheckExit();
+	void CheckDamage();
 	void GetTouchBounds(BBox &bounds);
 
 	static int lua_SetTouchBone(lua_State *L);
@@ -44,14 +43,13 @@ private:
 	static int lua_EnableTouch(lua_State *L);
 	static int lua_SetAutoFace(lua_State *L);
 	
+	EntityBits m_touching;
 	BBox m_bounds;
-	Entity::WRef m_instigator;
 	Entity::WRef m_autoFace;
 	SkMeshDrawModel::Ref m_model;
 	int m_boneIdx;
 	int m_touchClass;
 	bool m_enabled;
-	bool m_touched;
 };
 
 }

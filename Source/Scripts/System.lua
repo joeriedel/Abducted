@@ -176,9 +176,14 @@ function World.Precache(path, async)
 		return nil
 	end
 
-	while (state:Pending()) do
+	local thinkTime = entity:NextThink()
+	entity:SetNextThink(0)
+	
+	while state:Pending() do
 		coroutine.yield()
 	end
+	
+	entity:SetNextThink(thinkTime)
 	
 	local r = state:Result()
 	
@@ -221,9 +226,14 @@ function World.LoadOptional(path, numInstances, async)
 		return nil
 	end
 
-	while (state:Pending()) do
+	local thinkTime = entity:NextThink()
+	entity:SetNextThink(0)
+	
+	while state:Pending() do
 		coroutine.yield()
 	end
+	
+	entity:SetNextThink(thinkTime)
 	
 	local r = state:Result()
 	
@@ -290,9 +300,14 @@ function World.Spawn(keys)
 	COutLine(kC_Debug, "Spawning -- %s", keys.classname)
 	local state = System.CreateSpawnTask(entity, keys)
 	
-	while (state:Pending()) do
+	local thinkTime = entity:NextThink()
+	entity:SetNextThink(0)
+	
+	while state:Pending() do
 		coroutine.yield()
 	end
+	
+	entity:SetNextThink(thinkTime)
 	
 	local r = state:Result()
 	
@@ -322,9 +337,14 @@ function World.TempSpawn(keys)
 	COutLine(kC_Debug, "Spawning -- %s", keys.classname)
 	local state = System.CreateTempSpawnTask(entity, keys)
 	
+	local thinkTime = entity:NextThink()
+	entity:SetNextThink(0)
+	
 	while state:Pending() do
 		coroutine.yield()
 	end
+	
+	entity:SetNextThink(thinkTime)
 	
 	local r = state:Result()
 	

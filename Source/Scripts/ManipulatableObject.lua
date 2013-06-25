@@ -144,10 +144,32 @@ function ManipulatableObject.PostSpawn(self)
 
 end
 
+function ManipulatableObject.ManipulateShimmer(self)
+	self.enableManipulateShimmer = true
+end
+
+function ManipulatableObject.DoManipulateShimmer(self)
+	if (not self.enableManipulateShimmer) then
+		self.didManipulateShimmer = true
+	end
+	
+	if (self.didManipulateShimmer or (self.skillRequired > (PlayerSkills.Manipulate+1))) then
+		return
+	end
+	
+	self.didManipulateShimmer = true
+	self.model.vision:BlendTo(self:SelectColor(), 0.5)
+	local f = function()
+		self.model.vision:BlendTo({1,1,1,0}, 0.5)
+	end
+	self.manipulateShimmerTimer = World.gameTimers:Add(f, 0.5, true)
+end
+
 function ManipulatableObject.AddToManipulateList(self)
 	if (self.listItem == nil) then
 		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
 	end
+	self:DoManipulateShimmer()
 end
 
 function ManipulatableObject.RemoveFromManipulateList(self)
@@ -249,6 +271,7 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 	COutLineEvent("ManipulatableObject", cmd, args)
 	
 	if (cmd == "activate") then
+		self:ManipulateShimmer()
 		self:Awaken()
 		return true
 	elseif(cmd == "deactivate") then
@@ -290,17 +313,19 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 	
 end
 
-function ManipulatableObject.OnTouchEnter(self, instigator)
+function ManipulatableObject.OnDamage(self, targets)
 
-	if (self.keys.on_player_attacked) then
-		World.PostEvent(self.keys.on_player_attacked)
-	end
+	local killMsg = nil
 	
-	self.hitPlayer = true
+	if (self.killedMessages) then
+		killMsg = self.killedMessages[IntRand(1, #self.killedMessages)]
+	end
 
-end
-
-function ManipulatableObject.OnTouchExit(self)
+	for k,v in pairs(targets) do
+		if ((not v.dead) and v.Kill) then
+			v:Kill(killMsg)
+		end
+	end
 
 end
 
@@ -520,6 +545,11 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		
 		if (x.entity.skillRequired <= (PlayerSkills.Manipulate+1)) then
 			ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
+		end
+		
+		if (x.entity.manipulateShimmerTimer) then
+			x.entity.manipulateShimmerTimer:Clean()
+			x.entity.manipulateShimmerTimer = nil
 		end
 	end
 	
@@ -967,6 +997,21 @@ function StdManipulatable.Spawn(self)
 	self:Link() -- kMoveType_None
 end
 
-info_tentacle = StdManipulatable
-info_pylon = StdManipulatable
+Tentacle = StdManipulatable:New()
+
+function Tentacle.Spawn(self)
+	StdManipulatable.Spawn(self)
+	self.killedMessages = { "TENTACLE_KILLED_MESSAGE1" }
+end
+
+info_tentacle = Tentacle
+
+Pylon = StdManipulatable:New()
+
+function Pylon.Spawn(self)
+	StdManipulatable.Spawn(self)
+	self.killedMessages = { "PYLON_KILLED_MESSAGE1" }
+end
+
+info_pylon = Pylon
 info_custom_manipulatable = StdManipulatable

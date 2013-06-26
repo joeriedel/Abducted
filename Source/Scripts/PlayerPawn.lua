@@ -5,15 +5,15 @@
 
 PlayerPawn = Entity:New()
 PlayerPawn.kWalkSpeed = 80
-PlayerPawn.kAutoDecelDistance = 10
-PlayerPawn.kFriction = 300
-PlayerPawn.kRunSpeed = 200
+PlayerPawn.kAutoDecelDistance = 20
+PlayerPawn.kFriction = 240
+PlayerPawn.kRunSpeed = 160
 PlayerPawn.kShieldSpeed = 1
 PlayerPawn.kShieldAccel = 1
-PlayerPawn.kAccel = 200
+PlayerPawn.kAccel = 400
 PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
-PlayerPawn.PulseKillRadius = 25
+PlayerPawn.PulseKillRadius = 50
 PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {
@@ -48,7 +48,7 @@ PlayerPawn.AnimationStates = {
 	},
 	walkfast = {
 		walk = "walkfast",
-		speedScale = 2,
+		speedScale = 2.2,
 		OnSelect = function()
 			HUD:EnableAll()
 		end

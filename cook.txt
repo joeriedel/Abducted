@@ -6,6 +6,8 @@ pak0 {
 
 	Ep1/ep1_falling
 	Ep1/ep1_crushed
+	Ep1/ep1_crushed_intro
+	Ep1/ep1_crushed_combat
 	Ep1/ep1_eaten
 	Ep1/testroom2_manipulate
 	Ep1/testroom2_bugtest
@@ -16,18 +18,29 @@ pak0 {
 
 	Ep1/Falling
 	Ep1/Ep1Crushed
+	Ep1/Ep1General
+	Ep1/Ep1Database
 	UI/ArmTestChat
 
 	// Shared
 	Objects/big_tentacle1
 	Objects/big_tentacle2
 	Objects/big_tentacle3
+	Objects/ambient_tentacle2
+	Objects/crushed_down_pylon1
+	Objects/crushed_up_pylon1
 	Objects/podshield1
+	Objects/terminalglow1_M
+	Objects/terminalglow2_M
+	Objects/alien_metadata1
 	Characters/Eve
 	Characters/Tormentor_test
-	Characters/Buggroup12
-	Characters/Bugtestmesh1
+	Characters/Buggroup10
+	FX/bug_guts_group01
+	Characters/Bug1
+	FX/bug_guts_lone01
 	Characters/TentacleMedium1
+	Characters/TentacleMaster1
 	Characters/TentacleFalling1
 	Characters/TentacleFalling2
 	Characters/TentacleFalling3A
@@ -62,6 +75,7 @@ pak0 {
 	UI/StandardButton_TF
 	UI/StandardButtonDark_TF
 	Shared/spellcasting_edgelines_M
+	Shared/painblend_M
 	UI/lineborder1_M
 	UI/lineborder2_M
 	UI/lineborder3_M
@@ -88,10 +102,15 @@ pak0 {
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
 	UI/alphabet_scrollbar_M
-	UI/terminal_hack_M
-	UI/terminal_hack_pressed_M
-	UI/terminal_solve_M
-	UI/terminal_solve_pressed_M
+	UI/TerminalScreenButtons_TF
+	UI/puzzle_level1_M
+	UI/puzzle_level2_M
+	UI/puzzle_level3_M
+	UI/puzzle_level4_M
+	UI/puzzle_button_background1_M
+	UI/puzzle_button_background_pressed1_M
+	UI/return_arrow_pressed_M
+	UI/return_arrow_M
 	UI/manipulate_button_M
 	UI/manipulate_button_charging_M
 	UI/manipulate_button_flashing_M
@@ -113,6 +132,10 @@ pak0 {
 	UI/arm_screen1_M
 
 	UI/ability_recharge_shimmer_M
+	UI/generic_icon_base_M
+	UI/generic_icon_base_pressed_M
+	UI/right_arrow_M
+	UI/right_arrow_pressed_M
 
 	// Main menu
 	UI/MMGoldLarge_TF
@@ -176,6 +199,7 @@ pak0 {
 	Audio/Mus04-Cyber
 	Audio/Mus05-TheEvent
 	Audio/Mus06-Lochness
+	Audio/Mus00-Stinger
 
 	// Puzzles
 	Puzzles/reflex-greenparticle1_M
@@ -186,6 +210,8 @@ pak0 {
 	Puzzles/reflex-blackhole1_M
 	Puzzles/reflex-blueglow1_M
 	Puzzles/reflex-goal1_M
+	Puzzles/+0glyph_M
+	Puzzles/+0glyphPressed_M
 	Puzzles/glyph01_M
 	Puzzles/glyph02_M
 	Puzzles/glyph03_M
@@ -245,6 +271,32 @@ pak0 {
 	Audio/heartbeat1
 	Audio/ability_unlocked
 
+	Audio/EFX_SingleBugSquish_rev1
+	Audio/AFX_ShieldActivate
+	Audio/AFX_ShieldHum
+	Audio/AFX_ShieldDeactivate
+	Audio/AFX_ShieldImpactLight
+	Audio/AFX_PulseCycleLoop
+	Audio/AFX_ShieldImpactAggressive
+	Audio/AFX_PulseEnergyImpact
+	Audio/EFX_IdleBugSwarm_rev1
+	Audio/EFX_IdleBugSwarm_rev1
+	Audio/EFX_ManyBugSquish_rev1
+	Audio/EFX_BUGS_activate_rev1
+	Audio/EFX_TenticleActivate_rev1
+	Audio/EFX_TenticleAttack1
+	Audio/EFX_TenticleDeactivate_rev1
+	Audio/EnviroFX_PylonEnd
+	Audio/EnviroFX_PylonMoving
+
+	Audio/EnviroFX_Creak01
+	Audio/EnviroFX_Creak02
+	Audio/EnviroFX_Creak03
+	Audio/EnviroFX_Creak04
+	Audio/EnviroFX_Creak05
+	Audio/EnviroFX_Creak06
+	Audio/EnviroFX_Creak07
+
 	// System (for DebugUI)
 
 	Sys/Debug_TF
@@ -252,13 +304,16 @@ pak0 {
 	Sys/DebugPortal_M
 	Sys/DebugPortalEdge_M
 	Sys/DebugEntityBBox_M
+	Sys/DebugActorBBox_M
 	Sys/DebugWorldBBox_M
 	Sys/DebugWaypoint_M
+	Sys/DebugSphere_M
 	Sys/DebugLight0_M
 	Sys/DebugLight1_M
 	Sys/DebugLight2_M
 	Sys/DebugLight3_M
 	Sys/DebugLight4_M
 	Sys/DebugLight5_M
+	Sys/EditorLightSphere_M
 
 } // pak0

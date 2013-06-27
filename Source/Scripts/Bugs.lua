@@ -645,21 +645,18 @@ function Bug.SeekPlayerAttack(self)
 			end
 		end
 	else
-		if (not self.group) then
+		if (self.group) then
+			self:CheckGroupAttack()
+		else
 			local dd = VecDot(v, playerFwd)
 			
 			if (self.nextAttackCheck and (self.nextAttackCheck <= Game.time)) then
-				if (d < 0) then -- they turned to face us run away!
+				if (dd < 0) then -- they turned to face us run away!
 					return false
 				end
 			end
 			
 			self.nextAttackCheck = Game.time + 1
-		end
-		
-		if (self.group) then
-			self:CheckGroupAttack()
-		else
 			self:CheckAttack(d, dd, playerPos, playerAngle)
 		end
 		return true -- keep attacking

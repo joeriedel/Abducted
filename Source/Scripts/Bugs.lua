@@ -57,6 +57,17 @@ function BugSpawner.Spawn(self)
 		self:Go()
 	end
 	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
+	
 end
 
 function BugSpawner.PostSpawn(self)
@@ -186,6 +197,23 @@ function BugSpawner.OnEvent(self, cmd, args)
 	end
 end
 
+function BugSpawner.SaveState(self)
+	local state = {
+		enabled = tostring(self.enabled)
+	}
+	return state
+end
+
+function BugSpawner.LoadState(self, state)
+	self.enabled = state.enabled == "true"
+	self.active = 0
+	self.total = 0
+	
+	if (self.enabled) then
+		self:Go()
+	end
+end
+
 info_bug_spawner = BugSpawner
 
 --[[---------------------------------------------------------------------------
@@ -279,7 +307,8 @@ function Bug.Spawn(self)
 	self:SetAccel({self.accel, 0, 0}) -- <-- How fast the player accelerates (units per second).
 	self:SetGroundFriction(self.friction)
 	
-	self:SpawnFloorPosition()
+	local fp = self:SpawnFloorPosition()
+	self.floor = fp.floor
 	
 	if (self.keys.bug_waypoint) then
 		self.curWaypoint = 0
@@ -393,10 +422,10 @@ end
 
 function Bug.PlayerInSpawnerRadius(self)
 
-	if ((World.playerPawn.floorPosition == nil) or 
-        (self.floorPosition == nil) or 
-        (self.playerPawn.floorPosition.floor ~= self.floorPosition.floor)) then
-		return false
+	local playerFP = World.playerPawn:FloorPosition()
+	
+	if ((playerFP == nil) or (self.floor ~= playerFP.floor)) then
+		return false -- don't seek player when on a different floor
 	end
 	
 	if (self.spawner.radius < 1) then
@@ -954,6 +983,7 @@ function Bug.PulseKill(self)
 	self:Stop()
 	self:SetMoveType(kMoveType_None)
 	self.sounds.Squish:Play(kSoundChannel_FX, 0)
+	
 	if (self.group) then
 		self.model:BlendToState("pulsedeath")
 	else

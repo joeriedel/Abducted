@@ -7,6 +7,11 @@ ViewController = Class:New()
 
 ViewController.TM_Distance = 0
 ViewController.TM_Look = 1
+ViewController.kRailStart_Front = 0
+ViewController.kRailStart_Back = 1
+ViewController.kRailStart_Begin = 2
+ViewController.kRailStart_End = 3
+ViewController.kRailStart_DontCare = 4
 ViewController.Targets = {}
 
 function ViewController.Spawn(self)
@@ -68,15 +73,26 @@ function ViewController.HandleCameraCmd(self, args)
 	
 	local loose = FindArrayElement(x, "follow=loose")
 	
+	local startMode = ViewController.kRailStart_DontCare
+	if (FindArrayElement(x, "start=back")) then
+		startMode = ViewController.kRailStart_Back
+	elseif (FindArrayElement(x, "start=front")) then
+		startMode = ViewController.kRailStart_Front
+	elseif (FindArrayElement(x, "start=begin")) then
+		startMode = ViewController.kRailStart_Begin
+	elseif (FindArrayElement(x, "start=end")) then
+		startMode = ViewController.kRailStart_End
+	end
+	
 	if (loose) then
-		self:DoLooseCamera(camera, distance, strict, forceBehind, useFOV, angles)
+		self:DoLooseCamera(camera, distance, strict, forceBehind, startMode, useFOV, angles)
 	else
-		self:DoTightCamera(camera, distance, strict, forceBehind, useFOV, angles)
+		self:DoTightCamera(camera, distance, strict, forceBehind, startMode, useFOV, angles)
 	end
 	
 end
 
-function ViewController.DoTightCamera(self, camera, distance, strict, forceBehind, useFOV, angles)
+function ViewController.DoTightCamera(self, camera, distance, strict, forceBehind, startMode, useFOV, angles)
 	
 	if (not forceBehind) then
 		forceBehind = -1
@@ -91,13 +107,14 @@ function ViewController.DoTightCamera(self, camera, distance, strict, forceBehin
 		2,
 		2,
 		forceBehind,
+		startMode,
 		useFOV,
 		angles
 	)
 	
 end
 
-function ViewController.DoLooseCamera(self, camera, distance, strict, forceBehind, useFOV, angles)
+function ViewController.DoLooseCamera(self, camera, distance, strict, forceBehind, startMode, useFOV, angles)
 	if (not forceBehind) then
 		forceBehind = -1
 	else
@@ -111,6 +128,7 @@ function ViewController.DoLooseCamera(self, camera, distance, strict, forceBehin
 		1.2,
 		1.2,
 		forceBehind,
+		startMode,
 		useFOV,
 		angles
 	)

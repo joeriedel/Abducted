@@ -50,6 +50,7 @@ function GameDB.SaveCheckpoint(self)
 end
 
 function GameDB.LoadCheckpoint(self)
+	World.MarkTempEntsForGC()
 	GameDB:Load()
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()

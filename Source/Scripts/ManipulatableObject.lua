@@ -155,7 +155,7 @@ function ManipulatableObject.DoManipulateShimmer(self)
 		self.didManipulateShimmer = true
 	end
 	
-	if (self.didManipulateShimmer or (self.skillRequired > (PlayerSkills.Manipulate+1))) then
+	if (self.didManipulateShimmer) then
 		return
 	end
 	
@@ -297,17 +297,16 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 	elseif (cmd == "hide") then
 		self:Show(false)
 		return true
-	elseif (cmd == "manipulate_left") then
-		self:Manipulate("left", nil, args ~= "permanent")
+	elseif (cmd == "manipulate") then
+		local x = Tokenize(args)
+		if ((x[1] == "left") or (x[1] == "right") or (x[1] == "up") or (x[1] == "down")) then
+			self:Manipulate(x[1], nil, x[2] ~= "permanent")
+		else
+			self:CustomManipulate(x[1])
+		end
 		return true
-	elseif (cmd == "manipulate_right") then
-		self:Manipulate("right", nil, args ~= "permanent")
-		return true
-	elseif (cmd == "manipulate_up") then
-		self:Manipulate("up", nil, args ~= "permanent")
-		return true
-	elseif (cmd == "manipulate_down") then
-		self:Manipulate("down", nil, args ~= "permanent")
+	elseif (cmd == "play") then
+		self:CustomAnimation(args)
 		return true
 	end
 	
@@ -360,6 +359,7 @@ function ManipulatableObject.Dormant2(self)
 	self.awake = false
 	
 	self.think = nil
+	self.didManipulateShimmer = false -- let us trigger it again
 	
 	if (BoolForString(self.keys.idle_while_dormant, false)) then
 		self:PlayAnim("idle", self.model)
@@ -428,17 +428,22 @@ function ManipulatableObject.Awaken(self)
 		end
 		World.viewController:AddLookTarget(self.manipulateTarget, self.manipulateShift, fov)
 	end
-	local blend = self:PlayAnim("awaken", self.model)
-	if (self.sounds.Dormant) then
-		self.sounds.Dormant:FadeOutAndStop(1)
-	end
-	if (self.sounds.Idle) then
-		self.sounds.Idle:FadeOutAndStop(1)
-	end
-	if (blend) then
-		blend.Seq(ManipulatableObject.Idle)
-		if (self.sounds.Awaken) then
-			self.sounds.Awaken:Play(kSoundChannel_FX, 0)
+	
+	if (not BoolForString(self.keys.idle_while_dormant, false)) then
+		local blend = self:PlayAnim("awaken", self.model)
+		if (self.sounds.Dormant) then
+			self.sounds.Dormant:FadeOutAndStop(1)
+		end
+		if (self.sounds.Idle) then
+			self.sounds.Idle:FadeOutAndStop(1)
+		end
+		if (blend) then
+			blend.Seq(ManipulatableObject.Idle)
+			if (self.sounds.Awaken) then
+				self.sounds.Awaken:Play(kSoundChannel_FX, 0)
+			end
+		else
+			self:Idle()
 		end
 	else
 		self:Idle()
@@ -797,7 +802,87 @@ function ManipulatableObject.ManipulateUpDown(target, g)
 	return target:Manipulate(dir, dir)
 end
 
-function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
+function ManipulatableObject.CustomAnimation(self, customAnim) 
+		
+	if (not self.model:HasState(customAnim)) then
+		return false -- this model has no manipulate in that direction
+	end
+	
+	local f = function()
+		if (self.awake) then
+			self:Idle()
+		else
+			self:Dormant()
+		end
+	end
+	
+	if (self.sounds.Manipulate) then
+		self.sounds.Manipulate:FadeOutAndStop(0.1)
+	end
+	if (self.sounds.Idle) then
+		self.sounds.Idle:Play(kSoundChannel_FX, 0)
+	end
+	
+	self.manipulate = nil
+	self.canAttack = true
+	self.enabled = false
+	self:PlayAnim(customAnim, self.model).Seq(f)
+	self:SetAutoFace(nil)
+	self:EnableTouch(false)
+		
+	-- no longer manipulatable
+	self.model.vision:BlendTo({1,1,1,0}, 0.5)
+	self:RemoveFromManipulateList()
+	
+	return true
+end
+
+function ManipulatableObject.CustomManipulate(self, customAnim) 
+		
+	if (not self.model:HasState(customAnim)) then
+		return false -- this model has no manipulate in that direction
+	end
+	
+	local f = function()
+		if (self.shakeCamera == "EndOf") then
+			self:ShakeCamera()
+		end
+		if (self.sounds.Manipulate) then
+			self.sounds.Manipulate:FadeOutAndStop(0.1)
+		end
+		
+		self:EnableTouch(false)
+		
+		-- manipulatable again
+		self:AddToManipulateList()
+		self:Idle()
+	end
+	
+	if (self.shakeCamera == "StartOf") then
+		self:ShakeCamera()
+	end
+	
+	if (self.sounds.Manipulate) then
+		self.sounds.Manipulate:FadeVolume(1, 0)
+		self.sounds.Manipulate:Play(kSoundChannel_FX, 0)
+	end
+	
+	self.manipulate = nil
+	self.canAttack = false
+	self.enabled = false
+	self:PlayAnim(customAnim, self.model).Seq(f)
+	self:SetAutoFace(nil)
+	
+	self:EnableTouch(self.canDamage)
+		
+	-- no longer manipulatable
+	self.model.vision:BlendTo({1,1,1,0}, 0.5)
+	self:RemoveFromManipulateList()
+	
+	return true
+end
+
+function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 
 	local state = "manipulate_"..objDir
 	local idle  = "manipulate_"..objDir.."_idle"
@@ -846,13 +931,28 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
-	if (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate) or forceReset) then
+	if (((canReset == nil) and (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate))) or canReset) then
 		local f = function ()
+			COutLine(kC_Debug, "Manipulatable.Reset")
 			self.manipulate = nil
+			
+			if (self.keys.on_reset) then
+				World.PostEvent(self.keys.on_reset)
+			end
+			
 			local blend = self:PlayAnim(ret, self.model)
 			if (blend) then
 				if (self.sounds.Reset) then
-					local f = function()
+					self.sounds.Reset:FadeVolume(1, 0)
+					self.sounds.Reset:Play(kSoundChannel_FX, 0)
+				end
+				
+				local f = function()
+					COutLine(kC_Debug, "Manipulatable.PostReset")
+					if (self.keys.post_reset) then
+						World.PostEvent(self.keys.post_reset)
+					end
+					if (self.sounds.Reset) then
 						if (self.sounds.ManipulateEnd) then
 							if (self.sounds.Reset) then
 								self.sounds.Reset:Stop()
@@ -862,14 +962,16 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, forceReset)
 							self.sounds.Reset:FadeOutAndStop(0.1)
 						end
 					end
-					self.sounds.Reset:FadeVolume(1, 0)
-					self.sounds.Reset:Play(kSoundChannel_FX, 0)
-					blend.Seq(f)
 				end
-				blend.Seq(ManipulatableObject.Idle)
+				blend.Seq(f).Seq(ManipulatableObject.Idle)
 			else
+				COutLine(kC_Debug, "Manipulatable.PostReset")
+				if (self.keys.post_reset) then
+					World.PostEvent(self.keys.post_reset)
+				end
 				self:Idle()
 			end
+			
 			-- manipulatable again
 			self:AddToManipulateList()
 		end

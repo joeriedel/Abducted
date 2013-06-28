@@ -1,4 +1,4 @@
-FIXED4 SampleTexture2D(HLSL(uniform) GLSL(lowp) sampler2D t, HALF2 st GLOBALS)
+FIXED4 SampleTexture2D(HLSL(uniform) GLSL(lowp) sampler2D t, HALF4 st GLOBALS)
 {
-	return tex2D(t, st);
+	return tex2D(t, st.xy);
 }

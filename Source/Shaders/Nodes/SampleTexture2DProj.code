@@ -1,0 +1,4 @@
+FIXED4 SampleTexture2DProj(HLSL(uniform) GLSL(lowp) sampler2D t, HALF4 st GLOBALS)
+{
+	return texture2DProj(t, st) * max(sign(st.z), 0.0);
+}

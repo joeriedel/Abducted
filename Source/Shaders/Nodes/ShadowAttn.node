@@ -1,0 +1,14 @@
+
+Node({
+
+	Outputs = 
+	{
+		r = {t=FIXED4, r=-1}
+	},
+
+	Inputs = 
+	{
+		lightVertex = {t=HALF4, r=0}
+	}
+	
+})

@@ -1,0 +1,6 @@
+FIXED4 ShadowAttn(
+	HALF4 lightVertex
+) {
+	FIXED a = DistanceAttn(lightVertex);
+	return FIXED4(1, 1, 1, sat(a+0.25));
+}

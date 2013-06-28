@@ -23,6 +23,9 @@ BEGIN_UNIFORMS
 #if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
 	GLSL(uniform) FLOAT3 UDECL(eye) HLSL(:C0);
 #endif
+#if defined(GENPROJECT)
+	GLSL(uniform) FLOAT4X4 UDECL(tcPrj);
+#endif
 #if defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT2 UDECL(spriteVerts)[4];
 #endif
@@ -62,6 +65,15 @@ END_VARYING
 
 #if defined(FRAGMENT)
 
+HALF DistanceAttn(
+	HALF4 lightVertex // w contains radius
+) {
+	FLOAT3 _lightVertex = lightVertex.xyz; // optimizer converts length to dot(x, x) which overflows mediump
+	HALF e = length(_lightVertex);
+	e = max(HALF(0.0), lightVertex.w - e) / lightVertex.w;
+	return e;
+}
+
 HALF4 DiffuseLightPixel(
 	HALF4 lightVertex,
 	HALF3 lightVec,
@@ -69,9 +81,7 @@ HALF4 DiffuseLightPixel(
 	HALF3 normal,
 	HALF4 diffuseColor
 ) {
-	FLOAT3 _lightVertex = lightVertex.xyz; // optimizer converts length to dot(x, x) which overflows mediump
-	HALF e = length(_lightVertex);
-	e = max(HALF(0.0), lightVertex.w - e) / lightVertex.w;
+	HALF e = DistanceAttn(lightVertex);
 	e = e * lightDfColor.w;
 	HALF r = max(HALF(0.0), dot(lightVec, normal));
 	return HALF4((lightDfColor.xyz * diffuseColor.xyz) * (r * e), diffuseColor.w);
@@ -88,9 +98,7 @@ HALF4 DiffuseSpecularLightPixel(
 	HALF4 specularColor,
 	HALF specularExponent
 ) {
-	FLOAT3 _lightVertex = lightVertex.xyz; // optimizer converts length to dot(x, x) which overflows mediump
-	HALF e = length(_lightVertex);
-	e = max(HALF(0.0), lightVertex.w - e) / lightVertex.w;
+	HALF e = DistanceAttn(lightVertex);
 	e = e * lightDfColor.w;
 	HALF r = max(HALF(0.0), dot(lightVec, normal));
 	HALF3 d = (lightDfColor.xyz * diffuseColor.xyz) * r;
@@ -121,14 +129,18 @@ MAIN
 #endif
 
 #if defined(GENREFLECT)
-	HALF2 genReflectTC = reflect(IN(nm0), vn_eyevec).xy;
+	HALF4 genReflectTC = HALF4(reflect(IN(nm0), vn_eyevec).xy, 0.0, 1.0);
+#endif
+
+#if defined(GENPROJECT)
+	HALF4 genProjectTC = mul(UNIFORM(tcPrj), IN(position));
 #endif
 
 	TCGEN
 	TCMOD
 
 #if defined(LIGHTS)
-#if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHTVERTEXPOS) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
+#if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_VERTEXPOS) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_POS >= 4) || (SHADER_LIGHT_VERTEXPOS >= 4) || (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
 	HALF3 v_light3_dir = UNIFORM(light3_pos).xyz - IN(position).xyz;
 #endif

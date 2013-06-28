@@ -12,7 +12,9 @@ function ManipulatableObject.Spawn(self)
 	Entity.Spawn(self)
 	
 	self:SetClassBits(kEntityClass_Monster)
-	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	 if (BoolForString(self.keys.cast_shadows, false)) then
+		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	end
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
 	-- setup auto-face smoothing
@@ -826,7 +828,12 @@ function ManipulatableObject.CustomAnimation(self, customAnim)
 	self.manipulate = nil
 	self.canAttack = true
 	self.enabled = false
-	self:PlayAnim(customAnim, self.model).Seq(f)
+	local blend = self:PlayAnim(customAnim, self.model).Seq(f)
+	if (blend) then
+		blend.OnTag = function(self, tag)
+			World.PostEvent(tag)
+		end
+	end
 	self:SetAutoFace(nil)
 	self:EnableTouch(false)
 		

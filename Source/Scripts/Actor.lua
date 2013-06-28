@@ -14,7 +14,10 @@ function Actor.Spawn(self)
     COutLine(kC_Debug, "Actor:Spawn")
     Entity.Spawn(self)
     
-	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+    if (BoolForString(self.keys.cast_shadows, false)) then
+		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	end
+	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
     
     if (self.keys.model) then

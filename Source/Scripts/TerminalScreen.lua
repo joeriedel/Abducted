@@ -19,6 +19,10 @@ function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)
 	MakeAnimatable(self)
 	
+	 if (BoolForString(self.keys.cast_shadows, false)) then
+		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
+	end
+	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
 	self.model = LoadModel(self.keys.model)

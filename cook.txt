@@ -315,5 +315,7 @@ pak0 {
 	Sys/DebugLight4_M
 	Sys/DebugLight5_M
 	Sys/EditorLightSphere_M
+	Sys/Shadow_M
+	Sys/ProjectedShadow_M
 
 } // pak0

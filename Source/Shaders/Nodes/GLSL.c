@@ -48,6 +48,12 @@
 #define MVP gl_ModelViewProjectionMatrix
 #endif
 
+#if defined(MOBILE)
+#define optional_normalize(x) x
+#else
+#define optional_normalize(x) normalize(x)
+#endif
+
 #define FLOAT highp float
 #define FLOAT2 highp vec2
 #define FLOAT3 highp vec3

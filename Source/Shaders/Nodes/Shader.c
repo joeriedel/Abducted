@@ -215,15 +215,15 @@ MAIN
 #endif
 #if defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
-	HALF3 v_light3_halfvec = (v_light3_vec + vn_eyevec) * 0.5f;
+	HALF3 v_light3_halfvec = normalize((v_light3_vec + vn_eyevec) * 0.5f);
 #endif
 #if (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
-	HALF3 v_light2_halfvec = (v_light2_vec + vn_eyevec) * 0.5f;
+	HALF3 v_light2_halfvec = normalize((v_light2_vec + vn_eyevec) * 0.5f);
 #endif
 #if (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
-	HALF3 v_light1_halfvec = (v_light1_vec + vn_eyevec) * 0.5f;
+	HALF3 v_light1_halfvec = normalize((v_light1_vec + vn_eyevec) * 0.5f);
 #endif
-	HALF3 v_light0_halfvec = (v_light0_vec + vn_eyevec) * 0.5f;
+	HALF3 v_light0_halfvec = normalize((v_light0_vec + vn_eyevec) * 0.5f);
 #if defined(SHADER_LIGHT_HALFVEC)
 #if (SHADER_LIGHT_HALFVEC >= 4)
 	OUT(light3_halfvec) = v_light3_halfvec;

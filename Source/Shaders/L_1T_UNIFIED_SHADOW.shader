@@ -10,6 +10,7 @@ local Shader = function()
 
 	local shadowAttn = Node("ShadowAttn", "LightAttenuation")
 	shadowAttn.In.lightVertex = MLightVertex(0)
+	shadowAttn.In.normal = MNormal(0)
 	local mulByAttn = Node("Mul", "MulByAttn")
 	mulByAttn.In.x = shadowAttn
 	mulByAttn.In.y = shadowTexProj

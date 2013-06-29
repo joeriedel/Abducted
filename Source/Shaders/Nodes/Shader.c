@@ -178,18 +178,18 @@ MAIN
 #endif
 #if defined(SHADER_LIGHT_VERTEXPOS)
 #if (SHADER_LIGHT_VERTEXPOS >= 4)
-	OUT(light3_vpos).xyz = -v_light3_dir;
+	OUT(light3_vpos).xyz = v_light3_dir;
 	OUT(light3_vpos).w = HALF(UNIFORM(light3_pos).w);
 #endif
 #if (SHADER_LIGHT_VERTEXPOS >= 3)
-	OUT(light2_vpos).xyz = -v_light2_dir;
+	OUT(light2_vpos).xyz = v_light2_dir;
 	OUT(light2_vpos).w = HALF(UNIFORM(light2_pos).w);
 #endif
 #if (SHADER_LIGHT_VERTEXPOS >= 2)
-	OUT(light1_vpos).xyz = -v_light1_dir;
+	OUT(light1_vpos).xyz = v_light1_dir;
 	OUT(light1_vpos).w = HALF(UNIFORM(light1_pos).w);
 #endif
-	OUT(light0_vpos).xyz = -v_light0_dir;
+	OUT(light0_vpos).xyz = v_light0_dir;
 	OUT(light0_vpos).w = HALF(UNIFORM(light0_pos).w);
 #endif
 #if defined(SHADER_LIGHT_TANVEC)

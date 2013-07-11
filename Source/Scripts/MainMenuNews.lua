@@ -19,8 +19,28 @@ end
 function MainMenu.News.Create(self, options, parent)
 
 	options = MainMenuPanel.Create(self, options, parent)
+    local panelRect = self.widgets.panel:Rect()
+    local panelArea = {
+	    0,
+		0,
+		panelRect[3],
+		panelRect[4]
+		}
+		        
+	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect=panelArea})
+
+	if (UI.mode == kGameUIMode_PC) then
+        UI:CreateVListWidgetScrollBar(
+            self.widgets.vlist,
+	        24,
+	        24,
+	        8
+            )
+	        panelArea[3] = panelArea[3] - 24
+    end
 	
-	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect={0,0,8,8}})
+	self.widgets.vlist:SetClipRect(panelArea)
+    self.widgets.vlist:SetEndStops({0, panelRect[4]*0.1})
 	self.widgets.vlist:SetBlendWithParent(true)
 	self.widgets.panel:AddChild(self.widgets.vlist)
 
@@ -48,7 +68,8 @@ function MainMenu.News.LayoutNews(self)
 				local httpResponse = self.httpGet:Response()
 				local data = httpResponse:Body()
 				if (data) then
-					self.news = MainMenu.News.Parse(data)
+				    -- data  = data..data..data..data  -- for testing news scroll bar
+					self.news = MainMenu.News.Parse(data) 
 				end
 			end
 			
@@ -66,12 +87,13 @@ function MainMenu.News.Layout(self, news)
 	MainMenuPanel.Layout()
 	
 	if (news) then
-		local panelRect = self.widgets.panel:Rect()
+        local panelRect = self.widgets.panel:Rect()
+        
+        if (UI.mode == kGameUIMode_PC) then
+	        panelRect[3] = panelRect[3] - 24 -- make room for scroll bar
+        end
+        
 		self.widgets.vlist:Clear()
-		self.widgets.vlist:SetRect({0,0,panelRect[3], panelRect[4]})
-		self.widgets.vlist:SetClipRect({0,0,panelRect[3], panelRect[4]})
-		self.widgets.vlist:SetEndStops({0, panelRect[4]*0.1})
-				
 		local xInset = 16 * UI.identityScale[1]
 		local titleSpace = 8 * UI.fontScale[2]
 		local lineSpace = 8

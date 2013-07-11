@@ -27,10 +27,32 @@ function MainMenu.LoadGame.Create(self, options, parent)
 	if (MainMenu.saves == nil) then
 		return options
 	end
-
-	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect={0,0,8,8}})
+    
+    local parentRect = self.widgets.panel:Rect()
+    local parentArea = {
+        0,
+        0,
+        parentRect[3],
+        parentRect[4]
+        }
+    
+	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect=parentArea})
 	self.widgets.vlist:SetBlendWithParent(true)
 	self.widgets.panel:AddChild(self.widgets.vlist)
+	
+	-- scroll bar here
+	if (UI.mode == kGameUIMode_PC) then
+        UI:CreateVListWidgetScrollBar(
+            self.widgets.vlist,
+	        24,
+	        24,
+	        8
+            )
+	        parentArea[3] = parentArea[3] - 24
+    end
+	
+	self.widgets.vlist:SetClipRect(parentArea)
+	self.widgets.vlist:SetEndStops({0, parentRect[4]*0.1})
 	
 end
 
@@ -53,7 +75,9 @@ function MainMenu.LoadGame.Layout(self)
 	end
 	
 	local parentRect = self.widgets.panel:Rect()
-
+    if (UI.mode == kGameUIMode_PC) then
+        parentRect[3] = parentRect[3] - 24 -- make room for scrollbar
+    end
 	local inset = 8 * UI.identityScale[1]
 	local picSize = 160 * UI.identityScale[1]
 	
@@ -112,16 +136,6 @@ function MainMenu.LoadGame.Layout(self)
 	
 	end
 	
-	local panelRect = {
-		0,
-		0,
-		parentRect[3],
-		parentRect[4]
-	}
-	
-	self.widgets.vlist:SetRect(panelRect)
-	self.widgets.vlist:SetClipRect(panelRect)
-	self.widgets.vlist:SetEndStops({0, panelRect[4]*0.1})
 	self.widgets.vlist:RecalcLayout()
 	self.widgets.vlist:ScrollTo({0,0}, 0)
 

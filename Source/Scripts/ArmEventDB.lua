@@ -26,6 +26,19 @@ function Arm.SpawnEventDB(self)
 	self.widgets.db.EventLog = UI:CreateWidget("VListWidget", {rect=self.eventDBWorkspace})
 	self.widgets.db.Root:AddChild(self.widgets.db.EventLog)
 	self.widgets.db.EventLog:SetBlendWithParent(true)
+    
+	-- scroll bar added by dennis
+	if (UI.mode == kGameUIMode_PC) then
+	    UI:CreateVListWidgetScrollBar(
+	        self.widgets.db.EventLog,
+	        24,
+	        24,
+	        8
+        )
+        self.eventDBWorkspaceSize[3] = self.eventDBWorkspaceSize[3] - 24
+    end
+    -- end scroll bar add
+    
 	self.widgets.db.EventLog:SetClipRect(self.eventDBWorkspace)
 	self.widgets.db.EventLog:SetEndStops({0, self.eventDBWorkspace[4]*0.1})
 	

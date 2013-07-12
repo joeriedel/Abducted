@@ -295,7 +295,7 @@ function Bug.Spawn(self)
 	self.angle = angle
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 260 -- <-- larger numbers means she turns faster
+	spring.elasticity = 120 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	
 	self:SetClassBits(kEntityClass_Monster)

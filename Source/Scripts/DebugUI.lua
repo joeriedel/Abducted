@@ -50,7 +50,8 @@ function DebugUI.Spawn(self)
 	
 	World.globalTimers:Add(
 		function () DebugUI:Think() end,
-		0
+		0,
+		true
 	)
 end
 

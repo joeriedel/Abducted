@@ -374,14 +374,14 @@ function PlayerPawn.BeginShield(self)
 		self.shield.dm:ScaleTo({1,1,1,1}, 0.1)
 	end
 	
-	World.gameTimers:Add(f, 0.15, true)
+	World.gameTimers:Add(f, 0.15)
 	
 	f = function ()
 		self.shield.dm:BlendTo({1,1,1,1}, 1)
 		self.shieldSprite.dm:BlendTo({1,1,1,1}, 0.7)
 	end
 	
-	World.gameTimers:Add(f, 0.05, true)
+	World.gameTimers:Add(f, 0.05)
 	
 	self:SetSpeeds()
 	self:PlayShieldSound()
@@ -398,7 +398,7 @@ function PlayerPawn.EndShield(self)
 		self.shield.dm:ScaleTo({0,0,0,0}, 0.2)
 	end
 	
-	World.gameTimers:Add(f, 0.1, true)
+	World.gameTimers:Add(f, 0.1)
 	
 	self:SetSpeeds()
 	self:StopShieldSound()
@@ -450,7 +450,7 @@ function PlayerPawn.PulseLight(self, pos)
 		light:Unlink()
 	end
 	
-	World.gameTimers:Add(f, 0.5, true)
+	World.gameTimers:Add(f, 0.5)
 	
 end
 
@@ -519,7 +519,7 @@ function PlayerPawn.FirePulse(self, target, normal)
 		self.pulse.beam:BlendTo({0,0,0,0}, 0.1)
 	end
 	
-	World.gameTimers:Add(f, 0.1, true)
+	World.gameTimers:Add(f, 0.1)
 	
 	f = function()
 		self:EndPulse()
@@ -935,7 +935,7 @@ function PlayerPawn.EnterTerminal(self, terminal)
 		terminal:ShowUI()
 	end
 	
-	World.gameTimers:Add(f, 0.2, true)
+	World.gameTimers:Add(f, 0.2)
 end
 
 function PlayerPawn.EnterHackGame(self, terminal)
@@ -1053,7 +1053,7 @@ function PlayerPawn.ActivateShieldSpark(self)
 		self:DoShieldSpark()
 	end
 	
-	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(1, 10), true)
+	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(1, 10))
 end
 
 function PlayerPawn.DoShieldSpark(self)
@@ -1075,12 +1075,12 @@ function PlayerPawn.DoShieldSpark(self)
 		
 		for i=2,num do
 			local x = FloatRand(0.2, 0.7)
-			World.gameTimers:Add(spark, x+t, true)
+			World.gameTimers:Add(spark, x+t)
 			t = t + x
 		end
 	end
 	
-	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(num, 7), true)
+	self.shieldFlavorTimer = World.gameTimers:Add(f, FloatRand(num, 7))
 end
 
 function PlayerPawn.ActivateShieldHum2(self)
@@ -1088,7 +1088,7 @@ function PlayerPawn.ActivateShieldHum2(self)
 		self:DoShieldHum2()
 	end
 	
-	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10), true)
+	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10))
 end
 
 function PlayerPawn.DoShieldHum2(self)
@@ -1096,7 +1096,7 @@ function PlayerPawn.DoShieldHum2(self)
 		self:DoShieldHum2()
 	end
 	self.shieldSounds.Deactivate:Play(kSoundChannel_FX, 0)
-	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10), true)
+	self.shieldFlavorTimer2 = World.gameTimers:Add(f, FloatRand(4, 10))
 end
 
 function PlayerPawn.PauseShieldSound(self, pause)

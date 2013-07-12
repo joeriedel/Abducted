@@ -111,10 +111,10 @@ function MainMenu.InitUI(self)
 		local f = function()
 			self.mainPanel:TransitionIn({1,0}, 0.4)
 		end
-		World.globalTimers:Add(f, 4, true)
+		World.globalTimers:Add(f, 4)
 	end
 	
-	World.globalTimers:Add(f, 1, true)
+	World.globalTimers:Add(f, 1)
 	
 	self:InitNews()
 	self:InitNewGame()
@@ -543,7 +543,7 @@ function MainMenu.MainPanel.AnimateNextItem(self, index, onComplete)
 		self:AnimateNextItem(index+1, onComplete)
 	end
 
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 	
 end
 
@@ -574,7 +574,7 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 		self.widgets.selectionIndicator:MoveTo({rect[1], rect[2]}, {0, time})
 		
 		if (onComplete) then
-			World.globalTimers:Add(onComplete, time, true)
+			World.globalTimers:Add(onComplete, time)
 		end
 		
 		self.item = item
@@ -588,7 +588,7 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 		self.widgets.selectionIndicator:ScaleTo({1,1}, {0.3, 0})
 		
 		if (onComplete) then
-			World.globalTimers:Add(onComplete, 0.3, true)
+			World.globalTimers:Add(onComplete, 0.3)
 		end
 	end
 	
@@ -628,13 +628,13 @@ function MainMenu.MainPanel.Exit(self)
 					local f = function()
 						MainMenu.command()
 					end
-					World.globalTimers:Add(f, 0.55, true)
+					World.globalTimers:Add(f, 0.55)
 				end
 			end
 			
-			World.globalTimers:Add(f, 8, true)]]--
+			World.globalTimers:Add(f, 8)]]--
 		end
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 --		MainMenu.widgets.logo:MoveTo({r[1], r[2]}, {3, 0})
 
 	end

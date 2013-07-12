@@ -73,7 +73,7 @@ function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 		self:AnimateContents(f)
 	end
 	
-	World.globalTimers:Add(f, time, true)
+	World.globalTimers:Add(f, time)
 
 end
 
@@ -89,11 +89,11 @@ function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 			local f = function()
 				onComplete()
 			end
-			World.globalTimers:Add(f, time, true)
+			World.globalTimers:Add(f, time)
 		end
 	end
 	
-	World.globalTimers:Add(f, fade, true)
+	World.globalTimers:Add(f, fade)
 end
 
 function MainMenuPanel.PrepareContents(self)

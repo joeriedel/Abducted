@@ -329,7 +329,7 @@ function Arm.ReturnPressed(widget)
 		World.playerPawn:ExitArm()
 		collectgarbage()
 	end
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 	
 	if (Arm.armLockTimer) then
 		Arm.armLockTimer:Clean()
@@ -369,7 +369,7 @@ function Arm.QuitPressed(widget)
 			local f = function()
 				World.RequestLoad("UI/mainmenu", kUnloadDisposition_Slot)
 			end
-			World.globalTimers:Add(f, 1.1)
+			World.globalTimers:Add(f, 1.1, true)
 		end
 	end
 	
@@ -428,7 +428,7 @@ function Arm.Start(self, mode)
 		Arm:Intro()
 	end
 	
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 end
 
 function Arm.Signal(self, topic)
@@ -556,7 +556,7 @@ function Arm.Intro(self)
 		Arm:DoShimmer()
 	end
 	
-	World.globalTimers:Add(f, 0.5, true)
+	World.globalTimers:Add(f, 0.5)
 end
 
 function Arm.DoShimmer(self)
@@ -575,7 +575,7 @@ function Arm.DoShimmer(self)
 		Arm:DoInitialize()
 	end
 	
-	World.globalTimers:Add(f, 0.1, true)
+	World.globalTimers:Add(f, 0.1)
 end
 
 function Arm.DoInitialize(self)
@@ -603,13 +603,13 @@ function Arm.DoInitialize(self)
 		Arm:TransitionChat()
 	end
 	
-	World.globalTimers:Add(f, 2.8, true)
+	World.globalTimers:Add(f, 2.8)
 	
 	f = function()
 		Arm:ButtonsIntro()
 	end
 	
-	World.globalTimers:Add(f, 1.0, true)
+	World.globalTimers:Add(f, 1.0)
 	
 end
 
@@ -652,7 +652,7 @@ function Arm.ShowSymbol(self, show, time)
 		local f = function()
 			self:ActivateSymbol(false)
 		end
-		World.globalTimers:Add(f, time, true)
+		World.globalTimers:Add(f, time)
 	end
 end
 
@@ -666,14 +666,14 @@ function Arm.ToggleSymbolFlash(self, flash, options)
 		local f = function ()
 			Arm:ToggleSymbolFlash(false, options)
 		end
-		World.globalTimers:Add(f, FloatRand(options.flashMin, options.flashMax), true)
+		World.globalTimers:Add(f, FloatRand(options.flashMin, options.flashMax))
 	else
 		self.widgets.Symbol:SetMaterial(self.gfx.Symbol)
 		if (not options.singleShot) then
 			local f = function ()
 				Arm:ToggleSymbolFlash(true, options)
 			end
-			World.globalTimers:Add(f, FloatRand(options.solidMin, options.solidMax), true)
+			World.globalTimers:Add(f, FloatRand(options.solidMin, options.solidMax))
 		end
 	end
 end
@@ -689,7 +689,7 @@ function Arm.ButtonsIntro(self)
 		Arm:ListButtons(1)
 	end
 	
-	World.globalTimers:Add(f, 1.5, true)
+	World.globalTimers:Add(f, 1.5)
 end
 
 function Arm.ListButtons(self, num)
@@ -715,7 +715,7 @@ function Arm.ListButtons(self, num)
 	end
 	
 	if (didFade) then
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 	else
 		f()
 	end

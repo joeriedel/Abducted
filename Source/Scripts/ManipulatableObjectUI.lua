@@ -76,7 +76,7 @@ function ManipulatableObjectUI.Notify(self, enabled)
 			self.enabled = false
 		end
 		
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 	end
 		
 end

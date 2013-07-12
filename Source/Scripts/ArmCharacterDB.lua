@@ -282,7 +282,7 @@ function Arm.EnterCharDB(self, enter, callback, time)
 	end
 	
 	if (time > 0) then
-		self.dbTimer = World.globalTimers:Add(f, time, true)
+		self.dbTimer = World.globalTimers:Add(f, time)
 	else
 		f()
 	end
@@ -321,7 +321,7 @@ function Arm.DBAnimateTimePlayed(self, animate)
 		UI:SetLabelText(self.widgets.db.TimePlayed, s, UI.identityScale)
 	end
 
-	self.dbTimePlayedTimer = World.globalTimers:Add(f, 0)
+	self.dbTimePlayedTimer = World.globalTimers:Add(f, 0, true)
 end
 
 Arm.DBPulseTimes = {0.75, 0.2, 0.4, 0.65}
@@ -339,7 +339,7 @@ function Arm.DBPulseStart(self)
 		Arm:DBPulseBeat()
 	end
 	
-	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[2], true)
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[2])
 end
 
 function Arm.DBPulseBeat(self)
@@ -347,7 +347,7 @@ function Arm.DBPulseBeat(self)
 	local f = function()
 		Arm:DBPulseBeat2()
 	end
-	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[3], true)
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[3])
 end
 
 function Arm.DBPulseBeat2(self)
@@ -355,5 +355,5 @@ function Arm.DBPulseBeat2(self)
 	local f = function()
 		Arm:DBPulseStart()
 	end
-	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[4], true)
+	self.pulseTimer = World.globalTimers:Add(f, Arm.DBPulseTimes[4])
 end

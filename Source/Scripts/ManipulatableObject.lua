@@ -166,7 +166,7 @@ function ManipulatableObject.DoManipulateShimmer(self)
 	local f = function()
 		self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	end
-	self.manipulateShimmerTimer = World.gameTimers:Add(f, 0.5, true)
+	self.manipulateShimmerTimer = World.gameTimers:Add(f, 0.5)
 end
 
 function ManipulatableObject.AddToManipulateList(self)
@@ -982,7 +982,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 			-- manipulatable again
 			self:AddToManipulateList()
 		end
-		World.gameTimers:Add(f, self.manipulateWindow, true)
+		World.gameTimers:Add(f, self.manipulateWindow)
 	else
 		-- object is not going to reset
 		self.saveManipulateDir = objDir

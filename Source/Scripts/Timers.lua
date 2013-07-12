@@ -5,49 +5,84 @@
 
 TimerList = Class:New()
 
+function TimerList.Tick(self, time, ...)
+	local dt = time - self.time
+	self.time = time
+	
+	local ll_head = LL_Head
+	local ll_list = LL_List
+	local ll_next = LL_Next
+	local ll_remove = LL_Remove
+	
+	local item = ll_head(self.timers)
+	self.tick = self.tick + 1
+	
+	while (item) do
+		local next = ll_next(item)
+		
+		if (item.tick ~= self.tick) then
+			-- don't tick new timers added in timer refresh
+			if (item.tick ~= 0) then
+				item.time = item.time + dt
+				if (item.time >= item.delay) then
+					item.fn(item.time, time, ...)
+					item.time = 0
+					if ((not item.repeats) and (ll_list(item) == self.timers)) then
+						LL_Remove(self.timers, item)
+					end
+				end
+			end
+			
+			item.tick = self.tick
+		end
+		
+		-- next timer was removed, breaking our ability to move forward
+		if (next and (ll_list(next) ~= self.timers)) then
+			item = ll_head(self.timers) -- start from the top again
+		else
+			item = next
+		end
+	end
+end
+
+function TimerList.TimerSetPeriod(self, period)
+	self.period = period
+end
+
+function TimerList.TimerClean(self)
+	local list = LL_List(self)
+	if (list) then
+		LL_Remove(list, self)
+	end
+end
+
+function TimerList.Add(self, fn, delay, repeats)
+	local x = {
+		fn = fn, 
+		delay = delay, 
+		time = 0,
+		tick = 0,
+		repeats = repeats,
+		SetPeriod = TimerList.TimerSetPeriod,
+		Clean = TimerList.TimerClean
+	}
+	return LL_Append(self.timers, x)
+end
+
+function TimerList.Remove(self, item)
+	return LL_Remove(self.timers, item)
+end
+
 function TimerList.Create(self)
 	local fnList = {}
 	
-	fnList.list = LL_New()
+	fnList.timers = LL_New()
 	fnList.time = 0
-	fnList.Tick = function (self, time, ...)
-		self.time = time
-		local x = LL_Head(self.list)
-		local dt
-		while (x and (LL_List(x) == self.list)) do
-			local next = LL_Next(x)
-			dt = time - x.time
-			if (dt >= x.freq) then
-				x.fn(dt, time, ...)
-				x.time = time
-				if (x.singleShot and (LL_List(x) == self.list)) then
-					LL_Remove(self.list, x)
-				end
-			end
-			x = next
-		end
-	end
-	fnList.Add = function(self, fn, freq, singleShot)
-		local x = {
-			fn = fn, 
-			freq = freq, 
-			time = self.time,
-			singleShot = singleShot,
-			SetFreq = function(self, freq)
-				self.freq = freq
-			end,
-			Clean = function(self)
-				local list = LL_List(self)
-				if (list) then
-					LL_Remove(list, self)
-				end
-			end
-		}
-		return LL_Append(self.list, x)
-	end
-	fnList.Remove = function(self, item)
-		return LL_Remove(self.list, item)
-	end
+	fnList.tick = 0
+	
+	fnList.Tick = TimerList.Tick
+	fnList.Add = TimerList.Add
+	fnList.Remove = TimerList.Remove
 	
 	return fnList
 end

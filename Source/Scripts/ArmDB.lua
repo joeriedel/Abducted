@@ -99,7 +99,7 @@ function Arm.EndDB(self, callback)
 		callback()
 	end
 	
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 
 end
 
@@ -157,7 +157,7 @@ function Arm.DBIntro(self, mode)
 		Arm:DBShowPanel(true, mode)
 	end
 	
-	World.globalTimers:Add(f, 0.3, true)
+	World.globalTimers:Add(f, 0.3)
 	
 end
 

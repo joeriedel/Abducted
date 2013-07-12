@@ -14,7 +14,8 @@ function HUD.Spawn(self)
 	
 	World.globalTimers:Add(
 		function () HUD:Think() end,
-		0
+		0,
+		true
 	)
 end
 
@@ -281,14 +282,14 @@ function HUD.BeginShield(self, gameTime)
 		HUD:ExpireShield()
 	end
 	
-	self.shieldExpiryTimer = World.globalTimers:Add(f, PlayerSkills.MaxShieldTime - (GameDB.realTime - gameTime), true)
+	self.shieldExpiryTimer = World.globalTimers:Add(f, PlayerSkills.MaxShieldTime - (GameDB.realTime - gameTime))
 	
 	f = function ()
 		local dd = GameDB.realTime - HUD.shieldStartTime
 		self.widgets.ShieldCharging:FillCircleTo(-(1 - (dd / PlayerSkills.MaxShieldTime)), 0)
 	end
 	
-	self.shieldTimer = World.globalTimers:Add(f, 0)
+	self.shieldTimer = World.globalTimers:Add(f, 0, true)
 	
 end
 
@@ -327,14 +328,14 @@ function HUD.InternalRechargePulse(self)
 		HUD:Shimmer(self.widgets.PulseShimmer)
 	end
 	
-	World.globalTimers:Add(f, self.pulseRechargeTime - (GameDB.realTime - self.pulseStart), true)
+	World.globalTimers:Add(f, self.pulseRechargeTime - (GameDB.realTime - self.pulseStart))
 	
 	f = function ()
 		local dd = GameDB.realTime - self.pulseStart
 		self.widgets.PulseCharging:FillCircleTo(dd / self.pulseRechargeTime, 0)
 	end
 	
-	self.pulseTimer = World.globalTimers:Add(f, 0)
+	self.pulseTimer = World.globalTimers:Add(f, 0, true)
 end
 
 function HUD.Layout(self)
@@ -532,7 +533,7 @@ function HUD.AnimateUnlockMobile(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.ManipulateShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		end
 	end
@@ -550,7 +551,7 @@ function HUD.AnimateUnlockMobile(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		else
 			local oldRect = self.widgets.Shield:Rect()
@@ -575,7 +576,7 @@ function HUD.AnimateUnlockMobile(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		else
 			local oldRect = self.widgets.Pulse:Rect()
@@ -617,7 +618,7 @@ function HUD.AnimateUnlockPC(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.ManipulateShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		end
 	end
@@ -637,7 +638,7 @@ function HUD.AnimateUnlockPC(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.ShieldShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		end
 	end
@@ -657,7 +658,7 @@ function HUD.AnimateUnlockPC(self, items)
 				local f = function()
 					HUD:Shimmer(self.widgets.PulseShimmer)
 				end
-				World.gameTimers:Add(f, 0.3, true)
+				World.gameTimers:Add(f, 0.3)
 			end
 		end
 	end
@@ -760,14 +761,14 @@ function HUD.InternalRechargeManipulate(self)
 		HUD:Shimmer(self.widgets.ManipulateShimmer)
 	end
 	
-	World.globalTimers:Add(f, self.manipulateRechargeTime - (GameDB.realTime - self.manipulateStart), true)
+	World.globalTimers:Add(f, self.manipulateRechargeTime - (GameDB.realTime - self.manipulateStart))
 	
 	f = function ()
 		local dd = GameDB.realTime - self.manipulateStart
 		self.widgets.ManipulateCharging:FillCircleTo(dd / self.manipulateRechargeTime, 0)
 	end
 	
-	self.manipulateTimer = World.globalTimers:Add(f, 0)
+	self.manipulateTimer = World.globalTimers:Add(f, 0, true)
 end
 
 function HUD.ExpireShield(self)
@@ -828,7 +829,7 @@ function HUD.RechargeShield(self)
 		HUD:Shimmer(self.widgets.ShieldShimmer)
 	end
 	
-	World.globalTimers:Add(f, self.shieldRechargeTime, true)
+	World.globalTimers:Add(f, self.shieldRechargeTime)
 	
 	f = function ()
 		local dd = GameDB.realTime - self.shieldStartTime
@@ -837,7 +838,7 @@ function HUD.RechargeShield(self)
 		self.widgets.ShieldCharging:FillCircleTo(-dd, 0)
 	end
 	
-	self.shieldTimer = World.globalTimers:Add(f, 0)
+	self.shieldTimer = World.globalTimers:Add(f, 0, true)
 	
 end
 
@@ -851,7 +852,7 @@ function HUD.Shimmer(self, widget)
 		widget:BlendTo({0,0,0,0}, 0.2)
 	end
 	
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 end
 
 function HUD.PlayerDied(self)

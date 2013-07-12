@@ -83,7 +83,7 @@ function Arm.EndChat(self, callback)
 		callback()
 	end
 	
-	World.globalTimers:Add(f, 0.2, true)
+	World.globalTimers:Add(f, 0.2)
 end
 
 function Arm.ClearChat(self)
@@ -263,7 +263,7 @@ function Arm.ChatPrompt(self)
 	
 	UI:SetLabelText(self.promptState.labels[1], ">");
 	self.promptState.labels[1]:SetVisible(false)
-	self.chatTimer = World.globalTimers:Add(f, 0.2, false)
+	self.chatTimer = World.globalTimers:Add(f, 0.2, true)
 	
 end
 
@@ -288,7 +288,7 @@ function Arm.AnimatePrompt(self)
 	end
 	
 	local charactersPerSecond = 30
-	self.chatTimer = World.globalTimers:Add(f, 1/charactersPerSecond, false)
+	self.chatTimer = World.globalTimers:Add(f, 1/charactersPerSecond, true)
 end
 
 function Arm.TickPrompt(self)
@@ -312,12 +312,12 @@ function Arm.TickPrompt(self)
 				local f = function()
 					Arm:DisplayChatLockout()
 				end
-				self.chatTimer2 = World.globalTimers:Add(f, 3, true)
+				self.chatTimer2 = World.globalTimers:Add(f, 3)
 			else
 				local f = function()
 					Arm:EnableChangeTopic(true)
 				end
-				self.chatTimer2 = World.globalTimers:Add(f, 2, true)
+				self.chatTimer2 = World.globalTimers:Add(f, 2)
 			end
 			Arm:DisplayChoices()
 			collectgarbage()
@@ -344,7 +344,7 @@ function Arm.DisplayChatLockout(self)
 	end
 	
 	Abducted.entity.eatInput = true
-	self.armLockTimer = World.globalTimers:Add(f, 0.5, true)
+	self.armLockTimer = World.globalTimers:Add(f, 0.5)
 end
 
 function Arm.ChatLockout(self, time)
@@ -492,7 +492,7 @@ function Arm.DisplayChoices(self)
 	
 	end
 	
-	self.chatTimer = World.globalTimers:Add(f, 1, true)
+	self.chatTimer = World.globalTimers:Add(f, 1)
 end
 
 function Arm.ChoiceSelected(self, widget, choice, prompt, text)
@@ -528,7 +528,7 @@ function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 		Arm:ChatPrompt()
 	end
 	
-	self.chatTimer = World.globalTimers:Add(f, 1.5, true)
+	self.chatTimer = World.globalTimers:Add(f, 1.5)
 
 end
 

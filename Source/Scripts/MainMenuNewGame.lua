@@ -162,7 +162,7 @@ function MainMenu.NewGame.AnimateContents(self, onComplete)
 		local f = function()
 			onComplete()
 		end
-		World.globalTimers:Add(f, 0.2, true)
+		World.globalTimers:Add(f, 0.2)
 	end
 end
 

@@ -205,7 +205,7 @@ function TerminalScreen.CancelUI(callback)
 				callback()
 			end
 		end
-		World.gameTimers:Add(f, 0.2, true)
+		World.gameTimers:Add(f, 0.2)
 	else
 		if (callback) then
 			callback()
@@ -300,7 +300,7 @@ function TerminalScreen.HideUI(callback)
 	TerminalScreen.Widgets.Return:BlendTo({1,1,1,0}, 0.2)
 			
 	if (callback) then
-		World.gameTimers:Add(callback, 0.2, true)
+		World.gameTimers:Add(callback, 0.2)
 	end
 
 end
@@ -327,10 +327,10 @@ function TerminalScreen.DoHackGame()
 				ReflexGame:StartGame(f)
 			end
 			
-			World.globalTimers:Add(f, 0.3, true)
+			World.globalTimers:Add(f, 0.3)
 		end
 		
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 	end
 end
 
@@ -356,10 +356,10 @@ function TerminalScreen.DoSolveGame()
 				ReflexGame:StartGame(f)
 			end
 			
-			World.globalTimers:Add(f, 0.3, true)
+			World.globalTimers:Add(f, 0.3)
 		end
 		
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 	end
 end
 
@@ -374,7 +374,7 @@ function TerminalScreen.GameComplete(self, mode, result)
         MemoryGame:ResetGame()
 		collectgarbage()
 	end
-	World.globalTimers:Add(f, 0.3, true)
+	World.globalTimers:Add(f, 0.3)
 	
 	if (mode == "hack") then
 		World.playerPawn:LeaveHackGame(self, result)

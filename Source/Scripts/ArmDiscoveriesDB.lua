@@ -119,7 +119,7 @@ function Arm.EnterDiscoveriesDB(self, enter, callback, time)
 	end
 	
 	if (callback and (time > 0)) then
-		self.dbTimer = World.globalTimers:Add(callback, time, true)
+		self.dbTimer = World.globalTimers:Add(callback, time)
 	elseif (callback) then
 		callback()
 	end

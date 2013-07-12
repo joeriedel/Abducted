@@ -95,10 +95,10 @@ function AlertPanel.Dismiss(self, result)
 				callback(result)
 			end
 		end
-		World.globalTimers:Add(f, 0.3, true)
+		World.globalTimers:Add(f, 0.3)
 	end
 	
-	World.globalTimers:Add(f, 0.1, true)
+	World.globalTimers:Add(f, 0.1)
 end
 
 function AlertPanel.ButtonPressed(widget, e)
@@ -202,7 +202,7 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 	
 	self.widgets.root:SetVisible(true)
 	self.widgets.panel:ScaleTo({1,1}, {0.3, 0.3})
-	World.globalTimers:Add(f, 0.3, true)
+	World.globalTimers:Add(f, 0.3)
 
 end
 

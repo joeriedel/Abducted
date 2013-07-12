@@ -58,7 +58,7 @@ function Game.LoadLevel(self, level)
 		World.RequestLoad(level, kUnloadDisposition_Slot)
 	end
 	
-	World.globalTimers:Add(f, 1, true)
+	World.globalTimers:Add(f, 1)
 
 end
 

@@ -101,7 +101,7 @@ function Music.Stop(self)
 			end
 			self.active:FadeOutAndStop(1)
 			self.active = nil
-			World.gameTimers:Add(f, 1.1, true)
+			World.gameTimers:Add(f, 1.1)
 		else
 			self.active = nil
 		end
@@ -162,7 +162,7 @@ function Music.LoadState(self, state)
 			World.PostEvent("shiphum fadeto 1 1")
 		end
 		-- cannot post event here
-		World.globalTimers:Add(f, 0, true)
+		World.globalTimers:Add(f, 0)
 	end
 
 end

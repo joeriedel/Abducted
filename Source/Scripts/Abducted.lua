@@ -42,7 +42,7 @@ function Abducted.OnLevelStart(self)
 			self.showCheckpointNotification = false
 			World.RequestGenerateSaveGame()
 		end
-		World.globalTimers:Add(f, 0.25, true) -- let scripts and stuff fire to set states
+		World.globalTimers:Add(f, 0.25) -- let scripts and stuff fire to set states
 	end
 	
 end
@@ -94,7 +94,7 @@ function Abducted.DoLoadCheckpoint(self)
 		Abducted.entity.eatInput = false
 	end
 
-	World.globalTimers:Add(f, 0.5, true)
+	World.globalTimers:Add(f, 0.5)
 	
 end
 
@@ -239,13 +239,13 @@ function Abducted.BeginManipulate(self)
 		self:EndManipulate()
 	end
 	
-	self.endManipulateTimer = World.gameTimers:Add(f, 1.8, true)
+	self.endManipulateTimer = World.gameTimers:Add(f, 1.8)
 	
 	f = function ()
 		World.SetGameSpeed(0.2, 0.5)
 	end
 	
-	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7, true)
+	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7)
 end
 
 function Abducted.EndManipulate(self, immediate)
@@ -288,7 +288,7 @@ function Abducted.BeginPulse(self)
 		self:DischargePulse()
 	end
 	
-	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.PulseExplodeTime[1], PlayerSkills.PulseExplodeTime[2]), true)
+	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.PulseExplodeTime[1], PlayerSkills.PulseExplodeTime[2]))
 	
 end
 
@@ -360,7 +360,7 @@ function Abducted.PlayerDied(self, killMessage)
 		)
 	end
 	
-	World.globalTimers:Add(f, 2.5, true)
+	World.globalTimers:Add(f, 2.5)
 end
 
 function Abducted.Think(self, dt)

@@ -204,7 +204,7 @@ function UIPushButton.DoUnpressed(self, widget, event)
 				local f = function()
 					widget.highlight:BlendTo(options.highlight.on, options.highlight.time)
 				end
-				widget.state.timer = World.globalTimers:Add(f, delta, true)
+				widget.state.timer = World.globalTimers:Add(f, delta)
 			else
 				widget.highlight:BlendTo(options.highlight.on, options.highlight.time)
 			end

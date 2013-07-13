@@ -7,7 +7,7 @@ PostFX = {}
 
 PostFX.kBrightpass = 0
 PostFX.kBlur = 1
-PostFX.kNumBlurPasses = 4
+PostFX.kNumBlurPasses = 2
 PostFX.kBloom = 100
 PostFX.kFastBlur = false
 PostFX.BloomEnable = true
@@ -25,7 +25,7 @@ function PostFX.Init()
 		PostFX.gfx.BlurY = World.Load("FX/BlurY_M")
 	end
 	
-	local scale = 0.3
+	local scale = 0.25
 	
 	World.CreatePostProcessEffect(PostFX.kBrightpass, PostFX.gfx.Brightpass)
 	World.SetPostProcessEffectScale(PostFX.kBrightpass, {scale, scale})

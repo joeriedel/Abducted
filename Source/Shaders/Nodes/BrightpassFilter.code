@@ -1,5 +1,5 @@
 FIXED4 BrightpassFilter(FIXED4 rgba GLOBALS) {
 	FIXED lum = dot(rgba.xyz, FIXED3(0.299, 0.587, 0.114));
 	const FIXED kThreshold = 0.3;
-	return rgba * max((lum - kThreshold) / (1 - kThreshold), 0);
+	return rgba * max((lum - kThreshold) / (1.0 - kThreshold), 0.0);
 }

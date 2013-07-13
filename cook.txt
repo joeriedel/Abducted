@@ -317,5 +317,12 @@ pak0 {
 	Sys/EditorLightSphere_M
 	Sys/Shadow_M
 	Sys/ProjectedShadow_M
+	Sys/Copy_M
+
+	FX/Bloom_M
+	FX/BlurX_M
+	FX/BlurY_M
+	FX/Brightpass_M
+	FX/FastBlur_M
 
 } // pak0

@@ -643,7 +643,7 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		self:Show(true)
 		return true
 	elseif (cmd == "hide") then
-		self:Hide(true)
+		self:Show(false)
 		return true
 	elseif (cmd == "kill") then
 		self:Kill()

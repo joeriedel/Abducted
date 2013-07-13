@@ -1,0 +1,15 @@
+Node({
+
+	Outputs = 
+	{
+		rgba = {t=FIXED4, r=-1, s="color"}
+	},
+
+	Inputs = 
+	{
+		t = {t=sampler2D, s="texture", r=0},
+		tc = {t=HALF4,  s="texcoords", r=1},
+		pfx = {t=HALF2, s="pfx kernel", r=2}
+	}
+	
+})

@@ -1,0 +1,10 @@
+// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+FIXED4 GaussY(HLSL(uniform) GLSL(lowp) sampler2D t, HALF4 st, HALF2 kernel[4] GLOBALS) {
+	FIXED4 sum;
+	sum = tex2D(t, st.xy) * 0.2270270270;
+	sum += tex2D(t, HALF2(st.x, kernel[0][1])) * 0.3162162162;
+	sum += tex2D(t, HALF2(st.x, kernel[1][1])) * 0.3162162162;
+	sum += tex2D(t, HALF2(st.x, kernel[2][1])) * 0.0702702703;
+	sum += tex2D(t, HALF2(st.x, kernel[3][1])) * 0.0702702703;
+	return sum;
+}

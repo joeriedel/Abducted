@@ -29,6 +29,9 @@ BEGIN_UNIFORMS
 #if defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT2 UDECL(spriteVerts)[4];
 #endif
+#if defined(PFX_VARS)
+	GLSL(uniform) HALF2 UDECL(pfxVars);
+#endif
 	UTXREGS
 	UTCMODREGS
 	ULIGHTREGS
@@ -57,6 +60,9 @@ BEGIN_VARYING
 #endif
 #if defined(SHADER_VERTEX_COLOR)
 	GLSL(varying) FIXED4 OUT(vertexColor) HLSL(:POSITION1);
+#endif
+#if defined(PFX_VARS)
+	GLSL(varying) HALF2 OUT(pfxShift)[4];
 #endif
 	OUT_TCREGS
 	OUT_NMREGS
@@ -289,6 +295,16 @@ MAIN
 	gl_Position = mul(UNIFORM(pr), mvpos);
 #else
 	gl_Position = mul(MVP, IN(position));
+#endif
+#if defined(PFX_VARS) && (TEXCOORDS>=1)
+	// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+
+	HALF2 pfxShiftOne = HALF2(1.3846153846 * UNIFORM(pfxVars)[0], 1.3846153846 * UNIFORM(pfxVars)[1]);
+	HALF2 pfxShiftTwo = HALF2(3.2307692308 * UNIFORM(pfxVars)[0], 3.2307692308 * UNIFORM(pfxVars)[1]);
+	OUT(pfxShift)[0] = OUT(TEXCOORD0).xy - pfxShiftOne;
+	OUT(pfxShift)[1] = OUT(TEXCOORD0).xy + pfxShiftOne;
+	OUT(pfxShift)[2] = OUT(TEXCOORD0).xy - pfxShiftTwo;
+	OUT(pfxShift)[3] = OUT(TEXCOORD0).xy + pfxShiftTwo;
 #endif
 #else // !defined(VERTEX)
 

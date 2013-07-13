@@ -7,6 +7,7 @@ Game = Entity:New()
 
 function Game.Spawn(self)
 	Game.entity = self
+	PostFX.Init()
 	Input:Spawn()
 	World.SetGameCode(self)
 	World.gameCode = self

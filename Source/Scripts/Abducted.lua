@@ -102,13 +102,14 @@ function Abducted.Load(self)
 	self.gfx = {}
 	self.gfx.Manipulate = World.Load("Shared/spellcasting_edgelines_M")
 	self.gfx.PainBlend = World.Load("Shared/painblend_M")
-	
+		
 	self.sfx = {}
 	self.sfx.ManipulateBegin = World.LoadSound("Audio/manipulate_start")
 	self.sfx.ManipulateEnd = World.LoadSound("Audio/manipulate_end")
 	
 	self.overlays = {}
 	self.overlays.Manipulate = World.CreateScreenOverlay(self.gfx.Manipulate)
+
 end
 
 function Abducted.InputEventFilter(self, e)

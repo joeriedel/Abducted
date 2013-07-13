@@ -139,6 +139,9 @@
     <filename>Source\Scripts\PlayerSkills.lua</filename>
   </file>
   <file>
+    <filename>Source\PostFX.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\ReflexGame.lua</filename>
   </file>
   <file>

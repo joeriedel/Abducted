@@ -40,7 +40,7 @@ PlayerPawn.AnimationStates = {
 		puzzle_default_choice = "puzzle_limp_choice",
 		speedScale = 0.7,
 		tapAdjust = 48, -- CheckTappedOn
-		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 96}},
+		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
 		canRun = false,
 		OnSelect = function()
 			HUD:Enable({"arm", "shield", "manipulate"})

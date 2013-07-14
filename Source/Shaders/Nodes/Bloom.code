@@ -1,5 +1,5 @@
 FIXED4 Bloom(FIXED4 fb, FIXED4 bloom GLOBALS) {
-	bloom *= 3.0;
+	bloom *= 2.0;
 	fb *= 1.0 - sat(bloom);
 	return fb + bloom;
 }

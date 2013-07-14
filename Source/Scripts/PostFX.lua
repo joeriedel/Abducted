@@ -27,6 +27,11 @@ function PostFX.Init()
 	
 	local scale = 0.25
 	
+	if (UI.mode == kGameUIMode_PC) then
+		PostFX.kNumBlurPasses = 9
+		scale = 0.5
+	end
+	
 	World.CreatePostProcessEffect(PostFX.kBrightpass, PostFX.gfx.Brightpass)
 	World.SetPostProcessEffectScale(PostFX.kBrightpass, {scale, scale})
 	World.EnablePostProcessEffect(PostFX.kBrightpass, PostFX.BloomEnable)

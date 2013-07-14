@@ -170,10 +170,12 @@ function ManipulatableObject.DoManipulateShimmer(self)
 end
 
 function ManipulatableObject.AddToManipulateList(self)
-	if (self.listItem == nil) then
-		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+	if (PlayerSkills:ManipulateUnlocked()) then
+		if (self.listItem == nil) then
+			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+		end
+		self:DoManipulateShimmer()
 	end
-	self:DoManipulateShimmer()
 end
 
 function ManipulatableObject.RemoveFromManipulateList(self)
@@ -472,7 +474,7 @@ function ManipulatableObject.Idle(self)
 	end
 	
 	self:AddToManipulateList()
-	
+		
 	if (not self.enabled) then
 		self.enabled = true
 		if (Game.entity.manipulate) then -- show ourselves

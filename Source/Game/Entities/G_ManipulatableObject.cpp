@@ -167,4 +167,8 @@ void *info_pylon::Create() {
 	return new (ZWorld) world::G_ManipulatableObject();
 }
 
+void *info_custom_manipulatable::Create() {
+	return new (ZWorld) world::G_ManipulatableObject();
+}
+
 } // spawn

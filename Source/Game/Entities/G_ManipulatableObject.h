@@ -56,5 +56,6 @@ private:
 
 E_DECL_SPAWN(RADNULL_API, info_tentacle)
 E_DECL_SPAWN(RADNULL_API, info_pylon)
+E_DECL_SPAWN(RADNULL_API, info_custom_manipulatable)
 
 #include <Runtime/PopPack.h>

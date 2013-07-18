@@ -66,6 +66,15 @@ function Light.Spawn(self)
 	
 	self.light:SetStyle(style)
 	
+	style = StringForString(self.keys.style, "none")
+	if (style == "pslow") then
+        local steps = {
+            { intensity = 0, time = 3 },
+            { intensity = intensity, time = 3 }
+        }
+	    self.light:AnimateIntensity(steps, true)
+	end
+	
 	local interactions = 0
 	
 	if (bit.band(flags, kLightEntityFlag_AffectWorld) ~= 0) then

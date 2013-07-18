@@ -1,0 +1,3 @@
+FIXED4 SmoothShadow(FIXED4 rgba GLOBALS) {
+	return FIXED4(rgba.xyz, rgba.a * smoothstep(0.1, 0.6, rgba.a));
+}

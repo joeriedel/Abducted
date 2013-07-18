@@ -46,6 +46,26 @@ PlayerPawn.AnimationStates = {
 			HUD:Enable({"arm", "shield", "manipulate"})
 		end,
 	},
+	limpscrunch = {
+		idle = "limp_scrunched_idle",
+		walk = "limp_scrunched_forward",
+		manipulate_idle = "limpmanidle",
+		maniplate_left = "limpmanleft",
+		manipulate_right = "limpmanright",
+		manipulate_up = "limpmanup",
+		manipulate_down = "limpmandown",
+		arm_default_flyin = "arm_limp_flyin",
+		arm_default_flyout = "arm_limp_flyout",
+		arm_pose_standing = "arm_pose_limp",
+		puzzle_default_choice = "puzzle_limp_choice",
+		speedScale = 0.4,
+		tapAdjust = 48, -- CheckTappedOn
+		bbox = {mins = {-32, -32, 0}, maxs = {32, 32, 90}},
+		canRun = false,
+		OnSelect = function()
+			HUD:Enable({"arm", "shield", "manipulate"})
+		end,
+	},
 	walkfast = {
 		walk = "walkfast",
 		speedScale = 2.2,

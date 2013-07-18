@@ -228,6 +228,7 @@ private:
 	static void Connect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst);
 	static void Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool flip);
 	static int AddSelectedConnectionProps(CMapObject* pObject, void* p, void* p2);
+	static CString FixupScriptString(const CString &str);
 
 	enum Properties {
 		kProp_First,

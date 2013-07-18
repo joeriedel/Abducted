@@ -728,6 +728,18 @@ void CWaypoint::Disconnect(CTreadDoc *doc, CWaypoint &src, CWaypoint &dst, bool 
 //	dst.AddSelectedConnectionProps(doc);
 }
 
+CString CWaypoint::FixupScriptString(const CString &str) {
+	CString s(str);
+	s.Replace( '"', '\'' );
+	if (s[0] == '/' || s[0] == '\\')
+		s = s.Right(s.GetLength()-1);
+	s.Replace('\\', '/');
+	s.Replace( '"', '\'' );
+	s.Replace( "\r\n", "\n");
+	s.Replace( "\n", "\\n");
+	return s;
+}
+
 void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 	fs << "{\n\"classname\" \"waypoint\"\n";
 	fs << "\"uid\" \"" << GetUID() << "\"\n";
@@ -747,10 +759,10 @@ void CWaypoint::WriteToMapFile(std::fstream &fs, CTreadDoc *doc) {
 			" " << c->props[Connection::kProp_Flags].GetInt() <<
 			" ( " << c->ctrls[0].x << " " << c->ctrls[0].y << " " << c->ctrls[0].z << 
 			" ) ( " << c->ctrls[1].x << " " << c->ctrls[1].y << " " << c->ctrls[1].z << " )\"\n";
-		fs << "\"connection_fwd_start " << i << "\" \"" << c->props[Connection::kProp_FwdStart].GetString() << "\"\n";
-		fs << "\"connection_fwd_end " << i << "\" \"" << c->props[Connection::kProp_FwdEnd].GetString() << "\"\n";
-		fs << "\"connection_back_start " << i << "\" \"" << c->props[Connection::kProp_BackStart].GetString() << "\"\n";
-		fs << "\"connection_back_end " << i << "\" \"" << c->props[Connection::kProp_BackEnd].GetString() << "\"\n";
+		fs << "\"connection_fwd_start " << i << "\" \"" << FixupScriptString(c->props[Connection::kProp_FwdStart].GetString()) << "\"\n";
+		fs << "\"connection_fwd_end " << i << "\" \"" << FixupScriptString(c->props[Connection::kProp_FwdEnd].GetString()) << "\"\n";
+		fs << "\"connection_back_start " << i << "\" \"" << FixupScriptString(c->props[Connection::kProp_BackStart].GetString()) << "\"\n";
+		fs << "\"connection_back_end " << i << "\" \"" << FixupScriptString(c->props[Connection::kProp_BackEnd].GetString()) << "\"\n";
 		fs << "\"connection_fwd_anim " << i << "\" \"" << c->props[Connection::kProp_FwdAnim].GetString() << "\"\n";
 		fs << "\"connection_back_anim " << i << "\" \"" << c->props[Connection::kProp_BackAnim].GetString() << "\"\n";
 		

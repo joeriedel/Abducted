@@ -117,7 +117,11 @@ function GenPhongLight(
 
 end
 
-function GenGlow(glowSlot, diffuseColor)
+function GenGlow(glowSlot, diffuseColor, diffuseColor2)
+
+	if (diffuseColor2 == nil) then
+		diffuseColor2 = diffuseColor
+	end
 
 	local glowMap = Node("hSampleTexture2D", "glowMap")
 	glowMap.In.t = MTexture(glowSlot)
@@ -132,7 +136,7 @@ function GenGlow(glowSlot, diffuseColor)
 
 	local glowBlend = Node("hMul", "glowBlend")
 	glowBlend.In.x = glowMap
-	glowBlend.In.y = diffuseColor
+	glowBlend.In.y = diffuseColor2
 
 	return {
 		diffuseColor = diffuseGlow,
@@ -167,9 +171,21 @@ function GenLightShader(
 	end
 
 	if (glowSlot) then
-		local glow = GenGlow(glowSlot, diffuseColor)
-		defaultPass = glow.glowColor
-		diffuseColor = glow.diffuseColor
+		if (type(glowSlot) == "table") then
+			if (glowSlot.slot) then
+			-- custom glow diffuse color (ie. completeMap)
+				local glow = GenGlow(glowSlot.slot, glowSlot.diffuseColor, diffuseColor)
+				defaultPass = glow.glowColor
+				diffuseColor = glow.diffuseColor
+			else
+				-- explicit defaultPass provided
+				defaultPass = glowSlot
+			end
+		else
+			local glow = GenGlow(glowSlot, diffuseColor)
+			defaultPass = glow.glowColor
+			diffuseColor = glow.diffuseColor
+		end
 	else
 		if (alphaColor) then
 			defaultPass = Node("hSwp_xyzw_XYZw_xyzW", "alphaMask")
@@ -208,6 +224,334 @@ function GenLightShader(
 	end
 	
 	return shader
+end
+
+function GenDBakedPhongShader(completeMap, diffuseTexture)
+
+	if (completeMap == nil) then
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		completeMap
+	)
+
+end
+
+function GenDBakedPhongGlowShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		{slot=ofs+1, diffuseColor=completeMap}
+	)
+
+end
+
+function GenDSBakedPhongShader(completeMap, diffuseTexture)
+
+	if (completeMap == nil) then
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		completeMap
+	)
+
+end
+
+function GenDSBakedPhongGlowShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenPhongLight,
+		MNormal(0),
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		{slot=ofs+1, diffuseColor=completeMap}
+	)
+
+end
+
+function GenDBakedBumpShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		completeMap
+	)
+
+end
+
+function GenDBakedBumpGlowShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		nil,
+		MColor(0),
+		nil,
+		{slot=ofs+2, diffuseColor=completeMap}
+	)
+
+end
+
+function GenDSBakedBumpShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		completeMap
+	)
+
+end
+
+function GenDSBakedBumpGlowShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		{slot=ofs+2, diffuseColor=completeMap}
+	)
+
+end
+
+function GenDSBakedBumpSpecMaskShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	local specularTexture = Node("hSampleTexture2D", "diffuseTexture")
+	specularTexture.In.t = MTexture(ofs+2)
+	specularTexture.In.tc = MTexCoord(ofs+2)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		specularTexture,
+		MColor(0),
+		MSpecularColor(0),
+		completeMap
+	)
+
+end
+
+function GenDSBakedBumpSpecMaskGlowShader(completeMap, diffuseTexture, ofs)
+
+	if (completeMap == nil) then
+		ofs = 0
+		completeMap = Node("hSampleTexture2D", "completeMap")
+		completeMap.In.t = MTexture(0)
+		completeMap.In.tc = MTexCoord(0)
+	end
+
+	if (diffuseTexture == nil) then
+		ofs = 1
+		diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+		diffuseTexture.In.t = MTexture(1)
+		diffuseTexture.In.tc = MTexCoord(1)
+	end
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(ofs+1)
+	bumpMap.In.tc = MTexCoord(ofs+1)
+
+	local specularTexture = Node("hSampleTexture2D", "diffuseTexture")
+	specularTexture.In.t = MTexture(ofs+2)
+	specularTexture.In.tc = MTexCoord(ofs+2)
+
+	return GenLightShader(
+		{"Diffuse"},
+		kMaxLights,
+		GenPhongLight,
+		bumpMap,
+		diffuseTexture,
+		specularTexture,
+		MColor(0),
+		MSpecularColor(0),
+		{slot=ofs+3, diffuseColor=completeMap}
+	)
+
 end
 
 function GenDPhongShader()

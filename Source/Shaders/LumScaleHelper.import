@@ -1,0 +1,26 @@
+-- Helper to generate luminance scaled multiply
+
+function hGenLumScale(slot1, slot2)
+
+	local diffuse = Node("hSampleTexture2D", "lumScale Texture1")
+	local diffuse2 = Node("hSampleTexture2D", "lumScale Texture2")
+	local addTextures = Node("hAdd", "lumScale Add Textures")
+	
+	diffuse.In.t = MTexture(slot1)
+	diffuse.In.tc = MTexCoord(slot1)
+	diffuse2.In.t = MTexture(slot2)
+	diffuse2.In.tc = MTexCoord(slot2)
+	
+	local lum = Node("hLuminosity", "lumScale lum")
+	lum.In.x = diffuse
+
+	local lumMul = Node("hMul", "lumScale lumMul")
+	lumMul.In.x = lum
+	lumMul.In.y = diffuse2
+
+	addTextures.In.x = diffuse
+	addTextures.In.y = lumMul
+
+	return addTextures
+
+end

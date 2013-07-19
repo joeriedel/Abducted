@@ -1,0 +1,4 @@
+FIXED4 Luminance(FIXED4 a GLOBALS) {
+	FIXED lum = dot(a.xyz, FIXED3(0.2989, 0.5870, 0.1140));
+	return FIXED4(lum, lum, lum, lum);
+}

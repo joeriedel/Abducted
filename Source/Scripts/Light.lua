@@ -46,8 +46,8 @@ function Light.Spawn(self)
 	local radius = NumberForString(self.keys.radius, 400)
 	self.light:SetRadius(radius)
 	
-	local intensity = NumberForString(self.keys.intensity, 1)
-	self.light:SetIntensity(intensity)
+	self.intensity = NumberForString(self.keys.intensity, 1)
+	self.light:SetIntensity(self.intensity)
 	
 	local flags = NumberForString(self.keys.flags, 59)
 	local style = 0
@@ -68,11 +68,11 @@ function Light.Spawn(self)
 	
 	style = StringForString(self.keys.style, "none")
 	if (style == "pslow") then
-        local steps = {
-            { intensity = 0, time = 3 },
-            { intensity = intensity, time = 3 }
-        }
-	    self.light:AnimateIntensity(steps, true)
+        self:SlowPulse()
+	elseif (style == "wiflicker") then -- intermittent flickering
+		self:WeakIntermittentFlicker()
+	elseif (style == "siflicker") then -- intermittent flickering
+		self:StrongIntermittentFlicker()
 	end
 	
 	local interactions = 0
@@ -92,6 +92,90 @@ function Light.Spawn(self)
 	self.light:SetInteractionFlags(interactions)
 	
 	self.light:Link()
+end
+
+function Light.SlowPulse(self)
+	local steps = {
+		{ intensity = 0, time = 3 },
+		{ intensity = self.intensity, time = 3 }
+	}
+	self.light:AnimateIntensity(steps, true)
+end
+
+function Light.AddFlickerCommands(self, flickerTable, duration, intensityScale)
+	-- This function will add flickering intensities and times to "flickerTable"
+	-- intensityScale will control how strong the perceived flicker is
+	-- FloatRand(min, max) returns a random float between min and max
+	
+	-- time delays much lower than 0.033 probably won't get rendered (1/30th of a second).
+	local totalTime = 0
+	local timeStep = 0.017 -- base duration of times
+	
+	while (totalTime < duration) do
+		local step = {}
+		step.intensity = self.intensity * FloatRand(intensityScale, 1)
+		step.time = timeStep * FloatRand(0.7, 1.5)
+		totalTime = totalTime + step.time
+		table.insert(flickerTable, step)
+	end
+end
+
+function Light.WeakIntermittentFlicker(self)
+
+	self.nextFlicker = 1
+	self.flickers = {}
+	self.mode = "hold"
+	
+	for i=1,5 do -- generate 5 sets of randoms flickers
+		local steps = {}
+		self:AddFlickerCommands(steps, 2, 0.8)
+		table.insert(self.flickers, steps)
+	end
+	
+	self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full to start
+	
+	self.think = Light.FlickerThink
+	self:SetNextThink(FloatRand(2, 5))
+	
+end
+
+function Light.StrongIntermittentFlicker(self)
+
+	self.nextFlicker = 1
+	self.flickers = {}
+	self.mode = "hold"
+	
+	for i=1,5 do -- generate 5 sets of randoms flickers
+		local steps = {}
+		self:AddFlickerCommands(steps, 2, 0.2) -- NOTE: Strong flicker means the light gets closer to black (intensityScale is 0.2)
+		table.insert(self.flickers, steps)
+	end
+	
+	self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full to start
+	
+	self.think = Light.FlickerThink
+	self:SetNextThink(FloatRand(2, 5))
+	
+end
+
+function Light.FlickerThink(self)
+
+	if (self.mode == "hold") then
+		COutLine(kC_Debug, "Light - Flicker")
+		self.mode = "flicker"
+		if (self.nextFlicker > #self.flickers) then
+			self.nextFlicker = 1
+		end
+		self.light:AnimateIntensity(self.flickers[self.nextFlicker], true)
+		self.nextFlicker = self.nextFlicker + 1
+		self:SetNextThink(FloatRand(2, 4))
+	else
+		COutLine(kC_Debug, "Light - Hold")
+		self.mode = "hold"
+		self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full
+		self:SetNextThink(FloatRand(5, 7))
+	end
+
 end
 
 function Light.OnEvent(self, cmd, args)

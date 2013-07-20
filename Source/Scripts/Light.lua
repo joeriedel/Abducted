@@ -67,10 +67,62 @@ function Light.Spawn(self)
 	self.light:SetStyle(style)
 	
 	style = StringForString(self.keys.style, "none")
+	
+	
+    --if (style == "pslow") then
+    --   local steps = {
+    --        { intensity = 0, time = 3 },
+    --        { intensity = intensity, time = 3 }
+    --    }
+	--    self.light:AnimateIntensity(steps, true)
+	--end
+	
+	if (style == "pmedium") then
+       local steps = {
+            { intensity = 0, time = 1 },
+            { intensity = intensity, time = 1 }
+        }
+	    self.light:AnimateIntensity(steps, true)
+	end
+	
+	if (style == "pfast") then
+       local steps = {
+            { intensity = 0, time = .25 },
+            { intensity = intensity, time = .25 }
+        }
+	    self.light:AnimateIntensity(steps, true)
+	end
+	
+	if (style == "ffast") then
+       local steps = {
+            { intensity = 0, time = 0 },
+            { intensity = 0, time = .25 },
+            { intensity = intensity, time = 0},
+            { intensity = intensity, time = .125}
+        }
+	    self.light:AnimateIntensity(steps, true)
+	end
+	
+	if (style == "fmedium") then
+       local steps = {
+            { intensity = 0, time = 0 },
+            { intensity = 0, time = .5 },
+            { intensity = intensity, time = 0},
+            { intensity = intensity, time = .25}
+        }
+	    self.light:AnimateIntensity(steps, true)
+	end
+	
 	if (style == "pslow") then
-        local steps = {
-            { intensity = 0, time = 3 },
-            { intensity = intensity, time = 3 }
+       local steps = {
+            { intensity = 0.0, time = 0.000},
+            { intensity = 0.0, time = 7.000},
+            { intensity = intensity*.25, time = 0.001},
+            { intensity = 0.0, time = 0.005},
+            --{ intensity = 0, time = 0.05},
+            { intensity = intensity, time = 0.01},
+            { intensity = 0.0, time = 0.005}
+            
         }
 	    self.light:AnimateIntensity(steps, true)
 	end

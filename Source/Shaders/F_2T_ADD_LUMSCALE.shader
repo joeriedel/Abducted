@@ -32,7 +32,7 @@ local Shader = function()
 	diffuse2.In.t = MTexture(1) -- lightmap is second texture (i.e. Material.Texture2.Source)
 	diffuse2.In.tc = MTexCoord(1) -- coordinates come from second UV channel
 	
-	local lum = Node("Luminosity", "lum")
+	local lum = Node("Luminance", "lum")
 	lum.In.x = diffuse
 
 	local lumMul = Node("Mul", "lumMul")

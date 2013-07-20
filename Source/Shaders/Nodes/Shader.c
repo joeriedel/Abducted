@@ -107,10 +107,10 @@ HALF4 DiffuseSpecularLightPixel(
 	HALF e = DistanceAttn(lightVertex);
 	e = e * lightDfColor.w;
 	HALF r = max(HALF(0.0), dot(lightVec, normal));
-	HALF3 d = (lightDfColor.xyz * diffuseColor.xyz) * r;
-	r = max(HALF(0.0), dot(lightHalf, normal));
-	HALF3 s = (lightSpColor * specularColor.xyz) * pow(r, specularExponent);
-	return HALF4((d+s) * e, diffuseColor.w);
+	HALF3 d = (lightDfColor.xyz * diffuseColor.xyz);
+	HALF rs = max(HALF(0.0), dot(lightHalf, normal));
+	HALF3 s = (lightSpColor * specularColor.xyz) * pow(rs, specularExponent);
+	return HALF4((d+s) * r * e, diffuseColor.w);
 }
 
 #endif

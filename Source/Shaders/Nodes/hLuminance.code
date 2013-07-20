@@ -1,0 +1,4 @@
+HALF4 Luminance(HALF4 a GLOBALS) {
+	HALF lum = dot(a.xyz, HALF3(0.2989, 0.5870, 0.1140));
+	return HALF4(lum, lum, lum, lum);
+}

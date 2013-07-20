@@ -170,6 +170,8 @@ function GenLightShader(
 		diffuseColor = blend
 	end
 
+	local completeMap = nil
+
 	if (glowSlot) then
 		if (type(glowSlot) == "table") then
 			if (glowSlot.slot) then
@@ -177,9 +179,11 @@ function GenLightShader(
 				local glow = GenGlow(glowSlot.slot, glowSlot.diffuseColor, diffuseColor)
 				defaultPass = glow.glowColor
 				diffuseColor = glow.diffuseColor
+				completeMap = defaultPass
 			else
 				-- explicit defaultPass provided
 				defaultPass = glowSlot
+				completeMap = glowSlot
 			end
 		else
 			local glow = GenGlow(glowSlot, diffuseColor)
@@ -198,7 +202,7 @@ function GenLightShader(
 
 	local shader = {
 		Default = { color = defaultPass },
-		Preview = { color = diffuseColor }
+		Preview = { color = completeMap or diffuseColor }
 	}
 
 	for k,v in pairs(passes) do
@@ -365,7 +369,7 @@ function GenDBakedBumpShader(completeMap, diffuseTexture, ofs)
 	return GenLightShader(
 		{"Diffuse"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		nil,
@@ -399,7 +403,7 @@ function GenDBakedBumpGlowShader(completeMap, diffuseTexture, ofs)
 	return GenLightShader(
 		{"Diffuse"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		nil,
@@ -431,9 +435,9 @@ function GenDSBakedBumpShader(completeMap, diffuseTexture, ofs)
 	bumpMap.In.tc = MTexCoord(ofs+1)
 
 	return GenLightShader(
-		{"Diffuse"},
+		{"Diffuse", "DiffuseSpecular"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		MSpecularColor(0),
@@ -465,9 +469,9 @@ function GenDSBakedBumpGlowShader(completeMap, diffuseTexture, ofs)
 	bumpMap.In.tc = MTexCoord(ofs+1)
 
 	return GenLightShader(
-		{"Diffuse"},
+		{"Diffuse", "DiffuseSpecular"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		MSpecularColor(0),
@@ -503,9 +507,9 @@ function GenDSBakedBumpSpecMaskShader(completeMap, diffuseTexture, ofs)
 	specularTexture.In.tc = MTexCoord(ofs+2)
 
 	return GenLightShader(
-		{"Diffuse"},
+		{"Diffuse", "DiffuseSpecular"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		specularTexture,
@@ -541,9 +545,9 @@ function GenDSBakedBumpSpecMaskGlowShader(completeMap, diffuseTexture, ofs)
 	specularTexture.In.tc = MTexCoord(ofs+2)
 
 	return GenLightShader(
-		{"Diffuse"},
+		{"Diffuse", "DiffuseSpecular"},
 		kMaxLights,
-		GenPhongLight,
+		GenBumpLight,
 		bumpMap,
 		diffuseTexture,
 		specularTexture,

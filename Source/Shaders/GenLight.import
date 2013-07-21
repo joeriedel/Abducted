@@ -159,8 +159,7 @@ function GenLightShader(
 )
 
 	SetPrecisionMode("medium")
-	SetSamplerPrecision("medium")
-
+	
 	local defaultPass = nil
 
 	if (materialDiffuseColor) then

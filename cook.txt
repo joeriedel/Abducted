@@ -9,10 +9,6 @@ pak0 {
 	Ep1/ep1_crushed_intro
 	Ep1/ep1_crushed_combat
 	Ep1/ep1_eaten
-	Ep1/testroom2_manipulate
-	Ep1/testroom2_bugtest
-	Ep1/miniature_eve
-	Ep1/miniature_tormentor
 	Ep1/testroom3_dynlight1
 	Ep1/testroom3_dynlight2
 

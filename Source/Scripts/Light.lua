@@ -68,12 +68,18 @@ function Light.Spawn(self)
 	
 	style = StringForString(self.keys.style, "none")
 	if (style == "pslow") then
-        self:SlowPulse()
+        self:SlowPulse() --SlowPulse()
+    elseif (style == "pfast") then
+        self:FastPulse() --FastPulse()
+    elseif (style == "fslow") then
+        self:SlowFlash() --SlowFlash()
+    elseif (style == "ffast") then
+        self:FastFlash() --Fastflash()
 	elseif (style == "wiflicker") then -- intermittent flickering
 		self:WeakIntermittentFlicker()
 	elseif (style == "siflicker") then -- intermittent flickering
 		self:StrongIntermittentFlicker()
-	end
+    end
 	
 	local interactions = 0
 	
@@ -98,6 +104,34 @@ function Light.SlowPulse(self)
 	local steps = {
 		{ intensity = 0, time = 3 },
 		{ intensity = self.intensity, time = 3 }
+	}
+	self.light:AnimateIntensity(steps, true)
+end
+
+function Light.FastPulse(self)
+	local steps = {
+		{ intensity = 0, time = .25 },
+		{ intensity = self.intensity, time = .25 }
+	}
+	self.light:AnimateIntensity(steps, true)
+end
+
+function Light.SlowFlash(self)
+	local steps = {
+        { intensity = 0, time = 0 },
+        { intensity = 0, time = .25 },
+        { intensity = self.intensity, time = 0 },
+        { intensity = self.intensity, time = .25 }
+	}
+	self.light:AnimateIntensity(steps, true)
+end
+
+function Light.FastFlash(self)
+	local steps = {
+        { intensity = 0, time = 0 },
+        { intensity = 0, time = .125 },
+        { intensity = self.intensity, time = 0},
+        { intensity = self.intensity, time = .125}
 	}
 	self.light:AnimateIntensity(steps, true)
 end
@@ -177,6 +211,7 @@ function Light.FlickerThink(self)
 	end
 
 end
+
 
 function Light.OnEvent(self, cmd, args)
 	COutLineEvent("Light", cmd, args)

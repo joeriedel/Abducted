@@ -32,6 +32,7 @@ function BugSpawner.Spawn(self)
 	end
 	self.active = 0
 	self.total = 0
+	self.bugs = LL_New()
 	
 	self:Precache("Characters/Buggroup10")
 	self:Precache("FX/bug_guts_group01")
@@ -114,6 +115,7 @@ function BugSpawner.Think(self)
 	end
 	
 	local bug = World.TempSpawn(keys)
+	bug.listItem = LL_Append(self.bugs, {bug=bug})
 	bug.spawner = self
 	
 	self.active = self.active + 1
@@ -166,7 +168,9 @@ function BugSpawner.FindSpawnPosition(self)
 	
 end
 
-function BugSpawner.NotifyDead(self)
+function BugSpawner.NotifyDead(self, bug)
+
+	self:NotifyRemove(bug)
 
 	self.active = self.active - 1
 	if ((self.maxCount < 1) or (self.total < self.maxCount)) then
@@ -180,6 +184,13 @@ function BugSpawner.NotifyDead(self)
 		end
 	end
 	
+end
+
+function BugSpawner.NotifyRemove(self, bug)
+	if (bug.listItem) then
+		LL_Remove(self.bugs, bug.listItem)
+		bug.listItem = nil
+	end
 end
 
 function BugSpawner.OnEvent(self, cmd, args)
@@ -447,7 +458,7 @@ function Bug.SeekPlayer(self)
 		return
 	end
 	
-	if ((not (World.playerPawn.stomping or World.playerPawn.bugStun)) and self:SeekPlayerAttack()) then
+	if (((not World.playerPawn.stomping) and (self.group or (not World.playerPawn.bugStun))) and self:SeekPlayerAttack()) then
 		return
 	end
 	
@@ -728,16 +739,20 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	local fp = self:FloorPosition()
 	
 	local callback = function()
-		self.think = Bug.BugBrain
-		self.attacking = false
-		self:SetNextThink(0.1)
-		self.attackCooldown = Game.time + 5
-		self:SetMoveType(kMoveType_Floor)
-		self:SetFloorPosition(fp)
-		self:EnableFlags(kPhysicsFlag_Friction, false)
-		self.model:BlendImmediate("idle")
-		self:SetFacing(180)
-		self:Link()
+		if (World.playerPawn.dead) then
+			self:Remove()
+		else
+			self.think = Bug.BugBrain
+			self.attacking = false
+			self:SetNextThink(0.1)
+			self.attackCooldown = Game.time + 5
+			self:SetMoveType(kMoveType_Floor)
+			self:SetFloorPosition(fp)
+			self:EnableFlags(kPhysicsFlag_Friction, false)
+			self.model:BlendImmediate("idle")
+			self:SetFacing(180)
+			self:Link()
+		end
 	end
 
 	self.think = nil
@@ -955,9 +970,21 @@ function Bug.OnFloorMoveComplete(self)
 	end
 end
 
+function Bug.Start(self)
+	self.busy = false
+	self:EnableFlags(kPhysicsFlag_Friction, false)
+end
+
 function Bug.Stop(self)
 	self.busy = false
 	self:EnableFlags(kPhysicsFlag_Friction, true)
+end
+
+function Bug.Despawn(self)
+	if (self.spawner) then
+		self.spawner:NotifyDead(self)
+	end	
+	self:Remove()	
 end
 
 function Bug.Kill(self, instigator)
@@ -969,8 +996,27 @@ function Bug.Kill(self, instigator)
 	self.sounds.Squish:Play(kSoundChannel_FX, 0)
 	
 	if (self.spawner) then
-		self.spawner:NotifyDead()
+		self.spawner:NotifyDead(self)
 	end
+	
+	local f = function()
+		self:Remove()
+	end
+	
+	World.gameTimers:Add(f, 20) -- remove us in 20 seconds
+end
+
+function Bug.Remove(self)
+	if (self.spawner) then
+		self.spawner:NotifyRemove(self)
+	end
+	
+	self:SetMoveType(kMoveType_None)
+	self.model.dm:SetVisible(false)
+	self.guts.dm:SetVisible(false)
+	self.think = nil
+	self.dead = true
+	self:Delete() -- mark for gc
 end
 
 function Bug.PulseKill(self)
@@ -990,9 +1036,14 @@ function Bug.PulseKill(self)
 	self.guts.dm:SetVisible(true)
 	
 	if (self.spawner) then
-		self.spawner:NotifyDead()
+		self.spawner:NotifyDead(self)
 	end
 	
+	local f = function()
+		self:Remove()
+	end
+	
+	World.gameTimers:Add(f, 20) -- remove us in 20 seconds
 end
 
 info_bug = Bug

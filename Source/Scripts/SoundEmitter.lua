@@ -12,11 +12,6 @@ function SoundEmitter.Spawn(self)
 		return
 	end
 	
-	self.sound = World.LoadSound(file)
-	if self.sound == nil then
-		return
-	end
-
 	local maxDistance = NumberForString(self.keys.maxDistance, 200)
 	local channel = StringForString(self.keys.channel, "Ambient")
 	self.priority = NumberForString(self.keys.priority, 0)
@@ -36,6 +31,27 @@ function SoundEmitter.Spawn(self)
 		self.channel = kSoundChannel_Music
 	end
 	
+	local trigger = false
+	-- start playing music during loading screen
+	if (self.channel == kSoundChannel_Music) and (not self.positional) and (self.on) then
+		if (self.keys.targetname ~= "shiphum") then
+			if (not GameDB.loadingCheckpoint) then -- music system knows its own state for checkpoints
+				if (BoolForString(self.keys.loop, true)) then
+					Music.entity:Play("play", {file, "loop=true"})
+				else
+					Music.entity:Play("play", {file})
+				end
+			end
+			return
+		end
+		trigger = true
+	end
+	
+	self.sound = World.LoadSound(file)
+	if self.sound == nil then
+		return
+	end
+	
 	self.sound:FadeVolume(self.volume, 0)
 	self.sound:SetMaxDistance(maxDistance)
 	self.sound:SetRefDistance(maxDistance/3)
@@ -45,8 +61,7 @@ function SoundEmitter.Spawn(self)
 		self:AttachSound(self.sound)
 	end
 	
-	-- start playing music during loading screen
-	if (self.channel == kSoundChannel_Music) and (not self.positional) and (self.on) then
+	if (trigger) then
 		self:Trigger()
 	end
 	
@@ -90,8 +105,8 @@ function SoundEmitter.OnEvent(self, cmd, args)
 	elseif cmd == "fadeto" then
 		args = Tokenize(args)
 		self.volume = tonumber(args[1])
-		self.fadeTime = tonumber(args[2])
-		self.sound:FadeVolume(self.volume, self.fadeTime)
+		local fadeTime = tonumber(args[2])
+		self.sound:FadeVolume(self.volume, fadeTime)
 		return true
 	elseif cmd == "rewind" then	
 		self.on = false

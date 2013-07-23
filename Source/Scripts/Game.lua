@@ -159,9 +159,14 @@ end
 
 game_code = Game
 
-function World.BuiltIns()
+function World.BuiltIns() -- before music starts
 	return {
-		"imuse",
+		"imuse"
+	}
+end
+
+function World.BuiltIns2()
+	return {
 		"ui_code",
 		"game_code",
 		"scexec_code",

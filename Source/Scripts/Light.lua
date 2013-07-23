@@ -195,7 +195,7 @@ end
 function Light.FlickerThink(self)
 
 	if (self.mode == "hold") then
-		COutLine(kC_Debug, "Light - Flicker")
+--		COutLine(kC_Debug, "Light - Flicker")
 		self.mode = "flicker"
 		if (self.nextFlicker > #self.flickers) then
 			self.nextFlicker = 1
@@ -204,7 +204,7 @@ function Light.FlickerThink(self)
 		self.nextFlicker = self.nextFlicker + 1
 		self:SetNextThink(FloatRand(2, 4))
 	else
-		COutLine(kC_Debug, "Light - Hold")
+--		COutLine(kC_Debug, "Light - Hold")
 		self.mode = "hold"
 		self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full
 		self:SetNextThink(FloatRand(5, 7))

@@ -4,5 +4,5 @@ FIXED4 ShadowAttn(
 ) {
 	FIXED a = DistanceAttn(lightVertex);
 	FIXED n = dot(lightVertex.xyz, normal);
-	return FIXED4(1, 1, 1, sat(a+0.25) * sign(n));
+	return FIXED4(1, 1, 1, sat(a+0.25) * max(0, sign(n)));
 }

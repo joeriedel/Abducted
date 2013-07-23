@@ -132,7 +132,7 @@ function BugSpawner.FindSpawnPosition(self)
 		return self.floorPosition
 	end
 	
-	if (self.keys.intro_anim or (self.radius < 1)) then
+	if (self.keys.intro_anim or (self.spawn_radius < 1)) then
 		return self.floorPosition
 	end
 	
@@ -149,7 +149,7 @@ function BugSpawner.FindSpawnPosition(self)
 	
 	while (fp == nil) do
 	
-		local distance = random() * self.radius
+		local distance = random() * self.spawn_radius
 		local angle = random() * pi * 2
 		local c = x + (cos(angle) * distance)
 		local s = y + (sin(angle) * distance)
@@ -424,7 +424,7 @@ function Bug.PlayerInSpawnerRadius(self)
 
 	local playerFP = World.playerPawn:FloorPosition()
 	
-	if ((playerFP == nil) or (self.floor ~= playerFP.floor)) then
+	if ((playerFP == nil) or (self.floor ~= playerFP.floor) or (PlayerPawn.GodMode)) then
 		return false -- don't seek player when on a different floor
 	end
 	

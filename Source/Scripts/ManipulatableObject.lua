@@ -6,6 +6,7 @@
 ManipulatableObject = Entity:New()
 ManipulatableObject.Objects = LL_New()
 ManipulatableObject.MaxManipulateDistancePct = 1/5 -- max distance to target center
+ManipulatableObject.AmbiguousManipulateDistancePct = ManipulatableObject.MaxManipulateDistancePct * 0.25
 
 function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
@@ -619,24 +620,28 @@ function ManipulatableObject.FindSwipeTarget(g)
 	local lineEnd = g.finish
 	
 	if (lineSegDist[1] > lineSegDist[2]) then
-		local x = lineSegDist[1]
-		lineSegDist[1] = lineSegDist[2]
-		lineSegDist[2] = x
-		
-		x = lineStart
-		lineStart = lineEnd
-		lineEnd = lineStart
+		lineSegDist[1], lineSegDist[2] = lineSegDist[2], lineSegDist[1]
+		lineStart, lineEnd = lineEnd, lineStart
 	end
 
 	local cameraFwd = World.CameraFwd()
 	local cameraPos = World.CameraPos()
+	
+	-- select the object who's line is closes to the manipulate point
+	-- if any object falls in the ambiguous "area" (i.e. aren't that close)
+	-- then sort these by distance to the camera
 
-	local best
-	local bestWorldDist
+	local best = nil
+	local bestDist = nil
+	local bestWorldDist = nil
+	local bestScreenPos = nil
+	
 	local x = LL_Head(ManipulatableObject.Objects)
 	
 	while (x) do
 	
+		local targetname = x.entity.keys.targetname
+		
 		if (x.entity.visible and (x.entity.skillRequired <= (PlayerSkills.Manipulate+1))) then
 			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
 			local screen,r = World.Project(world)
@@ -648,46 +653,56 @@ function ManipulatableObject.FindSwipeTarget(g)
 				if ((screen[1] >= 0) and (screen[1] < UI.systemScreen.width) and
 					(screen[2] >= 0) and (screen[2] < UI.systemScreen.height)) then
 					
-					local keep = false
 					
-					-- closer than another matching object?
-					local worldDist = VecDot(world, cameraFwd)
-					if ((bestWorldDist == nil) or (worldDist < bestWorldDist)) then
-						-- capsule distance
+					-- capsule distance
+					local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
+					if (segPos < lineSegDist[1]) then
+						-- distance to endpoints check:
+						dx = screen[1] - lineStart[1]
+						dy = screen[2] - lineStart[2]
+						dd = math.sqrt(dx*dx+dy*dy)
+					elseif (segPos > lineSegDist[2]) then
+						dx = screen[1] - lineEnd[1]
+						dy = screen[2] - lineEnd[2]
+						dd = math.sqrt(dx*dx+dy*dy)
+					else
+						-- orthogonal distance check
+						dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
+						dd = math.abs(dd - lineDist)
+					end
+					
+					if (dd <= kMaxDist) then
+						local worldDist = VecDot(world, cameraFwd)
+					
+						-- candidate for selection
 						
-						local segPos = g.args[1]*screen[1] + g.args[2]*screen[2]
-						if (segPos < lineSegDist[1]) then
-							-- distance to endpoints check:
-							dx = screen[1] - lineStart[1]
-							dy = screen[2] - lineStart[2]
-							dd = math.sqrt(dx*dx + dy*dy)
-							if (dd <= kMaxDist) then
-								keep = true
-							end
-						elseif (segPos > lineSegDist[2]) then
-							dx = screen[1] - lineEnd[1]
-							dy = screen[2] - lineEnd[2]
-							dd = math.sqrt(dx*dx + dy*dy)
-							if (dd <= kMaxDist) then
-								keep = true
+						if (best) then
+							dx = screen[1] - bestScreenPos[1]
+							dy = screen[2] - bestScreenPos[2]
+							local z = math.sqrt(dx*dx+dy+dy)
+							if (z <= ManipulatableObject.AmbiguousManipulateDistancePct) then
+								-- these points are close together test Z from the camera
+								-- instead of screenspace
+								if (worldDist < bestWorldDist) then
+									best = x.entity
+									bestWorldDist = worldDist
+									bestDist = dd
+									bestScreenPos = screen
+								end
+							elseif (dd < bestDist) then
+								best = x.entity
+								bestWorldDist = worldDist
+								bestDist = dd
+								bestScreenPos = screen
 							end
 						else
-							-- orthogonal distance check
-							dd = (normal[1]*screen[1]) + (normal[2]*screen[2])
-							dd = math.abs(dd - lineDist)
-							
-							if (dd <= kMaxDist) then
-								keep = true
-							end
+							best = x.entity
+							bestWorldDist = worldDist
+							bestDist = dd
+							bestScreenPos = screen
 						end
 					end
-					
-					if (keep) then
-						bestWorldDist = worldDist
-						best = x.entity
-					end
 				end
-			
 			end
 		end
 		
@@ -797,7 +812,7 @@ end
 
 function ManipulatableObject.ManipulateUpDown(target, g)
 	local dir
-	if (g.args[1] >= 0) then
+	if (g.args[2] >= 0) then
 		dir = "down"
 	else
 		dir = "up"

@@ -1,7 +1,12 @@
-HALF3 hSampleNormalMap2D(HLSL(uniform) GLSL(mediump) sampler2D t, HALF4 st GLOBALS) {
+HALF3 hSampleNormalMap2D(HLSL(uniform) GLSL(lowp) sampler2D t, HALF4 st GLOBALS) {
+#if defined(MOBILE)
+	HALF3 s = tex2D(t, st.xy).xyz;
+	s.xyz = (s.xyz - HALF3(0.5)) * HALF3(2.0); // expand
+#else
 	HALF4 s = tex2D(t, st.xy);
 	s.x = s.x * s.w;
-	s.xy = (s.xy - HALF2(0.5, 0.5)) * HALF2(2.0, 2.0);
+	s.xy = (s.xy - HALF2(0.5)) * HALF2(2.0);
 	s.z = sqrt(HALF(1.0) - (s.x*s.x) - (s.y*s.y));
+#endif
 	return s.xyz;
 }

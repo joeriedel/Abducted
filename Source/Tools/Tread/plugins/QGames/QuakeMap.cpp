@@ -122,9 +122,8 @@ void CQuakeMap::WriteBrush(std::fstream &fs, CQBrush *brush, CTreadDoc *doc)
 		}
 
 		CString shader = f->s_shader;
-		shader.MakeUpper();
-
-		fs << shader;
+		
+		fs << "\"" << shader << "\"";
 		fs << " " << (int)f->shift[0] << " " << (int)f->shift[1] << " " << (int)f->rot << " " 
 			<< f->scale[0] << " " << f->scale[1] << "\n";
 	}

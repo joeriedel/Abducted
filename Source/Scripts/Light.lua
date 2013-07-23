@@ -212,7 +212,6 @@ function Light.FlickerThink(self)
 
 end
 
-
 function Light.OnEvent(self, cmd, args)
 	COutLineEvent("Light", cmd, args)
 end

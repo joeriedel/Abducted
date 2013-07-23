@@ -30,7 +30,8 @@ namespace
 		Version4 = 4,
 		Version5 = 5,
 		Version6 = 6,
-		Version = 7,
+		Version7 = 7,
+		Version = 8,
 		MaxUVChannels = 1,
 
 		HasMaterialFlag = 0x80000000,
@@ -781,6 +782,11 @@ bool MaxScene::Load(const char *filename)
 				mdl.name = ReadString(fp);
 			fread(&flags, sizeof(U32), 1, fp);
 			fread(&skel, sizeof(S32), 1, fp);
+
+			if (version > Version7) {
+				int unused;
+				fread(&unused, sizeof(U32), 1, fp);
+			}
 
 			if (flags & HasMaterialFlag) // has material
 			{

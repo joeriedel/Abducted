@@ -243,7 +243,7 @@ function Abducted.BeginManipulate(self)
 	self.endManipulateTimer = World.gameTimers:Add(f, 1.8)
 	
 	f = function ()
-		World.SetGameSpeed(0.2, 0.5)
+		World.SetGameSpeed(1, 0)
 	end
 	
 	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7)
@@ -252,11 +252,11 @@ end
 function Abducted.EndManipulate(self, immediate)
 	
 	if (immediate) then
-		World.SetGameSpeed(1, 0)
+		World.SetGameSpeed(1, 0.2)
 		self.overlays.Manipulate:FadeOut(0.5)
 		self.sfx.ManipulateBegin:FadeOutAndStop(0.5)
 	else
-		World.SetGameSpeed(1, 0.5)
+		World.SetGameSpeed(1, 0.2)
 		self.overlays.Manipulate:FadeOut(0.5)
 		self.sfx.ManipulateBegin:FadeOutAndStop(0.5)
 	end

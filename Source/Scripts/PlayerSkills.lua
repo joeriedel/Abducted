@@ -7,9 +7,9 @@ PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
 
 PlayerSkills.ManipulateRechargeTimes = { -- 3 levels of manipulate upgrades
-	15,
-	10,
-	5
+	7,
+	5,
+	3
 }
 
 PlayerSkills.MaxShieldTime = 30

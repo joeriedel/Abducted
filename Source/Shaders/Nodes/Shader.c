@@ -8,11 +8,20 @@
 // Uniform/Varying/Attributes mean what they mean in GLSL
 
 BEGIN_UNIFORMS
-#if defined(SKIN_SPRITE)
+#if defined(SHADER_MV) || defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(mv);
-	GLSL(uniform) FLOAT4X4 UDECL(pr);
-#elif defined(_GLES)
+#endif
+#if defined(SHADER_PRJ) || defined(SKIN_SPRITE)
+	GLSL(uniform) FLOAT4X4 UDECL(prj);
+#endif
+#if defined(_GLES) && !defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);
+#endif
+#if defined(SHADER_INVERSE_MVP)
+	GLSL(uniform) FLOAT4X4 UDELC(imvp);
+#endif
+#if defined(SHADER_INVERSE_PRJ)
+	GLSL(uniform) FLOAT4X4 UDECL(iprj);
 #endif
 #if defined(SHADER_COLOR) || defined(SHADER_VERTEX_COLOR)
 	GLSL(uniform) PRECISION_COLOR_TYPE UDECL(color) HLSL(:COLOR0);
@@ -292,7 +301,7 @@ MAIN
 	sprite_vertex *= IN(spriteSkin).xy;
 	FLOAT4 mvpos = mul(UNIFORM(mv), IN(position));
 	mvpos.xy += sprite_vertex.xy;
-	gl_Position = mul(UNIFORM(pr), mvpos);
+	gl_Position = mul(UNIFORM(prj), mvpos);
 #else
 	gl_Position = mul(MVP, IN(position));
 #endif

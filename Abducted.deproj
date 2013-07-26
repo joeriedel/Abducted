@@ -148,6 +148,9 @@
     <filename>Source\Scripts\SCExecContext.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ScreenOverlay.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\ScriptNode.lua</filename>
   </file>
   <file>

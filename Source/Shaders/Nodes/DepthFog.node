@@ -3,14 +3,14 @@ Node({
 
 	Outputs = 
 	{
-		rgba = {t=FIXED4, r=-1, s="color"}
+		rgba = {t=FLOAT4, r=-1, s="color"}
 	},
 
 	Inputs = 
 	{
 		t = {t=sampler2D, s="texture", r=0}, -- depth texture
 		tc = {t=HALF4, s="texcoords", r=1}, -- projected tc's
-		f = {t=FIXED4, s="color", r=2}, -- fog color
+		f = {t=FLOAT4, s="color", r=2}, -- fog color
 		pr = {t=FLOAT4X4, s="matrix", r=3}, -- projection matrix
 	}
 	

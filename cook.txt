@@ -11,6 +11,7 @@ pak0 {
 	Ep1/ep1_eaten
 	Ep1/testroom3_dynlight1
 	Ep1/testroom3_dynlight2
+	Ep1/testroom3_fog1
 
 	Ep1/Falling
 	Ep1/Ep1Crushed
@@ -161,7 +162,7 @@ pak0 {
 	Audio/Amb11-Spooked
 	"Audio/Amb12-Low Flutter1"
 	"Audio/Amb13-Low Flutter2"
-	"Audio/Amb14-Low Growl"
+	"Audio/Amb14-Low_Growl"
 	"Audio/Amb15-Low & Breathy"
 	"Audio/Amb16-Breath Drone"
 	"Audio/Amb17-Ghostly Drone"
@@ -314,6 +315,7 @@ pak0 {
 	Sys/Shadow_M
 	Sys/ProjectedShadow_M
 	Sys/Copy_M
+	Sys/FogZ_M
 
 	FX/Bloom_M
 	FX/BlurX_M

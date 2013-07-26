@@ -2,6 +2,7 @@
 
 local Shader = function()
 
+	SetPrecisionMode("high")
 	SetSamplerPrecision(0, "high")
 
 	local fog = Node("DepthFog", "fog")

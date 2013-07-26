@@ -1,28 +1,31 @@
-FLOAT4 DepthFog(HLSL(uniform) GLSL(highp) sampler2D t, HALF4 st, FLOAT4 f, FLOAT4X4 pr GLOBALS) {
-	const FLOAT LOG2 = 1.442695;
-	const FLOAT kDensity = 0.01;
-	FLOAT fogDensity = kDensity * FLOAT(f.a);
-	fogDensity = -fogDensity * fogDensity * LOG2;
-	FLOAT zShift = 1.0 - pr[2][2];
-	FLOAT zScale = pr[3][2];
+HALF4 DepthFog(HLSL(uniform) GLSL(mediump) sampler2D t, HALF4 st, HALF4 f, HALF4X4 pr GLOBALS) {
 
-	FLOAT fbDepth = texture2DProj(t, st).r;
+	HALF fbDepth = texture2DProj(t, st).r;
+	
+	if (gl_FragCoord.z >= fbDepth) {
+		discard;
+	}	
+
+	const HALF LOG2 = 1.442695;
+	const HALF kDensity = 0.01;
+	HALF fogDensity = kDensity * HALF(f.a);
+	fogDensity = -fogDensity * fogDensity * LOG2;
+	HALF zShift = HALF(pr[2][2]);
+	zShift = 1.0 - zShift;
+	HALF zScale = pr[3][2];
 
 	// z depth is encoded in 0.0->1.0, expand to clipspace (-1, 1) and
 	// push through the inverse of the 3rd row of the projection matrix
 	// to get eyespace Z.
 
-	FLOAT l_fbZ = (fbDepth * -2.0);
-	FLOAT l_fragZ = (gl_FragCoord.z * -2.0);
+	HALF l_fbZ = (fbDepth * -2.0);
+	HALF l_fragZ = (gl_FragCoord.z * -2.0);
 
-	FLOAT f_fbZ = zScale / (FLOAT(l_fbZ) + zShift);
-	FLOAT f_fragZ = zScale / (FLOAT(l_fragZ) + zShift);
-	FLOAT zDepth = f_fbZ - f_fragZ;
-	FLOAT fog = exp2(fogDensity * zDepth * zDepth);
-	FLOAT a = 1.0 - clamp(fog, 0.0, 1.0);
-		
-	// emulate GL_LESS ztest
-	a = a * max(0, sign(fbDepth-gl_FragCoord.z));
+	HALF f_fbZ = zScale / (HALF(l_fbZ) + zShift);
+	HALF f_fragZ = zScale / (HALF(l_fragZ) + zShift);
+	HALF zDepth = f_fbZ - f_fragZ;
+	HALF fog = exp2(fogDensity * zDepth * zDepth);
+	HALF a = HALF(1.0) - clamp(fog, HALF(0.0), HALF(1.0));
 
-	return FLOAT4(f.rgb, a);
+	return HALF4(f.rgb, a);
 }

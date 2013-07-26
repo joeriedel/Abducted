@@ -2,8 +2,8 @@
 
 local Shader = function()
 
-	SetPrecisionMode("high")
-	SetSamplerPrecision(0, "high")
+	SetPrecisionMode("medium")
+	SetSamplerPrecision(0, "medium")
 
 	local fog = Node("DepthFog", "fog")
 	fog.In.t = MTexture(0)

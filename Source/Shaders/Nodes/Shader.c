@@ -12,7 +12,11 @@ BEGIN_UNIFORMS
 	GLSL(uniform) FLOAT4X4 UDECL(mv);
 #endif
 #if defined(SHADER_PRJ) || defined(SKIN_SPRITE)
+#if defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(prj);
+#else
+	GLSL(uniform) HALF4X4 UDECL(prj); // fog hack
+#endif
 #endif
 #if defined(_GLES) && !defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);

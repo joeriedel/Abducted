@@ -46,10 +46,9 @@ kEntityClass_Any = 0
 kContentsFlag_Areaportal = 1
 kContentsFlag_Solid = 2
 kContentsFlag_Fog = 4
-kContentsFlag_Water = 8
-kContentsFlag_Clip = 16
-kContentsFlag_Detail = 32
-kContentsFlag_Floor = 64
+kContentsFlag_Clip = 8
+kContentsFlag_Detail = 16
+kContentsFlag_Floor = 32
 
 -- Physics Flags
 kPhysicsFlag_OnGround = 1

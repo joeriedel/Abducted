@@ -851,7 +851,7 @@ HALF4 TCTurb(HALF4 turb, HALF4 turb2, HALF4 tc, HALF PI) {
 
 #if defined(FRAGMENT)
 struct M {
-	PRECISION_COLOR_TYPE color;
+	PFLOAT4 color;
 #if defined(DEPTH)
 	FLOAT depth;
 #endif

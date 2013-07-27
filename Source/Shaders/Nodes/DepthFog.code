@@ -1,31 +1,29 @@
-HALF4 DepthFog(HLSL(uniform) GLSL(mediump) sampler2D t, HALF4 st, HALF4 f, HALF4X4 pr GLOBALS) {
+PFLOAT4 DepthFog(HLSL(uniform) GLSL(highp) sampler2D t, HALF4 st, PFLOAT4 f, PFLOAT4X4 pr, PFLOAT4 eyeVertex GLOBALS) {
 
-	HALF fbDepth = texture2DProj(t, st).r;
+	FLOAT fbDepth = texture2DProj(t, st).r;
 	
 	if (gl_FragCoord.z >= fbDepth) {
 		discard;
 	}	
 
-	const HALF LOG2 = 1.442695;
-	const HALF kDensity = 0.01;
-	HALF fogDensity = kDensity * HALF(f.a);
+	const PFLOAT LOG2 = 1.442695;
+	const PFLOAT kDensity = 0.01;
+	PFLOAT fogDensity = kDensity * HALF(f.a);
 	fogDensity = -fogDensity * fogDensity * LOG2;
-	HALF zShift = HALF(pr[2][2]);
+	PFLOAT zShift = pr[2][2];
 	zShift = 1.0 - zShift;
-	HALF zScale = pr[3][2];
+	PFLOAT zScale = pr[3][2];
 
 	// z depth is encoded in 0.0->1.0, expand to clipspace (-1, 1) and
 	// push through the inverse of the 3rd row of the projection matrix
 	// to get eyespace Z.
 
-	HALF l_fbZ = (fbDepth * -2.0);
-	HALF l_fragZ = (gl_FragCoord.z * -2.0);
+	PFLOAT l_fbZ = (fbDepth * -2.0);
+	PFLOAT f_fbZ = zScale / (l_fbZ + zShift);
+	
+	PFLOAT zDepth = f_fbZ - eyeVertex.z;
+	PFLOAT fog = exp2(fogDensity * zDepth * zDepth);
+	PFLOAT a = 1.0 - clamp(fog, 0.0, 1.0);
 
-	HALF f_fbZ = zScale / (HALF(l_fbZ) + zShift);
-	HALF f_fragZ = zScale / (HALF(l_fragZ) + zShift);
-	HALF zDepth = f_fbZ - f_fragZ;
-	HALF fog = exp2(fogDensity * zDepth * zDepth);
-	HALF a = HALF(1.0) - clamp(fog, HALF(0.0), HALF(1.0));
-
-	return HALF4(f.rgb, a);
+	return PFLOAT4(f.rgb, a);
 }

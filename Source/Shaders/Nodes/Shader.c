@@ -8,14 +8,14 @@
 // Uniform/Varying/Attributes mean what they mean in GLSL
 
 BEGIN_UNIFORMS
-#if defined(SHADER_MV) || defined(SKIN_SPRITE)
+#if defined(SHADER_MV) || defined(SKIN_SPRITE) || defined(SHADER_EYE_VERTEX)
 	GLSL(uniform) FLOAT4X4 UDECL(mv);
 #endif
 #if defined(SHADER_PRJ) || defined(SKIN_SPRITE)
 #if defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(prj);
 #else
-	GLSL(uniform) HALF4X4 UDECL(prj); // fog hack
+	GLSL(uniform) PFLOAT4X4 UDECL(prj); // fog hack
 #endif
 #endif
 #if defined(_GLES) && !defined(SKIN_SPRITE)
@@ -28,7 +28,7 @@ BEGIN_UNIFORMS
 	GLSL(uniform) FLOAT4X4 UDECL(iprj);
 #endif
 #if defined(SHADER_COLOR) || defined(SHADER_VERTEX_COLOR)
-	GLSL(uniform) PRECISION_COLOR_TYPE UDECL(color) HLSL(:COLOR0);
+	GLSL(uniform) PFLOAT4 UDECL(color) HLSL(:COLOR0);
 #endif
 #if defined(SHADER_SPECULAR_COLORS)
 	GLSL(uniform) HALF4 UDECL(scolor) HLSL(:COLOR1);
@@ -73,6 +73,9 @@ BEGIN_VARYING
 #endif
 #if defined(SHADER_VERTEX_COLOR)
 	GLSL(varying) FIXED4 OUT(vertexColor) HLSL(:POSITION1);
+#endif
+#if defined(SHADER_EYE_VERTEX)
+	GLSL(varying) PFLOAT4 OUT(eyeVertex) HLSL(:POSITION3);
 #endif
 #if defined(PFX_VARS)
 	GLSL(varying) HALF2 OUT(pfxShift)[4];
@@ -308,6 +311,9 @@ MAIN
 	gl_Position = mul(UNIFORM(prj), mvpos);
 #else
 	gl_Position = mul(MVP, IN(position));
+#endif
+#if defined(SHADER_EYE_VERTEX)
+	OUT(eyeVertex) = mul(UNIFORM(mv), IN(position));
 #endif
 #if defined(PFX_VARS) && (TEXCOORDS>=1)
 	// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/

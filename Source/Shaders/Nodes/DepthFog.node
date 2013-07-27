@@ -3,15 +3,16 @@ Node({
 
 	Outputs = 
 	{
-		rgba = {t=HALF4, r=-1, s="color"}
+		rgba = {t=PFLOAT4, r=-1, s="color"}
 	},
 
 	Inputs = 
 	{
 		t = {t=sampler2D, s="texture", r=0}, -- depth texture
 		tc = {t=HALF4, s="texcoords", r=1}, -- projected tc's
-		f = {t=HALF4, s="color", r=2}, -- fog color
-		pr = {t=HALF4X4, s="matrix", r=3}, -- projection matrix
+		f = {t=PFLOAT4, s="color", r=2}, -- fog color
+		pr = {t=PFLOAT4X4, s="matrix", r=3}, -- projection matrix
+		v = {t=PFLOAT4, s="vertex", r=4}, -- eye space vertex
 	}
 	
 })

@@ -21,6 +21,11 @@ BEGIN_UNIFORMS
 #if defined(_GLES) && !defined(SKIN_SPRITE)
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);
 #endif
+#if defined(SHADER_INVERSE_MV) || (defined(SKIN_SPRITE) && (defined(SHADER_POSITION) || defined(LIGHTS) || defined(GEN_REFLECT) || defined(GEN_PROJECT)))
+	// sprite skin may need worldspace vertex positions for lighting
+	// or texture projection, or reflection gen.
+	GLSL(uniform) FLOAT4X4 UDECL(imv);
+#endif
 #if defined(SHADER_INVERSE_MVP)
 	GLSL(uniform) FLOAT4X4 UDELC(imvp);
 #endif
@@ -145,8 +150,25 @@ MAIN
 	HALF3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
+#if defined(SKIN_SPRITE)
+	int idx = int(IN(spriteSkin).w);
+	FLOAT2 sprite_vertex = UNIFORM(spriteVerts)[idx];
+	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
+	FLOAT4 rotate = sprite_vertex.xxyy * sincos.xyxy;
+	sprite_vertex.x = rotate.y - rotate.z;
+	sprite_vertex.y = rotate.w + rotate.x;
+	sprite_vertex *= IN(spriteSkin).xy;
+	FLOAT4 sprite_skin = mul(UNIFORM(mv), IN(position));
+	sprite_skin.xy += sprite_vertex.xy;
+#if defined(SHADER_POSITION) || defined(LIGHTS) || defined(GEN_REFLECT) || defined(GEN_PROJECT)
+	FLOAT4 vertex = mul(UNIFORM(imv), sprite_skin);
+#endif
+#else
+	FLOAT4 vertex = IN(position);
+#endif
+
 #if defined(GENREFLECT) || (defined(LIGHTS) && (defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)))
-	FLOAT3 v_eyevec = UNIFORM(eye) - IN(position).xyz;
+	FLOAT3 v_eyevec = UNIFORM(eye) - vertex.xyz;
 	HALF3 vn_eyevec = normalize(v_eyevec);
 #endif
 
@@ -155,7 +177,7 @@ MAIN
 #endif
 
 #if defined(GENPROJECT)
-	HALF4 genProjectTC = mul(UNIFORM(tcPrj), IN(position));
+	HALF4 genProjectTC = mul(UNIFORM(tcPrj), vertex);
 #endif
 
 	TCGEN
@@ -164,15 +186,15 @@ MAIN
 #if defined(LIGHTS)
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_VERTEXPOS) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_POS >= 4) || (SHADER_LIGHT_VERTEXPOS >= 4) || (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
-	HALF3 v_light3_dir = UNIFORM(light3_pos).xyz - IN(position).xyz;
+	HALF3 v_light3_dir = UNIFORM(light3_pos).xyz - vertex.xyz;
 #endif
 #if (SHADER_LIGHT_POS >= 3) || (SHADER_LIGHT_VERTEXPOS >= 3) || (SHADER_LIGHT_VEC >= 3) || (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
-	HALF3 v_light2_dir = UNIFORM(light2_pos).xyz - IN(position).xyz;
+	HALF3 v_light2_dir = UNIFORM(light2_pos).xyz - vertex.xyz;
 #endif
 #if (SHADER_LIGHT_POS >= 2) || (SHADER_LIGHT_VERTEXPOS >= 2) || (SHADER_LIGHT_VEC >= 2) || (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
-	HALF3 v_light1_dir = UNIFORM(light1_pos).xyz - IN(position).xyz;
+	HALF3 v_light1_dir = UNIFORM(light1_pos).xyz - vertex.xyz;
 #endif
-	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - IN(position).xyz;
+	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - vertex.xyz;
 #endif
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
@@ -287,7 +309,7 @@ MAIN
 	OUT(vertexColor) = IN(vertexColor) * UNIFORM(color);
 #endif
 #if defined(SHADER_POSITION)
-	OUT(position) = IN(position);
+	OUT(position) = vertex;
 #endif
 #if defined(NUM_SHADER_NORMALS)
 	OUT(nm0) = IN(nm0);
@@ -299,21 +321,15 @@ MAIN
 	OUT(bitan0) = v_bitan0;
 #endif
 #if defined(SKIN_SPRITE)
-	int idx = int(IN(spriteSkin).w);
-	FLOAT2 sprite_vertex = UNIFORM(spriteVerts)[idx];
-	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
-	FLOAT4 rotate = sprite_vertex.xxyy * sincos.xyxy;
-	sprite_vertex.x = rotate.y - rotate.z;
-	sprite_vertex.y = rotate.w + rotate.x;
-	sprite_vertex *= IN(spriteSkin).xy;
-	FLOAT4 mvpos = mul(UNIFORM(mv), IN(position));
-	mvpos.xy += sprite_vertex.xy;
-	gl_Position = mul(UNIFORM(prj), mvpos);
-#else
-	gl_Position = mul(MVP, IN(position));
-#endif
+	gl_Position = mul(UNIFORM(prj), sprite_skin);
 #if defined(SHADER_EYE_VERTEX)
-	OUT(eyeVertex) = mul(UNIFORM(mv), IN(position));
+	OUT(eyeVertex) = sprite_skin;
+#endif
+#else
+	gl_Position = mul(MVP, vertex);
+#if defined(SHADER_EYE_VERTEX)
+	OUT(eyeVertex) = mul(UNIFORM(mv), vertex);
+#endif
 #endif
 #if defined(PFX_VARS) && (TEXCOORDS>=1)
 	// http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/

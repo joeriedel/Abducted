@@ -8,20 +8,20 @@
 // Uniform/Varying/Attributes mean what they mean in GLSL
 
 BEGIN_UNIFORMS
-#if defined(SHADER_MV) || defined(SKIN_SPRITE) || defined(SHADER_EYE_VERTEX)
+#if defined(SHADER_MV) || defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD) || defined(SHADER_EYE_VERTEX)
 	GLSL(uniform) FLOAT4X4 UDECL(mv);
 #endif
-#if defined(SHADER_PRJ) || defined(SKIN_SPRITE)
-#if defined(SKIN_SPRITE)
+#if defined(SHADER_PRJ) || defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
+#if defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
 	GLSL(uniform) FLOAT4X4 UDECL(prj);
 #else
 	GLSL(uniform) PFLOAT4X4 UDECL(prj); // fog hack
 #endif
 #endif
-#if defined(_GLES) && !defined(SKIN_SPRITE)
+#if defined(_GLES) && !(defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD))
 	GLSL(uniform) FLOAT4X4 UDECL(mvp);
 #endif
-#if defined(SHADER_INVERSE_MV) || (defined(SKIN_SPRITE) && (defined(SHADER_POSITION) || defined(LIGHTS) || defined(GEN_REFLECT) || defined(GEN_PROJECT)))
+#if defined(SHADER_INVERSE_MV) || ((defined(SKIN_SPRITE)||defined(SKIN_BILLBOARD)) && (defined(SHADER_POSITION) || defined(LIGHTS) || defined(GEN_REFLECT) || defined(GEN_PROJECT)))
 	// sprite skin may need worldspace vertex positions for lighting
 	// or texture projection, or reflection gen.
 	GLSL(uniform) FLOAT4X4 UDECL(imv);
@@ -44,7 +44,7 @@ BEGIN_UNIFORMS
 #if defined(GENPROJECT)
 	GLSL(uniform) FLOAT4X4 UDECL(tcPrj);
 #endif
-#if defined(SKIN_SPRITE)
+#if defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
 	GLSL(uniform) FLOAT2 UDECL(spriteVerts)[4];
 #endif
 #if defined(PFX_VARS)
@@ -62,7 +62,7 @@ BEGIN_ATTRIBUTES
 #if defined(SHADER_VERTEX_COLOR)
 	GLSL(attribute) FIXED4 IN(vertexColor) HLSL(:POSITION1);
 #endif
-#if defined(SKIN_SPRITE)
+#if defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
 	GLSL(attribute) FLOAT4 IN(spriteSkin) HLSL(:POSITION2);
 #endif
 	IN_TCREGS
@@ -150,7 +150,7 @@ MAIN
 	HALF3 v_bitan0 = IN(tan0).w * cross(IN(nm0), IN(tan0).xyz);
 #endif
 
-#if defined(SKIN_SPRITE)
+#if defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
 	int idx = int(IN(spriteSkin).w);
 	FLOAT2 sprite_vertex = UNIFORM(spriteVerts)[idx];
 	FLOAT2 sincos = FLOAT2(sin(IN(spriteSkin).z), cos(IN(spriteSkin).z));
@@ -159,7 +159,14 @@ MAIN
 	sprite_vertex.y = rotate.w + rotate.x;
 	sprite_vertex *= IN(spriteSkin).xy;
 	FLOAT4 sprite_skin = mul(UNIFORM(mv), IN(position));
+#if defined(SKIN_BILLBOARD)
+	// only rotate around world Z, not pure eye-space
+	FLOAT3 worldEyeZ = mul(FLOAT3X3(UNIFORM(mv)), FLOAT3(0,0,1));
+	sprite_skin.x += sprite_vertex.x;
+	sprite_skin.xyz += worldEyeZ*sprite_vertex.y;
+#else
 	sprite_skin.xy += sprite_vertex.xy;
+#endif
 #if defined(SHADER_POSITION) || defined(LIGHTS) || defined(GEN_REFLECT) || defined(GEN_PROJECT)
 	FLOAT4 vertex = mul(UNIFORM(imv), sprite_skin);
 #endif
@@ -320,7 +327,7 @@ MAIN
 #if defined(NUM_SHADER_BITANGENTS)
 	OUT(bitan0) = v_bitan0;
 #endif
-#if defined(SKIN_SPRITE)
+#if defined(SKIN_SPRITE) || defined(SKIN_BILLBOARD)
 	gl_Position = mul(UNIFORM(prj), sprite_skin);
 #if defined(SHADER_EYE_VERTEX)
 	OUT(eyeVertex) = sprite_skin;

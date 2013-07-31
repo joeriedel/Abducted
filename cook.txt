@@ -298,6 +298,8 @@ pak0 {
 
 	Sys/Debug_TF
 	Sys/DebugWireframe_M
+	Sys/DebugSpriteWireframe_M
+	Sys/DebugBillboardWireframe_M
 	Sys/DebugPortal_M
 	Sys/DebugPortalEdge_M
 	Sys/DebugEntityBBox_M

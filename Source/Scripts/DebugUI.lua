@@ -42,6 +42,10 @@ function DebugUI.Spawn(self)
 	self.widgets.rspeeds:AddChild(self.widgets.lights)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
 	
+	self.widgets.particles = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
+	self.widgets.rspeeds:AddChild(self.widgets.particles)
+	pos[2] = pos[2] + h + DebugUI.LineSpace
+	
 	self.widgets.misc = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
 	self.widgets.rspeeds:AddChild(self.widgets.misc)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
@@ -72,13 +76,17 @@ function DebugUI.Think(self)
 	width = math.max(UI:SizeLabelToContents(self.widgets.portals)[3])
 	
 	self.widgets.models:SetText(
-		string.format("%d/%d World, %d/%d/%d Entities, %d/%d/%d Actors", 
+		string.format("%d/%d World, %d/%d/%d Entities, %d/%d/%d Actors, %d Fogs", 
 			counters.drawnWorldModels, counters.testedWorldModels, 
 			counters.drawnEntityModels, counters.testedEntityModels, counters.drawnEntities,
-			counters.drawnActorModels, counters.testedActorModels, counters.drawnActors
+			counters.drawnActorModels, counters.testedActorModels, counters.drawnActors,
+			counters.drawnFogs
 		)
 	)
 	width = math.max(UI:SizeLabelToContents(self.widgets.models)[3])
+	
+	self.widgets.particles:SetText(string.format("%d/%d Particles(s)", counters.drawnParticles, counters.simulatedParticles))
+	width = math.max(UI:SizeLabelToContents(self.widgets.particles)[3])
 	
 	self.widgets.lights:SetText(string.format("%d/%d/%d Light(s)", counters.drawnLights, counters.visLights, counters.testedLights))
 	width = math.max(UI:SizeLabelToContents(self.widgets.lights)[3])
@@ -92,6 +100,7 @@ function DebugUI.Think(self)
 	UI:MoveWidget(self.widgets.fps, left)
 	UI:MoveWidget(self.widgets.portals, left)
 	UI:MoveWidget(self.widgets.models, left)
+	UI:MoveWidget(self.widgets.particles, left)
 	UI:MoveWidget(self.widgets.lights, left)
 	UI:MoveWidget(self.widgets.misc, left)
 		

@@ -42,6 +42,10 @@ function DebugUI.Spawn(self)
 	self.widgets.rspeeds:AddChild(self.widgets.lights)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
 	
+	self.widgets.lights2 = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
+	self.widgets.rspeeds:AddChild(self.widgets.lights2)
+	pos[2] = pos[2] + h + DebugUI.LineSpace
+	
 	self.widgets.particles = UI:CreateWidget("TextLabel", {rect={pos[1], pos[2], 8, 8}, typeface=self.gfx.Typeface})
 	self.widgets.rspeeds:AddChild(self.widgets.particles)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
@@ -91,6 +95,14 @@ function DebugUI.Think(self)
 	self.widgets.lights:SetText(string.format("%d/%d/%d Light(s)", counters.drawnLights, counters.visLights, counters.testedLights))
 	width = math.max(UI:SizeLabelToContents(self.widgets.lights)[3])
 	
+	self.widgets.lights2:SetText(string.format("%d/%d/%d Light Passes(s), %d Avg Lights Per Pass", 
+		counters.numLightPasses, 
+		counters.numStencilLightPasses,
+		counters.numLightPassLights, 
+		math.floor(counters.numLightPassLights/counters.numLightPasses)
+	))
+	width = math.max(UI:SizeLabelToContents(self.widgets.lights2)[3])
+	
 	self.widgets.misc:SetText(string.format("%d Tri(s), %d Batch(s), %d Material(s)", 
 		counters.numTris, counters.numBatches, counters.numMaterials
 	))
@@ -102,6 +114,7 @@ function DebugUI.Think(self)
 	UI:MoveWidget(self.widgets.models, left)
 	UI:MoveWidget(self.widgets.particles, left)
 	UI:MoveWidget(self.widgets.lights, left)
+	UI:MoveWidget(self.widgets.lights2, left)
 	UI:MoveWidget(self.widgets.misc, left)
 		
 	self.widgets.rspeeds:SetVisible(true)

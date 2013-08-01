@@ -17,6 +17,8 @@ pak0 {
 	Ep1/Ep1Crushed
 	Ep1/Ep1General
 	Ep1/Ep1Database
+	Ep1/dustmotevolume1
+	Ep1/rainvolume1
 	UI/ArmTestChat
 
 	// Shared

@@ -68,16 +68,21 @@ end
 function Arm.UnlockTopic(self, name, topic)
 	if (topic == nil) then
 		topic = Arm.Chats.Loaded[name]
-		assert(topic)
+		if (topic == nil) then
+			COutLine(kC_Error, "ERROR: Arm topic '%s' does not exist or is not loaded.", name)
+			return false
+		end
 		if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
 			if (topic.priority <= 0) then
-				error(string.format("Arm topic '%s' is a critical path topic, it should never be unlocked!", name))
+				COutLine(kC_Error, "ERROR: Arm topic '%s' is a critical path topic (priority <= 0), it cannot be unlocked, it must be triggered.", name)
+				return false
 			end
 			Arm.Chats.Available[name] = topic
 		end
 	end
 	topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
 	Persistence.WriteBool(SaveGame, "armTopicUnlocked", true, name)
+	return true
 end
 
 function Arm.SetTopicFlags(self, name, topic)

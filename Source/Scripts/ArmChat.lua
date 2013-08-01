@@ -54,16 +54,28 @@ function Arm.SpawnChat(self)
 end
 
 function Arm.ResetChat(self)
+	self:EnableChangeTopic(false)
 	GameDB:CheckChatLockout()
 	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0)
 end
 
-function Arm.StartChat(self)
+function Arm.StartChat(self, delay)
 	if (not GameDB.chatLockout) then
 		Arm:SwapToChange()
 		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0.2)
-		self.changeConversationCount = 0
-		Arm:StartConversation()
+		
+		if ((self.requestedTopic or self.requiredTopic) or (self.topic == nil)) then
+			Arm:StartConversation()
+		else
+			if (delay) then
+				local f = function()
+					Arm:EnableChangeTopic(true)
+				end
+				World.globalTimers:Add(f, delay)
+			else
+				Arm:EnableChangeTopic(true)
+			end
+		end
 	else
 		Arm:DisplayChatLockout()
 	end
@@ -74,15 +86,18 @@ function Arm.EndChat(self, callback)
 	
 	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0.2)
 	
+	local f = nil
+	
 	if (GameDB.chatLockout) then
 		Arm:ShowSymbol(false, 0.2)
+		f = function()
+			Arm:ClearChat()
+			callback()
+		end
+	else
+		f = callback
 	end
-	
-	local f = function()
-		Arm:ClearChat()
-		callback()
-	end
-	
+		
 	World.globalTimers:Add(f, 0.2)
 end
 
@@ -109,9 +124,16 @@ function Arm.ClearChat(self)
 		end
 	end
 	
+	if (self.rewardWidgets) then
+		for k,v in pairs(self.rewardWidgets) do
+			v:Unmap() -- mark for gc
+		end
+	end
+	
 	self.promptState = nil
 	self.choiceWidgets = nil
-	self.requestedTopic = nil
+	self.rewardWidgets = nil
+	self.currentRewardWidgets = nil
 	self.choices = nil
 	self.widgets.chat.ChatList:Clear()
 	collectgarbage()
@@ -119,7 +141,12 @@ end
 
 function Arm.HideChat(self)
 
-	Arm:ClearChat()
+	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0)
+	
+	if (self.chatTimer2) then
+		self.chatTimer2:Clean()
+		self.chatTimer2 = nil
+	end
 
 end
 
@@ -132,6 +159,7 @@ end
 
 function Arm.StartConversation(self)
 
+	self:ClearChat()
 	Arm:EnableChangeTopic(false)
 	
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
@@ -157,11 +185,111 @@ function Arm.StartConversation(self)
 end
 
 function Arm.ProcessActions(self, actions)
-	local b = FindArrayElement(actions, "clear_topic")
-	if (b) then
+	if (FindArrayElement(actions, "clear_topic")) then
 		self.requiredTopic = nil
 		HUD:SignalArm(false)
 	end
+	
+	self.rewardTopic = nil
+	self.rewardSkillPoints = nil
+	self.rewardTrigger = nil
+	self.rewardMessage = nil
+	self.rewardSkill = nil
+	
+	-- rewards?
+	for k,v in pairs(actions) do
+		local tokens = Tokenize(v)
+		if (#tokens > 0) then
+			self:ProcessActionTokens(tokens)
+		end
+	end
+end
+
+function Arm.ProcessActionTokens(self, tokens)
+
+	if (tokens[1] == "trigger") then
+		self:ProcessTriggerTokens(tokens)
+	elseif (tokens[1] == "unlock_topic") then
+		self.rewardTopic = {tokens[2], tokens[3]}
+	elseif (tokens[1] == "message") then
+		self.rewardMessage = tokens[2]
+	elseif (tokens[1] == "reward") then
+		self.rewardSkillPoints = tonumber(tokens[2])
+	elseif (tokens[1] == "unlock_skill") then
+		self.rewardSkill = tokens[2]
+	end
+
+end
+
+function Arm.ProcessTriggerTokens(self, tokens)
+	local s = nil
+	for i=2,#tokens do
+		if (s) then
+			s = s.." "..tokens[i]
+		else
+			s = tokens[i]
+		end
+	end
+	self.rewardTrigger = s
+end
+
+function Arm.CreateRewardActionText(self, text, maxWidth, f)
+	local size = UI:StringDimensions(self.typefaces.ChatChoice, text)
+	
+	local r = {0, 0, size[1], size[2]}
+	
+	local w = UI:CreateStylePushButton(
+		r,
+		f,
+		{
+			background = false,
+			highlight = { 
+				on = {0.75, 0.75, 0.75, 1}, 
+				time = 0.2 
+			}, 
+			typeface = self.typefaces.ChatChoice,
+			pressed = self.sfx.Button
+		}
+	)
+	
+	if (maxWidth and (size[1] > maxWidth)) then
+		r = UI:LineWrapCenterText(w.label, maxWidth, true, Arm.ChatChoiceSpace, text)
+	else
+		UI:SetLabelText(w.label, text)
+		r = UI:SizeLabelToContents(w.label)
+	end
+	
+	-- expand the button around the label
+	local buttonRect = {
+		self.chatPos[1], 
+		self.chatPos[2],
+		r[3]+Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1],
+		r[4]+Arm.ChatChoiceButtonPadd[2]*UI.identityScale[2]
+	}
+	
+	w:SetRect(buttonRect)
+	w:SetBlendWithParent(true)
+	w.highlight:SetRect({0, 0, buttonRect[3], buttonRect[4]})
+	r = CenterChildRectInRect(buttonRect, r)
+	w.label:SetRect(r)
+	
+	return w,buttonRect
+end
+
+function Arm.CreateRewardText(self)
+
+	if (not (self.rewardTopic or self.rewardMessage or self.rewardSkillpoints or self.rewardSkill)) then
+		return nil
+	end
+	
+	local inset = Arm.ChatChoiceInset[1] * UI.identityScale[1]
+	local maxWidth = self.chatRect[3] - self.chatPos[1] - inset - (Arm.ChatClipAdjust[1]*UI.identityScale[1]) - 4
+	self.chatPos[2] = self.chatPos[2] + (Arm.ChatChoiceExtraSpaceAfterPrompt*UI.identityScale[2])
+
+	self.currentRewardWidgets = {}
+	
+	return nil
+
 end
 
 function Arm.ChatPrompt(self)
@@ -244,7 +372,9 @@ function Arm.ChatPrompt(self)
 		-- convert prompt text to UTF32 so we can reveal character by character in extended character sets
 		self.promptState.lines[k] = System.UTF8To32(v)
 	end
-
+	
+	self:CreateRewardText()
+	
 	self.widgets.chat.ChatList:RecalcLayout()
 	self.widgets.chat.ChatList:ScrollTo(scrollPos, 0.4)
 	
@@ -308,16 +438,18 @@ function Arm.TickPrompt(self)
 		if (self.promptState.line > #self.promptState.lines) then
 			self.chatTimer:Clean()
 			self.chatTimer = nil
-			if (GameDB.chatLockout) then
-				local f = function()
-					Arm:DisplayChatLockout()
+			if (Arm.active and (Arm.mode == "chat")) then
+				if (GameDB.chatLockout) then
+					local f = function()
+						Arm:DisplayChatLockout()
+					end
+					self.chatTimer2 = World.globalTimers:Add(f, 3)
+				else
+					local f = function()
+						Arm:EnableChangeTopic(true)
+					end
+					self.chatTimer2 = World.globalTimers:Add(f, 2)
 				end
-				self.chatTimer2 = World.globalTimers:Add(f, 3)
-			else
-				local f = function()
-					Arm:EnableChangeTopic(true)
-				end
-				self.chatTimer2 = World.globalTimers:Add(f, 2)
 			end
 			Arm:DisplayChoices()
 			collectgarbage()

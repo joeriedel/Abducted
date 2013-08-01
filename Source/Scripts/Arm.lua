@@ -63,7 +63,7 @@ function Arm.SpawnShared(self)
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")
 	self.sfx.Button = UI.sfx.Command2
 	self.sfx.HeartBeat = World.Load("Audio/heartbeat1")
-	
+	self.sfx.Reward = World.Load("Audio/armreward")
 	self.sfx.HeartBeat:SetLoop(true)
 	
 	Arm:SetupBackgroundAndWorkspaces()
@@ -349,7 +349,6 @@ end
 
 function Arm.ChangePressed(widget)
 	Arm:ClearButtonHighlights(widget)
-	Arm:ClearChat()
 	Arm:StartConversation()
 end
 
@@ -413,6 +412,7 @@ function Arm.Start(self, mode)
 	self.backToGame = false
 	self.talk = false
 	self.introMode = mode
+	self.changeConversationCount = 0
 	
 	UI:BlendTo({1,1,1,1}, 0.2)
 	self:ResetWidgets()
@@ -458,7 +458,11 @@ function Arm.SwitchToChat(self)
 		end
 		cleanup(f)
 	else
-		self:StartChat()
+		local delay = nil
+		if (self.introMode) then
+			delay = 0.75
+		end
+		self:StartChat(delay)
 	end
 	
 end

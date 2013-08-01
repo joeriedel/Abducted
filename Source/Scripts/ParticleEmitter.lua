@@ -37,8 +37,8 @@ function ParticleEmitter.Spawn(self)
 	
 	self.emitter.dm = self:AttachDrawModel(self.emitter)
 	self.emitter.dm:SetBounds(mins, maxs)
+	self.emitter.dm:SetLocalDir(dir)
 	
-	self.emitter:SetDir(dir)
 	self.emitter:SetSpread(spread)
 	self.emitter:SetVolume(volume)
 	

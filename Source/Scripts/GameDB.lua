@@ -162,7 +162,7 @@ function GameDB.Discover(self, name)
 end
 
 function GameDB.CheckDiscovery(self, name)
-	return true --Persistence.ReadBool(SaveGame, "discovery", false, name)
+	return Persistence.ReadBool(SaveGame, "discovery", false, name)
 end
 
 function GameDB.LoadChatLockouts(self)

@@ -67,6 +67,7 @@ pak0 {
 	UI/ChatChoice_TF
 	UI/Chat_TF
 	UI/ChatLocked_TF
+	UI/ChatReward_TF
 	UI/LogEvent_TF
 	UI/LogDiscovery_TF
 	UI/LogArmAsk_TF
@@ -266,6 +267,7 @@ pak0 {
 	Audio/ui_command
 	Audio/armintro1
 	Audio/armsignaled
+	Audio/armreward
 	Audio/shiphum1
 	Audio/heartbeat1
 	Audio/ability_unlocked

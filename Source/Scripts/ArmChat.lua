@@ -966,20 +966,7 @@ end
 
 function Arm.ShuffleResponses(self, responses)
 
-	local range = #responses
-		
-	for i = 1,2 do
-	
-		local a = IntRand(1, #responses)
-		local b = IntRand(1, #responses)
-		
-		if (a ~= b) then
-			local x = responses[a]
-			responses[a] = responses[b]
-			responses[b] = x
-		end
-	
-	end
+	return ShuffleArray(responses)
 
 end
 
@@ -1008,33 +995,34 @@ function Arm.FillInChoices(self, responses, priority)
 	
 	for z = 1,2 do
 		for i = priority, 10 do
-			local t = Arm.Chats.Procedural[i]
+			local t = Arm:SortProceduralTopics(i)
 			if (t ~= nil) then
 				for k,v in pairs(t) do
-					if (self.topicTree[k] == nil) then -- has not been selected by user
+					if (self.topicTree[v.name] == nil) then -- has not been selected by user
 						local chosen = false
 						if (z < 2) then
 							-- knock out this choices if the user has selected it before
-							chosen = Persistence.ReadBool(SaveGame, "armGeneratedTopicChosen", false, k)
+							chosen = Persistence.ReadBool(SaveGame, "armGeneratedTopicChosen", false, v.name)
 						end
 						
 						if (chosen) then
 							-- 15 % chance an item that was seen will show up
-							if (math.random() <= 0.15) then
+							-- after they have swapped conversations 4 times
+							if ((self.changeConversationCount >= 4) and (math.random() <= 0.15)) then
 								chosen = false
 							end
 						end
 						
 						if (not chosen) then
-							if (added[k]) then
+							if (added[v.name]) then
 								chosen = true
 							end
 						end
 						
 						if (not chosen) then
-							v.generated = k -- flag as a generated option
+							v.generated = v.name -- flag as a generated option
 							table.insert(responses, v)
-							added[k] = true
+							added[v.name] = true
 						end
 					end
 					

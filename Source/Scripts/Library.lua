@@ -133,6 +133,18 @@ function string:split(delim, maxNb)
 end
 
 --[[---------------------------------------------------------------------------
+	Shuffle Array
+	http://snippets.luacode.org/snippets/Shuffle_array_145
+-----------------------------------------------------------------------------]]
+function ShuffleArray(tab)
+	local n, order, res = #tab, {}, {}
+	for i=1,n do order[i] = { rnd = math.random(), idx = i } end
+	table.sort(order, function(a,b) return a.rnd < b.rnd end)
+	for i=1,n do res[i] = tab[order[i].idx] end
+	return res
+end
+
+--[[---------------------------------------------------------------------------
 	Tokenize a string
 -----------------------------------------------------------------------------]]
 

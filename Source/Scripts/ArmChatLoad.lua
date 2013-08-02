@@ -69,8 +69,16 @@ function Arm.LinkProceduralChat(self, name, topic)
 		error(string.format("Arm topic '%s' is a procedural topic and must contain 1 dialog.", name))
 	end
 	
-	t[name] = topic.choices[1]
+	table.insert(t, topic.choices[1])
+end
 
+function Arm.SortProceduralTopics(self, priority)
+
+	local t = Arm.Chats.Procedural[priority]
+	if (t ~= nil) then
+		t = ShuffleArray(t)
+	end
+	return t
 end
 
 function Arm.UnlockTopic(self, name, topic)

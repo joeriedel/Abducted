@@ -133,6 +133,9 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "enable_arm") then
 		PlayerSkills:UnlockArm()
 		return true
+	elseif (cmd == "unlock_topic") then
+		self:UnlockTopic(args)
+		return true
 	elseif (cmd == "enable_manipulate") then
 		PlayerSkills:UnlockManipulate()
 		return true

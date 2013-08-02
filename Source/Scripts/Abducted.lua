@@ -8,6 +8,8 @@ Abducted.PulseTargets = LL_New()
 Abducted.KillMessages = { "DEFAULT_KILLED_MESSAGE1" }
 
 function Abducted.Initialize(self)
+	math.randomseed(System.ReadMilliseconds())
+	
 	self.eatInput = false
 	Abducted.KeyBindings = LoadKeyBindings()
 	
@@ -366,6 +368,10 @@ end
 
 function Abducted.Discover(self, name)
 	return GameDB:Discover(name)
+end
+
+function Abducted.UnlockTopic(self, name)
+	Arm:UnlockTopic(name)
 end
 
 function Abducted.Think(self, dt)

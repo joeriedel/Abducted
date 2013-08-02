@@ -23,7 +23,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		bbox = {mins = {-24, -24, 0}, maxs = {24, 24, 128}}
+		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 128}}
 	},
 	limp = {
 		idle = "limpidle",

@@ -41,10 +41,18 @@ function Arm.LinkDialogDB(self, db)
 	return data
 end
 
+function Arm.TopicIsProcedural(self, topic)
+	return bit.band(topic.flags, kArmChatFlag_Procedural) ~= 0
+end
+
 function Arm.LinkProceduralChat(self, name, topic)
 
 	if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
 		return
+	end
+	
+	if (bit.band(topic.flags, kArmChatFlag_Locked) ~= 0) then
+		return -- locked
 	end
 	
 	if (topic.priority <= 0) then
@@ -72,17 +80,28 @@ function Arm.UnlockTopic(self, name, topic)
 			COutLine(kC_Error, "ERROR: Arm topic '%s' does not exist or is not loaded.", name)
 			return false
 		end
+	end
+	
+	local locked = bit.band(topic.flags, kArmChatFlag_Locked) ~= 0
+	if (locked) then
+	
+		topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
+		Persistence.WriteBool(SaveGame, "armTopicUnlocked", true, topic.name)
+		
 		if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
 			if (topic.priority <= 0) then
-				COutLine(kC_Error, "ERROR: Arm topic '%s' is a critical path topic (priority <= 0), it cannot be unlocked, it must be triggered.", name)
+				COutLine(kC_Error, "ERROR: Arm topic '%s' is a critical path topic (priority <= 0), it cannot be unlocked, it must be triggered.", topic.name)
 				return false
 			end
 			Arm.Chats.Available[name] = topic
+		else
+			Arm:LinkProceduralChat(topic.name, topic)
 		end
+		
+		return true
 	end
-	topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
-	Persistence.WriteBool(SaveGame, "armTopicUnlocked", true, name)
-	return true
+	
+	return false
 end
 
 function Arm.SetTopicFlags(self, name, topic)
@@ -92,6 +111,14 @@ function Arm.SetTopicFlags(self, name, topic)
 		topic.flags = bit.band(topic.flags, bit.bnot(kArmChatFlag_Locked))
 	end
 
+end
+
+function Arm.CheckTopicReward(self, topic, type)
+	return Persistence.ReadBool(SaveGame, "armTopicRewards", false, name, type)
+end
+
+function Arm.SaveTopicReward(self, topic, type)
+	Persistence.WriteBool(SaveGame, "armTopicRewards", true, name, type)
 end
 
 function Arm.AddAvailableChats(self, db, group, flags)

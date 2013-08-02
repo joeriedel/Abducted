@@ -11,7 +11,7 @@ Arm.ChatChoiceExtraSpaceAfterPrompt = 6
 Arm.ChatChoiceHorzSpace = 16
 Arm.ChatChoiceButtonPadd = { 16, 10 }
 Arm.ChatClipAdjust = { 0, 0, 0, 0 }
-Arm.MaxChangeConversationTimes = 4
+Arm.MaxChangeConversationTimes = 8
 
 function Arm.SpawnChat(self)
 
@@ -85,6 +85,11 @@ function Arm.EndChat(self, callback)
 	Arm:SwapToTalk()
 	
 	self.widgets.chat.Root:BlendTo({1,1,1,0}, 0.2)
+	
+	if (self.chatTimer2) then
+		self.chatTimer2:Clean()
+		self.chatTimer2 = nil
+	end
 	
 	local f = nil
 	
@@ -189,13 +194,7 @@ function Arm.ProcessActions(self, actions)
 		self.requiredTopic = nil
 		HUD:SignalArm(false)
 	end
-	
-	self.rewardTopic = nil
-	self.rewardSkillPoints = nil
-	self.rewardTrigger = nil
-	self.rewardMessage = nil
-	self.rewardSkill = nil
-	
+
 	-- rewards?
 	for k,v in pairs(actions) do
 		local tokens = Tokenize(v)
@@ -210,15 +209,28 @@ function Arm.ProcessActionTokens(self, tokens)
 	if (tokens[1] == "trigger") then
 		self:ProcessTriggerTokens(tokens)
 	elseif (tokens[1] == "unlock_topic") then
-		self.rewardTopic = {tokens[2], tokens[3]}
+		if (Arm:UnlockTopic(tokens[2])) then
+			self.rewardTopic = {tokens[2], tokens[3]}
+		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
 	elseif (tokens[1] == "reward") then
-		self.rewardSkillPoints = tonumber(tokens[2])
+		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
+			self.rewardSkillPoints = tonumber(tokens[2])
+			Arm:SaveTopicReward(self.topic, "skillpoints")
+		end
 	elseif (tokens[1] == "unlock_skill") then
-		self.rewardSkill = tokens[2]
+		if (not Arm:CheckTopicReward(self.topic, "unlock_skill")) then
+			self.rewardSkill = tokens[2]
+			Arm:SaveTopicReward(self.topic, "unlock_skill")
+		end
+	elseif (tokens[1] == "discover") then
+--		if (Abducted.entity:Discover(tokens[2])) then
+			self.rewardDiscover = tokens[2]
+--		end
 	end
 
+	SaveGame:Save()
 end
 
 function Arm.ProcessTriggerTokens(self, tokens)
@@ -230,17 +242,25 @@ function Arm.ProcessTriggerTokens(self, tokens)
 			s = tokens[i]
 		end
 	end
-	self.rewardTrigger = s
+	
+	if (s) then
+		World.PostEvent(s)
+	end
 end
 
-function Arm.CreateRewardActionText(self, text, maxWidth, f)
-	local size = UI:StringDimensions(self.typefaces.ChatChoice, text)
+function Arm.CreateRewardActionText(self, text, inset, maxWidth, f)
+	local sizeW, sizeH = UI:StringDimensions(self.typefaces.ChatChoice, text)
 	
-	local r = {0, 0, size[1], size[2]}
+	local r = {0, 0, sizeW, sizeH}
 	
 	local w = UI:CreateStylePushButton(
 		r,
-		f,
+		function (w)
+			w.class:ResetHighlight(w)
+			if (f) then
+				f()
+			end
+		end,
 		{
 			background = false,
 			highlight = { 
@@ -252,7 +272,7 @@ function Arm.CreateRewardActionText(self, text, maxWidth, f)
 		}
 	)
 	
-	if (maxWidth and (size[1] > maxWidth)) then
+	if (maxWidth and (sizeW > maxWidth)) then
 		r = UI:LineWrapCenterText(w.label, maxWidth, true, Arm.ChatChoiceSpace, text)
 	else
 		UI:SetLabelText(w.label, text)
@@ -261,7 +281,7 @@ function Arm.CreateRewardActionText(self, text, maxWidth, f)
 	
 	-- expand the button around the label
 	local buttonRect = {
-		self.chatPos[1], 
+		self.chatPos[1]+inset, 
 		self.chatPos[2],
 		r[3]+Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1],
 		r[4]+Arm.ChatChoiceButtonPadd[2]*UI.identityScale[2]
@@ -278,7 +298,7 @@ end
 
 function Arm.CreateRewardText(self)
 
-	if (not (self.rewardTopic or self.rewardMessage or self.rewardSkillpoints or self.rewardSkill)) then
+	if (not (self.rewardTopic or self.rewardMessage or self.rewardSkillpoints or self.rewardSkill or self.rewardDiscover)) then
 		return nil
 	end
 	
@@ -286,10 +306,58 @@ function Arm.CreateRewardText(self)
 	local maxWidth = self.chatRect[3] - self.chatPos[1] - inset - (Arm.ChatClipAdjust[1]*UI.identityScale[1]) - 4
 	self.chatPos[2] = self.chatPos[2] + (Arm.ChatChoiceExtraSpaceAfterPrompt*UI.identityScale[2])
 
+	local startY = self.chatPos[2]
 	self.currentRewardWidgets = {}
 	
-	return nil
-
+	if (self.rewardTopic) then
+		local rewardTopic = self.rewardTopic -- this may change as the conversation does so record it
+		local w, r = self:CreateRewardActionText(
+			StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]), 
+			inset,
+			maxWidth,
+			function ()
+				self.requestedTopic = rewardTopic[1]
+				Arm:StartConversation()
+			end
+		)
+		
+		w.x = r[1]
+		w.y = self.chatPos[2]
+		self.chatPos[2] = r[2] + r[4] + (Arm.ChatLineSpace*UI.identityScale[2])
+		table.insert(self.currentRewardWidgets, w)
+		
+		self.widgets.chat.ChatList:AddItem(w)
+		w:SetBlendWithParent(true)
+		w:BlendTo({1,1,1,0}, 0)
+	end
+	
+	if (self.rewardDiscover) then
+		local rewardDiscover = self.rewardDiscover -- this may change as the conversation does so record it
+		local dbItem = Arm.Discoveries[rewardDiscover]
+		if (dbItem) then
+			local w, r = self:CreateRewardActionText(
+				StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title), 
+				inset,
+				maxWidth,
+				function ()
+					Arm:OpenDatabaseItem(rewardDiscover)
+				end
+			)
+			
+			w.x = r[1]
+			w.y = self.chatPos[2]
+			self.chatPos[2] = r[2] + r[4] + (Arm.ChatLineSpace*UI.identityScale[2])
+			table.insert(self.currentRewardWidgets, w)
+			
+			self.widgets.chat.ChatList:AddItem(w)
+			w:SetBlendWithParent(true)
+			w:BlendTo({1,1,1,0}, 0)
+		else
+			COutLine(kC_Error, "There is no item called '%s' in the game database.", rewardDiscover)
+		end
+	end
+	
+	self.currentRewardWidgetsHeight = self.chatPos[2] - startY
 end
 
 function Arm.ChatPrompt(self)
@@ -320,6 +388,14 @@ function Arm.ChatPrompt(self)
 	self.promptText = "> "..promptText
 	
 	local lock = false
+	
+	self.rewardTopic = nil
+	self.rewardSkillPoints = nil
+	self.rewardTrigger = nil
+	self.rewardMessage = nil
+	self.rewardSkill = nil
+	self.rewardDiscover = nil
+	self.currentRewardWidgets = nil
 	
 	if (self.topic.action) then
 		local actions = string.split(self.topic.action, ";")
@@ -421,6 +497,28 @@ function Arm.AnimatePrompt(self)
 	self.chatTimer = World.globalTimers:Add(f, 1/charactersPerSecond, true)
 end
 
+function Arm.DisplayRewards(self)
+	if (self.currentRewardWidgets) then
+		if (Arm.active and (Arm.mode == "chat")) then
+			Arm.sfx.Reward:Play(kSoundChannel_UI, 0)
+		end
+		for k,v in pairs(self.currentRewardWidgets) do
+			v:MoveTo({v.x, v.y+self.currentRewardWidgetsHeight}, {0,0})
+			v:MoveTo({v.x, v.y}, {0,0.3})
+			v:BlendTo({1,1,1,1}, 0.1)
+		end
+		
+		local f = function()
+			Arm:DisplayChoices()
+			collectgarbage()
+		end
+		self.chatTimer = World.globalTimers:Add(f, 0.8)
+	else
+		Arm:DisplayChoices()
+		collectgarbage()
+	end
+end
+
 function Arm.TickPrompt(self)
 	local utf32 = self.promptState.lines[self.promptState.line]
 	local w = self.promptState.labels[self.promptState.line]
@@ -451,8 +549,7 @@ function Arm.TickPrompt(self)
 					self.chatTimer2 = World.globalTimers:Add(f, 2)
 				end
 			end
-			Arm:DisplayChoices()
-			collectgarbage()
+			Arm:DisplayRewards()
 			return
 		end
 		
@@ -669,7 +766,7 @@ function Arm.SelectChatRoot(self)
 	if (self.changeConversationCount > Arm.MaxChangeConversationTimes) then
 		EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED")
 		Arm:ChatLockout(FloatRand(35, 95))
-		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}, stringTable=Arm.Chats.CommonDB.StringTable}
+		return {reply={{"ARM_CHAT_WE_WILL_TALK_LATER"}}, stringTable=StringTable.Global}
 	end
 
 	local roots = {}
@@ -844,16 +941,32 @@ function Arm.FillInChoices(self, responses, priority)
 	local exit = false
 	local added = {}
 	
-	for k = 1,2 do
+	local proceduralRoot = Arm:TopicIsProcedural(self.topic)
+	
+	for k,v in pairs(responses) do
+		added[v.name] = true -- don't let procedurals have their own choices repeated
+		if (proceduralRoot) then
+			v.generated = v.name
+		end
+	end
+	
+	for z = 1,2 do
 		for i = priority, 10 do
 			local t = Arm.Chats.Procedural[i]
 			if (t ~= nil) then
 				for k,v in pairs(t) do
 					if (self.topicTree[k] == nil) then -- has not been selected by user
 						local chosen = false
-						if (k == 1) then
+						if (z < 2) then
 							-- knock out this choices if the user has selected it before
 							chosen = Persistence.ReadBool(SaveGame, "armGeneratedTopicChosen", false, k)
+						end
+						
+						if (chosen) then
+							-- 15 % chance an item that was seen will show up
+							if (math.random() <= 0.15) then
+								chosen = false
+							end
 						end
 						
 						if (not chosen) then

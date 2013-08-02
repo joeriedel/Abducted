@@ -337,6 +337,14 @@ function Arm.ReturnPressed(widget)
 	end
 end
 
+function Arm.OpenDatabaseItem(self, item)
+	self.requestedDBTopic = item
+	self.widgets.Database.state.pressed = true
+	self.widgets.Database.class:SetGfxState(self.widgets.Database)
+	Arm:ClearButtonHighlights(self.widgets.Database)
+	Arm:SwitchMode("db")
+end
+
 function Arm.DatabasePressed(widget)
 	Arm:ClearButtonHighlights(widget)
 	Arm:SwitchMode("db")

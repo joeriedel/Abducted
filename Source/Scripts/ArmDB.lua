@@ -76,7 +76,11 @@ function Arm.SpawnDB(self)
 end
 
 function Arm.StartDB(self)
-	self.dbMode = Persistence.ReadString(Session, "dbMode", "char")
+	if (self.requestedDBTopic) then
+		self.dbMode = "discoveries"
+	else
+		self.dbMode = Persistence.ReadString(Session, "dbMode", "char")
+	end
 	Arm:DBResetAll()
 	Arm:DBIntro(self.dbMode)
 end

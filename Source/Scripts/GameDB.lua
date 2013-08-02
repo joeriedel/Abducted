@@ -149,7 +149,7 @@ function GameDB.Discover(self, name)
 
 	local discovered = self:CheckDiscovery(name)
 	if (discovered) then
-		return
+		return false
 	end
 
 	self.numDiscoveries = self.numDiscoveries + 1
@@ -158,7 +158,7 @@ function GameDB.Discover(self, name)
 	
 	self.discoveryTime = self.realTime
 	Persistence.WriteNumber(SaveGame, "lastDiscoveryTime", self.discoveryTime)
-
+	return true
 end
 
 function GameDB.CheckDiscovery(self, name)

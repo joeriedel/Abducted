@@ -364,6 +364,10 @@ function Abducted.PlayerDied(self, killMessage)
 	World.globalTimers:Add(f, 2.5)
 end
 
+function Abducted.Discover(self, name)
+	return GameDB:Discover(name)
+end
+
 function Abducted.Think(self, dt)
 	Game.Think(self, dt)
 	

@@ -161,6 +161,9 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 
 	local w
 	local title = StringTable.Get(discovery.title)
+	if (discovery.chat) then
+		title = title.." "..StringTable.Get("ARM_DISCOVERY_TALK_ABOUT_THIS")
+	end
 	local underlineY
 	
 	if (discovery.chat) then
@@ -325,6 +328,23 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 	
 	state.y = state.y + y + textY + state.discoverySpace
 	
+end
+
+function Arm.ScrollToRequestedItem(self)
+	local requestedTopic = self.requestedDBTopic
+	self.requestedDBTopic = nil
+	
+	if (requestedTopic) then
+		local topic = Arm.Discoveries[requestedTopic]
+		if (topic) then
+			topic = self.discoveryList[topic.index]
+			if (topic) then
+				-- it's in our list scroll to it
+				self.widgets.db.Discoveries:ScrollTo({0, topic.y}, 0.4)
+			end
+		end
+	end
+
 end
 
 function Arm.LoadDiscoveries(self)

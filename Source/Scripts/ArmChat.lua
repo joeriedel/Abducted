@@ -214,7 +214,7 @@ function Arm.ProcessActionTokens(self, tokens)
 		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
-	elseif (tokens[1] == "reward") then
+	elseif (tokens[1] == "award") then
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
 			self.rewardSkillPoints = tonumber(tokens[2])
 			Arm:SaveTopicReward(self.topic, "skillpoints")
@@ -225,9 +225,9 @@ function Arm.ProcessActionTokens(self, tokens)
 			Arm:SaveTopicReward(self.topic, "unlock_skill")
 		end
 	elseif (tokens[1] == "discover") then
---		if (Abducted.entity:Discover(tokens[2])) then
+		if (Abducted.entity:Discover(tokens[2])) then
 			self.rewardDiscover = tokens[2]
---		end
+		end
 	end
 
 	SaveGame:Save()
@@ -248,8 +248,8 @@ function Arm.ProcessTriggerTokens(self, tokens)
 	end
 end
 
-function Arm.CreateRewardActionText(self, text, inset, maxWidth, f)
-	local sizeW, sizeH = UI:StringDimensions(self.typefaces.ChatChoice, text)
+function Arm.CreateRewardActionButton(self, text, inset, maxWidth, f)
+	local sizeW, sizeH = UI:StringDimensions(self.typefaces.ChatReward, text)
 	
 	local r = {0, 0, sizeW, sizeH}
 	
@@ -267,7 +267,7 @@ function Arm.CreateRewardActionText(self, text, inset, maxWidth, f)
 				on = {0.75, 0.75, 0.75, 1}, 
 				time = 0.2 
 			}, 
-			typeface = self.typefaces.ChatChoice,
+			typeface = self.typefaces.ChatReward,
 			pressed = self.sfx.Button
 		}
 	)
@@ -283,7 +283,7 @@ function Arm.CreateRewardActionText(self, text, inset, maxWidth, f)
 	local buttonRect = {
 		self.chatPos[1]+inset, 
 		self.chatPos[2],
-		r[3]+Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1],
+		r[3],
 		r[4]+Arm.ChatChoiceButtonPadd[2]*UI.identityScale[2]
 	}
 	
@@ -293,7 +293,38 @@ function Arm.CreateRewardActionText(self, text, inset, maxWidth, f)
 	r = CenterChildRectInRect(buttonRect, r)
 	w.label:SetRect(r)
 	
+	w.x = buttonRect[1]
+	w.y = self.chatPos[2]
+	
+	self.chatPos[2] = buttonRect[2] + buttonRect[4] + (Arm.ChatLineSpace*UI.identityScale[2])
+	
 	return w,buttonRect
+end
+
+function Arm.CreateRewardActionText(self, text, inset, maxWidth)
+	local sizeW, sizeH = UI:StringDimensions(self.typefaces.ChatReward, text)
+	
+	local label = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.ChatReward})
+	local r = nil
+
+	if (maxWidth and (sizeW > maxWidth)) then
+		r = UI:LineWrapCenterText(label, maxWidth, true, Arm.ChatChoiceSpace, text)
+	else
+		UI:SetLabelText(label, text)
+		r = UI:SizeLabelToContents(label)
+	end
+	
+	r[1] = self.chatPos[1]+inset
+	r[2] = self.chatPos[2]
+	r[4] = r[4]+Arm.ChatChoiceButtonPadd[2]*UI.identityScale[2]
+	
+	label:SetRect(r)
+	
+	label.x = r[1]
+	label.y = self.chatPos[2]
+		
+	self.chatPos[2] = r[2] + r[4] + (Arm.ChatLineSpace*UI.identityScale[2])
+	return label
 end
 
 function Arm.CreateRewardText(self)
@@ -311,8 +342,8 @@ function Arm.CreateRewardText(self)
 	
 	if (self.rewardTopic) then
 		local rewardTopic = self.rewardTopic -- this may change as the conversation does so record it
-		local w, r = self:CreateRewardActionText(
-			StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]), 
+		local w, r = self:CreateRewardActionButton(
+			"> "..StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]), 
 			inset,
 			maxWidth,
 			function ()
@@ -321,11 +352,7 @@ function Arm.CreateRewardText(self)
 			end
 		)
 		
-		w.x = r[1]
-		w.y = self.chatPos[2]
-		self.chatPos[2] = r[2] + r[4] + (Arm.ChatLineSpace*UI.identityScale[2])
 		table.insert(self.currentRewardWidgets, w)
-		
 		self.widgets.chat.ChatList:AddItem(w)
 		w:SetBlendWithParent(true)
 		w:BlendTo({1,1,1,0}, 0)
@@ -335,8 +362,8 @@ function Arm.CreateRewardText(self)
 		local rewardDiscover = self.rewardDiscover -- this may change as the conversation does so record it
 		local dbItem = Arm.Discoveries[rewardDiscover]
 		if (dbItem) then
-			local w, r = self:CreateRewardActionText(
-				StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title), 
+			local w, r = self:CreateRewardActionButton(
+				"> "..StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title), 
 				inset,
 				maxWidth,
 				function ()
@@ -344,17 +371,46 @@ function Arm.CreateRewardText(self)
 				end
 			)
 			
-			w.x = r[1]
-			w.y = self.chatPos[2]
-			self.chatPos[2] = r[2] + r[4] + (Arm.ChatLineSpace*UI.identityScale[2])
 			table.insert(self.currentRewardWidgets, w)
-			
 			self.widgets.chat.ChatList:AddItem(w)
 			w:SetBlendWithParent(true)
 			w:BlendTo({1,1,1,0}, 0)
 		else
 			COutLine(kC_Error, "There is no item called '%s' in the game database.", rewardDiscover)
 		end
+	end
+	
+	if (self.rewardSkillPoints) then
+		local msg = "+"..tostring(self.rewardSkillPoints)
+		if (self.rewardSkillPoints > 1) then
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		else
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
+		end
+		
+		local w = self:CreateRewardActionText(
+			msg,
+			inset,
+			maxWidth
+		)
+		
+		table.insert(self.currentRewardWidgets, w)
+		self.widgets.chat.ChatList:AddItem(w)
+		w:SetBlendWithParent(true)
+		w:BlendTo({1,1,1,0}, 0)
+	end
+	
+	if (self.rewardMessage) then
+		local w = self:CreateRewardActionText(
+			StringTable.Get(self.rewardMessage),
+			inset,
+			maxWidth
+		)
+		
+		table.insert(self.currentRewardWidgets, w)
+		self.widgets.chat.ChatList:AddItem(w)
+		w:SetBlendWithParent(true)
+		w:BlendTo({1,1,1,0}, 0)
 	end
 	
 	self.currentRewardWidgetsHeight = self.chatPos[2] - startY

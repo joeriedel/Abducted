@@ -78,6 +78,7 @@ end
 function Arm.StartDB(self)
 	if (self.requestedDBTopic) then
 		self.dbMode = "discoveries"
+		Persistence.WriteString(Session, "dbMode", "discoveries")
 	else
 		self.dbMode = Persistence.ReadString(Session, "dbMode", "char")
 	end
@@ -188,8 +189,8 @@ function Arm.DBShowPanel(self, show, mode, callback, animateTab)
 				enabled = self.gfx.DiscoveriesTab
 				pressed = self.gfx.DiscoveriesTabPressed
 			end
+			self.widgets.db.Tab.class:ChangeGfx(self.widgets.db.Tab, {enabled=enabled, pressed=pressed})
 			if (animateTab) then
-				self.widgets.db.Tab.class:ChangeGfx(self.widgets.db.Tab, {enabled=enabled, pressed=pressed})
 				self.widgets.db.Tab:BlendTo({1,1,1,1}, 0)
 				self.widgets.db.Tab:ScaleTo({0,1}, {0,0})
 				self.widgets.db.Tab:ScaleTo({1,1}, {0.2,0})

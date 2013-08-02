@@ -55,6 +55,7 @@ function Arm.SpawnShared(self)
 	self.typefaces.Chat = World.Load("UI/Chat_TF")
 	self.typefaces.ChatLocked = World.Load("UI/ChatLocked_TF")
 	self.typefaces.ChatChoice = World.Load("UI/ChatChoice_TF")
+	self.typefaces.ChatReward = World.Load("UI/ChatReward_TF")
 	self.typefaces.LogEvent = World.Load("UI/LogEvent_TF")
 	self.typefaces.LogDiscovery = World.Load("UI/LogDiscovery_TF")
 	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
@@ -341,6 +342,7 @@ function Arm.OpenDatabaseItem(self, item)
 	self.requestedDBTopic = item
 	self.widgets.Database.state.pressed = true
 	self.widgets.Database.class:SetGfxState(self.widgets.Database)
+	self.widgets.Database.state.pressed = false
 	Arm:ClearButtonHighlights(self.widgets.Database)
 	Arm:SwitchMode("db")
 end

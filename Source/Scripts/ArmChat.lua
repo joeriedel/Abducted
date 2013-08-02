@@ -64,7 +64,7 @@ function Arm.StartChat(self, delay)
 		Arm:SwapToChange()
 		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0.2)
 		
-		if ((self.requestedTopic or self.requiredTopic) or (self.topic == nil)) then
+		if (self.topic == nil) then
 			Arm:StartConversation()
 		else
 			if (delay) then

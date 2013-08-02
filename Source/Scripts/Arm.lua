@@ -445,6 +445,7 @@ function Arm.Signal(self, topic)
 
 	if (topic) then
 		self.requiredTopic = topic
+		self.topic = nil
 		HUD:SignalArm(true)
 	end
 	

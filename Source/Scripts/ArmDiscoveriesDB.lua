@@ -141,6 +141,7 @@ end
 
 function Arm.DiscoveryPressed(self, discovery)
 	self.requestedTopic = discovery.chat
+	self.topic = nil
 	Arm:TalkPressed()
 end
 

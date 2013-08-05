@@ -113,7 +113,7 @@ function UIPushButton.OnInputEvent(widget, e)
 	
 	if (Input.IsTouchBegin(e)) then
 		return UIPushButton:DoPressed(widget, e)
-	elseif ((widget.state.pressed) and Input.IsTouchMove(e, widget.busy)) then
+	elseif ((widget.state.pressed) and Input.IsTouchMove(e)) then
 		return true
 	elseif ((widget.state.pressed) and widget.busy and Input.IsTouchEnd(e, widget.busy)) then
 		if (e.type == kI_TouchCancelled) then

@@ -69,7 +69,7 @@ cv_savechecpoint = CVarFunc("savecheckpoint", "_cv_savecheckpoint_func")
 cv_postevent = CVarFunc("postevent", "_cv_postevent_func")
 cv_r_fly = CVarBool("r_fly", false)
 cv_godmode = CVarFunc("godmode", "_cv_godmode_func")
-
+cv_drg = CVarFunc("drg", "_cv_debug_reflex_game")
 -------------------------------------------------------------------------------
 
 function tabstr(tabs)
@@ -186,4 +186,8 @@ function _cv_godmode_func(cmd)
 	else
 		COutLine(kC_Debug, "godmode OFF")
 	end
+end
+
+function _cv_debug_reflex_game()
+	ReflexGame:DebugStart()
 end

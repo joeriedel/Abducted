@@ -158,7 +158,7 @@ function BugSpawner.FindSpawnPosition(self)
 		
 		fp = ClipToFloor(
 			self.floorPosition.floor,
-			{c, s, z+512},
+			{c, s, z+32},
 			{c, s, z-512}
 		)
 	
@@ -930,7 +930,7 @@ function Bug.ZigZagToTarget(self, targetPos)
 		
 		local target = clipToFloor(
 			pos.floor,
-			{fwd[1], fwd[2], fwd[3]+512},
+			{fwd[1], fwd[2], fwd[3]+32},
 			{fwd[1], fwd[2], fwd[3]-512}
 		)
 		

@@ -84,12 +84,12 @@ function Entity.TraceFloorDir(self, distance, dir, curFP)
 	if (curFP) then
 		fp = World.ClipToFloor(
 			curFP.floor, 
-			{testPos[1], testPos[2], testPos[3]+512},
+			{testPos[1], testPos[2], testPos[3]+32},
 			{testPos[1], testPos[2], testPos[3]-512}
 		)
 	else
 		fp = World.ClipToFloor(
-			{testPos[1], testPos[2], testPos[3]+512},
+			{testPos[1], testPos[2], testPos[3]+32},
 			{testPos[1], testPos[2], testPos[3]-512}
 		)
 	end

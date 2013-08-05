@@ -75,82 +75,6 @@ function ReflexGame.ResetGame(self)
 	ReflexGame.active = false
 end
 
-function ReflexGame.CreateLevel1x1(self)
-	local level = {}
-	
-	level.name = "1x1"
-	
-	level.antivirusSpiderSpawnRate = 5
-	level.antivirusSpiderSpeed = 40
-    level.blackholeSpeed = 40
-    level.lineTimerEnabledEnabledTimer = 5
-    level.time = 120
-	
-	level.board = {
-		-- row 0
-		-- row 1
-		{ x=0, y=1, img="mark_start" }	
-		, { x=0, y=0, img="blocker_green" }
-		, { x=3, y=1, img="blocker_green" }
-		, { x=11, y=1, img="blocker_green" }		
-		-- row 2
-		, { x=3, y=2, img="blocker_green" }
-		, { x=4, y=2, img="cell_02" }
-		, { x=11, y=2, img="blocker_green" }		
-		, { x=12, y=2, img="blocker_green" }				
-		-- row 3
-		, { x=5, y=3, img="blocker_green" }
-		-- row 4
-		, { x=12, y=4, img="blocker_green" }
-		, { x=13, y=4, img="cell_04" }
-		-- row 5
-		, { x=6, y=5, img="blocker_green" }
-		, { x=13, y=5, img="cell_03" }
-		-- row 6
-		, { x=2, y=6, img="blocker_green" }
-		, { x=3, y=6, img="blocker_green" }
-		-- row 7
-		, { x=3, y=7, img="cell_01" }		
-		, { x=16, y=7, img="mark_end" }
-		-- row 8
-		-- row 9
-        , { x=8, y=4, img="blackhole", heading={ 0,1 } }
-        -- row 10
-		-- row 11
-		-- row 12
-		-- row 13
-		-- row 14
-		}
-	
-	return level
-end
-
-function ReflexGame.CreateLevel1x2(self)
-	local level = {}
-	
-	level.name = "1x2"	
-
-	level.board = {  { x=0, y=0, img="blocker_green" }
-		, { x=9, y=3, img="blocker_green" }
-		, { x=7, y=5, img="blocker_green" }
-		}
-	
-	return level
-end
-
-function ReflexGame.CreateLevel1x3(self)
-	local level = {}
-	
-	level.name = "1x3"	
-	
-	level.board = {  { x=0, y=0, img="blocker_green" }
-		, { x=6, y=3, img="blocker_green" }
-		, { x=3, y=5, img="blocker_green" }
-		}
-	
-	return level
-end
-
 function ReflexGame.CreateBoards(self)
 	self.db = { }
 	self.db.levels = { }    
@@ -169,72 +93,76 @@ end
 
 function ReflexGame.OnInputEvent(self,e)
 	self = ReflexGame.entity
-
-	if (e.type == kI_KeyDown) then
-		--COutLine(kC_Debug,"key=%i",e.data[1])
-		if (e.data[1] == kKeyCode_I) then
-			--COutLine(kC_Debug,"moving widget")
-			self.state.heading.x = 0
-			self.state.heading.y = -1
-            --UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
-			return true
-		end
-		if (e.data[1] == kKeyCode_K) then
-			self.state.heading.x = 0
-			self.state.heading.y = 1
-			return true
-		end		
-		if (e.data[1] == kKeyCode_J) then
-			self.state.heading.x = -1
-			self.state.heading.y = 0
-			return true
-		end				
-		if (e.data[1] == kKeyCode_L) then
-			self.state.heading.x = 1
-			self.state.heading.y = 0
-			return true
-		end						
-	end
-	
-	return false
+	return self.eatInput
 end
 
-function ReflexGame.OnInputGesture(self,g)
-	self = ReflexGame.entity
+function ReflexGame.HandleDPadEvents(self, widget, e)
+	local press = false
 	
-	if (g.id ~= kIG_Line) then
-		return true
+	if (Input.IsTouchBegin(e)) then
+		if (widget.touch == nil) then
+			press = true
+			widget:SetMaterial(self.gfx.RightArrowPressed)
+			widget:SetCapture(true)
+			widget.touch = e.touch
+			self.sfx.dpad:Play(kSoundChannel_UI, 0)
+		end
+	elseif (widget.touch and Input.IsTouchEnd(e, widget.touch)) then
+		widget.touch = nil
+		widget:SetMaterial(self.gfx.RightArrow)
+		widget:SetCapture(false)
 	end
+	
+	return press
+end
 
-	-- left?
-	if (g.args[1] > 0.707) then
-		self.state.heading.x = 1
-		self.state.heading.y = 0
-	elseif (g.args[1] < -0.707) then -- right?
-		self.state.heading.x = -1
-		self.state.heading.y = 0
-	elseif (g.args[2] > 0.707) then -- down
-		self.state.heading.x = 0
-		self.state.heading.y = 1
-	else -- up
+function ReflexGame.DPadUp(widget, e)
+	self = ReflexGame.entity
+	if (self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 0
 		self.state.heading.y = -1
 	end
-	
+	return true
+end
+
+function ReflexGame.DPadDown(widget, e)
+	self = ReflexGame.entity
+	if (self:HandleDPadEvents(widget, e)) then
+		self.state.heading.x = 0
+		self.state.heading.y = 1
+	end
+	return true
+end
+
+function ReflexGame.DPadLeft(widget, e)
+	self = ReflexGame.entity
+	if (self:HandleDPadEvents(widget, e)) then
+		self.state.heading.x = -1
+		self.state.heading.y = 0
+	end
+	return true
+end
+
+function ReflexGame.DPadRight(widget, e)
+	self = ReflexGame.entity
+	if (self:HandleDPadEvents(widget, e)) then
+		self.state.heading.x = 1
+		self.state.heading.y = 0
+	end
 	return true
 end
 
 function ReflexGame.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1] }
-    self.BLACKHOLE_SIZE = {100*UI.identityScale[1], 100*UI.identityScale[1]}
+    self.BLACKHOLE_SIZE = {self.REFLEX_CELL_SIZE[1]*3, self.REFLEX_CELL_SIZE[2]*3}
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 9
     self.LINE_SPAWN_TIME = 1
 	self.PLAYER_SPEED = 100
-	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + 0 * self.REFLEX_CELL_SIZE[1]
-	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + 0 * self.REFLEX_CELL_SIZE[2]
+	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1]
+	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2]
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
 	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]	
 
@@ -267,7 +195,6 @@ function ReflexGame.InitUI(self)
     self.state.lineIndex = 1
     self.state.fadeInBoardTimer = 2
     self.state.swipeToMoveTimer = 1
-    self.state.touchWhenReadyTimer = 3
 
 	-- define structure self.widgets
 	self.widgets = {}
@@ -278,8 +205,8 @@ function ReflexGame.InitUI(self)
     self.widgets.blackholes = { }
 	self.widgets.grid = {}
 	self.widgets.cells = {}
-
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
+	
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
 	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
 	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
 	
@@ -287,8 +214,6 @@ function ReflexGame.InitUI(self)
 
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.border})
 	self.widgets.board = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.board})
---	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
---	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
 	self.widgets.root:AddChild(self.widgets.border)
 	self.widgets.root:AddChild(self.widgets.board)
 
@@ -339,17 +264,60 @@ function ReflexGame.InitUI(self)
             table.insert(self.widgets.goals,b)
 		end
     end
-
-    self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={80, 35, UI.screenWidth*.15,UI.screenHeight*.15}, typeface=self.typefaces.TimerText})
+    
+    if (UI.mode == kGameUIMode_Mobile) then
+		self.widgets.dpad = {}
+		
+		local dpadButtonSize = 64*UI.identityScale[1]
+		local dpadSize = dpadButtonSize*3
+		local dpadPad = 16*UI.identityScale[1]
+		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])
+		local dpadTop = UI.screenHeight-dpadSize-(72*UI.identityScale[1])
+		
+		self.widgets.dpad.left = UI:CreateWidget(
+			"MatWidget", 
+			{rect={dpadLeft-dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
+			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadLeft}
+		)
+		
+		self.widgets.dpad.left:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 180}, {0,0,0})
+		self.widgets.root:AddChild(self.widgets.dpad.left)
+		
+		self.widgets.dpad.right = UI:CreateWidget(
+			"MatWidget", 
+			{rect={dpadLeft+dpadSize-dpadButtonSize+dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
+			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadRight}
+		)
+				
+		self.widgets.root:AddChild(self.widgets.dpad.right)
+		
+		self.widgets.dpad.up = UI:CreateWidget(
+			"MatWidget", 
+			{rect={dpadLeft+dpadButtonSize, dpadTop-dpadPad, dpadButtonSize, dpadButtonSize}, 
+			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadUp}
+		)
+		
+		self.widgets.dpad.up:RotateTo({dpadButtonSize/2, dpadButtonSize/2, -90}, {0,0,0})
+		self.widgets.root:AddChild(self.widgets.dpad.up)
+		
+		self.widgets.dpad.down = UI:CreateWidget(
+			"MatWidget", 
+			{rect={dpadLeft+dpadButtonSize, dpadTop+dpadSize-dpadButtonSize+dpadPad, dpadButtonSize, dpadButtonSize}, 
+			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadDown}
+		)
+		
+		self.widgets.dpad.down:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 90}, {0,0,0})
+		self.widgets.root:AddChild(self.widgets.dpad.down)
+		
+	end
+	
+    self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={80*UI.identityScale[1], 35*UI.identityScale[2], 8, 8}, typeface=self.typefaces.TimerText})
     self.widgets.root:AddChild(self.widgets.timeLeftLabel)
 
-    self.widgets.touchWhenReadyLabel = UI:CreateWidget("TextLabel", {rect={ 320, UI.screenHeight/2 - 65, UI.screenWidth, UI.screenHeight/2 + 20}, typeface=self.typefaces.TouchWhenReadyText})
-    self.widgets.touchWhenReadyLabel:SetText("Touch when ready")
-    self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,0}, 0)
-    self.widgets.root:AddChild(self.widgets.touchWhenReadyLabel)
-
-    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 60, 500, 500, 100}, typeface=self.typefaces.SwipeToMoveText})
-    self.widgets.swipeToMoveLabel:SetText("Swipe to move - Collect the Glyphs")
+    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 0, 0, 8, 8}, typeface=self.typefaces.SwipeToMoveText})
+	UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("TAP_DPAD_TO_MOVE"))
+    UI:SizeLabelToContents(self.widgets.swipeToMoveLabel)
+    UI:CenterLabel(self.widgets.swipeToMoveLabel, UI.fullscreenRect)
     self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
     self.widgets.root:AddChild(self.widgets.swipeToMoveLabel)
 
@@ -372,7 +340,7 @@ function ReflexGame.LoadMaterials(self)
 	self.gfx.border = World.Load("UI/arm_screen1_M")
 
     self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
-    self.gfx.mark_line_v = World.Load("Puzzles/reflex-goal1_M")
+    self.gfx.mark_line_v = World.Load("Puzzles/trail_M")
     self.gfx.mark_line_h = self.gfx.mark_line_v
     self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
@@ -405,13 +373,17 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
     self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
     self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
+    
+    self.gfx.RightArrow = World.Load("UI/right_arrow_M")
+    self.gfx.RightArrowPressed = World.Load("UI/right_arrow_pressed_M")
 
     self.gfx.mark_start = nil
 	self.typefaces = {}
-	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
     self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesBigFont_TF")
     self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    
+    self.sfx = {}
+    self.sfx.dpad = World.Load("Audio/dpad")
 
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
@@ -432,7 +404,7 @@ function ReflexGame.LoadMaterials(self)
 	
 	self.screen = {
 		1280 * 0.05156 * xScale,
-		(720 * 0.07644 * yScale) + (wideInset-inset)*yScale,
+		(720 * 0.07430 * yScale) + (wideInset-inset)*yScale,
 		0,
 		0
 	}
@@ -590,7 +562,6 @@ function ReflexGame.CreateState(self,architype,ref)
 end
 
 function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
-	--COutLine(kC_Debug,"SetLineSegment start/end @ start=%i,%i, end=%i,%i",startPos.x,startPos.y,endPos.x,endPos.y)		
 
 	local x = startPos.x
 	local y = startPos.y
@@ -616,6 +587,19 @@ function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	local height = yy - y
 	if (height == 0) then
 		height = 5
+		y = y-(height/2)
+		if (startPos.x < endPos.x) then
+			width = width + height/2
+		else
+			x = x-height/2
+		end
+	else
+		x = x-(width/2)
+		if (startPos.y < endPos.y) then
+			height = height + width/2
+		else
+			y = y-width/2
+		end
 	end
 	
 	local r = { }
@@ -624,7 +608,6 @@ function ReflexGame.SetLineSegmentPosition(self,line,startPos,endPos)
 	r[3] = width
 	r[4] = height
 	
-	--COutLine(kC_Debug,"SetLineSegment @ x=%i, y=%i, width=%i, height=%i",x,y,width,height)		
 	line:SetRect(r)
 end
 
@@ -691,19 +674,19 @@ end
 
 function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
 	if (x < self.COORD_MIN_X) then
-		COutLine(kC_Debug,"CollideWihtBoard found min X @ x=%i, y=%i",x,y)		
+		COutLine(kC_Debug,"CollideWithBoard found min X @ x=%i, y=%i",x,y)		
 		return true
 	end
 	if (x >= self.COORD_MAX_X) then
-		COutLine(kC_Debug,"CollideWihtBoard found max X @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollideWithBoard found max X @ x=%i, y=%i",x,y)			
 		return true
 	end
 	if (y < self.COORD_MIN_Y) then
-		COutLine(kC_Debug,"CollideWihtBoard found min Y @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollideWithBoard found min Y @ x=%i, y=%i",x,y)			
 		return true
 	end		
 	if (y >= self.COORD_MAX_Y) then
-		COutLine(kC_Debug,"CollideWihtBoard found max Y @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollideWithBoard found max Y @ x=%i, y=%i",x,y)			
 		return true
 	end	
 	
@@ -748,18 +731,6 @@ function ReflexGame.Think(self,dt)
 			return
 		end
 		
-		if (self.widgets.bigTextLabel == nil) then 
-			self.widgets.bigTextLabel = UI:CreateWidget("TextLabel", {rect={0, 0, UI.screenWidth,UI.screenHeight}, typeface=self.typefaces.BigText})
-			self.widgets.root:AddChild(self.widgets.bigTextLabel)		
-		end
-		--self.widgets.bigTextLabel:SetText(string.fromat("%i",self.state.gameOverTimer))
-		if (self.state.victory) then
-			self.widgets.bigTextLabel:SetText("You Win!")
-		else
-			self.widgets.bigTextLabel:SetText("You Lose!")
-		end
-		UI:CenterLabel(self.widgets.bigTextLabel, UI.fullscreenRect)
-				
 		-- game over never advances past here
 		return
     end
@@ -784,34 +755,26 @@ function ReflexGame.Think(self,dt)
         return
     end
 
-    if (self.state.touchWhenReadyTimer > 0) then
-        self.state.touchWhenReadyTimer = self.state.touchWhenReadyTimer - dt
-        if (self.state.touchWhenReadyTimer <= 0) then
-            self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,1}, 2)
-        end
-    end
-
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		
 		return
     end
 
     if (not self.state.labelFadeOut) then
-        self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,0}, .5)
-        self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, .5)
+		self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, .5)
         self.state.labelFadeOut = true
     end
 
+	local firstMove = false
 	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
 		self.state.lastHeading.x = self.state.heading.x
 		self.state.lastHeading.y = self.state.heading.y
+		firstMove = true
 	end
 	
 	if (self.widgets.current.heading == nil) then
 		self.widgets.current.heading = self.state.heading
     end
-
-
 
 	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
     self:CollideWithSymbol(currentPos.x,currentPos.y)
@@ -828,7 +791,7 @@ function ReflexGame.Think(self,dt)
 	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
     UI:MoveWidgetByCenter(self.widgets.player,currentPos.x,currentPos.y)
     local nextCell = self:GetGridCellFromVec2(currentPos)
-    if (nextCell.x ~= self.widgets.current.state.lastCell.x or nextCell.y ~= self.widgets.current.state.lastCell.y) then
+    if ((nextCell.x ~= self.widgets.current.state.lastCell.x) or (nextCell.y ~= self.widgets.current.state.lastCell.y)) then
         self.widgets.current.state.lastCell = nextCell
         local index = self:ConvertCoordToIndex(nextCell.x,nextCell.y)
         if (self.state.pathByCell[index] == nil) then
@@ -837,47 +800,45 @@ function ReflexGame.Think(self,dt)
         end
     end
 
-	-- detect change of direction
-    local rpos = self:GetPositionByGrid(nextCell.x,nextCell.y)
-    local dx2 = math.abs(currentPos.x - rpos.x)
-    local dy2 = math.abs(currentPos.y - rpos.y)
+	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
+		local angle = 0
+		if (self.state.heading.x < 0) then
+			angle = 180
+		elseif (self.state.heading.y < 0) then
+			angle = 270
+		elseif (self.state.heading.y > 0) then
+			angle = 90
+		end
+		self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
+		-- so the first arg there is a Vec3, or just a [3] array
+		-- cx, cy are the coordinates to rotate around
 
-    local threshold = (dx2 < 1 and dy2 < 1)
-    if (threshold) then
-        if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
-            currentPos = self:GetPositionByGrid(nextCell.x,nextCell.y)
-            self:SetPositionByGrid(self.widgets.player,currentPos.x,currentPos.y)
-            self.widgets.current.state.endPos = currentPos
-            -- self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
-            local angle = 0
-            if (self.state.heading.x < 0) then
-                angle = 180
-            elseif (self.state.heading.y < 0) then
-                angle = 270
-            elseif (self.state.heading.y > 0) then
-                angle = 90
-            end
-            self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
-            -- so the first arg there is a Vec3, or just a [3] array
-            -- cx, cy are the coordinates to rotate around
+		local oldR = self.widgets.current:Rect()
+		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])
+		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
+		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
+		line.state = self:CreateState("mark_line_v")
+		table.insert(self.widgets.lines,line)
+		self.widgets.current = line
+		self.widgets.root:AddChild(line)
 
-            local oldR = self.widgets.current:Rect()
-            COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])
-            COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
-            local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
-            line.state = self:CreateState("mark_line_v")
-            table.insert(self.widgets.lines,line)
-            self.widgets.current = line
-            self.widgets.root:AddChild(line)
+		line.state.lastCell = nextCell
+		line.state.startPos = currentPos
+		line.state.endPos = line.state.startPos
+		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
 
-            line.state.lastCell = nextCell
-            line.state.startPos = currentPos
-            line.state.endPos = line.state.startPos
-            self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
-
-            self.state.lastHeading.x = self.state.heading.x
-            self.state.lastHeading.y = self.state.heading.y
-        end
+		self.state.lastHeading.x = self.state.heading.x
+		self.state.lastHeading.y = self.state.heading.y
+	elseif (firstMove) then
+		local angle = 0
+		if (self.state.heading.x < 0) then
+			angle = 180
+		elseif (self.state.heading.y < 0) then
+			angle = 270
+		elseif (self.state.heading.y > 0) then
+			angle = 90
+		end
+		self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/2, self.REFLEX_CELL_SIZE[2]/2, angle}, {0, 0, .05}, true)
     end
 
     self.state.lineTimerEnabledTimer = self.state.lineTimerEnabledTimer - dt
@@ -921,11 +882,6 @@ function ReflexGame.Think(self,dt)
             return
         end
     end
---	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
---		COutLine(kC_Debug,"Game Over - collided with own line")
---		self.state.gameOver = true
---		return
---	end
 	
 	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
@@ -955,7 +911,6 @@ function ReflexGame.Think(self,dt)
         end
 
         local pos = k:Rect()
---        COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
         local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.blackholeSpeed,false)
         if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
             k.state.heading.x = -k.state.heading.x
@@ -966,26 +921,14 @@ function ReflexGame.Think(self,dt)
         UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
     end
 
-    --COutLine(kC_Debug,"Spider move")
 	for i,k in pairs(self.widgets.spiders) do	
 		local pos = k:Rect()
---		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
 		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed,false)
         UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
         if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
 			table.remove(self.widgets.spiders,i)
 			self.widgets.root:RemoveChild(k)
 			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)
--- this isn't how it works now
---		else
---			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
---			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)
---			-- TODO: detect spider crossing a line segment
---			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
---				COutLine(kC_Debug,"Game Over - spider crossed player line")
---				self.state.gameOver = true
---				return
---			end
 		end	
 	end	
 end

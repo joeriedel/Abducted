@@ -154,37 +154,99 @@ function ReflexGame.DPadRight(widget, e)
 	return true
 end
 
-function ReflexGame.DeInitUI(self)
-	if (self.widgets) then
-		if (self.widgets.grid) then
-			for k,v in pairs(self.widgets.grid) do
-				v:Unmap()
-			end
-		end
-		if (self.widgets.lines) then
-			for k,v in pairs(self.widgets.lines) do
-				v:Unmap()
-			end
-		end
-		if (self.widgets.blackholes) then
-			for k,v in pairs(self.widgets.blackholes) do
-				v:Unmap()
-			end
-		end
-		if (self.widgets.spiders) then
-			for k,v in pairs(self.widgets.spiders) do
-				v:Unmap()
-			end
-		end
+function ReflexGame.LoadMaterials(self)
+	
+	self.gfx = {}
+	self.gfx.blackhole = World.Load("Puzzles/reflex-blackhole1_M");
+	self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
+    self.gfx.blue_glow = World.Load("Puzzles/reflex-blueglow1_M")
+    self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
+	self.gfx.border = World.Load("UI/arm_screen1_M")
+
+    self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
+    self.gfx.mark_line_v = World.Load("Puzzles/trail_M")
+    self.gfx.mark_line_h = self.gfx.mark_line_v
+    self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
+
+    self.gfx.blocker_green = World.Load("Puzzles/reflex-block1_M")
+
+    self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
+    self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
+    self.gfx.cell_03 = World.Load("Puzzles/glyph03_M")
+    self.gfx.cell_04 = World.Load("Puzzles/glyph04_M")
+    self.gfx.cell_05 = World.Load("Puzzles/glyph05_M")
+    self.gfx.cell_06 = World.Load("Puzzles/glyph06_M")
+    self.gfx.cell_07 = World.Load("Puzzles/glyph07_M")
+    self.gfx.cell_08 = World.Load("Puzzles/glyph08_M")
+    self.gfx.cell_09 = World.Load("Puzzles/glyph09_M")
+    self.gfx.cell_10 = World.Load("Puzzles/glyph10_M")
+    self.gfx.cell_11 = World.Load("Puzzles/glyph11_M")
+    self.gfx.cell_12 = World.Load("Puzzles/glyph12_M")
+    self.gfx.cell_13 = World.Load("Puzzles/glyph13_M")
+    self.gfx.cell_14 = World.Load("Puzzles/glyph14_M")
+    self.gfx.cell_15 = World.Load("Puzzles/glyph15_M")
+    self.gfx.cell_16 = World.Load("Puzzles/glyph16_M")
+    self.gfx.cell_17 = World.Load("Puzzles/glyph17_M")
+    self.gfx.cell_18 = World.Load("Puzzles/glyph18_M")
+    self.gfx.cell_19 = World.Load("Puzzles/glyph19_M")
+    self.gfx.cell_20 = World.Load("Puzzles/glyph20_M")
+    self.gfx.cell_21 = World.Load("Puzzles/glyph21_M")
+    self.gfx.cell_22 = World.Load("Puzzles/glyph22_M")
+    self.gfx.cell_23 = World.Load("Puzzles/glyph23_M")
+    self.gfx.cell_24 = World.Load("Puzzles/glyph24_M")
+    self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
+    self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
+    self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
+    
+    self.gfx.RightArrow = World.Load("UI/right_arrow_M")
+    self.gfx.RightArrowPressed = World.Load("UI/right_arrow_pressed_M")
+	self.gfx.PlayerParticles = World.Load("Puzzles/playerparticles_M")
+	self.gfx.GoalParticles = World.Load("Puzzles/goalparticles_M")
+	self.gfx.GoalOpen = World.Load("Puzzles/reflex-goal_open_M")
+	
+    self.gfx.mark_start = nil
+	self.typefaces = {}
+    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    
+    self.sfx = {}
+    self.sfx.dpad = World.Load("Audio/dpad")
+
+	local xScale = UI.screenWidth / 1280
+	local yScale = UI.screenHeight / 720
+	
+	-- the border is authored to be a 16:9 image packed in a square image, adjust for this
+	
+	local region = (1 - UI.yAspect) / 2
+	local inset  = region * UI.screenWidth
+	
+	self.magicBoardRect = {0, -inset, UI.screenWidth, UI.screenHeight+inset*2}
+	
+	local wideRegion = (1 - (9/16)) / 2
+	local wideInset = wideRegion * 1280 * xScale
+	
+	if (UI.systemScreen.aspect == "4x3") then
+		wideInset = wideInset * 0.91 -- wtf?
 	end
+	
+	self.screen = {
+		1280 * 0.05156 * xScale,
+		(720 * 0.07430 * yScale) + (wideInset-inset)*yScale,
+		0,
+		0
+	}
+	
+	self.screen[3] = UI.screenWidth - (self.screen[1]*2)
+	self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 end
+
 
 function ReflexGame.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1] }
     self.BLACKHOLE_SIZE = {self.REFLEX_CELL_SIZE[1]*1.5, self.REFLEX_CELL_SIZE[2]*1.5}
     self.BLACKHOLE_WIDGET_SIZE = {self.REFLEX_CELL_SIZE[1]*3, self.REFLEX_CELL_SIZE[2]*3}
-    self.SPIDER_SIZE = {self.REFLEX_CELL_SIZE[1]*1.1, self.REFLEX_CELL_SIZE[2]*1.1}
+    self.SPIDER_SIZE = {self.REFLEX_CELL_SIZE[1]*0.9, self.REFLEX_CELL_SIZE[2]*0.9}
     self.SPIDER_WIDGET_SIZE = {self.REFLEX_CELL_SIZE[1]*2, self.REFLEX_CELL_SIZE[2]*2}
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
@@ -193,8 +255,8 @@ function ReflexGame.InitUI(self)
 	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1]
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2]
-	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
-	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]	
+	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1] + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
+	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2] + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]	
 
 	self:LoadLevels()	
 		
@@ -225,6 +287,62 @@ function ReflexGame.InitUI(self)
 	self:CreateBoard()
 end
 
+function ReflexGame.DeInitUI(self)
+	if (self.widgets) then
+		if (self.widgets.goals) then
+			for k,v in pairs(self.widgets.goals) do
+				self.widgets.root2:RemoveChild(v.particles)
+				v.particles:Unmap()
+				v.particles = nil
+			end
+			self.widgets.goals = nil
+		end
+		
+		if (self.widgets.grid) then
+			for k,v in pairs(self.widgets.grid) do
+				self.widgets.root:RemoveChild(v)
+				v:Unmap()
+			end
+			self.widgets.grid = nil
+		end
+		if (self.widgets.lines) then
+			for k,v in pairs(self.widgets.lines) do
+				self.widgets.root:RemoveChild(v)
+				v:Unmap()
+			end
+		end
+		if (self.widgets.blackholes) then
+			for k,v in pairs(self.widgets.blackholes) do
+				self.widgets.root2:RemoveChild(v)
+				v:Unmap()
+			end
+			self.widgets.blackholes = nil
+		end
+		if (self.widgets.spiders) then
+			for k,v in pairs(self.widgets.spiders) do
+				self.widgets.root2:RemoveChild(v)
+				v:Unmap()
+			end
+			self.widgets.spiders = nil
+		end
+		if (self.widgets.player) then
+			self.widgets.root2:RemoveChild(self.widgets.player)
+			self.widgets.player:Unmap()
+			self.widgets.player = nil
+		end
+		
+		if (self.widgets.playerParticles) then
+			self.widgets.root2:RemoveChild(self.widgets.playerParticles)
+			self.widgets.playerParticles:Unmap()
+			self.widgets.playerParticles = nil
+		end
+		
+		self.widgets.portal = nil
+		
+		collectgarbage()
+	end
+end
+
 function ReflexGame.CreateBoard(self)
 	self:DeInitUI()
 	
@@ -250,7 +368,7 @@ function ReflexGame.CreateBoard(self)
 	self.state.antivirusSpawnTimer = FloatRand(level.antivirusSpiderSpawnRate[1], level.antivirusSpiderSpawnRate[2])
     self.state.lineTimerEnabledTimer = level.blockChaseTime
     self.state.lineTimer = 0
-	self.state.goalCounter = 1
+	self.state.goalCounter = 0
     self.state.lineIndex = 1
     self.state.fadeInBoardTimer = 2
     self.state.swipeToMoveTimer = 1
@@ -262,6 +380,7 @@ function ReflexGame.CreateBoard(self)
     self.widgets.blackholes = { }
 	self.widgets.grid = {}
 	self.widgets.cells = {}
+	self.widgets.portal = nil
 	
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 
@@ -307,6 +426,9 @@ function ReflexGame.CreateBoard(self)
 			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
 			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)
         end
+        if (v.img == "mark_end") then
+			self.widgets.portal = b
+        end
         if (string.find(b.state.architype,"cell_") ~= nil) then
             table.insert(self.widgets.goals,b)
 		end
@@ -315,6 +437,16 @@ function ReflexGame.CreateBoard(self)
     if (self.widgets.player) then
 		self.widgets.root2:AddChild(self.widgets.player) -- on top of blackholes
     end
+    
+    self.widgets.playerParticles = UI:CreateWidget("MatWidget", {rect={0,0,310*UI.identityScale[1],310*UI.identityScale[1]}, material=self.gfx.PlayerParticles})
+	self.widgets.root2:AddChild(self.widgets.playerParticles)
+	self.widgets.playerParticles:SetVisible(false)
+	
+	for k,v in pairs(self.widgets.goals) do
+		local w = UI:CreateWidget("MatWidget", {rect={0,0,310*UI.identityScale[1],310*UI.identityScale[1]}, material=self.gfx.GoalParticles})
+		w:SetVisible(false)
+		v.particles = w
+	end
     
     if (UI.mode == kGameUIMode_Mobile) then
 		self.widgets.dpad = {}
@@ -379,89 +511,6 @@ function ReflexGame.CreateBoard(self)
 	end
 	
 	COutLine(kC_Debug, "Board Completed")		
-end
-
-function ReflexGame.LoadMaterials(self)
-	
-	self.gfx = {}
-	self.gfx.blackhole = World.Load("Puzzles/reflex-blackhole1_M");
-	self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
-    self.gfx.blue_glow = World.Load("Puzzles/reflex-blueglow1_M")
-    self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
-	self.gfx.border = World.Load("UI/arm_screen1_M")
-
-    self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
-    self.gfx.mark_line_v = World.Load("Puzzles/trail_M")
-    self.gfx.mark_line_h = self.gfx.mark_line_v
-    self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
-
-    self.gfx.blocker_green = World.Load("Puzzles/reflex-block1_M")
-
-    self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
-    self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
-    self.gfx.cell_03 = World.Load("Puzzles/glyph03_M")
-    self.gfx.cell_04 = World.Load("Puzzles/glyph04_M")
-    self.gfx.cell_05 = World.Load("Puzzles/glyph05_M")
-    self.gfx.cell_06 = World.Load("Puzzles/glyph06_M")
-    self.gfx.cell_07 = World.Load("Puzzles/glyph07_M")
-    self.gfx.cell_08 = World.Load("Puzzles/glyph08_M")
-    self.gfx.cell_09 = World.Load("Puzzles/glyph09_M")
-    self.gfx.cell_10 = World.Load("Puzzles/glyph10_M")
-    self.gfx.cell_11 = World.Load("Puzzles/glyph11_M")
-    self.gfx.cell_12 = World.Load("Puzzles/glyph12_M")
-    self.gfx.cell_13 = World.Load("Puzzles/glyph13_M")
-    self.gfx.cell_14 = World.Load("Puzzles/glyph14_M")
-    self.gfx.cell_15 = World.Load("Puzzles/glyph15_M")
-    self.gfx.cell_16 = World.Load("Puzzles/glyph16_M")
-    self.gfx.cell_17 = World.Load("Puzzles/glyph17_M")
-    self.gfx.cell_18 = World.Load("Puzzles/glyph18_M")
-    self.gfx.cell_19 = World.Load("Puzzles/glyph19_M")
-    self.gfx.cell_20 = World.Load("Puzzles/glyph20_M")
-    self.gfx.cell_21 = World.Load("Puzzles/glyph21_M")
-    self.gfx.cell_22 = World.Load("Puzzles/glyph22_M")
-    self.gfx.cell_23 = World.Load("Puzzles/glyph23_M")
-    self.gfx.cell_24 = World.Load("Puzzles/glyph24_M")
-    self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
-    self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
-    self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
-    
-    self.gfx.RightArrow = World.Load("UI/right_arrow_M")
-    self.gfx.RightArrowPressed = World.Load("UI/right_arrow_pressed_M")
-
-    self.gfx.mark_start = nil
-	self.typefaces = {}
-    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    
-    self.sfx = {}
-    self.sfx.dpad = World.Load("Audio/dpad")
-
-	local xScale = UI.screenWidth / 1280
-	local yScale = UI.screenHeight / 720
-	
-	-- the border is authored to be a 16:9 image packed in a square image, adjust for this
-	
-	local region = (1 - UI.yAspect) / 2
-	local inset  = region * UI.screenWidth
-	
-	self.magicBoardRect = {0, -inset, UI.screenWidth, UI.screenHeight+inset*2}
-	
-	local wideRegion = (1 - (9/16)) / 2
-	local wideInset = wideRegion * 1280 * xScale
-	
-	if (UI.systemScreen.aspect == "4x3") then
-		wideInset = wideInset * 0.91 -- wtf?
-	end
-	
-	self.screen = {
-		1280 * 0.05156 * xScale,
-		(720 * 0.07430 * yScale) + (wideInset-inset)*yScale,
-		0,
-		0
-	}
-	
-	self.screen[3] = UI.screenWidth - (self.screen[1]*2)
-	self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 end
 
 function ReflexGame.GetPositionByGrid(self,x,y)
@@ -670,10 +719,13 @@ function ReflexGame.CollideWithSymbol(self,x,y)
     if (piece ~= nil) then
         if (string.find(piece.state.architype,"cell_") ~= nil) then
             -- -djr do effect
-            table.remove(self.widgets.goals,i)
+            self:ExplodeGoal(piece)
             self.widgets.grid[index] = nil
             self.widgets.root:RemoveChild(piece)
             self.state.goalCounter = self.state.goalCounter + 1
+            if (self.state.goalCounter == #self.widgets.goals) then
+				self.widgets.portal:SetMaterial(self.gfx.GoalOpen)
+            end
             return true
         end
     end
@@ -852,6 +904,7 @@ function ReflexGame.Think(self,dt)
 	if (self:CollidePlayerWithBoard(currentPos.x,currentPos.y)) then
 		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)			
 		self.state.gameOver = true
+		self:ExplodePlayer()
 		return
     end
 
@@ -942,6 +995,8 @@ function ReflexGame.Think(self,dt)
 			COutLine(kC_Debug,"Game Over Detected")
 			self.state.gameOver = true
             self.state.victory = true
+            local pos = self:GetPosition(pieceAtPlayer)
+            self:SuckupPlayer(pos.x, pos.y)
 			return
 		end
 
@@ -1055,6 +1110,7 @@ function ReflexGame.SpiderThink(self, index, spider, dt)
 		if (self:CheckTouchPlayer(nextPos.x, nextPos.y, self.SPIDER_SIZE[1],self.SPIDER_SIZE[2])) then
 			COutLine(kC_Debug, "Player eaten by spider.")
 			self.state.gameOver = true
+			self:ExplodePlayer()
 		end
 	end
 end
@@ -1066,6 +1122,40 @@ function ReflexGame.SpiderPickHeading(self, spider)
 	if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
 		spider.state.heading.x = 1
 	end
+end
+
+function ReflexGame.ExplodePlayer(self)
+
+	self.widgets.player:SetVisible(false)
+	UI:MoveWidgetByCenter(self.widgets.playerParticles,self.widgets.current.state.endPos.x,self.widgets.current.state.endPos.y)
+	self.widgets.root2:AddChild(self.widgets.playerParticles)
+	self.widgets.playerParticles:SetVisible(true)
+	self.widgets.playerParticles:ScaleTo({0,0}, {0,0})
+	self.widgets.playerParticles:ScaleTo({1,1}, {1,0.7})
+	
+	local f = function()
+		self.widgets.playerParticles:BlendTo({1,1,1,0}, 0.3)
+	end
+	
+	World.globalTimers:Add(f, 0.4)
+end
+
+function ReflexGame.ExplodeGoal(self, widget)
+	local r = widget:Rect()
+	r[1] = r[1] + (r[3]/2)
+	r[2] = r[2] + (r[4]/2)
+	UI:MoveWidgetByCenter(widget.particles, r[1], r[2])
+	widget.particles:SetVisible(true)
+	self.widgets.root2:AddChild(widget.particles)
+	
+	widget.particles:ScaleTo({0,0}, {0,0})
+	widget.particles:ScaleTo({1,1}, {1,0.7})
+	
+	local f = function()
+		widget.particles:BlendTo({1,1,1,0}, 0.3)
+	end
+	
+	World.globalTimers:Add(f, 0.4)
 end
 
 function ReflexGame.CheckTouchPlayer(self,x,y,w,h)

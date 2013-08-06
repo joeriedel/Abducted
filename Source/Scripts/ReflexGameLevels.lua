@@ -51,6 +51,8 @@ function ReflexGame.CreateLevel1x1(self)
 		-- row 12
 		-- row 13
 		-- row 14
+		-- row 15
+		-- row 16
 		}
 	
 	return level

@@ -305,6 +305,13 @@ function ReflexGame.DeInitUI(self)
 			end
 			self.widgets.grid = nil
 		end
+		if (self.widgets.trash) then
+			for k,v in pairs(self.widgets.trash) do
+				self.widgets.root:RemoveChild(v)
+				v:Unmap()
+			end
+			self.widgets.trash = nil
+		end
 		if (self.widgets.lines) then
 			for k,v in pairs(self.widgets.lines) do
 				self.widgets.root:RemoveChild(v)
@@ -381,6 +388,7 @@ function ReflexGame.CreateBoard(self)
 	self.widgets.grid = {}
 	self.widgets.cells = {}
 	self.widgets.portal = nil
+	self.widgets.trash = {}
 	
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 
@@ -824,7 +832,28 @@ function ReflexGame.CollidePlayerWithBoard(self,x,y)
 end
 
 function ReflexGame.SuckupPieces(self,x,y,w,h)
-
+	local min,max = self:RectCellBounds(x,y,w,h)
+	
+	local kdd = w*w
+	
+	for gx=min.x,max.x do
+		for gy=min.y,max.y do
+			local vec = self:GetPositionByGrid(gx,gy)
+			local index = self:ConvertCoordToIndex(gx, gy)
+			local piece = self.widgets.grid[index]
+			if (piece and (piece.state.architype == "blocker_green")) then
+				local pos = self:GetPosition(piece)
+				local dx = pos.x-vec.x
+				local dy = pos.y-vec.y
+				local dd = dx*dx+dy*dy
+				if (dd < kdd) then
+					self:SuckupWidget(piece,x,y)
+					self.widgets.grid[index] = nil
+					table.insert(self.widgets.trash, piece)
+				end
+			end
+		end
+	end
 end
 
 function ReflexGame.SuckupPlayer(self,x,y)
@@ -835,6 +864,15 @@ function ReflexGame.SuckupPlayer(self,x,y)
 	self.widgets.player:ScaleTo({0,0}, {0.7,0.7})
 	self.widgets.player:BlendTo({1,1,1,0}, 0.7)
 	--self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/8, self.REFLEX_CELL_SIZE[2]/4, 360*5}, {0,0,4})
+end
+
+function ReflexGame.SuckupWidget(self,w,x,y)
+	local tr = w:Rect()
+	tr[1] = tr[1] + x - (tr[1]+(tr[3]/2))
+	tr[2] = tr[2] + y - (tr[2]+(tr[4]/2))
+	w:MoveTo(tr, {0.7,0.7})
+	w:ScaleTo({0,0}, {0.7,0.7})
+	w:BlendTo({1,1,1,0}, 0.7)
 end
 
 function ReflexGame.UpdateHud(self)
@@ -1015,16 +1053,26 @@ function ReflexGame.Think(self,dt)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
 	if (self.state.antivirusSpawnTimer < 0) then
 		self.state.antivirusSpawnTimer = FloatRand(self.state.level.antivirusSpiderSpawnRate[1], self.state.level.antivirusSpiderSpawnRate[2])		
-		local x = math.random(self.INDEX_MAX_X)-1
-		local y = math.random(self.INDEX_MAX_Y)-1		
-		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
-		self.widgets.root2:AddChild(spider)	
-		table.insert(self.widgets.spiders,spider)
-		self:SetPositionByGrid(spider,x,y)		
-		spider.state = self:CreateState("antivirus_spider")
-		spider.state.lifetime = FloatRand(self.state.level.antivirusSpiderLifetime[1], self.state.level.antivirusSpiderLifetime[2])
-		self:SpiderPickHeading(spider)
-		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
+		for i=1,5 do
+			local x = math.random(self.INDEX_MAX_X)-1
+			local y = math.random(self.INDEX_MAX_Y)-1
+			local dx = self.widgets.current.state.endPos.x - x
+			local dy = self.widgets.current.state.endPos.y - y
+			local dd = dx*dx+dy*dy
+			local minDist = self.REFLEX_CELL_SIZE[1]*3
+			minDist = minDist * minDist
+			if (dd >= minDist) then
+				local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
+				self.widgets.root2:AddChild(spider)	
+				table.insert(self.widgets.spiders,spider)
+				self:SetPositionByGrid(spider,x,y)		
+				spider.state = self:CreateState("antivirus_spider")
+				spider.state.lifetime = FloatRand(self.state.level.antivirusSpiderLifetime[1], self.state.level.antivirusSpiderLifetime[2])
+				self:SpiderPickHeading(spider)
+				COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
+				break
+			end
+		end
     end
 
     for i,k in pairs(self.widgets.blackholes) do

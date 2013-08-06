@@ -11,12 +11,14 @@ UI.kLayer_HUD = 2 -- not used at same time as main menu
 UI.kLayer_Interactive = 3
 UI.kLayer_Arm = 4
 UI.kLayer_TerminalPuzzles = 5
-UI.kLayer_LB = 6
-UI.kLayer_AlertPanel = 7
-UI.kLayer_Notifications = 8
-UI.kLayer_Feedback = 9
-UI.kLayer_FX = 10
-UI.kLayer_Debug = 11
+UI.kLayer_TerminalPuzzles2 = 6
+UI.kLayer_TerminalPuzzles3 = 7
+UI.kLayer_LB = 8
+UI.kLayer_AlertPanel = 9
+UI.kLayer_Notifications = 10
+UI.kLayer_Feedback = 11
+UI.kLayer_FX = 12
+UI.kLayer_Debug = 13
 
 function UI.Spawn(self)
 	UI.entity = self

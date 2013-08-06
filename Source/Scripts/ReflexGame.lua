@@ -32,6 +32,8 @@ function ReflexGame.ShowBoard(self, show)
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 	self.widgets.root:SetVisible(show)
+	self.widgets.root2:SetVisible(show)
+	self.widgets.root3:SetVisible(show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
@@ -75,7 +77,7 @@ function ReflexGame.ResetGame(self)
 	ReflexGame.active = false
 end
 
-function ReflexGame.CreateBoards(self)
+function ReflexGame.LoadLevels(self)
 	self.db = { }
 	self.db.levels = { }    
 	
@@ -152,13 +154,41 @@ function ReflexGame.DPadRight(widget, e)
 	return true
 end
 
+function ReflexGame.DeInitUI(self)
+	if (self.widgets) then
+		if (self.widgets.grid) then
+			for k,v in pairs(self.widgets.grid) do
+				v:Unmap()
+			end
+		end
+		if (self.widgets.lines) then
+			for k,v in pairs(self.widgets.lines) do
+				v:Unmap()
+			end
+		end
+		if (self.widgets.blackholes) then
+			for k,v in pairs(self.widgets.blackholes) do
+				v:Unmap()
+			end
+		end
+		if (self.widgets.spiders) then
+			for k,v in pairs(self.widgets.spiders) do
+				v:Unmap()
+			end
+		end
+	end
+end
+
 function ReflexGame.InitUI(self)
 	-- constants
 	self.REFLEX_CELL_SIZE = {67*UI.identityScale[1], 67*UI.identityScale[1] }
-    self.BLACKHOLE_SIZE = {self.REFLEX_CELL_SIZE[1]*3, self.REFLEX_CELL_SIZE[2]*3}
+    self.BLACKHOLE_SIZE = {self.REFLEX_CELL_SIZE[1]*1.5, self.REFLEX_CELL_SIZE[2]*1.5}
+    self.BLACKHOLE_WIDGET_SIZE = {self.REFLEX_CELL_SIZE[1]*3, self.REFLEX_CELL_SIZE[2]*3}
+    self.SPIDER_SIZE = {self.REFLEX_CELL_SIZE[1]*1.1, self.REFLEX_CELL_SIZE[2]*1.1}
+    self.SPIDER_WIDGET_SIZE = {self.REFLEX_CELL_SIZE[1]*2, self.REFLEX_CELL_SIZE[2]*2}
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
-	self.INDEX_MAX_Y = 9
+	self.INDEX_MAX_Y = 8
     self.LINE_SPAWN_TIME = 1
 	self.PLAYER_SPEED = 100
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1]
@@ -166,7 +196,37 @@ function ReflexGame.InitUI(self)
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
 	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]	
 
-	self:CreateBoards()	
+	self:LoadLevels()	
+		
+	-- define structure self.widgets
+	self.widgets = {}
+	
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
+	
+	self.widgets.root:SetVisible(false)
+	
+	self.widgets.root2 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles2, self.widgets.root2)
+	
+	self.widgets.root2:SetVisible(false)
+	
+	self.widgets.root3 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
+	World.SetRootWidget(UI.kLayer_TerminalPuzzles3, self.widgets.root3)
+	
+	self.widgets.root3:SetVisible(false)
+
+	self.widgets.border = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.border})
+	self.widgets.board = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.board})
+	self.widgets.root:AddChild(self.widgets.border)
+	self.widgets.root:AddChild(self.widgets.board)
+	
+	self:CreateBoard()
+end
+
+function ReflexGame.CreateBoard(self)
+	self:DeInitUI()
 	
 	-- define structure: self.state
 	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
@@ -187,17 +247,14 @@ function ReflexGame.InitUI(self)
 	self.state.victory = false
 	self.state.level = level
     self.state.timeLeft = level.time
-	self.state.spawnTimer = level.antivirusSpiderSpawnRate	
-	self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
-    self.state.lineTimerEnabledTimer = level.lineTimerEnabledEnabledTimer
+	self.state.antivirusSpawnTimer = FloatRand(level.antivirusSpiderSpawnRate[1], level.antivirusSpiderSpawnRate[2])
+    self.state.lineTimerEnabledTimer = level.blockChaseTime
     self.state.lineTimer = 0
 	self.state.goalCounter = 1
     self.state.lineIndex = 1
     self.state.fadeInBoardTimer = 2
     self.state.swipeToMoveTimer = 1
-
-	-- define structure self.widgets
-	self.widgets = {}
+	
 	self.widgets.goals = { }
 	self.widgets.board = { }		
 	self.widgets.lines = { }
@@ -206,17 +263,6 @@ function ReflexGame.InitUI(self)
 	self.widgets.grid = {}
 	self.widgets.cells = {}
 	
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
-	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
-	
-	self.widgets.root:SetVisible(false)
-
-	self.widgets.border = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.board})
-	self.widgets.root:AddChild(self.widgets.border)
-	self.widgets.root:AddChild(self.widgets.board)
-
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 
 	COutLine(kC_Debug, "Creating Board")	
@@ -225,27 +271,28 @@ function ReflexGame.InitUI(self)
 
         local objectTable = self.widgets.cells
         local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
-
+		local layer = self.widgets.root
+		
         if (self.gfx[v.img] == self.gfx.blackhole) then
             objectTable = self.widgets.blackholes
-            objectSize = { self.BLACKHOLE_SIZE[1], self.BLACKHOLE_SIZE[2] }
+            objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
+			layer = self.widgets.root2
         end
 
 		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=self.gfx[v.img]})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
 		b.state = self:CreateState(v.img,v)
         b:BlendTo({1,1,1,0}, 0)
-		self.widgets.root:AddChild(b)
+		layer:AddChild(b)
         if (objectTable == self.widgets.cells) then
 		    self.widgets.grid[index] = b
         end
         table.insert(objectTable,b)
-		self:SetPositionByGrid(b,v.x,v.y)
+		self:SetPositionByGrid(b,v.x,v.y,objectTable==self.widgets.blackholes)
 		if (v.img == "mark_start") then
             local player = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})
             player.state = self:CreateState("player",v)
             self.widgets.player = player
-            self.widgets.root:AddChild(player)
             self:SetPositionByGrid(player,v.x,v.y)
 
 			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
@@ -265,6 +312,10 @@ function ReflexGame.InitUI(self)
 		end
     end
     
+    if (self.widgets.player) then
+		self.widgets.root2:AddChild(self.widgets.player) -- on top of blackholes
+    end
+    
     if (UI.mode == kGameUIMode_Mobile) then
 		self.widgets.dpad = {}
 		
@@ -281,7 +332,7 @@ function ReflexGame.InitUI(self)
 		)
 		
 		self.widgets.dpad.left:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 180}, {0,0,0})
-		self.widgets.root:AddChild(self.widgets.dpad.left)
+		self.widgets.root3:AddChild(self.widgets.dpad.left)
 		
 		self.widgets.dpad.right = UI:CreateWidget(
 			"MatWidget", 
@@ -289,7 +340,7 @@ function ReflexGame.InitUI(self)
 			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadRight}
 		)
 				
-		self.widgets.root:AddChild(self.widgets.dpad.right)
+		self.widgets.root3:AddChild(self.widgets.dpad.right)
 		
 		self.widgets.dpad.up = UI:CreateWidget(
 			"MatWidget", 
@@ -298,7 +349,7 @@ function ReflexGame.InitUI(self)
 		)
 		
 		self.widgets.dpad.up:RotateTo({dpadButtonSize/2, dpadButtonSize/2, -90}, {0,0,0})
-		self.widgets.root:AddChild(self.widgets.dpad.up)
+		self.widgets.root3:AddChild(self.widgets.dpad.up)
 		
 		self.widgets.dpad.down = UI:CreateWidget(
 			"MatWidget", 
@@ -307,19 +358,19 @@ function ReflexGame.InitUI(self)
 		)
 		
 		self.widgets.dpad.down:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 90}, {0,0,0})
-		self.widgets.root:AddChild(self.widgets.dpad.down)
+		self.widgets.root3:AddChild(self.widgets.dpad.down)
 		
 	end
 	
     self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={80*UI.identityScale[1], 35*UI.identityScale[2], 8, 8}, typeface=self.typefaces.TimerText})
-    self.widgets.root:AddChild(self.widgets.timeLeftLabel)
+    self.widgets.root3:AddChild(self.widgets.timeLeftLabel)
 
     self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 0, 0, 8, 8}, typeface=self.typefaces.SwipeToMoveText})
 	UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("TAP_DPAD_TO_MOVE"))
     UI:SizeLabelToContents(self.widgets.swipeToMoveLabel)
     UI:CenterLabel(self.widgets.swipeToMoveLabel, UI.fullscreenRect)
     self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
-    self.widgets.root:AddChild(self.widgets.swipeToMoveLabel)
+    self.widgets.root3:AddChild(self.widgets.swipeToMoveLabel)
 
     self:UpdateHud()
 
@@ -415,14 +466,18 @@ end
 
 function ReflexGame.GetPositionByGrid(self,x,y)
     local v = { }
-    v.x = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + x * self.REFLEX_CELL_SIZE[1]
-    v.y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + y * self.REFLEX_CELL_SIZE[2]
+    v.x = self.REFLEX_BOARD_OFFSET[1] + ((self.REFLEX_CELL_SIZE[1]-1)/2) + x * self.REFLEX_CELL_SIZE[1]
+    v.y = self.REFLEX_BOARD_OFFSET[2] + ((self.REFLEX_CELL_SIZE[2]-1)/2) + y * self.REFLEX_CELL_SIZE[2]
     return v
 end
 
 
-function ReflexGame.SetPositionByGrid(self,w,x,y)
+function ReflexGame.SetPositionByGrid(self,w,x,y,shift)
     local v = self:GetPositionByGrid(x,y)
+    if (shift) then
+		v.x = v.x + ((self.REFLEX_CELL_SIZE[1]-1)/2)
+		v.y = v.y + ((self.REFLEX_CELL_SIZE[1]-1)/2)
+	end
 	UI:MoveWidgetByCenter(w,v.x,v.y)
 	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
@@ -486,8 +541,8 @@ function ReflexGame.LerpWidget(self,widget,heading,dt,speed,constrain)
 end
 
 function ReflexGame.GetGridCellFromVec2(self,v)
-	local x = (v.x - self.REFLEX_BOARD_OFFSET[1])/self.REFLEX_CELL_SIZE[1]
-	local y = (v.y - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[2]
+	local x = (v.x-self.REFLEX_BOARD_OFFSET[1])/self.REFLEX_CELL_SIZE[1]
+	local y = (v.y-self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[2]
 	local ix = math.floor(x)
 	local iy = math.floor(y)
 
@@ -500,17 +555,7 @@ end
 
 function ReflexGame.GetGridCell(self,widget)
 	local pos = self:GetPosition(widget)
-
-	local x = (pos.x - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[1]
-	local y = (pos.y - self.REFLEX_BOARD_OFFSET[2])/self.REFLEX_CELL_SIZE[2]
-	local ix = math.floor(x)
-	local iy = math.floor(y)
-
-	local vec2 = { }
-	vec2.x = ix
-	vec2.y = iy
-	
-	return vec2
+	return self:GetGridCellFromVec2(pos)
 end
 
 function ReflexGame.IsGridCellOnBoard(self,x,y)
@@ -525,18 +570,21 @@ function ReflexGame.ConvertCoordToIndex(self,x,y)
 	return bit.bor(bit.lshift(y, 16), x)
 end
 
-function ReflexGame.ConstrainPointToBoard(self,x,y)
-	if (x < self.COORD_MIN_X) then
-		x = self.COORD_MIN_X
+function ReflexGame.ConstrainPointToBoard(self,x,y,w,h)
+	w = w/2
+	h = h/2
+	
+	if ((x-w) < self.COORD_MIN_X) then
+		x = self.COORD_MIN_X+w
 	end
-	if (x >= self.COORD_MAX_X) then
-		x = self.COORD_MAX_X - 1
+	if ((x+w) >= self.COORD_MAX_X) then
+		x = self.COORD_MAX_X-w-1
 	end
-	if (y < self.COORD_MIN_Y) then
-		y = self.COORD_MIN_Y
+	if ((y-h) < self.COORD_MIN_Y) then
+		y = self.COORD_MIN_Y+h
 	end		
-	if (y >= self.COORD_MAX_Y) then
-		y = self.COORD_MAX_Y - 1
+	if ((y+h) >= self.COORD_MAX_Y) then
+		y = self.COORD_MAX_Y-h-1
 	end	
 
 	local vec2 = { }
@@ -622,7 +670,7 @@ function ReflexGame.CollideWithSymbol(self,x,y)
     if (piece ~= nil) then
         if (string.find(piece.state.architype,"cell_") ~= nil) then
             -- -djr do effect
-            table.remove(self.widgets.spiders,i)
+            table.remove(self.widgets.goals,i)
             self.widgets.grid[index] = nil
             self.widgets.root:RemoveChild(piece)
             self.state.goalCounter = self.state.goalCounter + 1
@@ -631,29 +679,6 @@ function ReflexGame.CollideWithSymbol(self,x,y)
     end
 
     return false
-end
-
-function ReflexGame.CollideWithHazard(self,x,y)
-    local v2 = {}
-    v2.x = x
-    v2.y = y
-    local cell = self:GetGridCellFromVec2(v2)
-
-    for i,k in pairs(self.widgets.blackholes) do
-        local v = self:GetGridCell(k)
-        if (v.x == cell.x and v.y == cell.y) then
-            return true
-        end
-    end
-
-    for i,k in pairs(self.widgets.spiders) do
-        local v = self:GetGridCell(k)
-        if (v.x == cell.x and v.y == cell.y) then
-            return true
-        end
-    end
-	
-	return false
 end
 
 function ReflexGame.CollideWithLine(self,x,y,ignore)
@@ -672,47 +697,92 @@ function ReflexGame.CollideWithLine(self,x,y,ignore)
     return false
 end
 
-function ReflexGame.CollideWithBoard(self,x,y,isPlayer)
+function ReflexGame.RectCellBounds(self,x,y,w,h)
+
+	w = w/2
+	h = h/2
+	
+	local min = self:GetGridCellFromVec2({x=x-w,y=y-h})
+	local max = self:GetGridCellFromVec2({x=x+w,y=y+h})
+	
+	return min,max
+
+end
+
+function ReflexGame.ClipToBoard(self,x,y,w,h)
+
+	w = w/2
+	h = h/2
+
+	if ((x-w) < self.COORD_MIN_X) then
+		return self:ConstrainPointToBoard(x,y,w,h), 1
+	end
+	if ((x+w) >= self.COORD_MAX_X) then
+		return self:ConstrainPointToBoard(x,y,w,h), 2
+	end
+	if ((y-h) < self.COORD_MIN_Y) then
+		return self:ConstrainPointToBoard(x,y,w,h), 3
+	end		
+	if ((y+h) >= self.COORD_MAX_Y) then
+		return self:ConstrainPointToBoard(x,y,w,h), 4
+	end	
+	
+	return nil
+end
+
+function ReflexGame.CollidePlayerWithBoard(self,x,y)
+
 	if (x < self.COORD_MIN_X) then
-		COutLine(kC_Debug,"CollideWithBoard found min X @ x=%i, y=%i",x,y)		
+		COutLine(kC_Debug,"CollidePlayerWithBoard found min X @ x=%i, y=%i",x,y)		
 		return true
 	end
 	if (x >= self.COORD_MAX_X) then
-		COutLine(kC_Debug,"CollideWithBoard found max X @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollidePlayerWithBoard found max X @ x=%i, y=%i",x,y)			
 		return true
 	end
 	if (y < self.COORD_MIN_Y) then
-		COutLine(kC_Debug,"CollideWithBoard found min Y @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollidePlayerWithBoard found min Y @ x=%i, y=%i",x,y)			
 		return true
 	end		
 	if (y >= self.COORD_MAX_Y) then
-		COutLine(kC_Debug,"CollideWithBoard found max Y @ x=%i, y=%i",x,y)			
+		COutLine(kC_Debug,"CollidePlayerWithBoard found max Y @ x=%i, y=%i",x,y)			
 		return true
 	end	
 	
-	local screenCoord = { }
-	screenCoord.x = x
-	screenCoord.y = y
+	local screenCoord = { x = x, y = y }
 	local v = self:GetGridCellFromVec2(screenCoord)
+			
 	local index = self:ConvertCoordToIndex(v.x,v.y)
-	
+			
 	local piece = self.widgets.grid[index]		
-	if (piece == nil) then
-		return false
-	end
-	
-	if (isPlayer) then
+	if (piece ~= nil) then
 		if (piece.state.architype == "mark_end" or piece.state.architype == "mark_start") then
 			return false
 		end
 
-        if (string.find(piece.state.architype,"cell_") ~= nil) then
+		if (string.find(piece.state.architype,"cell_") ~= nil) then
 			return false
 		end
+				
+		COutLine(kC_Debug,"CollidePlayerWithBoard found Piece @ x=%i, y=%i, type=%s",x,y,piece.state.architype)			
+		return true
 	end
 	
-	COutLine(kC_Debug,"CollideWihtBoard found Piece @ x=%i, y=%i, type=%s",x,y,piece.state.architype)			
-	return true
+	return false
+end
+
+function ReflexGame.SuckupPieces(self,x,y,w,h)
+
+end
+
+function ReflexGame.SuckupPlayer(self,x,y)
+	local tr = self.widgets.player:Rect()
+	tr[1] = tr[1] + x - (tr[1]+(tr[3]/2))
+	tr[2] = tr[2] + y - (tr[2]+(tr[4]/2))
+	self.widgets.player:MoveTo(tr, {0.7,0.7})
+	self.widgets.player:ScaleTo({0,0}, {0.7,0.7})
+	self.widgets.player:BlendTo({1,1,1,0}, 0.7)
+	--self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/8, self.REFLEX_CELL_SIZE[2]/4, 360*5}, {0,0,4})
 end
 
 function ReflexGame.UpdateHud(self)
@@ -779,19 +849,19 @@ function ReflexGame.Think(self,dt)
 	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
     self:CollideWithSymbol(currentPos.x,currentPos.y)
 
-	if (self:CollideWithBoard(currentPos.x,currentPos.y,true) or self:CollideWithHazard(currentPos.x,currentPos.y)) then
+	if (self:CollidePlayerWithBoard(currentPos.x,currentPos.y)) then
 		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)			
 		self.state.gameOver = true
 		return
     end
 
 	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)
-	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
+	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y,0,0)
 	self.widgets.current.state.endPos = currentPos
 	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
     UI:MoveWidgetByCenter(self.widgets.player,currentPos.x,currentPos.y)
     local nextCell = self:GetGridCellFromVec2(currentPos)
-    if ((nextCell.x ~= self.widgets.current.state.lastCell.x) or (nextCell.y ~= self.widgets.current.state.lastCell.y)) then
+    if ((nextCell.x ~= self.widgets.current.state.lastCell.x) or (nextCell.y ~= self.widgets.current.state.lastCell.y) or firstMove) then
         self.widgets.current.state.lastCell = nextCell
         local index = self:ConvertCoordToIndex(nextCell.x,nextCell.y)
         if (self.state.pathByCell[index] == nil) then
@@ -882,55 +952,140 @@ function ReflexGame.Think(self,dt)
             return
         end
     end
+    
+    for i,k in pairs(self.widgets.spiders) do
+		self:SpiderThink(i, k, dt)
+	end	
 	
-	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
 	if (self.state.antivirusSpawnTimer < 0) then
-		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate		
+		self.state.antivirusSpawnTimer = FloatRand(self.state.level.antivirusSpiderSpawnRate[1], self.state.level.antivirusSpiderSpawnRate[2])		
 		local x = math.random(self.INDEX_MAX_X)-1
 		local y = math.random(self.INDEX_MAX_Y)-1		
-		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.antivirus_spider})
-		self.widgets.root:AddChild(spider)	
+		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
+		self.widgets.root2:AddChild(spider)	
 		table.insert(self.widgets.spiders,spider)
 		self:SetPositionByGrid(spider,x,y)		
 		spider.state = self:CreateState("antivirus_spider")
-		spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
-		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
-			spider.state.heading.x = 1
-		end
+		spider.state.lifetime = FloatRand(self.state.level.antivirusSpiderLifetime[1], self.state.level.antivirusSpiderLifetime[2])
+		self:SpiderPickHeading(spider)
 		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
     end
 
-    --COutLine(kC_Debug,"Blackhole move")
     for i,k in pairs(self.widgets.blackholes) do
         if (k.state.heading == null) then
             k.state.heading = {}
             k.state.heading.x = k.state.ref.heading[1]
             k.state.heading.y = k.state.ref.heading[2]
+            k.state.headingTime = FloatRand(1.7, 10)
+            k.state.speed = FloatRand(self.state.level.blackholeSpeed[1], self.state.level.blackholeSpeed[2])
             COutLine(kC_Debug,"blackhole heading @ : x=%i, y=%i",k.state.heading.x,k.state.heading.y)
+		else
+			k.state.headingTime = k.state.headingTime - dt
         end
 
         local pos = k:Rect()
-        local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.blackholeSpeed,false)
-        if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
+        local nextPos = self:LerpWidget(k,k.state.heading,dt,k.state.speed,false)
+        if ((k.state.headingTime < 0) or (self:ClipToBoard(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2]))) then
             k.state.heading.x = -k.state.heading.x
             k.state.heading.y = -k.state.heading.y
-            nextPos = self:LerpWidget(k,k.state.heading,2*dt,self.state.level.blackholeSpeed,false)
+            k.state.headingTime = FloatRand(1.7, 10)
+            nextPos = self:LerpWidget(k,k.state.heading,2*dt,k.state.speed,false)
             COutLine(kC_Debug,"blackhole bounce @ : x=%i, y=%i",nextPos.x,nextPos.y)
         end
         UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
+        self:SuckupPieces(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2])
+        if (not self.state.gameOver) then
+			if (self:CheckTouchPlayer(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2])) then
+				self:SuckupPlayer(nextPos.x, nextPos.y)
+				self.state.gameOver = true
+				COutLine(kC_Debug, "Player eaten by blackhole.")
+			end
+		end
     end
+end
 
-	for i,k in pairs(self.widgets.spiders) do	
-		local pos = k:Rect()
-		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed,false)
-        UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
-        if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
-			table.remove(self.widgets.spiders,i)
-			self.widgets.root:RemoveChild(k)
-			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)
-		end	
+function ReflexGame.SpiderThink(self, index, spider, dt)
+	if (spider.state.lifetime < dt) then
+		table.remove(self.widgets.spiders,index)
+		self.widgets.root2:RemoveChild(spider)
+		return
+	else
+		spider.state.lifetime = spider.state.lifetime - dt
+	end
+	
+	local pos = self:GetPosition(spider)
+	local gridRange = self.REFLEX_CELL_SIZE[1] * self.state.level.antivirusSpiderSeekPlayerRange
+	local seekPlayer = self:CheckTouchPlayer(pos.x, pos.y, gridRange, gridRange)
+	
+	if (seekPlayer) then
+	
+		--COutLine(kC_Debug, "Spider seeking player")
+		-- seek the player
+		spider.state.headingTime = 0
+		spider.state.heading = self:GetHeadingTowardsPlayer(pos.x,pos.y)
+	
+	else
+	
+		if (spider.state.headingTime < dt) then
+			self:SpiderPickHeading(spider)
+		else
+			spider.state.headingTime = spider.state.headingTime - dt
+		end
+	
+	end
+	
+	local pos = spider:Rect()
+	local nextPos = self:LerpWidget(spider,spider.state.heading,dt,spider.state.speed,false)
+	local clip, edge = self:ClipToBoard(nextPos.x,nextPos.y,self.SPIDER_SIZE[1],self.SPIDER_SIZE[2])
+	
+	if (clip) then
+		nextPos = clip
+		
+		if (edge == 1 or edge == 2) then
+			spider.state.heading.x = -spider.state.heading.x
+		elseif (edge == 3 or edge == 4) then
+			spider.state.heading.y = -spider.state.heading.y
+		end
 	end	
+	
+	UI:MoveWidgetByCenter(spider,nextPos.x,nextPos.y)
+	
+	if (not self.state.gameOver) then
+		if (self:CheckTouchPlayer(nextPos.x, nextPos.y, self.SPIDER_SIZE[1],self.SPIDER_SIZE[2])) then
+			COutLine(kC_Debug, "Player eaten by spider.")
+			self.state.gameOver = true
+		end
+	end
+end
+
+function ReflexGame.SpiderPickHeading(self, spider)
+	spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
+	spider.state.speed = FloatRand(self.state.level.antivirusSpiderSpeed[1], self.state.level.antivirusSpiderSpeed[2])
+	spider.state.headingTime = FloatRand(self.state.level.antivirusSpiderHeadingTime[1], self.state.level.antivirusSpiderHeadingTime[2])
+	if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
+		spider.state.heading.x = 1
+	end
+end
+
+function ReflexGame.CheckTouchPlayer(self,x,y,w,h)
+	local touchRect = {x-(w/2), y-(h/2),x+(w/2), y+(h/2)}
+			   
+	local playerRect = {self.widgets.current.state.endPos.x-(self.REFLEX_CELL_SIZE[1]/2), 
+						self.widgets.current.state.endPos.y-(self.REFLEX_CELL_SIZE[2]/2),
+						self.widgets.current.state.endPos.x+(self.REFLEX_CELL_SIZE[1]/2), 
+						self.widgets.current.state.endPos.y+(self.REFLEX_CELL_SIZE[2]/2)}
+						
+	local disjointX = (touchRect[3] <= playerRect[1]) or (playerRect[3] <= touchRect[1])
+	local disjointY = (touchRect[4] <= playerRect[2]) or (playerRect[4] <= touchRect[2])
+	
+	return not (disjointX or disjointY)
+end
+
+function ReflexGame.GetHeadingTowardsPlayer(self,x,y)
+	local dx = self.widgets.current.state.endPos.x - x
+	local dy = self.widgets.current.state.endPos.y - y
+	return self:Vec2Normal(dx,dy)
 end
 
 reflex_game = ReflexGame

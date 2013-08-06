@@ -9,10 +9,13 @@ function ReflexGame.CreateLevel1x1(self)
 	
 	level.name = "1x1"
 	
-	level.antivirusSpiderSpawnRate = 5
-	level.antivirusSpiderSpeed = 40
-    level.blackholeSpeed = 40
-    level.lineTimerEnabledEnabledTimer = 5
+	level.antivirusSpiderSpawnRate = {5, 8}
+	level.antivirusSpiderSpeed = {40, 50}
+	level.antivirusSpiderLifetime = {7, 10}
+	level.antivirusSpiderHeadingTime = {3, 4}
+	level.antivirusSpiderSeekPlayerRange = 4 -- grid squares
+    level.blackholeSpeed = {40, 50}
+    level.blockChaseTime = 5 -- delay before blocks start eating player line
     level.time = 120
 	
 	level.board = {

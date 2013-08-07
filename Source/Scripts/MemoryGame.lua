@@ -270,7 +270,7 @@ function MemoryGame.LoadMaterials(self)
 --	self.gfx.symbol_d = World.Load("Memory-Game/memory-symbol-d_M")
 	
 	self.typefaces = {}
-	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
+--	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
 end
 
 function MemoryGame.SetPositionByGrid(self,w,x,y)

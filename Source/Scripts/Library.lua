@@ -53,7 +53,7 @@ function ExpandRect(r, w, h)
 	return { r[1]-w/2, r[2]-h/2, r[3]+w, r[4]+h }
 end
 
-function CenterRectInRect(outer, inner)
+function CenterRectInRect(inner, outer)
 	local r = {
 		outer[1] + ((outer[3]-inner[3])/2),
 		outer[2] + ((outer[4]-inner[4])/2),
@@ -63,7 +63,7 @@ function CenterRectInRect(outer, inner)
 	return r
 end
 
-function CenterChildRectInRect(outer, inner)
+function CenterChildRectInRect(inner, outer)
 	local r = {
 		((outer[3]-inner[3])/2),
 		((outer[4]-inner[4])/2),

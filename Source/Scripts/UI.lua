@@ -10,15 +10,20 @@ UI.kLayer_MainMenu = 2
 UI.kLayer_HUD = 2 -- not used at same time as main menu
 UI.kLayer_Interactive = 3
 UI.kLayer_Arm = 4
-UI.kLayer_TerminalPuzzles = 5
-UI.kLayer_TerminalPuzzles2 = 6
-UI.kLayer_TerminalPuzzles3 = 7
-UI.kLayer_LB = 8
-UI.kLayer_AlertPanel = 9
-UI.kLayer_Notifications = 10
-UI.kLayer_Feedback = 11
-UI.kLayer_FX = 12
-UI.kLayer_Debug = 13
+UI.kLayer_HackGame = 5
+UI.kLayer_HackGame2 = 6
+UI.kLayer_HackGame3 = 7
+UI.kLayer_HackGame4 = 8
+UI.kLayer_SolveGame = 9
+UI.kLayer_SolveGame2 = 10
+UI.kLayer_SolveGame3 = 11
+UI.kLayer_SolveGame4 = 12
+UI.kLayer_LB = 13
+UI.kLayer_AlertPanel = 14
+UI.kLayer_Notifications = 15
+UI.kLayer_Feedback = 16
+UI.kLayer_FX = 17
+UI.kLayer_Debug = 18
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -153,6 +158,7 @@ function UI.LoadShared(self)
 	self.gfx.Solid = World.Load("UI/Solid_M")
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
+	self.gfx.SolidButton = World.Load("UI/arm_buttons_solid_M")
 	
 	if (UI.mode == kGameUIMode_PC) then
 		self.gfx.VScrollBar = {
@@ -339,7 +345,11 @@ function UI.CreateStylePushButton(self, rect, OnPressed, options, parent)
 	
 	if ((options.background == nil) or (options.background)) then
 		options.background = true
-		enabled = self.gfx.Button
+		if (options.solidBackground) then
+			enabled = self.gfx.SolidButton
+		else
+			enabled = self.gfx.Button
+		end
 	end
 	
 	local typeface
@@ -663,8 +673,28 @@ function UI.RAlignLabel(self, label, x, y)
 
 end
 
+function UI.VAlignLabelTop(self, label, x, y)
 
-function UI.VAlignLabel(self, label, x, y)
+	local d = label:Dimensions()
+	
+	if ((x == nil) or (y == nil)) then
+		local r = label:Rect()
+		if (x == nil) then
+			x = r[1]
+		end
+		
+		if (y == nil) then
+			y = r[2]
+		end
+	end
+	
+	local r = {x-d[1], y-d[2], d[3], d[4]}
+	label:SetRect(r)
+	return r, d
+
+end
+
+function UI.VAlignLabelBottom(self, label, x, y)
 
 	local d = label:Dimensions()
 	
@@ -685,7 +715,28 @@ function UI.VAlignLabel(self, label, x, y)
 
 end
 
-function UI.RVAlignLabel(self, label, x, y)
+function UI.RVAlignLabelTop(self, label, x, y)
+
+	local d = label:Dimensions()
+	
+	if ((x == nil) or (y == nil)) then
+		local r = label:Rect()
+		if (x == nil) then
+			x = r[1]
+		end
+		
+		if (y == nil) then
+			y = r[2]
+		end
+	end
+	
+	local r = {x-d[3], y-d[2], d[3], d[4]}
+	label:SetRect(r)
+	return r, d
+
+end
+
+function UI.RVAlignLabelBottom(self, label, x, y)
 
 	local d = label:Dimensions()
 	

@@ -205,7 +205,7 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 		w:SetRect(buttonRect)
 		w:SetBlendWithParent(true)
 		w.highlight:SetRect({0, 0, buttonRect[3], buttonRect[4]})
-		rect = CenterChildRectInRect(buttonRect, rect)
+		rect = CenterChildRectInRect(rect, buttonRect)
 		w.label:SetRect(rect)
 		
 		-- put an underline under the title

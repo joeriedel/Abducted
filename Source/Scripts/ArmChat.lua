@@ -290,7 +290,7 @@ function Arm.CreateRewardActionButton(self, text, inset, maxWidth, f)
 	w:SetRect(buttonRect)
 	w:SetBlendWithParent(true)
 	w.highlight:SetRect({0, 0, buttonRect[3], buttonRect[4]})
-	r = CenterChildRectInRect(buttonRect, r)
+	r = CenterChildRectInRect(r, buttonRect)
 	w.label:SetRect(r)
 	
 	w.x = buttonRect[1]
@@ -743,7 +743,7 @@ function Arm.DisplayChoices(self)
 		w:SetRect(buttonRect)
 		w:SetBlendWithParent(true)
 		w.highlight:SetRect({0, 0, buttonRect[3], buttonRect[4]})
-		r = CenterChildRectInRect(buttonRect, r)
+		r = CenterChildRectInRect(r, buttonRect)
 		w.label:SetRect(r)
 		
 		xPos = xPos + buttonRect[3] + horzSpace

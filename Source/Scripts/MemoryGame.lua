@@ -24,7 +24,7 @@ function MemoryGame.PostSpawn(self)
 	if (Game.entity.type == "Map") then
 
 		self:LoadMaterials()
-		self:InitUI()
+--		self:InitUI()
 	
 	end
 	

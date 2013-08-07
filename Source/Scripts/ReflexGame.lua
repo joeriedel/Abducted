@@ -10,7 +10,6 @@ function ReflexGame.DebugStart(self)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
 	local f = function()
-		Abducted.entity.eatInput = false
 		ReflexGame:InitGame("reflex-game: debug_start", 1, 1)
 		UI:BlendTo({0,0,0,0}, 0.3)
 		ReflexGame:ShowBoard(true)
@@ -29,6 +28,7 @@ function ReflexGame.PostSpawn(self)
 	if (Game.entity.type == "Map") then
 		self:LoadMaterials()
 		self:InitUI()
+		PuzzleScoreScreen:Init(self.screen)
 		-- Note: InitUI sets widgets.root to be invisible (hides the whole board)
 	end
 	
@@ -41,13 +41,14 @@ function ReflexGame.ShowBoard(self, show)
 	self.widgets.root:SetVisible(show)
 	self.widgets.root2:SetVisible(show)
 	self.widgets.root3:SetVisible(show)
+	self.widgets.root4:SetVisible(show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
 function ReflexGame.InitGame(self, playerSkill, terminalSkill)
 	self = ReflexGame.entity
 	self.think = nil
-	self.eatInput = true
+	self.gameReady = false
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 	self:CreateBoard()
@@ -66,8 +67,7 @@ end
 
 function ReflexGame.EndGame(self, result)
 	self.think = nil
-	self.eatInput = false
-	
+		
 	World.FlushInput(true)
 	
 	if (self.gameCompleteCallback) then
@@ -101,11 +101,8 @@ end
 
 function ReflexGame.OnInputEvent(self,e)
 	self = ReflexGame.entity
-	if (self.eatInput) then
-		return true
-	end
 	
-	if (e.type == kI_KeyDown) then
+	if ((self.gameReady) and (e.type == kI_KeyDown)) then
 		if (e.data[1] == kKeyCode_Up) then
 			self.state.heading.x = 0
 			self.state.heading.y = -1
@@ -156,7 +153,7 @@ end
 
 function ReflexGame.DPadDown(widget, e)
 	self = ReflexGame.entity
-	if (self:HandleDPadEvents(widget, e)) then
+	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 0
 		self.state.heading.y = 1
 	end
@@ -165,7 +162,7 @@ end
 
 function ReflexGame.DPadLeft(widget, e)
 	self = ReflexGame.entity
-	if (self:HandleDPadEvents(widget, e)) then
+	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = -1
 		self.state.heading.y = 0
 	end
@@ -174,7 +171,7 @@ end
 
 function ReflexGame.DPadRight(widget, e)
 	self = ReflexGame.entity
-	if (self:HandleDPadEvents(widget, e)) then
+	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 1
 		self.state.heading.y = 0
 	end
@@ -294,20 +291,28 @@ function ReflexGame.InitUI(self)
 	self.widgets = {}
 	
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+	World.SetRootWidget(UI.kLayer_HackGame, self.widgets.root)
 	self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
 	
 	self.widgets.root:SetVisible(false)
 	
-	self.widgets.root2 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles2, self.widgets.root2)
+	self.widgets.root2 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+	World.SetRootWidget(UI.kLayer_HackGame2, self.widgets.root2)
 	
 	self.widgets.root2:SetVisible(false)
 	
-	self.widgets.root3 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=ReflexGame.OnInputEvent})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles3, self.widgets.root3)
+	self.widgets.root3 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+	World.SetRootWidget(UI.kLayer_HackGame3, self.widgets.root3)
 	
 	self.widgets.root3:SetVisible(false)
+	
+	self.widgets.root4 = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+	World.SetRootWidget(UI.kLayer_HackGame4, self.widgets.root4)
+	
+	self.widgets.root4:SetVisible(false)
+	
+	self.widgets.black = UI:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=UI.gfx.Solid})
+	self.widgets.root4:AddChild(self.widgets.black)
 	
 	if (UI.mode == kGameUIMode_Mobile) then
 		self.widgets.dpad = {}
@@ -432,6 +437,12 @@ function ReflexGame.DeInitUI(self)
 			self.widgets.swipeBar = nil
 		end
 		
+		if (self.widgets.timeLeftLabel) then
+			self.widgets.root4:RemoveChild(self.widgets.timeLeftLabel)
+			self.widgets.timeLeftLabel:Unmap()
+			self.widgets.timeLeftLabel = nil
+		end
+		
 		self.widgets.portal = nil
 		
 		if (self.widgets.swipeToMoveLabel) then
@@ -465,7 +476,6 @@ function ReflexGame.CreateBoard(self)
 	self.state.lastHeading.y = 0
 	self.state.gameOver = false
 	self.state.currentMove = 1
-	self.state.gameOverTimer = 2	
 	self.state.victory = false
 	self.state.level = level
     self.state.timeLeft = level.time
@@ -557,7 +567,7 @@ function ReflexGame.CreateBoard(self)
 	end
 	
     self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={self.screen[1], self.screen[2], 8,8}, typeface=self.typefaces.TimerText})
-    self.widgets.root3:AddChild(self.widgets.timeLeftLabel)
+    self.widgets.root4:AddChild(self.widgets.timeLeftLabel)
 
     self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 0, 0, 8, 8}, typeface=self.typefaces.SwipeToMoveText})
     
@@ -941,11 +951,12 @@ function ReflexGame.SuckupWidget(self,w,x,y)
 end
 
 function ReflexGame.UpdateHud(self)
-    local minutes = math.floor(self.state.timeLeft / 60)
-    local seconds = self.state.timeLeft - (minutes * 60)
+    local minutes = math.floor(math.ceil(self.state.timeLeft) / 60)
+    local seconds = math.ceil(self.state.timeLeft) - (minutes * 60)
     local text = string.format("%01i:%02i",minutes,seconds)
-    UI:SetLabelText(self.widgets.timeLeftLabel, text)
+    UI:SetLabelText(self.widgets.timeLeftLabel, text, {1,1})
     UI:SizeLabelToContents(self.widgets.timeLeftLabel)
+    UI:VAlignLabelTop(self.widgets.timeLeftLabel, self.screen[1], self.screen[2])
 end
 
 function ReflexGame.UpdateTimer(self, dt)
@@ -977,7 +988,8 @@ function ReflexGame.PrepBoardIntro(self)
 end
 
 function ReflexGame.ReadyGameStart(self)
-	self.eatInput = false
+	Abducted.entity.eatInput = false
+	self.gameReady = true
 	self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .2)
 	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .2)
 	if (self.widgets.dpad) then
@@ -1042,7 +1054,8 @@ function ReflexGame.AnimateIntro(self)
 	self:PrepBoardIntro()
 	
 	self.widgets.board:BlendTo({1,1,1,0}, 0)
-	
+	self.widgets.black:BlendTo({0,0,0,0}, 0)
+		
 	if (self.widgets.dpad) then
 		for k,v in pairs(self.widgets.dpad) do
 			v:BlendTo({1,1,1,0}, 0)
@@ -1082,16 +1095,67 @@ function ReflexGame.AnimateRestart(self)
 
 end
 
-function ReflexGame.Think(self,dt)
-	if (self.state.gameOver) then
-		self.state.gameOverTimer = self.state.gameOverTimer - dt
-		if (self.state.gameOverTimer < 0) then
-			self.state.gameOverTimer = 0
-			self:EndGame("win")
-			return
+function ReflexGame.DoRetry(self)
+	self.widgets.black:BlendTo({0,0,0,1}, 0.3)
+	local f = function()
+		PuzzleScoreScreen:Unlink()
+	
+		if (self.widgets.dpad) then
+			for k,v in pairs(self.widgets.dpad) do
+				v:BlendTo({1,1,1,0}, 0)
+			end
+		end
+	
+		local timeLeft = self.state.timeLeft
+		self:CreateBoard()
+		self.state.timeLeft = timeLeft
+		
+		local f = function()
+			
+			self:PrepBoardIntro()
+			self.widgets.black:BlendTo({0,0,0,0}, 0.3)
+			
+			local f = function()
+			
+				for k,v in pairs(self.widgets.grid) do
+					if (v.state.archetype == "blocker_green") then
+						v:BlendTo({1,1,1,1}, 0.3)
+					end
+				end
+				
+				local f = function()
+					self:RevealBoard()
+				end
+				
+				World.globalTimers:Add(f, 0.3)
+			
+			end
+			
+			World.globalTimers:Add(f, 0.3)
 		end
 		
+		World.globalTimers:Add(f, 0)
+	end
+	World.globalTimers:Add(f, 0.3)
+end
+
+function ReflexGame.DoQuit(self)
+
+end
+
+function ReflexGame.Think(self,dt)
+	if (self.state.gameOver) then
 		-- game over never advances past here
+		self.think = nil
+		PuzzleScoreScreen:DoRetryQuitScreen(
+			self.widgets.root3,
+			function ()
+				self:DoRetry()
+			end,
+			function ()
+				self:DoQuit()
+			end
+		)
 		return
     end
 
@@ -1099,6 +1163,7 @@ function ReflexGame.Think(self,dt)
         self.state.swipeToMoveTimer = self.state.swipeToMoveTimer - dt
         if (self.state.swipeToMoveTimer <= 0) then
             self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .5)
+            self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .5)
         end
     end
 
@@ -1428,3 +1493,143 @@ function ReflexGame.GetHeadingTowardsPlayer(self,x,y)
 end
 
 reflex_game = ReflexGame
+
+-------------------------------------------------------------------------------
+-- Score screen common stuff
+
+PuzzleScoreScreen = Class:New()
+
+function PuzzleScoreScreen.Init(self, screenRect)
+
+	self.screen = {0, 0, 0, 0}
+	self.screen[3] = screenRect[3] - 64*4*UI.identityScale[1]
+	self.screen[4] = screenRect[4] - 64*2*UI.identityScale[2]
+	self.screen = CenterRectInRect(self.screen, screenRect)
+	self.gameBoard = screenRect
+
+	self.typefaces = {}
+	self.typefaces.Score1 = World.Load("UI/TerminalPuzzlesScoreFont_TF")
+	self.typefaces.Score2 = World.Load("UI/TerminalPuzzlesScoreFont2_TF")
+	
+	self.gfx = {}
+	self.gfx.BackgroundSuccess = World.Load("UI/arm_buttons_M")
+	self.gfx.BackgroundFail = World.Load("UI/MMItemBackground2_M")
+	
+	self.widgets = {}
+	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect,OnInputEvent=UI.EatInput})
+		
+	self:CreateRetryQuit()
+end
+
+function PuzzleScoreScreen.CreateRetryQuit(self)
+
+	--local inflate8 = {8*UI.identityScale[1], 8*UI.identityScale[2]}
+	local inflate32 = {32*UI.identityScale[1], 32*UI.identityScale[2]}
+		
+	local retryText = StringTable.Get("RETRY")
+	local quitText = StringTable.Get("QUIT")
+	local rw,rh = UI:StringDimensions(self.typefaces.Score1, retryText)
+	local qw,qh = UI:StringDimensions(self.typefaces.Score1, quitText)
+	
+	rh = math.max(rh, qh)
+	
+	local retryRect = {0, 0, rw+inflate32[1], rh+inflate32[2]}
+	self.widgets.Retry = UI:CreateStylePushButton(
+		retryRect,
+		function ()
+			self:Retry()
+		end,
+		{
+			typeface=self.typefaces.Score1,
+			highlight={on={0,0,0,0}},
+			solidBackground = true
+		}
+	)
+	
+	self.widgets.Retry:SetBlendWithParent(true)
+		
+	local quitRect = {0, 0, qw+inflate32[1], rh+inflate32[2]}
+
+	self.widgets.Quit = UI:CreateStylePushButton(
+		quitRect,
+		function ()
+			self:Quit()
+		end,
+		{
+			typeface=self.typefaces.Score1,
+			highlight={on={0,0,0,0}},
+			solidBackground = true
+		}
+	)
+	
+	self.widgets.Quit:SetBlendWithParent(true)
+	
+	UI:SetLabelText(self.widgets.Retry.label, retryText)
+	UI:CenterLabel(self.widgets.Retry.label, self.widgets.Retry.label:Rect())
+	UI:SetLabelText(self.widgets.Quit.label, quitText)
+	UI:CenterLabel(self.widgets.Quit.label, self.widgets.Quit.label:Rect())
+		
+	local gap = self.gameBoard[3] * 0.25
+	local totalWidth = retryRect[3] + quitRect[3] + gap
+	local leftEdge = self.gameBoard[1] + (self.gameBoard[3] - totalWidth) / 2
+	local topEdge = self.gameBoard[2] + (self.gameBoard[4] - rh - inflate32[2]) / 2
+	
+	retryRect[1] = leftEdge
+	retryRect[2] = topEdge
+	self.widgets.Retry:SetRect(retryRect)
+	
+	quitRect[1] = leftEdge + retryRect[3] + gap
+	quitRect[2] = topEdge
+	self.widgets.Quit:SetRect(quitRect)
+
+	self.widgets.RetryQuitRoot = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
+	self.widgets.root:AddChild(self.widgets.RetryQuitRoot)
+	
+	local rootRect = {
+		leftEdge - inflate32[1],
+		topEdge - inflate32[2],
+		totalWidth + inflate32[2]*2,
+		rh + inflate32[2]*3
+	}
+	
+	self.widgets.RetryQuitBackground = UI:CreateWidget("MatWidget", {rect=rootRect, material=self.gfx.BackgroundFail})
+	self.widgets.RetryQuitBackground:SetBlendWithParent(true)
+	self.widgets.RetryQuitRoot:AddChild(self.widgets.RetryQuitBackground)
+	self.widgets.RetryQuitRoot:AddChild(self.widgets.Retry)
+	self.widgets.RetryQuitRoot:AddChild(self.widgets.Quit)
+end
+
+function PuzzleScoreScreen.DoRetryQuitScreen(self, layer, retry, quit)
+	self.retryHook = retry
+	self.quitHook = quit
+		
+	layer:AddChild(self.widgets.root)
+	
+	self.widgets.RetryQuitRoot:BlendTo({1,1,1,0}, 0)
+	self.widgets.RetryQuitRoot:BlendTo({1,1,1,1}, 0.3)
+	
+	self.unlink = function()
+		layer:RemoveChild(self.widgets.root)
+	end
+	
+end
+
+function PuzzleScoreScreen.DismissRetryQuit(self, callback)
+	Abducted.entity.eatInput = true
+	callback()
+end
+
+function PuzzleScoreScreen.Unlink(self)
+	if (self.unlink) then
+		self.unlink()
+		self.unlink = nil
+	end
+end
+
+function PuzzleScoreScreen.Retry(self)
+	self:DismissRetryQuit(self.retryHook)
+end
+
+function PuzzleScoreScreen.Quit(self)
+	self:DismissRetryQuit(self.quitHook)
+end

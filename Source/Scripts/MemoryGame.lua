@@ -36,7 +36,7 @@ function MemoryGame.ShowBoard(self, show)
 	self = MemoryGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
-	self.widgets.root:SetVisible(show)
+--	self.widgets.root:SetVisible(show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 

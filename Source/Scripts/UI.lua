@@ -709,7 +709,7 @@ function UI.VAlignLabelBottom(self, label, x, y)
 		end
 	end
 	
-	local r = {x-d[1], y-d[4], d[3], d[4]}
+	local r = {x, y-d[4], d[3], d[4]}
 	label:SetRect(r)
 	return r, d
 

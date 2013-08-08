@@ -296,7 +296,6 @@ function ManipulatableObjectUI.MakePanel(self, key)
 	left:RotateTo({arrowSize/2, arrowSize/2, 180}, {0,0,0})
 	
 	left:SetBlendWithParent(true)
-	panel:AddChild(left)
 	table.insert(panel.widgets, left)
 	panel.left = left
 	
@@ -321,7 +320,6 @@ function ManipulatableObjectUI.MakePanel(self, key)
 		panel
 	)
 	right:SetBlendWithParent(true)
-	panel:AddChild(right)
 	table.insert(panel.widgets, right)
 	panel.right = right
 	
@@ -347,7 +345,6 @@ function ManipulatableObjectUI.MakePanel(self, key)
 	)
 	up:RotateTo({arrowSize/2, arrowSize/2, -90}, {0,0,0})
 	up:SetBlendWithParent(true)
-	panel:AddChild(up)
 	table.insert(panel.widgets, up)
 	panel.up = up
 	
@@ -373,7 +370,6 @@ function ManipulatableObjectUI.MakePanel(self, key)
 	)
 	down:RotateTo({arrowSize/2, arrowSize/2, 90}, {0,0,0})
 	down:SetBlendWithParent(true)
-	panel:AddChild(down)
 	table.insert(panel.widgets, down)
 	panel.down = down
 	

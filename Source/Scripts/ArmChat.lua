@@ -340,6 +340,26 @@ function Arm.CreateRewardText(self)
 	local startY = self.chatPos[2]
 	self.currentRewardWidgets = {}
 	
+	if (self.rewardSkillPoints) then
+		local msg = "+"..tostring(self.rewardSkillPoints)
+		if (self.rewardSkillPoints > 1) then
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		else
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
+		end
+		
+		local w = self:CreateRewardActionText(
+			msg,
+			inset,
+			maxWidth
+		)
+		
+		table.insert(self.currentRewardWidgets, w)
+		self.widgets.chat.ChatList:AddItem(w)
+		w:SetBlendWithParent(true)
+		w:BlendTo({1,1,1,0}, 0)
+	end
+	
 	if (self.rewardTopic) then
 		local rewardTopic = self.rewardTopic -- this may change as the conversation does so record it
 		local w, r = self:CreateRewardActionButton(
@@ -378,26 +398,6 @@ function Arm.CreateRewardText(self)
 		else
 			COutLine(kC_Error, "There is no item called '%s' in the game database.", rewardDiscover)
 		end
-	end
-	
-	if (self.rewardSkillPoints) then
-		local msg = "+"..tostring(self.rewardSkillPoints)
-		if (self.rewardSkillPoints > 1) then
-			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
-		else
-			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
-		end
-		
-		local w = self:CreateRewardActionText(
-			msg,
-			inset,
-			maxWidth
-		)
-		
-		table.insert(self.currentRewardWidgets, w)
-		self.widgets.chat.ChatList:AddItem(w)
-		w:SetBlendWithParent(true)
-		w:BlendTo({1,1,1,0}, 0)
 	end
 	
 	if (self.rewardMessage) then

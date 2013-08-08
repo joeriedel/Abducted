@@ -21,10 +21,10 @@ function ReflexGame.DebugStart(self)
 			end
 			World.globalTimers:Add(f, 0.3)
 		end
-		ReflexGame:InitGame("reflex-game: debug_start", 1, 1)
+		ReflexGame:InitGame(1)
 		UI:BlendTo({0,0,0,0}, 0.3)
 		ReflexGame:ShowBoard(true)
-		ReflexGame:StartGame(f)
+		ReflexGame:StartGame("discover Bugs;award 6;message ARM_REWARD_MSG_POWER_RESTORED;unlock_topic LockedTest ARM_REWARD_LOCKEDTEST", f)
 	end
 	World.globalTimers:Add(f, 0.3)
 end
@@ -56,7 +56,7 @@ function ReflexGame.ShowBoard(self, show)
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function ReflexGame.InitGame(self, playerSkill, terminalSkill)
+function ReflexGame.InitGame(self, terminalSkill)
 	self = ReflexGame.entity
 	self.think = nil
 	self.gameReady = false
@@ -77,11 +77,12 @@ function ReflexGame.InitGame(self, playerSkill, terminalSkill)
 	end
 end
 
-function ReflexGame.StartGame(self, gameCompleteCallback)
+function ReflexGame.StartGame(self, actions, gameCompleteCallback)
 	self = ReflexGame.entity
 	
 	ReflexGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
+	self.actions = actions
 	
 	World.FlushInput(true)
 	
@@ -97,8 +98,6 @@ function ReflexGame.EndGame(self, result)
 		self.timerTask = nil
 	end
 	
-	self:DeInitUI()
-	
 	World.FlushInput(true)
 	
 	if (self.gameCompleteCallback) then
@@ -110,6 +109,7 @@ end
 function ReflexGame.ResetGame(self)
 	self = ReflexGame.entity
 	PuzzleScoreScreen:Unlink()
+	self:DeInitUI()
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
 	ReflexGame.active = false
@@ -986,7 +986,7 @@ function ReflexGame.UpdateHud(self)
     local text = string.format("%01i:%02i",minutes,seconds)
     UI:SetLabelText(self.widgets.timeLeftLabel, text, {1,1})
     UI:SizeLabelToContents(self.widgets.timeLeftLabel)
-    UI:VAlignLabelTop(self.widgets.timeLeftLabel, self.screen[1], self.screen[2]-8*UI.identityScale[2])
+    UI:VCenterLabel(self.widgets.timeLeftLabel, {self.screen[1], self.screen[2], self.screen[3], self.REFLEX_CELL_SIZE[1]})
 end
 
 function ReflexGame.UpdateTimer(self, dt)
@@ -1227,9 +1227,15 @@ function ReflexGame.Think(self,dt)
 		if (self.state.victory) then
 			self.tickTimer = false
 			local f = function()
-				self:EndGame("w")
+				PuzzleScoreScreen:DoSuccessScreen(
+					self.widgets.root3,
+					self.actions,
+					function ()
+						self:EndGame("w")
+					end
+				)
 			end
-			World.globalTimers:Add(f, 2.5)
+			World.globalTimers:Add(f, 1.5)
 		else
 			PuzzleScoreScreen:DoRetryQuitScreen(
 				self.widgets.root3,
@@ -1574,10 +1580,6 @@ PuzzleScoreScreen = Class:New()
 
 function PuzzleScoreScreen.Init(self, screenRect)
 
-	self.screen = {0, 0, 0, 0}
-	self.screen[3] = screenRect[3] - 64*4*UI.identityScale[1]
-	self.screen[4] = screenRect[4] - 64*2*UI.identityScale[2]
-	self.screen = CenterRectInRect(self.screen, screenRect)
 	self.gameBoard = screenRect
 
 	self.typefaces = {}
@@ -1585,13 +1587,57 @@ function PuzzleScoreScreen.Init(self, screenRect)
 	self.typefaces.Score2 = World.Load("UI/TerminalPuzzlesScoreFont2_TF")
 	
 	self.gfx = {}
-	self.gfx.BackgroundSuccess = World.Load("UI/arm_buttons_M")
+	self.gfx.BackgroundSuccess = World.Load("UI/puzzle_success_bkg_M")
 	self.gfx.BackgroundFail = World.Load("UI/MMItemBackground2_M")
 	
 	self.widgets = {}
 	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect,OnInputEvent=UI.EatInput})
 		
 	self:CreateRetryQuit()
+	self:CreateSuccess()
+end
+
+function PuzzleScoreScreen.CreateSuccess(self)
+
+	local screen = {0, 0, 0, 0}
+	screen[3] = self.gameBoard[3] - 64*4*UI.identityScale[1]
+	screen[4] = self.gameBoard[4]--UI.fullscreenRect - 64*2*UI.identityScale[2]
+	screen = CenterRectInRect(screen, self.gameBoard)
+	
+	self.widgets.SuccessRoot = UI:CreateWidget("MatWidget", {rect={screen[1], self.gameBoard[2], screen[3], self.gameBoard[4]}, material=self.gfx.BackgroundSuccess})
+	self.widgets.root:AddChild(self.widgets.SuccessRoot)
+	
+	screen = {0, 0, screen[3], screen[4]}
+	
+	self.widgets.SuccessLabel = UI:CreateWidget("TextLabel", {rect=screen, typeface=self.typefaces.Score1})
+	UI:SetLabelText(self.widgets.SuccessLabel, StringTable.Get("SUCCESS"))
+	UI:SizeLabelToContents(self.widgets.SuccessLabel)
+	UI:VAlignLabelTop(self.widgets.SuccessLabel, nil, 32*UI.identityScale[2])
+	self.successLabelRect = UI:HCenterLabel(self.widgets.SuccessLabel, screen)
+	self.widgets.SuccessLabel:SetBlendWithParent(true)
+	self.widgets.SuccessRoot:AddChild(self.widgets.SuccessLabel)
+	
+	self.widgets.TopicLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(self.widgets.TopicLabel)
+	self.widgets.TopicLabel:SetBlendWithParent(true)
+	
+	self.widgets.MessageLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(self.widgets.MessageLabel)
+	self.widgets.MessageLabel:SetBlendWithParent(true)
+	
+	self.widgets.SkillLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(self.widgets.SkillLabel)
+	self.widgets.SkillLabel:SetBlendWithParent(true)
+	
+	self.widgets.SkillPointsLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(self.widgets.SkillPointsLabel)
+	self.widgets.SkillPointsLabel:SetBlendWithParent(true)
+	
+	self.widgets.DiscoverLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(self.widgets.DiscoverLabel)
+	self.widgets.DiscoverLabel:SetBlendWithParent(true)
+
+	self.successScreenRect = screen
 end
 
 function PuzzleScoreScreen.CreateRetryQuit(self)
@@ -1620,7 +1666,7 @@ function PuzzleScoreScreen.CreateRetryQuit(self)
 	)
 	
 	self.widgets.Retry:SetBlendWithParent(true)
-		
+
 	local quitRect = {0, 0, qw+inflate32[1], rh+inflate32[2]}
 
 	self.widgets.Quit = UI:CreateStylePushButton(
@@ -1672,12 +1718,179 @@ function PuzzleScoreScreen.CreateRetryQuit(self)
 	self.widgets.RetryQuitRoot:AddChild(self.widgets.Quit)
 end
 
+function PuzzleScoreScreen.RevealNextItem(self, callback)
+	local w = self.widgets.items[self.nextItem]
+	if (w) then
+		self.nextItem = self.nextItem + 1
+		w:BlendTo({1,1,1,1}, 0.5)
+	else
+		self.revealTimer:Clean()
+		self.revealTimer = nil
+		World.globalTimers:Add(callback, #self.widgets.items * 0.7 + 1)
+	end
+end
+
+function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
+
+	self.successHook = callback
+	
+	layer:AddChild(self.widgets.root)
+	
+	self.widgets.RetryQuitRoot:SetVisible(false)
+	self.widgets.SuccessRoot:SetVisible(true)
+	self.widgets.SuccessRoot:BlendTo({1,1,1,0}, 0)
+	self.widgets.SuccessRoot:BlendTo({1,1,1,1}, 0.3)
+	
+	self.rewardTopic = nil
+	self.rewardMessage = nil
+	self.rewardSkill = nil
+	self.rewardSkillPoints = nil
+	self.rewardDiscover = nil
+	
+	self:ProcessActions(actions)
+	
+	local kSpace = 32*UI.identityScale[2]
+	local totalHeight = 0--self.successLabelRect[2] + self.successLabelRect[4] + kSpace
+	
+	self.widgets.items = {}
+	
+	self.widgets.TopicLabel:BlendTo({1,1,1,0}, 0)
+	self.widgets.MessageLabel:BlendTo({1,1,1,0}, 0)
+	self.widgets.SkillLabel:BlendTo({1,1,1,0}, 0)
+	self.widgets.SkillPointsLabel:BlendTo({1,1,1,0}, 0)
+	self.widgets.DiscoverLabel:BlendTo({1,1,1,0}, 0)
+	
+	if (self.rewardSkillPoints) then
+		local msg = "+"..tostring(self.rewardSkillPoints)
+		if (self.rewardSkillPoints > 1) then
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		else
+			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
+		end
+		
+		UI:SetLabelText(self.widgets.SkillPointsLabel, msg)
+		UI:SizeLabelToContents(self.widgets.SkillPointsLabel)
+		local r = UI:HCenterLabel(self.widgets.SkillPointsLabel, self.successScreenRect)
+		table.insert(self.widgets.items, self.widgets.SkillPointsLabel)
+		totalHeight = totalHeight + r[4]
+	end
+	
+	if (self.rewardTopic) then
+		UI:SetLabelText(self.widgets.TopicLabel, StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
+		UI:SizeLabelToContents(self.widgets.TopicLabel)
+		local r = UI:HCenterLabel(self.widgets.TopicLabel, self.successScreenRect)
+		table.insert(self.widgets.items, self.widgets.TopicLabel)
+		totalHeight = totalHeight + r[4]
+	end
+	
+	if (self.rewardDiscover) then
+		local dbItem = Arm.Discoveries[self.rewardDiscover]
+		if (dbItem) then
+			UI:SetLabelText(self.widgets.DiscoverLabel, StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
+			UI:SizeLabelToContents(self.widgets.DiscoverLabel)
+			local r = UI:HCenterLabel(self.widgets.DiscoverLabel, self.successScreenRect)
+			table.insert(self.widgets.items, self.widgets.DiscoverLabel)
+			totalHeight = totalHeight + r[4]
+		end
+	end
+	
+	if (self.rewardMessage) then
+		UI:SetLabelText(self.widgets.MessageLabel, StringTable.Get(self.rewardMessage))
+		UI:SizeLabelToContents(self.widgets.MessageLabel)
+		local r = UI:HCenterLabel(self.widgets.MessageLabel, self.successScreenRect)
+		table.insert(self.widgets.items, self.widgets.MessageLabel)
+		totalHeight = totalHeight + r[4]
+	end
+	
+	-- center widgets for better presentation
+	totalHeight = totalHeight + (#self.widgets.items - 1) * kSpace
+	
+	local topBorder = self.successLabelRect[2] + self.successLabelRect[4] + kSpace
+	local verticalArea = self.successScreenRect[4]-- - topBorder
+	local y = (verticalArea - totalHeight) / 2
+	y = math.max(y, topBorder)
+
+	for k,v in pairs(self.widgets.items) do
+	
+		local r = v:Rect()
+		r[2] = y
+		y = y + r[4] + kSpace
+		v:SetRect(r)
+		
+	end
+	
+	if (next(self.widgets.items) == nil) then
+		World.globalTimers:Add(callback, 3)
+	else
+		self.nextItem = 1
+		local f = function()
+			self:RevealNextItem(callback)
+		end
+		self.revealTimer = World.globalTimers:Add(f, 0.9, true)
+	end
+	
+	self.unlink = function()
+		if (self.revealTimer) then
+			self.revealTimer:Clean()
+			self.revealTimer = nil
+		end
+		self.widgets.items = nil
+		layer:RemoveChild(self.widgets.root)
+	end
+
+end
+
+function PuzzleScoreScreen.ProcessActions(self, actions)
+	if (actions == nil) then
+		return
+	end
+	
+	actions = string.split(actions, ";")
+	
+	for k,v in pairs(actions) do
+		local tokens = Tokenize(v)
+		if (#tokens > 0) then
+			self:ProcessActionTokens(tokens)
+		end
+	end
+end
+
+function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
+
+	if (tokens[1] == "unlock_topic") then
+		if (Arm:UnlockTopic(tokens[2])) then
+			self.rewardTopic = {tokens[2], tokens[3]}
+		end
+	elseif (tokens[1] == "message") then
+		self.rewardMessage = tokens[2]
+	elseif (tokens[1] == "award") then
+		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
+			self.rewardSkillPoints = tonumber(tokens[2])
+			Arm:SaveTopicReward(self.topic, "skillpoints")
+		end
+	elseif (tokens[1] == "unlock_skill") then
+		if (not Arm:CheckTopicReward(self.topic, "unlock_skill")) then
+			self.rewardSkill = tokens[2]
+			Arm:SaveTopicReward(self.topic, "unlock_skill")
+		end
+	elseif (tokens[1] == "discover") then
+		if (Abducted.entity:Discover(tokens[2])) then
+			self.rewardDiscover = tokens[2]
+		end
+	end
+
+	SaveGame:Save()
+end
+
 function PuzzleScoreScreen.DoRetryQuitScreen(self, layer, retry, quit)
 	self.retryHook = retry
 	self.quitHook = quit
-		
+	self.successHook = nil
+	
 	layer:AddChild(self.widgets.root)
 	
+	self.widgets.SuccessRoot:SetVisible(false)
+	self.widgets.RetryQuitRoot:SetVisible(true)
 	self.widgets.RetryQuitRoot:BlendTo({1,1,1,0}, 0)
 	self.widgets.RetryQuitRoot:BlendTo({1,1,1,1}, 0.3)
 	

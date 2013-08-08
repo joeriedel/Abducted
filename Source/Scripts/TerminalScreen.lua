@@ -61,6 +61,23 @@ function TerminalScreen.Spawn(self)
 	self.activateRadius = NumberForString(self.keys.activate_radius, 200)
 	self.hackDifficulty = NumberForString(self.keys.hack_difficulty, 1)
 	self.solveDifficulty = NumberForString(self.keys.solve_difficulty, 1)
+	self.hackActions = self.keys.hack_success_actions
+	self.solveActions = self.keys.solve_success_actions
+	
+	if (self.keys.success_actions) then
+		if (self.hackActions) then
+			self.hackActions = self.hackActions..";"..self.keys.success_actions
+		else
+			self.hackActions = self.keys.success_actions
+		end
+		
+		if (self.solveActions) then
+			self.solveActions = self.solveActions..";"..self.keys.success_actions
+		else
+			self.solveActions = self.keys.success_actions
+		end
+	end
+	
 	self.active = false
 	self.popup = false
 	self.size = "small"
@@ -305,11 +322,10 @@ function TerminalScreen.HideUI(callback)
 
 end
 
-function TerminalScreen.DoHackGame()
+function TerminalScreen.DoHackGame(self)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
-	ReflexGame:InitGame(1, 1)
-	
+		
 	local entity = TerminalScreen.Active
 		
 	if (TerminalScreen.Skip) then
@@ -317,35 +333,32 @@ function TerminalScreen.DoHackGame()
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
+			ReflexGame:InitGame(self.hackDifficulty)
 			ReflexGame:ShowBoard(true)
 			
-			local f = function ()
-				local f = function(result)
-					TerminalScreen.GameComplete(entity, "hack", result)
-				end
-				Abducted.entity.eatInput = false
-				ReflexGame:StartGame(f)
+			local f = function(result)
+				TerminalScreen.GameComplete(entity, "hack", result)
 			end
-			
-			World.globalTimers:Add(f, 0.3)
+				
+			ReflexGame:StartGame(self.hackActions, f)
 		end
 		
 		World.globalTimers:Add(f, 0.3)
 	end
 end
 
-function TerminalScreen.DoSolveGame()
+function TerminalScreen.DoSolveGame(self)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
-	ReflexGame:InitGame(1, 1)
-	
+		
 	local entity = TerminalScreen.Active
 		
-	if (TerminalScreen.Skip) then
+	if (true) then
 		TerminalScreen.GameComplete(entity, "solve", "w")
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
+			ReflexGame:InitGame(self.solveDifficulty)
 			ReflexGame:ShowBoard(true)
 			
 			local f = function ()
@@ -353,7 +366,7 @@ function TerminalScreen.DoSolveGame()
 					TerminalScreen.GameComplete(entity, "solve", result)
 				end
 				Abducted.entity.eatInput = false
-				ReflexGame:StartGame(f)
+				ReflexGame:StartGame(self.solveActions, f)
 			end
 			
 			World.globalTimers:Add(f, 0.3)

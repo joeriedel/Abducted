@@ -10,10 +10,21 @@ function ReflexGame.DebugStart(self)
 	Abducted.entity.eatInput = true
 	UI:BlendTo({1,1,1,1}, 0.3)
 	local f = function()
+		local f = function()
+			UI:BlendTo({1,1,1,1}, 0.3)
+			local f = function()
+				UI:BlendTo({0,0,0,0}, 0.3)
+				ReflexGame:ShowBoard(false)
+				ReflexGame:ResetGame()
+				collectgarbage()
+				Abducted.entity.eatInput = false
+			end
+			World.globalTimers:Add(f, 0.3)
+		end
 		ReflexGame:InitGame("reflex-game: debug_start", 1, 1)
 		UI:BlendTo({0,0,0,0}, 0.3)
 		ReflexGame:ShowBoard(true)
-		ReflexGame:StartGame()
+		ReflexGame:StartGame(f)
 	end
 	World.globalTimers:Add(f, 0.3)
 end
@@ -49,9 +60,21 @@ function ReflexGame.InitGame(self, playerSkill, terminalSkill)
 	self = ReflexGame.entity
 	self.think = nil
 	self.gameReady = false
+	self.tickTimer = false
+	self.animatingRetry = false
+	self.exiting = false
+	
+	self.level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 	self:CreateBoard()
+	self.state.timeLeft = self.level.time
+	self.widgets.timeLeftLabel:SetTypeface(self.typefaces.TimerText)
+	self:UpdateHud()
+	
+	if (self.timerTask == nil) then
+		self.timerTask = World.globalTimers:Add(function (dt) self:UpdateTimer(dt) end, 0, true)
+	end
 end
 
 function ReflexGame.StartGame(self, gameCompleteCallback)
@@ -67,7 +90,15 @@ end
 
 function ReflexGame.EndGame(self, result)
 	self.think = nil
-		
+	self.exiting = true
+	
+	if (self.timerTask) then
+		self.timerTask:Clean()
+		self.timerTask = nil
+	end
+	
+	self:DeInitUI()
+	
 	World.FlushInput(true)
 	
 	if (self.gameCompleteCallback) then
@@ -78,6 +109,7 @@ end
 
 function ReflexGame.ResetGame(self)
 	self = ReflexGame.entity
+	PuzzleScoreScreen:Unlink()
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
 	ReflexGame.active = false
@@ -231,9 +263,10 @@ function ReflexGame.LoadMaterials(self)
 	self.gfx.Outline = World.Load("UI/lineborder1_M")
 	self.gfx.ItemBackground = World.Load("UI/MMItemBackground_M")
 	
-    self.gfx.mark_start = nil
 	self.typefaces = {}
     self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesTimeFont_TF")
+    self.typefaces.TimerTextFlash = World.Load("UI/TerminalPuzzlesTimeFontFlash_TF")
+    self.typefaces.TimerTextRed = World.Load("UI/TerminalPuzzlesTimeFontRed_TF")
     self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesFont_TF")
     
     self.sfx = {}
@@ -371,6 +404,27 @@ function ReflexGame.InitUI(self)
 	self.widgets.outline:SetVAlign(kVerticalAlign_Top)
 	self.widgets.outline:SetVisible(false)
 	
+	self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={self.screen[1], self.screen[2], 8,8}, typeface=self.typefaces.TimerText})
+    self.widgets.root4:AddChild(self.widgets.timeLeftLabel)
+
+    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 0, 0, 8, 8}, typeface=self.typefaces.SwipeToMoveText})
+    
+    if (UI.mode == kGameUIMode_Mobile) then
+		UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("TAP_DPAD_TO_MOVE"))
+	else
+		UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("PRESS_ARROW_KEYS_TO_MOVE"))
+	end
+	
+    UI:SizeLabelToContents(self.widgets.swipeToMoveLabel)
+    local swipeLabelRect = UI:CenterLabel(self.widgets.swipeToMoveLabel, UI.fullscreenRect)
+    self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
+	
+	self.widgets.swipeToMoveLabelBkg = UI:CreateWidget("MatWidget", {rect=ExpandRect(swipeLabelRect, 32*UI.identityScale[1], 32*UI.identityScale[2]),material=self.gfx.ItemBackground})
+	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,0}, 0)
+	
+	self.widgets.root3:AddChild(self.widgets.swipeToMoveLabelBkg)
+    self.widgets.root3:AddChild(self.widgets.swipeToMoveLabel)
+	
 end
 
 function ReflexGame.DeInitUI(self)
@@ -380,6 +434,7 @@ function ReflexGame.DeInitUI(self)
 				self.widgets.root2:RemoveChild(v.particles)
 				v.particles:Unmap()
 				v.particles = nil
+				v:Unmap()
 			end
 			self.widgets.goals = nil
 		end
@@ -403,6 +458,7 @@ function ReflexGame.DeInitUI(self)
 				self.widgets.root:RemoveChild(v)
 				v:Unmap()
 			end
+			self.widgets.lines = nil
 		end
 		self.widgets.current = nil
 		if (self.widgets.blackholes) then
@@ -437,22 +493,8 @@ function ReflexGame.DeInitUI(self)
 			self.widgets.swipeBar = nil
 		end
 		
-		if (self.widgets.timeLeftLabel) then
-			self.widgets.root4:RemoveChild(self.widgets.timeLeftLabel)
-			self.widgets.timeLeftLabel:Unmap()
-			self.widgets.timeLeftLabel = nil
-		end
-		
 		self.widgets.portal = nil
-		
-		if (self.widgets.swipeToMoveLabel) then
-			self.widgets.root3:RemoveChild(self.widgets.swipeToMoveLabel)
-			self.widgets.swipeToMoveLabel:Unmap()
-			self.widgets.swipeToMoveLabel = nil
-			self.widgets.root3:RemoveChild(self.widgets.swipeToMoveLabelBkg)
-			self.widgets.swipeToMoveLabelBkg:Unmap()
-			self.widgets.swipeToMoveLabelBkg = nil
-		end
+		self.widgets.cells = nil
 		
 		collectgarbage()
 	end
@@ -461,9 +503,10 @@ end
 function ReflexGame.CreateBoard(self)
 	self:DeInitUI()
 	
-	-- define structure: self.state
-	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
-	self.state = { }	
+	local oldState = self.state
+		
+	local level = self.level
+	self.state = { }
 	self.state.heading = { }
 	self.state.lastHeading = { }
 	self.state.victory = { }
@@ -478,15 +521,17 @@ function ReflexGame.CreateBoard(self)
 	self.state.currentMove = 1
 	self.state.victory = false
 	self.state.level = level
-    self.state.timeLeft = level.time
 	self.state.antivirusSpawnTimer = FloatRand(level.antivirusSpiderSpawnRate[1], level.antivirusSpiderSpawnRate[2])
     self.state.lineTimerEnabledTimer = level.blockChaseTime
     self.state.lineTimer = 0
 	self.state.goalCounter = 0
     self.state.lineIndex = 1
-    self.state.fadeInBoardTimer = 2
     self.state.swipeToMoveTimer = 1
-	
+    
+    if (oldState) then
+		self.state.timeLeft = oldState.timeLeft
+	end
+    
 	self.widgets.goals = { }
 	self.widgets.lines = { }
 	self.widgets.spiders = { }
@@ -506,25 +551,33 @@ function ReflexGame.CreateBoard(self)
         local objectTable = self.widgets.cells
         local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
 		local layer = self.widgets.root
+		local img = v.img
+		local archetype = v.img
 		
         if (self.gfx[v.img] == self.gfx.blackhole) then
             objectTable = self.widgets.blackholes
             objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
 			layer = self.widgets.root2
+		elseif (v.img == "mark_start") then
+			layer = nil
+			img = "mark_current"
+			archetype = "player"
         end
 
 		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=self.gfx[v.img]})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
-		b.state = self:CreateState(v.img,v)
-        layer:AddChild(b)
-        if (objectTable == self.widgets.cells) then
+		b.state = self:CreateState(archetype,v)
+        if (layer) then
+			layer:AddChild(b)
+		end
+        if ((objectTable == self.widgets.cells) and (v.img ~= "mark_start")) then
 		    self.widgets.grid[index] = b
         end
         table.insert(objectTable,b)
 		self:SetPositionByGrid(b,v.x,v.y,objectTable==self.widgets.blackholes)
 		if (v.img == "mark_start") then
-            local player = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_current})
-            player.state = self:CreateState("player",v)
+            local player = b
+            player:SetMaterial(self.gfx.mark_current)
             self.widgets.player = player           
             self:SetPositionByGrid(player,v.x,v.y)
 
@@ -549,11 +602,11 @@ function ReflexGame.CreateBoard(self)
     end
     
     if (self.widgets.player) then
-		self.widgets.root2:AddChild(self.widgets.player) -- on top of blackholes
+		-- on top of blackholes
+		self.widgets.root2:AddChild(self.widgets.player)
     end
     
     self.widgets.playerParticles = UI:CreateWidget("MatWidget", {rect={0,0,310*UI.identityScale[1],310*UI.identityScale[1]}, material=self.gfx.PlayerParticles})
-	self.widgets.root2:AddChild(self.widgets.playerParticles)
 	self.widgets.playerParticles:SetVisible(false)
 	
 	self.widgets.swipeBar = UI:CreateWidget("MatWidget", {rect={self.screen[1],self.screen[2],232,self.screen[4]},material=self.gfx.SwipeBar})
@@ -565,29 +618,6 @@ function ReflexGame.CreateBoard(self)
 		w:SetVisible(false)
 		v.particles = w
 	end
-	
-    self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={self.screen[1], self.screen[2], 8,8}, typeface=self.typefaces.TimerText})
-    self.widgets.root4:AddChild(self.widgets.timeLeftLabel)
-
-    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 0, 0, 8, 8}, typeface=self.typefaces.SwipeToMoveText})
-    
-    if (UI.mode == kGameUIMode_Mobile) then
-		UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("TAP_DPAD_TO_MOVE"))
-	else
-		UI:SetLabelText(self.widgets.swipeToMoveLabel, StringTable.Get("PRESS_ARROW_KEYS_TO_MOVE"))
-	end
-	
-    UI:SizeLabelToContents(self.widgets.swipeToMoveLabel)
-    local swipeLabelRect = UI:CenterLabel(self.widgets.swipeToMoveLabel, UI.fullscreenRect)
-    self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
-	
-	self.widgets.swipeToMoveLabelBkg = UI:CreateWidget("MatWidget", {rect=ExpandRect(swipeLabelRect, 32*UI.identityScale[1], 32*UI.identityScale[2]),material=self.gfx.ItemBackground})
-	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,0}, 0)
-	
-	self.widgets.root3:AddChild(self.widgets.swipeToMoveLabelBkg)
-    self.widgets.root3:AddChild(self.widgets.swipeToMoveLabel)
-
-    self:UpdateHud()
 
     if (self.widgets.current == nil) then
 		COutLine(kC_Debug,"mark_start NOT FOUND --> ERROR")	
@@ -956,11 +986,41 @@ function ReflexGame.UpdateHud(self)
     local text = string.format("%01i:%02i",minutes,seconds)
     UI:SetLabelText(self.widgets.timeLeftLabel, text, {1,1})
     UI:SizeLabelToContents(self.widgets.timeLeftLabel)
-    UI:VAlignLabelTop(self.widgets.timeLeftLabel, self.screen[1], self.screen[2])
+    UI:VAlignLabelTop(self.widgets.timeLeftLabel, self.screen[1], self.screen[2]-8*UI.identityScale[2])
 end
 
 function ReflexGame.UpdateTimer(self, dt)
-	
+	if (self.tickTimer) then
+		local oldTime = self.state.timeLeft
+		self.state.timeLeft = self.state.timeLeft - dt
+		if (self.state.timeLeft <= 0) then
+			self.state.timeLeft = 0
+			self.timerTask:Clean()
+			self.timerTask = nil
+		end
+		
+		if ((oldTime >= 30) and (self.state.timeLeft < 30)) then
+			self.widgets.timeLeftLabel:SetTypeface(self.typefaces.TimerTextFlash)
+		elseif (self.state.timeLeft == 0) then
+			self.widgets.timeLeftLabel:SetTypeface(self.typefaces.TimerTextRed)
+			if (not self.animatingRetry) then
+				self.state.gameOver = true
+				self.gameReady = false
+				self.think = nil
+				self:HandleTimeUp()
+			end
+		end
+		
+		self:UpdateHud()
+	end
+end
+
+function ReflexGame.HandleTimeUp(self)
+	Abducted.entity.eatInput = true
+	local f = function()
+		self:EndGame("f")
+	end
+	World.globalTimers:Add(f, 2.5)
 end
 
 function ReflexGame.PrepBoardIntro(self)
@@ -990,6 +1050,7 @@ end
 function ReflexGame.ReadyGameStart(self)
 	Abducted.entity.eatInput = false
 	self.gameReady = true
+	self.animatingRetry = false
 	self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .2)
 	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .2)
 	if (self.widgets.dpad) then
@@ -1007,6 +1068,17 @@ function ReflexGame.RevealBoard(self)
 	self.widgets.swipeBar:MoveTo({self.screen[1]+self.screen[3], self.screen[2]}, {1.5,0})
 		
 	local f = function()
+	
+		if (self.state.timeLeft <= 0) then
+			self.widgets.swipeBar:SetVisible(false)
+			if (self.revealTimer) then
+				self.revealTimer:Clean()
+				self.revealTimer = nil
+			end
+			self.animatingRetry = false
+			self:HandleTimeUp()
+			return
+		end
 	
 		for k,v in pairs(self.widgets.goals) do
 		
@@ -1035,7 +1107,7 @@ function ReflexGame.RevealBoard(self)
 				end
 				self:ReadyGameStart()
 			end
-			World.globalTimers:Remove(self.revealTimer)
+			self.revealTimer:Clean()
 			self.revealTimer = nil
 			self.widgets.swipeBar:SetVisible(false)
 			World.globalTimers:Add(f, 0.5)
@@ -1045,12 +1117,15 @@ function ReflexGame.RevealBoard(self)
 	end
 		
 	f()
-	local dt = 1.5/(self.INDEX_MAX_X+1)
-	self.revealTimer = World.globalTimers:Add(f, dt, true)
+	if (self.state.timeLeft > 0) then
+		local dt = 1.5/(self.INDEX_MAX_X+1)
+		self.revealTimer = World.globalTimers:Add(f, dt, true)
+	end
 	
 end
 
 function ReflexGame.AnimateIntro(self)
+	self.tickTimer = false
 	self:PrepBoardIntro()
 	
 	self.widgets.board:BlendTo({1,1,1,0}, 0)
@@ -1091,11 +1166,12 @@ function ReflexGame.AnimateIntro(self)
 	World.globalTimers:Add(f, 0.4)
 end
 
-function ReflexGame.AnimateRestart(self)
-
-end
-
 function ReflexGame.DoRetry(self)
+	if (self.exiting) then
+		return
+	end
+	
+	self.animatingRetry = true
 	self.widgets.black:BlendTo({0,0,0,1}, 0.3)
 	local f = function()
 		PuzzleScoreScreen:Unlink()
@@ -1106,10 +1182,8 @@ function ReflexGame.DoRetry(self)
 			end
 		end
 	
-		local timeLeft = self.state.timeLeft
 		self:CreateBoard()
-		self.state.timeLeft = timeLeft
-		
+				
 		local f = function()
 			
 			self:PrepBoardIntro()
@@ -1140,22 +1214,33 @@ function ReflexGame.DoRetry(self)
 end
 
 function ReflexGame.DoQuit(self)
-
+	if (not self.exiting) then
+		self:EndGame("f")
+	end
 end
 
 function ReflexGame.Think(self,dt)
 	if (self.state.gameOver) then
 		-- game over never advances past here
 		self.think = nil
-		PuzzleScoreScreen:DoRetryQuitScreen(
-			self.widgets.root3,
-			function ()
-				self:DoRetry()
-			end,
-			function ()
-				self:DoQuit()
+		self.gameReady = false
+		if (self.state.victory) then
+			self.tickTimer = false
+			local f = function()
+				self:EndGame("w")
 			end
-		)
+			World.globalTimers:Add(f, 2.5)
+		else
+			PuzzleScoreScreen:DoRetryQuitScreen(
+				self.widgets.root3,
+				function ()
+					self:DoRetry()
+				end,
+				function ()
+					self:DoQuit()
+				end
+			)
+		end
 		return
     end
 
@@ -1167,23 +1252,12 @@ function ReflexGame.Think(self,dt)
         end
     end
 
-    if (self.state.fadeInBoardTimer > 0) then
-        self.state.fadeInBoardTimer = self.state.fadeInBoardTimer - dt
-        if (self.state.fadeInBoardTimer <= 0) then
-            for i,k in pairs(self.widgets.cells) do
-                k:BlendTo({1,1,1,1}, 2)
-            end
-            for i,k in pairs(self.widgets.blackholes) do
-                k:BlendTo({1,1,1,1}, 2)
-            end
-        end
-        return
-    end
-
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		
 		return
     end
+    
+    self.tickTimer = true
 
     if (not self.state.labelFadeOut) then
 		self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, .5)
@@ -1279,22 +1353,22 @@ function ReflexGame.Think(self,dt)
             local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green})
             b.state = self:CreateState("blocker_green")
             self.widgets.root:AddChild(b)
+            assert(self.widgets.grid[index] == nil)
+            self.widgets.grid[index] = nil
             self.widgets.grid[index] = b
             self:SetPositionByGrid(b,v.x,v.y)
             b:ScaleTo({0,0}, {0,0})
             b:ScaleTo({1,1}, {1,1})
             self.state.lineIndex = self.state.lineIndex + 1
+            COutLine(kC_Debug, "Spawned block")
         end
     end
-
-    self.state.timeLeft = self.state.timeLeft - dt
-    self:UpdateHud()
 
 	local playerGridCell = self:GetGridCellFromVec2(currentPos)
 	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)	 
 
 	local pieceAtPlayer = self.widgets.grid[playerIndex]	
-	if (pieceAtPlayer or self.state.timeLeft <= 0) then
+	if (pieceAtPlayer) then
 		if (pieceAtPlayer.state.archetype == "mark_end" and self.state.goalCounter >= #self.widgets.goals) then
 			COutLine(kC_Debug,"Game Over Detected")
 			self.state.gameOver = true
@@ -1303,13 +1377,6 @@ function ReflexGame.Think(self,dt)
             self:SuckupPlayer(pos.x, pos.y)
 			return
 		end
-
-        if (self.state.timeLeft <= 0) then
-            COutLine(kC_Debug,"Game Over Detected (time ran out)")
-            self.state.gameOver = true
-            self.state.victory = false
-            return
-        end
     end
     
     for i,k in pairs(self.widgets.spiders) do
@@ -1319,15 +1386,15 @@ function ReflexGame.Think(self,dt)
 	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
 	if (self.state.antivirusSpawnTimer < 0) then
 		self.state.antivirusSpawnTimer = FloatRand(self.state.level.antivirusSpiderSpawnRate[1], self.state.level.antivirusSpiderSpawnRate[2])		
+		local spawned = false
 		for i=1,5 do
 			local x = math.random(self.INDEX_MAX_X)-1
 			local y = math.random(self.INDEX_MAX_Y)-1
-			local dx = self.widgets.current.state.endPos.x - x
-			local dy = self.widgets.current.state.endPos.y - y
-			local dd = dx*dx+dy*dy
-			local minDist = self.REFLEX_CELL_SIZE[1]*3
-			minDist = minDist * minDist
-			if (dd >= minDist) then
+			local playerGrid = self:GetGridCellFromVec2({x=self.widgets.current.state.endPos.x, y=self.widgets.current.state.endPos.y})
+			local dx = playerGrid.x - x
+			local dy = playerGrid.y - y
+			local dd = math.sqrt(dx*dx+dy*dy)
+			if (dd >= 6) then
 				local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
 				self.widgets.root2:AddChild(spider)	
 				table.insert(self.widgets.spiders,spider)
@@ -1335,9 +1402,14 @@ function ReflexGame.Think(self,dt)
 				spider.state = self:CreateState("antivirus_spider")
 				spider.state.lifetime = FloatRand(self.state.level.antivirusSpiderLifetime[1], self.state.level.antivirusSpiderLifetime[2])
 				self:SpiderPickHeading(spider)
-				COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
+				COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f, distFromPlayer = %f",x,y,spider.state.heading.x,spider.state.heading.y, dd)
+				spawned = true
 				break
 			end
+		end
+		
+		if (not spawned) then
+			COutLine(kC_Debug, "FAILED TO SPAWN SPIDER!")
 		end
     end
 
@@ -1378,6 +1450,7 @@ function ReflexGame.SpiderThink(self, index, spider, dt)
 	if (spider.state.lifetime < dt) then
 		table.remove(self.widgets.spiders,index)
 		self.widgets.root2:RemoveChild(spider)
+		spider:Unmap()
 		return
 	else
 		spider.state.lifetime = spider.state.lifetime - dt

@@ -313,7 +313,7 @@ function TerminalScreen.DoHackGame()
 	local entity = TerminalScreen.Active
 		
 	if (TerminalScreen.Skip) then
-		TerminalScreen.GameComplete(entity, "hack", true)
+		TerminalScreen.GameComplete(entity, "hack", "w")
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
@@ -342,7 +342,7 @@ function TerminalScreen.DoSolveGame()
 	local entity = TerminalScreen.Active
 		
 	if (TerminalScreen.Skip) then
-		TerminalScreen.GameComplete(entity, "solve", true)
+		TerminalScreen.GameComplete(entity, "solve", "w")
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
@@ -377,15 +377,15 @@ function TerminalScreen.GameComplete(self, mode, result)
 	World.globalTimers:Add(f, 0.3)
 	
 	if (mode == "hack") then
-		World.playerPawn:LeaveHackGame(self, result)
+		World.playerPawn:LeaveHackGame(self, result == "w")
 	else
-		World.playerPawn:LeaveSolveGame(self, result)
+		World.playerPawn:LeaveSolveGame(self, result == "w")
 	end
 end
 
-function TerminalScreen.PostHackEvents(self, result)
+function TerminalScreen.PostHackEvents(self, won)
 
-	if (result) then
+	if (won) then
 		if (self.keys.hack_success) then
 			World.PostEvent(self.keys.hack_success)
 		end
@@ -395,7 +395,7 @@ function TerminalScreen.PostHackEvents(self, result)
 		end
 	end
 		
-	if (result) then
+	if (won) then
 		if (self.keys.success) then
 			World.PostEvent(self.keys.success)
 		end
@@ -407,9 +407,9 @@ function TerminalScreen.PostHackEvents(self, result)
 
 end
 
-function TerminalScreen.PostSolveEvents(self, result)
+function TerminalScreen.PostSolveEvents(self, won)
 
-	if (result) then
+	if (won) then
 		if (self.keys.solve_success) then
 			World.PostEvent(self.keys.solve_success)
 		end
@@ -419,7 +419,7 @@ function TerminalScreen.PostSolveEvents(self, result)
 		end
 	end
 
-	if (result) then
+	if (won) then
 		if (self.keys.success) then
 			World.PostEvent(self.keys.success)
 		end

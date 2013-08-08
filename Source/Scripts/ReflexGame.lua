@@ -1227,6 +1227,11 @@ function ReflexGame.Think(self,dt)
 		if (self.state.victory) then
 			self.tickTimer = false
 			local f = function()
+				if (self.widgets.dpad) then
+					for k,v in pairs(self.widgets.dpad) do
+						v:BlendTo({1,1,1,0}, 0.2)
+					end
+				end
 				PuzzleScoreScreen:DoSuccessScreen(
 					self.widgets.root3,
 					self.actions,
@@ -1612,7 +1617,7 @@ function PuzzleScoreScreen.CreateSuccess(self)
 	self.widgets.SuccessLabel = UI:CreateWidget("TextLabel", {rect=screen, typeface=self.typefaces.Score1})
 	UI:SetLabelText(self.widgets.SuccessLabel, StringTable.Get("SUCCESS"))
 	UI:SizeLabelToContents(self.widgets.SuccessLabel)
-	UI:VAlignLabelTop(self.widgets.SuccessLabel, nil, 32*UI.identityScale[2])
+	UI:VAlignLabelTop(self.widgets.SuccessLabel, nil, 16*UI.identityScale[2])
 	self.successLabelRect = UI:HCenterLabel(self.widgets.SuccessLabel, screen)
 	self.widgets.SuccessLabel:SetBlendWithParent(true)
 	self.widgets.SuccessRoot:AddChild(self.widgets.SuccessLabel)
@@ -1749,7 +1754,7 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	
 	self:ProcessActions(actions)
 	
-	local kSpace = 32*UI.identityScale[2]
+	local kSpace = 24*UI.identityScale[2]
 	local totalHeight = 0--self.successLabelRect[2] + self.successLabelRect[4] + kSpace
 	
 	self.widgets.items = {}
@@ -1768,7 +1773,8 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
 		end
 		
-		UI:SetLabelText(self.widgets.SkillPointsLabel, msg)
+		self.widgets.SkillPointsLabel:SetText(msg) -- no zoom on fonts here, gets too crowded
+		--UI:SetLabelText(self.widgets.SkillPointsLabel, msg)
 		UI:SizeLabelToContents(self.widgets.SkillPointsLabel)
 		local r = UI:HCenterLabel(self.widgets.SkillPointsLabel, self.successScreenRect)
 		table.insert(self.widgets.items, self.widgets.SkillPointsLabel)
@@ -1776,7 +1782,8 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	end
 	
 	if (self.rewardTopic) then
-		UI:SetLabelText(self.widgets.TopicLabel, StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
+		self.widgets.TopicLabel:SetText(StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
+		--UI:SetLabelText(self.widgets.TopicLabel, StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
 		UI:SizeLabelToContents(self.widgets.TopicLabel)
 		local r = UI:HCenterLabel(self.widgets.TopicLabel, self.successScreenRect)
 		table.insert(self.widgets.items, self.widgets.TopicLabel)
@@ -1786,7 +1793,8 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	if (self.rewardDiscover) then
 		local dbItem = Arm.Discoveries[self.rewardDiscover]
 		if (dbItem) then
-			UI:SetLabelText(self.widgets.DiscoverLabel, StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
+			self.widgets.DiscoverLabel:SetText(StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
+			--UI:SetLabelText(self.widgets.DiscoverLabel, StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
 			UI:SizeLabelToContents(self.widgets.DiscoverLabel)
 			local r = UI:HCenterLabel(self.widgets.DiscoverLabel, self.successScreenRect)
 			table.insert(self.widgets.items, self.widgets.DiscoverLabel)
@@ -1795,7 +1803,8 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	end
 	
 	if (self.rewardMessage) then
-		UI:SetLabelText(self.widgets.MessageLabel, StringTable.Get(self.rewardMessage))
+		self.widgets.MessageLabel:SetText(StringTable.Get(self.rewardMessage))
+		--UI:SetLabelText(self.widgets.MessageLabel, StringTable.Get(self.rewardMessage))
 		UI:SizeLabelToContents(self.widgets.MessageLabel)
 		local r = UI:HCenterLabel(self.widgets.MessageLabel, self.successScreenRect)
 		table.insert(self.widgets.items, self.widgets.MessageLabel)

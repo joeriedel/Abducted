@@ -959,16 +959,29 @@ function ReflexGame.SuckupPieces(self,x,y,w,h)
 			end
 		end
 	end
+	
+	for k,v in pairs(self.widgets.spiders) do
+	
+		local pos = self:GetPosition(v)
+		
+		local dx = pos.x-x
+		local dy = pos.y-y
+		local dd = dx*dx+dy*dy
+		if (dd < kdd*1.5) then
+			self:SuckupSpider(k,v,x,y)
+		end
+	
+	end
 end
 
 function ReflexGame.SuckupPlayer(self,x,y)
-	local tr = self.widgets.player:Rect()
-	tr[1] = tr[1] + x - (tr[1]+(tr[3]/2))
-	tr[2] = tr[2] + y - (tr[2]+(tr[4]/2))
-	self.widgets.player:MoveTo(tr, {0.7,0.7})
-	self.widgets.player:ScaleTo({0,0}, {0.7,0.7})
-	self.widgets.player:BlendTo({1,1,1,0}, 0.7)
-	--self.widgets.player:RotateTo({self.REFLEX_CELL_SIZE[1]/8, self.REFLEX_CELL_SIZE[2]/4, 360*5}, {0,0,4})
+	self:SuckupWidget(self.widgets.player,x,y)
+end
+
+function ReflexGame.SuckupSpider(self,index,spider,x,y)
+	table.remove(self.widgets.spiders,index)
+	table.insert(self.widgets.trash, spider)
+	self:SuckupWidget(spider,x,y)
 end
 
 function ReflexGame.SuckupWidget(self,w,x,y)
@@ -1469,15 +1482,17 @@ function ReflexGame.SpiderThink(self, index, spider, dt)
 	
 	local pos = self:GetPosition(spider)
 	local gridRange = self.REFLEX_CELL_SIZE[1] * self.state.level.antivirusSpiderSeekPlayerRange
-	local seekPlayer = self:CheckTouchPlayer(pos.x, pos.y, gridRange, gridRange)
+	self.seekPlayer = self:CheckTouchPlayer(pos.x, pos.y, gridRange, gridRange)
 	
-	if (seekPlayer) then
+	local speed = self.state.level.antivirusSpiderSpeed[1]
+	
+	if (self.seekPlayer) then
 	
 		--COutLine(kC_Debug, "Spider seeking player")
 		-- seek the player
 		spider.state.headingTime = 0
 		spider.state.heading = self:GetHeadingTowardsPlayer(pos.x,pos.y)
-	
+		speed = self.state.level.antivirusSpiderSpeed[2]
 	else
 	
 		if (spider.state.headingTime < dt) then
@@ -1489,7 +1504,7 @@ function ReflexGame.SpiderThink(self, index, spider, dt)
 	end
 	
 	local pos = spider:Rect()
-	local nextPos = self:LerpWidget(spider,spider.state.heading,dt,spider.state.speed,false)
+	local nextPos = self:LerpWidget(spider,spider.state.heading,dt,speed,false)
 	local clip, edge = self:ClipToBoard(nextPos.x,nextPos.y,self.SPIDER_SIZE[1],self.SPIDER_SIZE[2])
 	
 	if (clip) then
@@ -1515,7 +1530,6 @@ end
 
 function ReflexGame.SpiderPickHeading(self, spider)
 	spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
-	spider.state.speed = FloatRand(self.state.level.antivirusSpiderSpeed[1], self.state.level.antivirusSpiderSpeed[2])
 	spider.state.headingTime = FloatRand(self.state.level.antivirusSpiderHeadingTime[1], self.state.level.antivirusSpiderHeadingTime[2])
 	if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
 		spider.state.heading.x = 1

@@ -258,6 +258,7 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.RightArrowPressed = World.Load("UI/right_arrow_pressed_M")
 	self.gfx.PlayerParticles = World.Load("Puzzles/playerparticles_M")
 	self.gfx.GoalParticles = World.Load("Puzzles/goalparticles_M")
+	self.gfx.SpiderParticles = World.Load("Puzzles/spiderparticles_M")
 	self.gfx.GoalOpen = World.Load("Puzzles/reflex-goal_open_M")
 	self.gfx.SwipeBar = World.Load("UI/lineborder3_M")
 	self.gfx.Outline = World.Load("UI/lineborder1_M")
@@ -470,6 +471,8 @@ function ReflexGame.DeInitUI(self)
 		end
 		if (self.widgets.spiders) then
 			for k,v in pairs(self.widgets.spiders) do
+				self.widgets.root2:RemoveChild(v.particles)
+				v.particles:Unmap()
 				self.widgets.root2:RemoveChild(v)
 				v:Unmap()
 			end
@@ -981,6 +984,7 @@ end
 function ReflexGame.SuckupSpider(self,index,spider,x,y)
 	table.remove(self.widgets.spiders,index)
 	table.insert(self.widgets.trash, spider)
+	spider.particles:Unmap()
 	self:SuckupWidget(spider,x,y)
 end
 
@@ -1239,6 +1243,7 @@ function ReflexGame.Think(self,dt)
 		self.gameReady = false
 		if (self.state.victory) then
 			self.tickTimer = false
+			self:ExplodeSpiders()
 			local f = function()
 				if (self.widgets.dpad) then
 					for k,v in pairs(self.widgets.dpad) do
@@ -1420,6 +1425,7 @@ function ReflexGame.Think(self,dt)
 			local dd = math.sqrt(dx*dx+dy*dy)
 			if (dd >= 6) then
 				local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
+				spider.particles = UI:CreateWidget("MatWidget", {rect={0,0,310*UI.identityScale[1],310*UI.identityScale[1]},material=self.gfx.SpiderParticles})
 				self.widgets.root2:AddChild(spider)	
 				table.insert(self.widgets.spiders,spider)
 				self:SetPositionByGrid(spider,x,y)		
@@ -1473,6 +1479,7 @@ end
 function ReflexGame.SpiderThink(self, index, spider, dt)
 	if (spider.state.lifetime < dt) then
 		table.remove(self.widgets.spiders,index)
+		spider.particles:Unmap()
 		self.widgets.root2:RemoveChild(spider)
 		spider:Unmap()
 		return
@@ -1570,6 +1577,55 @@ function ReflexGame.ExplodeGoal(self, widget)
 	World.globalTimers:Add(f, 0.4)
 end
 
+function ReflexGame.ExplodeSpider(self, spider)
+
+	local pos = self:GetPosition(spider)
+	spider:SetVisible(false)
+	
+	local particles = spider.particles
+	
+	UI:MoveWidgetByCenter(particles, pos.x, pos.y)
+	self.widgets.root2:AddChild(particles)
+	
+	particles:SetVisible(true)
+	particles:ScaleTo({0,0}, {0,0})
+	particles:ScaleTo({1,1}, {1,0.7})
+	
+	local f = function()
+		particles:BlendTo({1,1,1,0}, 0.3)
+	end
+	
+	World.globalTimers:Add(f, 0.4)
+end
+
+function ReflexGame.ExplodeSpiders(self)
+
+	if (#self.widgets.spiders < 1) then
+		return
+	end
+
+	local timeOfs = 0
+	local timeStep = 0.2
+	local totalTime = timeStep * (#self.widgets.spiders - 1)
+	
+	if (totalTime > 3) then
+		timeStep = 3 / (#self.widgets.spiders-1)
+	end
+	
+	
+	for k,v in pairs(self.widgets.spiders) do
+	
+		local f = function()
+			self:ExplodeSpider(v)
+		end
+		
+		World.globalTimers:Add(f, timeOfs)
+		timeOfs = timeOfs + timeStep
+	
+	end
+
+end
+
 function ReflexGame.CheckTouchPlayer(self,x,y,w,h)
 	local touchRect = {x-(w/2), y-(h/2),x+(w/2), y+(h/2)}
 			   
@@ -1581,7 +1637,7 @@ function ReflexGame.CheckTouchPlayer(self,x,y,w,h)
 	local disjointX = (touchRect[3] <= playerRect[1]) or (playerRect[3] <= touchRect[1])
 	local disjointY = (touchRect[4] <= playerRect[2]) or (playerRect[4] <= touchRect[2])
 	
-	return not (disjointX or disjointY)
+	return false --not (disjointX or disjointY)
 end
 
 function ReflexGame.GetHeadingTowardsPlayer(self,x,y)

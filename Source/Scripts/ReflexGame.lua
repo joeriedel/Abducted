@@ -311,8 +311,8 @@ function ReflexGame.InitUI(self)
 	self.REFLEX_BOARD_OFFSET = {self.screen[1], self.screen[2]}
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 8
-    self.LINE_SPAWN_TIME = 1
-	self.PLAYER_SPEED = 100
+    self.LINE_SPAWN_TIME = 0.5
+	self.PLAYER_SPEED = 125
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1]
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2]
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1] + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
@@ -1529,10 +1529,10 @@ function ReflexGame.ExplodePlayer(self)
 	self.widgets.root2:AddChild(self.widgets.playerParticles)
 	self.widgets.playerParticles:SetVisible(true)
 	self.widgets.playerParticles:ScaleTo({0,0}, {0,0})
-	self.widgets.playerParticles:ScaleTo({1,1}, {1,0.7})
+	self.widgets.playerParticles:ScaleTo({1,1}, {1,1})
 	
 	local f = function()
-		self.widgets.playerParticles:BlendTo({1,1,1,0}, 0.3)
+		self.widgets.playerParticles:BlendTo({1,1,1,0}, 0.6)
 	end
 	
 	World.globalTimers:Add(f, 0.4)
@@ -1547,10 +1547,10 @@ function ReflexGame.ExplodeGoal(self, widget)
 	self.widgets.root2:AddChild(widget.particles)
 	
 	widget.particles:ScaleTo({0,0}, {0,0})
-	widget.particles:ScaleTo({1,1}, {1,0.7})
+	widget.particles:ScaleTo({1,1}, {1,1})
 	
 	local f = function()
-		widget.particles:BlendTo({1,1,1,0}, 0.3)
+		widget.particles:BlendTo({1,1,1,0}, 0.6)
 	end
 	
 	World.globalTimers:Add(f, 0.4)

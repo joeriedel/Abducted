@@ -63,6 +63,9 @@ function TerminalScreen.Spawn(self)
 	self.solveDifficulty = NumberForString(self.keys.solve_difficulty, 1)
 	self.hackActions = self.keys.hack_success_actions
 	self.solveActions = self.keys.solve_success_actions
+	self.downgraded = false
+	self.failcount = 0
+	self.success = false
 	
 	if (self.keys.success_actions) then
 		if (self.hackActions) then
@@ -86,6 +89,17 @@ function TerminalScreen.Spawn(self)
 	self:PlayAnim("idle", self.model)
 	
 	table.insert(TerminalScreen.Objects, self)
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function TerminalScreen.CheckProximity(self, playerPos)
@@ -121,14 +135,15 @@ function TerminalScreen.Activate(self, activate)
 		self:BeginActivated()
 	else
 		self:EndActivated()
-		
 	end
 end
 
 function TerminalScreen.BeginActivated(self)
 
 	if (self.size == "big") then
-		self:PopupUI()
+		if (not self.success) then
+			self:PopupUI()
+		end
 	else
 		self.activateTime = Game.time
 	end
@@ -138,6 +153,8 @@ end
 function TerminalScreen.EndActivated(self)
 	if (self.popup) then
 		TerminalScreen.CancelUI()
+		Arm:ClearContext()
+		TerminalScreen.Signaled = nil
 	end
 	
 	self.model.glow1:BlendTo({1,1,1,0}, 0.1)
@@ -206,23 +223,29 @@ function TerminalScreen.ExecutePopup(self)
 	TerminalScreen.PopupEntity = self
 	self.popup = true
 	TerminalScreen.Widgets.Glyph:ScaleTo({1, 1}, {0.2,0.2})
+	self:CheckSignalDowngrade()
 end
 
 function TerminalScreen.CancelUI(callback)
 	if (TerminalScreen.PopupEntity) then
-		Abducted.entity.eatInput = true
-		TerminalScreen.Widgets.Glyph:ScaleTo({0, 0}, {0.2,0.2})
-		local f = function ()
-			Abducted.entity.eatInput = false
-			if (TerminalScreen.PopupEntity) then
-				TerminalScreen.PopupEntity.popup = false
-				TerminalScreen.PopupEntity = nil
+		if (GameDB:LoadingSaveGame()) then
+			TerminalScreen.Widgets.Glyph:ScaleTo({0, 0}, {0, 0})
+			TerminalScreen.PopupEntity = nil
+		else
+			Abducted.entity.eatInput = true
+			TerminalScreen.Widgets.Glyph:ScaleTo({0, 0}, {0.2,0.2})
+			local f = function ()
+				Abducted.entity.eatInput = false
+				if (TerminalScreen.PopupEntity) then
+					TerminalScreen.PopupEntity.popup = false
+					TerminalScreen.PopupEntity = nil
+				end
+				if (callback) then
+					callback()
+				end
 			end
-			if (callback) then
-				callback()
-			end
+			World.gameTimers:Add(f, 0.2)
 		end
-		World.gameTimers:Add(f, 0.2)
 	else
 		if (callback) then
 			callback()
@@ -266,6 +289,30 @@ function TerminalScreen.CheckActivate(dt)
 		v:CheckActive(playerPos)
 	end
 
+end
+
+function TerminalScreen.CheckSignalDowngrade(self)
+	if ((self.failcount >= 2) and (not self.downgraded) and (self.hackDifficulty > 1)) then
+		TerminalScreen.Signaled = self
+		Arm:SignalContext(
+			"TerminalDowngrade",
+			function ()
+				self:ClearContextChat()
+			end
+		)
+	end
+end
+
+function TerminalScreen.Downgrade()
+	local self = TerminalScreen.Signaled
+	if (self.hackDifficulty > 1) then
+		self.hackDifficulty = self.hackDifficulty - 1
+		self.downgraded = true
+	end
+end
+
+function TerminalScreen.ClearContextChat(self)
+	self.failcount = 0
 end
 
 function TerminalScreen.GlyphPressed()
@@ -337,6 +384,10 @@ function TerminalScreen.DoHackGame(self)
 			ReflexGame:ShowBoard(true)
 			
 			local f = function(result)
+				if (result ~= "w") then
+					-- failed
+					entity.failcount = entity.failcount + 1
+				end
 				TerminalScreen.GameComplete(entity, "hack", result)
 			end
 				
@@ -652,6 +703,37 @@ function TerminalScreen.SetButtonDifficulty(button, difficulty)
 	button.icon:SetRect({0,0,d[1],d[2]})
 	UI:MoveWidgetByCenter(button.icon, button.iconPos[1], button.iconPos[2])
 	
+end
+
+function TerminalScreen.SaveState(self)
+	local state = {
+		size = self.size,
+		downgraded = tostring(self.downgraded),
+		failcount = tostring(self.failcount),
+		success = tostring(self.success),
+		enabled = tostring(self.enabled)
+	}
+		
+	return state
+end
+
+function TerminalScreen.LoadState(self, state)
+
+	self.activated = false
+	self.popup = false
+	self.size = state.size
+	self.downgraded = state.downgraded == "true"
+	self.failcount = tonumber(self.failcount)
+	self.success = state.success == "true"
+	self.enabled = state.enabled == "true"
+	self.state = "none"
+	
+	if (self.size == "big") then
+		self.model:BlendImmediate("grown")
+	else
+		self.model:BlendImmediate("idle")
+	end
+
 end
 
 

@@ -33,7 +33,7 @@ function MemoryGame.PostSpawn(self)
 end
 
 function MemoryGame.ShowBoard(self, show)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 --	self.widgets.root:SetVisible(show)
@@ -41,13 +41,13 @@ function MemoryGame.ShowBoard(self, show)
 end
 
 function MemoryGame.InitGame(self, playerSkill, terminalSkill)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 end
 
 function MemoryGame.StartGame(self, gameCompleteCallback)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 	
 	MemoryGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
@@ -71,7 +71,7 @@ function MemoryGame.EndGame(self, result)
 end
 
 function MemoryGame.ResetGame(self)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
 	MemoryGame.active = false
@@ -115,7 +115,7 @@ function MemoryGame.CreateBoards(self)
 end
 
 function MemoryGame.OnInputEvent(self,e)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 
 -- djr, disabling this for now
 --	if (e.type == kI_KeyDown) then

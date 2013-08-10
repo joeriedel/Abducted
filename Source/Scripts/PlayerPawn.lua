@@ -989,8 +989,11 @@ function PlayerPawn.LeaveHackGame(self, terminal, result)
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
 			terminal:PostHackEvents(result)
-			if (not result) then
+			if (result) then
+				Abducted.entity:VisibleCheckpoint()
+			else
 				terminal:PopupUI()
+				terminal:CheckSignalDowngrade()
 			end
 		end
 	}
@@ -1030,7 +1033,9 @@ function PlayerPawn.LeaveSolveGame(self, terminal)
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
 			terminal:PostSolveEvents(terminal)
-			if (not result) then
+			if (result) then
+				Abducted.entity:VisibleCheckpoint()
+			else
 				terminal:PopupUI()
 			end
 		end

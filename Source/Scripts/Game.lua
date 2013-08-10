@@ -149,8 +149,7 @@ function Game.OnEvent(self, cmd, args)
 		self:Discover(args)
 		return true
 	elseif (cmd == "checkpoint") then
-		self.showCheckpointNotification = true
-		World.RequestGenerateSaveGame()
+		Abducted.entity:VisibleCheckpoint()
 		return true
 	elseif (cmd == "mainMenuCommand") then
 		if (self.OnMainMenuCommand) then

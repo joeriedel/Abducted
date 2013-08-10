@@ -55,6 +55,7 @@ function GameDB.LoadCheckpoint(self)
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
 	self.loadingCheckpoint = true
+	TerminalScreen.CancelUI()
 	Game.entity:LoadState()
 	GameDB:LoadPersistentObjects()
 	GameDB:LoadEvents()

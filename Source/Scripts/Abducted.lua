@@ -49,6 +49,11 @@ function Abducted.OnLevelStart(self)
 	
 end
 
+function Abducted.VisibleCheckpoint(self)
+	self.showCheckpointNotification = true
+	World.RequestGenerateSaveGame()
+end
+
 function Abducted.LoadCheckpoint(self)
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()

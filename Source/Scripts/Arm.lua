@@ -453,6 +453,33 @@ function Arm.Signal(self, topic)
 	
 end
 
+function Arm.SignalContext(self, topic, clearedCallback)
+	
+	if (topic) then
+		self.contextTopic = topic
+		self.clearContext = clearedCallback
+		self.topic = nil
+		HUD:SignalArm(true)
+	end
+	
+	Arm:ClearLockout()
+	
+end
+
+function Arm.ClearContext(self)
+	self.clearContext = nil
+	self.contextTopic = nil
+	Arm:ClearSignal()
+end
+
+function Arm.ClearSignal(self)
+
+	if ((self.requiredTopic == nil) and (self.contextTopic == nil)) then
+		HUD:SignalArm(false)
+	end
+
+end
+
 function Arm.SwitchToChat(self)
 
 	local cleanup = self.modeCleanup
@@ -764,15 +791,17 @@ end
 
 function Arm.LoadState(self)
 
+	self.requestedTopic = nil
+	self.requiredTopic = nil
+	self.contextTopic = nil
+	self.logTime = -1
+	
 	local x = Persistence.ReadString(SaveGame, "armReqTopic")
 	if (x) then
 		Arm:Signal(x)
 	else
 		HUD:SignalArm(false)
 	end
-	
-	self.requestedTopic = nil
-	self.logTime = -1
 
 end
 

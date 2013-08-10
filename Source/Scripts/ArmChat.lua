@@ -160,6 +160,8 @@ function Arm.LoadChats(self, chats)
     if (chats) then
 		Arm:LoadChatList(chats)
     end
+    
+    Arm:LoadCommonChat()
 end
 
 function Arm.StartConversation(self)
@@ -169,7 +171,10 @@ function Arm.StartConversation(self)
 	
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
 	
-	if (self.requestedTopic) then
+	if (self.contextTopic) then
+		self.changeConversationCount = 0
+		self.topic = Arm.Chats.Loaded[self.contextTopic]
+	elseif (self.requestedTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.requestedTopic]
 		self.requestedTopic = nil
@@ -190,11 +195,6 @@ function Arm.StartConversation(self)
 end
 
 function Arm.ProcessActions(self, actions)
-	if (FindArrayElement(actions, "clear_topic")) then
-		self.requiredTopic = nil
-		HUD:SignalArm(false)
-	end
-
 	-- rewards?
 	for k,v in pairs(actions) do
 		local tokens = Tokenize(v)
@@ -227,6 +227,18 @@ function Arm.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "discover") then
 		if (Abducted.entity:Discover(tokens[2])) then
 			self.rewardDiscover = tokens[2]
+		end
+	elseif (tokens[1] == "clear_topic") then
+		self.requiredTopic = nil
+		self:ClearSignal()
+	elseif (tokens[1] == "downgrade_yes") then
+		TerminalScreen.Downgrade()
+	elseif (tokens[1] == "clear_context") then
+		if (self.clearContext) then
+			self.clearContext()
+			self.clearContext = nil
+			self.contextTopic = nil
+			self:ClearSignal()
 		end
 	end
 

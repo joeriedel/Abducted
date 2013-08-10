@@ -16,6 +16,7 @@ function ReflexGame.CreateLevel1x1(self)
 	level.antivirusSpiderSeekPlayerRange = 5 -- grid squares
     level.blackholeSpeed = {50, 50}
     level.blockChaseTime = 1 -- delay before blocks start eating player line
+    level.blockGrowTime = 1
     level.time = 40
 	
 	level.board = {
@@ -55,27 +56,67 @@ function ReflexGame.CreateLevel1x1(self)
 end
 
 function ReflexGame.CreateLevel1x2(self)
-	local level = {}
-	
-	level.name = "1x2"	
-
-	level.board = {  { x=0, y=0, img="blocker_green" }
-		, { x=9, y=3, img="blocker_green" }
-		, { x=7, y=5, img="blocker_green" }
-		}
-	
-	return level
+	return self:CreateLevel1x1()
 end
 
 function ReflexGame.CreateLevel1x3(self)
-	local level = {}
-	
-	level.name = "1x3"	
-	
-	level.board = {  { x=0, y=0, img="blocker_green" }
-		, { x=6, y=3, img="blocker_green" }
-		, { x=3, y=5, img="blocker_green" }
-		}
-	
-	return level
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel1x4(self)
+	return self:CreateLevel1x1()
+end
+
+------- level 2's
+
+function ReflexGame.CreateLevel2x1(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel2x2(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel2x3(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel2x4(self)
+	return self:CreateLevel1x1()
+end
+
+------- level 3's
+
+function ReflexGame.CreateLevel3x1(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel3x2(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel3x3(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel3x4(self)
+	return self:CreateLevel1x1()
+end
+
+------- level 4's
+
+function ReflexGame.CreateLevel4x1(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel4x2(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel4x3(self)
+	return self:CreateLevel1x1()
+end
+
+function ReflexGame.CreateLevel4x4(self)
+	return self:CreateLevel1x1()
 end

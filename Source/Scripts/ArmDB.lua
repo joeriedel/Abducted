@@ -109,7 +109,7 @@ function Arm.EndDB(self, callback)
 end
 
 function Arm.DBTabPressed(self)
-	self = Arm
+	local self = Arm
 	
 	if (self.dbMode == "char") then
 		self.dbMode = "log"

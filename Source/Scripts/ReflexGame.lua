@@ -46,7 +46,7 @@ function ReflexGame.PostSpawn(self)
 end
 
 function ReflexGame.ShowBoard(self, show)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
 	self.widgets.root:SetVisible(show)
@@ -57,14 +57,18 @@ function ReflexGame.ShowBoard(self, show)
 end
 
 function ReflexGame.InitGame(self, terminalSkill)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	self.think = nil
 	self.gameReady = false
 	self.tickTimer = false
 	self.animatingRetry = false
 	self.exiting = false
 	
-	self.level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
+	terminalSkill = Clamp(terminalSkill, 1, #self.db.levels)
+	
+	local levelBank = self.db.levels[terminalSkill]
+	self.level = levelBank[IntRand(1, #levelBank)]
+	
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 	self:CreateBoard()
@@ -78,7 +82,7 @@ function ReflexGame.InitGame(self, terminalSkill)
 end
 
 function ReflexGame.StartGame(self, actions, gameCompleteCallback)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	
 	ReflexGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
@@ -119,15 +123,11 @@ function ReflexGame.LoadLevels(self)
 	self.db = { }
 	self.db.levels = { }    
 	
-	self.db.levels = {  { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }               
-		, { self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3() }                               
+	self.db.levels = {  
+		{ self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3(), self:CreateLevel1x4() },
+		{ self:CreateLevel2x1(), self:CreateLevel2x2(), self:CreateLevel2x3(), self:CreateLevel2x4() },
+		{ self:CreateLevel3x1(), self:CreateLevel3x2(), self:CreateLevel3x3(), self:CreateLevel3x4() },
+		{ self:CreateLevel4x1(), self:CreateLevel4x2(), self:CreateLevel4x3(), self:CreateLevel4x4() }
 		}
 end
 
@@ -175,7 +175,7 @@ function ReflexGame.HandleDPadEvents(self, widget, e)
 end
 
 function ReflexGame.DPadUp(widget, e)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	if (self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 0
 		self.state.heading.y = -1
@@ -184,7 +184,7 @@ function ReflexGame.DPadUp(widget, e)
 end
 
 function ReflexGame.DPadDown(widget, e)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 0
 		self.state.heading.y = 1
@@ -193,7 +193,7 @@ function ReflexGame.DPadDown(widget, e)
 end
 
 function ReflexGame.DPadLeft(widget, e)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = -1
 		self.state.heading.y = 0
@@ -202,7 +202,7 @@ function ReflexGame.DPadLeft(widget, e)
 end
 
 function ReflexGame.DPadRight(widget, e)
-	self = ReflexGame.entity
+	local self = ReflexGame.entity
 	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
 		self.state.heading.x = 1
 		self.state.heading.y = 0
@@ -1387,7 +1387,7 @@ function ReflexGame.Think(self,dt)
             self.widgets.grid[index] = b
             self:SetPositionByGrid(b,v.x,v.y)
             b:ScaleTo({0,0}, {0,0})
-            b:ScaleTo({1,1}, {1,1})
+            b:ScaleTo({1,1}, {self.state.level.blockGrowTime,self.state.level.blockGrowTime})
             self.state.lineIndex = self.state.lineIndex + 1
             COutLine(kC_Debug, "Spawned block")
         end
@@ -1637,7 +1637,7 @@ function ReflexGame.CheckTouchPlayer(self,x,y,w,h)
 	local disjointX = (touchRect[3] <= playerRect[1]) or (playerRect[3] <= touchRect[1])
 	local disjointY = (touchRect[4] <= playerRect[2]) or (playerRect[4] <= touchRect[2])
 	
-	return false --not (disjointX or disjointY)
+	return not (disjointX or disjointY)
 end
 
 function ReflexGame.GetHeadingTowardsPlayer(self,x,y)
@@ -1801,7 +1801,7 @@ function PuzzleScoreScreen.RevealNextItem(self, callback)
 	else
 		self.revealTimer:Clean()
 		self.revealTimer = nil
-		World.globalTimers:Add(callback, #self.widgets.items * 0.7 + 1)
+		World.globalTimers:Add(callback, #self.widgets.items * 0.5 + 1)
 	end
 end
 

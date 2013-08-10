@@ -219,6 +219,10 @@ function World.LoadOptional(path, numInstances, async)
 		async = true
 	end
 	
+	if (path == nil) then
+		local b = math.random()
+	end
+	
 	COutLine(kC_Debug, "Loading -- %s", path)
 	local state = System.CreatePrecacheTask(entity, path, true, numInstances, async)
 	if (not state) then

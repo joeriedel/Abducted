@@ -148,7 +148,7 @@ function MemoryGame.OnInputEvent(self,e)
 end
 
 function MemoryGame.OnInputGesture(self,g)
-	self = MemoryGame.entity
+	local self = MemoryGame.entity
 
 --  djr, disabling this for now (joe added this i think)
 --	if (g.id ~= kIG_Line) then

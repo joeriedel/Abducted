@@ -37,9 +37,9 @@ function SoundEmitter.Spawn(self)
 		if (self.keys.targetname ~= "shiphum") then
 			if (not GameDB.loadingCheckpoint) then -- music system knows its own state for checkpoints
 				if (BoolForString(self.keys.loop, true)) then
-					Music.entity:Play("play", {file, "loop=true"})
+					Music.entity:Play("play \""..file.."\" loop=true", {file, "loop=true"})
 				else
-					Music.entity:Play("play", {file})
+					Music.entity:Play("play \""..file.."\"", {file})
 				end
 			end
 			return

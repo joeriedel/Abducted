@@ -600,7 +600,7 @@ function PlayerPawn.PulseExplode(self)
 	self:Kill()
 end
 
-function PlayerPawn.Kill(self, killMessage)
+function PlayerPawn.Kill(self, instigator, killMessage)
 	if (self.dead or PlayerPawn.GodMode) then
 		return
 	end

@@ -329,7 +329,7 @@ function ManipulatableObject.OnDamage(self, targets)
 
 	for k,v in pairs(targets) do
 		if ((not v.dead) and v.Kill) then
-			v:Kill(killMsg)
+			v:Kill(self, killMsg)
 		end
 	end
 
@@ -955,7 +955,10 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
-	if (((canReset == nil) and (BoolForString(self.keys.reset, true) or (self.skillRequired > PlayerSkills.Manipulate))) or canReset) then
+	local alwaysReset = StringForString(self.keys.reset, "auto")=="always"
+	local neverReset = StringForString(self.keys.reset, "auto")=="never"
+	
+	if (((canReset == nil) and (not neverReset) and (alwaysReset or (self.skillRequired > PlayerSkills.Manipulate))) or (canReset and (not neverReset))) then
 		local f = function ()
 			COutLine(kC_Debug, "Manipulatable.Reset")
 			self.manipulate = nil
@@ -1082,7 +1085,7 @@ function ManipulatableObject.DoManipulateDamage(self, dir)
 			if (ents) then
 				for k,v in pairs(ents) do
 					if (v.Kill) then
-						v:Kill(self) -- crush!
+						v:Kill(self)
 					end
 				end
 			end

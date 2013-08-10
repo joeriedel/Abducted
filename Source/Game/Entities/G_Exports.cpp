@@ -8,11 +8,13 @@
 #include "G_ViewController.h"
 #include "G_PlayerPawn.h"
 #include "G_TouchTrigger.h"
+#include "G_TouchVolume.h"
 #include "G_ManipulatableObject.h"
 
 E_EXPORT(RADNULL_API, view_controller)
 E_EXPORT(RADNULL_API, info_player_start)
 E_EXPORT(RADNULL_API, info_touch_trigger)
+E_EXPORT(RADNULL_API, info_kill_volume)
 E_EXPORT(RADNULL_API, info_tentacle)
 E_EXPORT(RADNULL_API, info_pylon)
 E_EXPORT(RADNULL_API, info_custom_manipulatable)

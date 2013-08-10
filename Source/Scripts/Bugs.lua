@@ -836,7 +836,7 @@ function Bug.CheckStomp(self)
 	end
 
 	local f = function()
-		self:Kill()
+		self:Kill(World.playerPawn)
 	end
 
 	self.think = nil

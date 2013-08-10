@@ -159,6 +159,9 @@
     <ClInclude Include="..\..\Game\Lua\G_VtModel.h">
       <Filter>Source\Game\Lua</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Game\Entities\G_TouchVolume.h">
+      <Filter>Source\Game\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Abducted.rc">
@@ -195,6 +198,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Game\Lua\G_VtModel.cpp">
       <Filter>Source\Game\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Game\Entities\G_TouchVolume.cpp">
+      <Filter>Source\Game\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

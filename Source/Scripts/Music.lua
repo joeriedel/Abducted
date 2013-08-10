@@ -49,13 +49,15 @@ function Music.Play(self, cmd, args)
 	end
 	
 	self:Stop() -- fade out active music
+	
+	self.cmd = cmd
+	self.name = args[1]
+		
 	if (GameDB.loadingCheckpoint) then
 		self.active = World.Load(args[1], 1, false) -- blocking load
 	else
 		self.active = World.Load(args[1])
 	end
-	self.name = args[1]
-	self.cmd = cmd
 	
 	local fade = not FindArrayElement(args, "fade=false")
 	local loop = FindArrayElement(args, "loop=true")
@@ -93,6 +95,7 @@ end
 function Music.Stop(self)
 	self.name = nil
 	self.cmd = nil
+	self.args = nil
 	if (self.active) then
 		if (self.active:Playing()) then
 			local sound = self.active
@@ -131,7 +134,7 @@ function Music.SaveState(self)
 	local state = {}
 	
 	if (self.name and self.active) then
-		state.active = self.cmd
+		state.cmd = self.cmd
 	end
 	
 	return state
@@ -142,13 +145,13 @@ function Music.LoadState(self, state)
 
 	self.queue = LL_New()
 
-	if (state.active) then
+	if (state.cmd) then
 	-- spin up another one
 		self.name = nil
 		local f = function(self)
-			local x = Tokenize(state.active)
+			local x = Tokenize(state.cmd)
 			table.remove(x, 1)
-			Music.Play(self, state.active, x)
+			Music.Play(self, state.cmd, x)
 		end
 		LL_Append(self.queue, {f=f})
 	else

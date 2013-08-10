@@ -59,6 +59,9 @@ function KillVolume.OnEvent(self, cmd, args)
 	elseif (cmd == "disable") then
 		self:Enable(false)
 		return true
+	elseif (cmd == "trigger") then
+		self:KillThink()
+		return true
 	end
 	
 	return false

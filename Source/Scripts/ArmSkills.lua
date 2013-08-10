@@ -102,12 +102,9 @@ function Arm.StartSkills(self)
 	self.widgets.skills.Root:BlendTo({1,1,1,1}, 0.2)
 end
 
-function Arm.EndSkills(self)
+function Arm.EndSkills(self, callback)
 	self.widgets.skills.Root:BlendTo({1,1,1,0}, 0.2)
-end
-
-function Arm.EndSkills(self)
-
+	World.globalTimers:Add(callback, 0.2)
 end
 
 function Arm.SkillsReset(self)

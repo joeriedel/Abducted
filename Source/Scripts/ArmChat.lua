@@ -171,7 +171,10 @@ function Arm.StartConversation(self)
 	
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
 	
-	if (self.contextTopic) then
+	if (self.horrorTopic) then
+		self.changeConversationCount = 0
+		self.topic = Arm.Chats.Loaded[self.horrorTopic]
+	elseif (self.contextTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.contextTopic]
 	elseif (self.requestedTopic) then
@@ -249,7 +252,7 @@ function Arm.ProcessTriggerTokens(self, tokens)
 	local s = nil
 	for i=2,#tokens do
 		if (s) then
-			s = s.." "..tokens[i]
+			s = s.." \""..tokens[i].."\""
 		else
 			s = tokens[i]
 		end
@@ -446,7 +449,7 @@ function Arm.ChatPrompt(self)
 	end
 	
 	if (next(self.topic.reply) == nil) then
-		self.topic.reply = {{"I_DONT_KNOW"}}
+		return
 	end
 	
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
@@ -469,6 +472,19 @@ function Arm.ChatPrompt(self)
 		local actions = string.split(self.topic.action, ";")
 		Arm:ProcessActions(actions)
 		lock = FindArrayElement(actions, "lock")
+		
+		if (self.horrorTopic) then
+			if (FindArrayElement(actions, "clear_topic")) then
+				self.clearTopicPending = true
+			end
+		end
+		
+		if (FindArrayElement(actions, "abort")) then
+			if (self.clearTopicPending) then
+				Arm:EndHorrorTopic()
+			end
+			return
+		end
 	end
 	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
 		if (lock) then
@@ -658,6 +674,11 @@ function Arm.ClearLockout(self)
 end
 
 function Arm.DisplayChoices(self)
+
+	if (self.clearTopicPending) then
+		Arm:EndHorrorTopic()
+		return
+	end
 
 	if (self.choices == nil) then
 		return

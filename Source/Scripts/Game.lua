@@ -136,6 +136,9 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "unlock_topic") then
 		self:UnlockTopic(args)
 		return true
+	elseif (cmd == "horror_topic") then
+		Arm:HorrorTopic(args)
+		return true
 	elseif (cmd == "enable_manipulate") then
 		PlayerSkills:UnlockManipulate()
 		return true

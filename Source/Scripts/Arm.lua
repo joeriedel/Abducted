@@ -427,27 +427,36 @@ function Arm.Start(self, mode)
 	self.introMode = mode
 	self.changeConversationCount = 0
 	
-	UI:BlendTo({1,1,1,1}, 0.2)
 	self:ResetWidgets()
-		
-	self.sfx.ArmIntro:Rewind()
-	self.sfx.ArmIntro:Play(kSoundChannel_UI, 0)
 	
-	local f = function()
-		UI:BlendTo({1,1,1,0}, 0.2)
-		HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
+	if (self.horrorTopic) then
+		UI:BlendTo({0,0,0,0}, 0.2)
 		World.SetDrawUIOnly(true) -- no world rendering anymore
 		World.PauseGame(true)
-		Arm:Intro()
-	end
+		Arm:FixedChat()
+	else
+		UI:BlendTo({1,1,1,0}, 0)
+		UI:BlendTo({1,1,1,1}, 0.2)
+		self.sfx.ArmIntro:Rewind()
+		self.sfx.ArmIntro:Play(kSoundChannel_UI, 0)
 	
-	World.globalTimers:Add(f, 0.2)
+		local f = function()
+			UI:BlendTo({1,1,1,0}, 0.2)
+			HUD.widgets.Arm.class:Reset(HUD.widgets.Arm) -- eatInput we'll never get an up event for this
+			World.SetDrawUIOnly(true) -- no world rendering anymore
+			World.PauseGame(true)
+			Arm:Intro()
+		end
+		
+		World.globalTimers:Add(f, 0.2)
+	end
 end
 
 function Arm.Signal(self, topic)
 
 	if (topic) then
 		self.requiredTopic = topic
+		self.requestedTopic = nil
 		self.topic = nil
 		HUD:SignalArm(true)
 	end
@@ -461,12 +470,50 @@ function Arm.SignalContext(self, topic, clearedCallback)
 	if (topic) then
 		self.contextTopic = topic
 		self.clearContext = clearedCallback
+		self.requestedTopic = nil
 		self.topic = nil
-		HUD:SignalArm(true)
 	end
 	
 	Arm:ClearLockout()
 	
+end
+
+function Arm.HorrorTopic(self, topic)
+
+	if (topic) then
+		self.requestedTopic = nil
+		self.horrorTopic = topic
+		self.topic = nil
+		self.clearTopicPending = false
+		
+		Abducted.entity.eatInput = true
+		World.playerPawn:Stop()
+		UI:BlendTo({0,0,0,0}, 0)
+		UI:BlendTo({0,0,0,1}, 0.2)
+		local f = function()
+			Arm:Start("chat")
+		end
+		
+		World.globalTimers:Add(f, 0.2)
+	end
+	
+	Arm:ClearLockout()
+
+end
+
+function Arm.EndHorrorTopic(self)
+	self.horrorTopic = nil
+	self.topic = nil
+	self.clearTopicPending = false
+	
+	World.FlushInput(true)
+	Abducted.entity.eatInput = true
+	
+	local f = function()
+		Arm:EndFixedChat()
+	end
+	
+	World.globalTimers:Add(f, 1.5)
 end
 
 function Arm.ClearContext(self)
@@ -480,6 +527,45 @@ function Arm.ClearSignal(self)
 	if ((self.requiredTopic == nil) and (self.contextTopic == nil)) then
 		HUD:SignalArm(false)
 	end
+
+end
+
+function Arm.FixedChat(self)
+	self.widgets.Root:SetVisible(true)
+	
+	self.widgets.LineBorder1:BlendTo({1,1,1,1}, 0)
+	self.widgets.LineBorder1:ScaleTo({1, 1}, {0, 0})
+	self.widgets.LineBorder2:BlendTo({1,1,1,0}, 0)
+	self.widgets.LineBorder3:BlendTo({1,1,1,1}, 0)
+	
+	Arm:SwitchMode("chat")
+	Abducted.entity.eatInput = false
+	World.FlushInput(true)
+end
+
+function Arm.EndFixedChat(self)
+
+	UI:BlendTo({0,0,0,1}, 0.2)
+
+	local f = function()
+		UI:BlendTo({0,0,0,0}, 0.2)
+		Arm:HideChat()
+		Arm:DBHide()
+		Arm.active = false
+		Arm.widgets.Root:SetVisible(false)
+		Arm:ClearButtonHighlights()
+		World.SetDrawUIOnly(false)
+		World.PauseGame(false)
+		collectgarbage()
+		Abducted.entity.eatInput = false
+	end
+		
+	if (Arm.armLockTimer) then
+		Arm.armLockTimer:Clean()
+		Arm.armLockTimer = nil
+	end
+	
+	World.globalTimers:Add(f, 0.2)
 
 end
 
@@ -532,7 +618,7 @@ function Arm.SwitchToSkills(self)
 
 	local cleanup = self.modeCleanup
 	self.modeCleanup = function(callback)
-		Arm:EndSkills()
+		Arm:EndSkills(callback)
 	end
 	
 	if (cleanup) then
@@ -549,7 +635,7 @@ function Arm.SwitchToSkills(self)
 end
 
 function Arm.SwapToTalk(self)
-	if (self.talk) then
+	if ((self.talk) or self.horrorTopic) then
 		return
 	end
 	
@@ -568,7 +654,7 @@ function Arm.SwapToTalk(self)
 end
 
 function Arm.SwapToChange(self)
-	if (not self.talk) then
+	if ((not self.talk) or self.horrorTopic) then
 		return
 	end
 	if (GameDB.chatLockout) then
@@ -584,6 +670,10 @@ function Arm.SwapToChange(self)
 end
 
 function Arm.EnableChangeTopic(self, enable)
+	if (enable and (self.horrorTopic or self.requiredTopic or self.contextTopic)) then
+		return
+	end
+	
 	if (enable) then
 		self.widgets.Change.class:SetEnabled(self.widgets.Change, true, true)
 		self.widgets.Change:BlendTo({1,1,1,1}, 0.2)

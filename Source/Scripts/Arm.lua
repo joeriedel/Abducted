@@ -12,6 +12,7 @@ function Arm.Spawn(self)
 	self:SpawnShared()
 	self:SpawnChat()
 	self:SpawnDB()
+	self:SpawnSkills()
 	
 end
 
@@ -48,6 +49,7 @@ function Arm.SpawnShared(self)
 	self.gfx.LogTab = World.Load("UI/tab-selection-log_M")
 	self.gfx.LogTabPressed = World.Load("UI/tab-selection-log-pressed_M")
 	self.gfx.CharPortrait = World.Load(GameDB.portrait)
+	self.gfx.SkillsBackground = World.Load("UI/backgroundplate1_M")
 --self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
 	
 	self.typefaces = {}
@@ -364,6 +366,7 @@ end
 
 function Arm.PowersPressed(widget)
 	Arm:ClearButtonHighlights(widget)
+	Arm:SwitchMode("powers")
 end
 
 function Arm.QuitPressed(widget)
@@ -398,19 +401,19 @@ function Arm.EatAllInput(self, e)
 end
 
 function Arm.ResetWidgets(self)
-	self.widgets.Shimmer:BlendTo({0,0,0,0}, 0)
-	self.widgets.Symbol:BlendTo({0,0,0,0}, 0)
-	self.widgets.LineBorder1:BlendTo({0,0,0,0}, 0)
-	self.widgets.LineBorder2:BlendTo({0,0,0,0}, 0)
-	self.widgets.LineBorder3:BlendTo({0,0,0,0}, 0)
+	self.widgets.Shimmer:BlendTo({1,1,1,0}, 0)
+	self.widgets.Symbol:BlendTo({1,1,1,0}, 0)
+	self.widgets.LineBorder1:BlendTo({1,1,1,0}, 0)
+	self.widgets.LineBorder2:BlendTo({1,1,1,0}, 0)
+	self.widgets.LineBorder3:BlendTo({1,1,1,0}, 0)
 	
 	for k,v in pairs(self.widgets.MenuButtons) do
-		v:BlendTo({0,0,0,0}, 0)
+		v:BlendTo({1,1,1,0}, 0)
 	end
 	
 	Arm:ResetChat()
 	Arm:DBResetAll()
-	
+	Arm:SkillsReset()
 end
 
 function Arm.Start(self, mode)
@@ -525,6 +528,26 @@ function Arm.SwitchToDB(self)
 
 end
 
+function Arm.SwitchToSkills(self)
+
+	local cleanup = self.modeCleanup
+	self.modeCleanup = function(callback)
+		Arm:EndSkills()
+	end
+	
+	if (cleanup) then
+		Abducted.entity.eatInput = true
+		local f = function()
+			Abducted.entity.eatInput = false
+			self:StartSkills()
+		end
+		cleanup(f)
+	else
+		self:StartSkills()
+	end
+	
+end
+
 function Arm.SwapToTalk(self)
 	if (self.talk) then
 		return
@@ -538,9 +561,9 @@ function Arm.SwapToTalk(self)
 	end
 	
 	self.widgets.Change.class:SetEnabled(self.widgets.Change, false)
-	self.widgets.Change:BlendTo({0,0,0,0}, 0.1)
+	self.widgets.Change:BlendTo({1,1,1,0}, 0.1)
 	
-	self.widgets.LineBorder2:BlendTo({0,0,0,0}, 0.5)
+	self.widgets.LineBorder2:BlendTo({1,1,1,0}, 0.5)
 	self.widgets.LineBorder3:BlendTo({1,1,1,1}, 0.5)
 end
 
@@ -554,10 +577,10 @@ function Arm.SwapToChange(self)
 	
 	self.talk = false
 	self.widgets.Talk.class:SetEnabled(self.widgets.Talk, false)
-	self.widgets.Talk:BlendTo({0,0,0,0}, 0.2)
+	self.widgets.Talk:BlendTo({1,1,1,0}, 0.2)
 	self.widgets.Change.class:SetEnabled(self.widgets.Change, true)
 	self.widgets.LineBorder2:BlendTo({1,1,1,1}, 0.5)
-	self.widgets.LineBorder3:BlendTo({0,0,0,0}, 0.5)
+	self.widgets.LineBorder3:BlendTo({1,1,1,0}, 0.5)
 end
 
 function Arm.EnableChangeTopic(self, enable)
@@ -566,7 +589,7 @@ function Arm.EnableChangeTopic(self, enable)
 		self.widgets.Change:BlendTo({1,1,1,1}, 0.2)
 	else
 		self.widgets.Change.class:SetEnabled(self.widgets.Change, false, false)
-		self.widgets.Change:BlendTo({0,0,0,0}, 0.2)
+		self.widgets.Change:BlendTo({1,1,1,0}, 0.2)
 	end
 end
 
@@ -587,6 +610,8 @@ function Arm.SwitchMode(self, mode)
 		self:SwitchToChat()
 	elseif (mode == "db") then
 		self:SwitchToDB()
+	elseif (mode == "powers") then
+		self:SwitchToSkills()
 	end
 	
 end
@@ -665,7 +690,7 @@ function Arm.TransitionChat(self)
 		}
 	)
 	
-	self.widgets.Symbol:BlendTo({0,0,0,0}, 0.5)
+	self.widgets.Symbol:BlendTo({1,1,1,0}, 0.5)
 end
 
 function Arm.ActivateSymbol(self, active, options)
@@ -690,7 +715,7 @@ function Arm.ShowSymbol(self, show, time)
 			}
 		)
 	else
-		self.widgets.Symbol:BlendTo({0,0,0,0}, time)
+		self.widgets.Symbol:BlendTo({1,1,1,0}, time)
 		local f = function()
 			self:ActivateSymbol(false)
 		end

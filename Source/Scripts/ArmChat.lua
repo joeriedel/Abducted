@@ -761,7 +761,7 @@ function Arm.DisplayChoices(self)
 		xPos = xPos + buttonRect[3] + horzSpace
 		lineHeight = Max(lineHeight, buttonRect[4])
 		
-		w:BlendTo({0,0,0,0}, 0)
+		w:BlendTo({1,1,1,0}, 0)
 		self.widgets.chat.ChatList:AddItem(w)
 		table.insert(self.choiceWidgets, w)
 		

@@ -268,7 +268,7 @@ function Arm.EnterCharDB(self, enter, callback, time)
 		Arm:DBAnimateTimePlayed(true)
 		self.widgets.db.CharRoot:BlendTo({1,1,1,1}, time)
 	else
-		self.widgets.db.CharRoot:BlendTo({0,0,0,0}, time)
+		self.widgets.db.CharRoot:BlendTo({1,1,1,0}, time)
 	end
 	
 	local f = function()

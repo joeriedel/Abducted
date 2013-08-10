@@ -116,7 +116,7 @@ function Arm.EnterDiscoveriesDB(self, enter, callback, time)
 		Arm:ScrollToRequestedItem()
 		self.widgets.db.DiscoveriesRoot:BlendTo({1,1,1,1}, time)
 	else
-		self.widgets.db.DiscoveriesRoot:BlendTo({0,0,0,0}, time)
+		self.widgets.db.DiscoveriesRoot:BlendTo({1,1,1,0}, time)
 	end
 	
 	if (callback and (time > 0)) then

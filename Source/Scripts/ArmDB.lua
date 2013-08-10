@@ -93,7 +93,7 @@ function Arm.EndDB(self, callback)
 		self.dbTimer = nil
 	end
 	
-	self.widgets.db.Root:BlendTo({0,0,0,0}, 0.2)
+	self.widgets.db.Root:BlendTo({1,1,1,0}, 0.2)
 	
 	local f = function()
 		self.widgets.db.Root:SetVisible(false)
@@ -146,10 +146,10 @@ function Arm.DBResetAll(self)
 
 	self.widgets.db.Root:BlendTo({1,1,1,1}, 0)
 	self.widgets.db.Root:SetVisible(true)
-	self.widgets.db.CharRoot:BlendTo({0,0,0,0}, 0)
-	self.widgets.db.EventLog:BlendTo({0,0,0,0}, 0)
-	self.widgets.db.DiscoveriesRoot:BlendTo({0,0,0,0}, 0)
-	self.widgets.db.Tab:BlendTo({0,0,0,0}, 0)
+	self.widgets.db.CharRoot:BlendTo({1,1,1,0}, 0)
+	self.widgets.db.EventLog:BlendTo({1,1,1,0}, 0)
+	self.widgets.db.DiscoveriesRoot:BlendTo({1,1,1,0}, 0)
+	self.widgets.db.Tab:BlendTo({1,1,1,0}, 0)
 	
 end
 
@@ -198,7 +198,7 @@ function Arm.DBShowPanel(self, show, mode, callback, animateTab)
 			self.dbActive(self, true, callback, 0.2)
 		end
 	else
-		self.widgets.db.Tab:BlendTo({0,0,0,0}, 0.2)
+		self.widgets.db.Tab:BlendTo({1,1,1,0}, 0.2)
 		self.dbActive(self, false, callback, 0.2)
 		self.dbActive = nil
 	end

@@ -613,9 +613,9 @@ function StringTable.Get(name, stringTable, useDefault, default, language)
 		x = "nil"
 	end
 	
-	if (x) then
-		x = x:gsub("\\n", "\n")
-	end
+	--if (x) then
+	--	x = x:gsub("\\n", "\n")
+	--end
 	
 	return x
 end

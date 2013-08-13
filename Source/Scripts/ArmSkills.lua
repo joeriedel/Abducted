@@ -50,16 +50,16 @@ function Arm.SpawnSkills(self)
 		end
 	end
 	
-	local buttonFontH = UI:FontAdvanceSize(UI.typefaces.StandardButton, self.skillsFontScale)
-	local buttonHeight = buttonFontH + 48*UI.identityScale[1]
-	local footerItemSpace = 0--4 * UI.identityScale[2]
+	--local buttonFontH = UI:FontAdvanceSize(UI.typefaces.StandardButton, self.skillsFontScale)
+	--local buttonHeight = buttonFontH + 48*UI.identityScale[1]
+	--local footerItemSpace = 0--4 * UI.identityScale[2]
 	local skillPointsFontH = UI:FontAdvanceSize(self.typefaces.SkillPoints, self.skillsFontScale)
 		
 	self.skillsTreeRect = {
 		0,
 		0,
 		skillsTreeImageRect[3],
-		self.skillsRootWorkspaceSize[4] - (buttonHeight*2) - skillPointsFontH - (8*UI.identityScale[1])
+		self.skillsRootWorkspaceSize[4] - self.menuButtonSize[2] - (8*UI.identityScale[1])
 	}
 	
 	local gap = 24 * UI.identityScale[1]
@@ -82,14 +82,14 @@ function Arm.SpawnSkills(self)
 	local lineSpace = 28 * UI.identityScale[1]
 	
 	local w = UI:CreateWidget("MatWidget", {
-		rect={self.skillsTreeRect[1] + self.skillsTreeRect[3], 0, lineSpace, self.skillsRootWorkspaceSize[4]},
+		rect={self.skillsTreeRect[1] + self.skillsTreeRect[3], 0, lineSpace, self.skillsTreeRect[4]},
 		material=self.gfx.SkillsThinVertLines2
 	})
 	
 	self.skillsTreeFooter = {
 		self.skillsTreeRect[1],
 		self.skillsTreeRect[2] + self.skillsTreeRect[4] + (10*UI.identityScale[1]),
-		self.skillsTreeRect[3],
+		self.skillsRootWorkspaceSize[3],
 		0
 	}
 	
@@ -116,7 +116,6 @@ function Arm.SpawnSkills(self)
 		titleSize
 	}
 	
-	local footerSize = skillPointsFontH + (buttonHeight*3) + (10*UI.identityScale[2])
 	self.skillsDescriptionRect = {
 		self.skillsTextRect[1],
 		self.skillsTitleRect[2] + self.skillsTitleRect[4] + (10*UI.identityScale[2]),
@@ -124,7 +123,7 @@ function Arm.SpawnSkills(self)
 		0
 	}
 	
-	self.skillsDescriptionRect[4] = self.skillsRootWorkspaceSize[4] - self.skillsDescriptionRect[2] - footerSize
+	self.skillsDescriptionRect[4] = self.skillsRootWorkspaceSize[4] - self.skillsDescriptionRect[2]
 	
 	w = UI:CreateWidget("MatWidget",
 		{rect={self.skillsTitleRect[1], self.skillsTitleRect[2]+self.skillsTitleRect[4], self.skillsTextRect[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
@@ -133,7 +132,7 @@ function Arm.SpawnSkills(self)
 	self.widgets.skills.Root:AddChild(w)
 	
 	w = UI:CreateWidget("MatWidget",
-		{rect={self.skillsTreeRect[1], self.skillsTreeRect[2]+self.skillsTreeRect[4], self.skillsTreeRect[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
+		{rect={self.skillsTreeRect[1], self.skillsTreeRect[2]+self.skillsTreeRect[4], self.skillsRootWorkspaceSize[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
 	)
 	w:SetBlendWithParent(true)
 	self.widgets.skills.Root:AddChild(w)
@@ -142,21 +141,17 @@ function Arm.SpawnSkills(self)
 	self.widgets.skills.Title:SetBlendWithParent(true)
 	self.widgets.skills.Root:AddChild(self.widgets.skills.Title)
 	
-	self.skillPointsLabelRect = {self.skillsTreeFooter[1], self.skillsTreeFooter[2], self.skillsTreeFooter[3], skillPointsFontH}
-	self.widgets.skills.SkillPointsLabel = UI:CreateWidget("TextLabel", {
-		rect=self.skillPointsLabelRect,
-		typeface=self.typefaces.SkillPoints
-	})
-	
-	self.widgets.skills.SkillPointsLabel:SetBlendWithParent(true)
-	self.widgets.skills.Root:AddChild(self.widgets.skills.SkillPointsLabel)
-	
-	local x = self.skillsTreeFooter[1]
-	local y = self.skillsTreeFooter[2] + self.skillsTreeFooter[4] - buttonHeight*2
-	local buttonWidth = self.skillsTreeFooter[3] / 2
-	
+	local y = self.skillsTreeFooter[2] + self.skillsTreeFooter[4] - self.menuButtonSize[2]
+	local buttonSpace = 16 * UI.identityScale[1]
+	local buttonWidth = (self.skillsTreeFooter[3]-(buttonSpace*2)) / 3
+	local controlSize = buttonWidth*3
+	local buttonWidth2 = buttonWidth * 1.15
+	buttonWidth = (controlSize-buttonWidth2) / 2
+	controlSize = controlSize + (buttonSpace*2)
+	local x = self.skillsTreeFooter[1] + (self.skillsTreeFooter[3] - controlSize) / 2
+			
 	self.widgets.skills.Store = UI:CreateStylePushButton(
-		{ x, y, buttonWidth, buttonHeight*2 },
+		{ x, y, buttonWidth, self.menuButtonSize[2] },
 		function () self:OnStoreButtonPressed() end,
 		{ pressed = self.sfx.Button, highlight={on={0,0,0,0}} },
 		self.widgets.skills.Root
@@ -174,10 +169,31 @@ function Arm.SpawnSkills(self)
 		UI.invIdentityScale
 	)
 	
-	x = x + buttonWidth
+	x = x + buttonWidth + buttonSpace
+	
+	self.widgets.skills.Train = UI:CreateStylePushButton(
+		{ x, y, buttonWidth, self.menuButtonSize[2] },
+		function () self:OnTrainButtonPressed() end,
+		{ pressed = self.sfx.Button, highlight={on={0,0,0,0}} },
+		self.widgets.skills.Root
+	)
+	self.widgets.skills.Train:SetBlendWithParent(true)
+	
+	local text = StringTable.Get("SKILL_TRAIN")
+	UI:LineWrapCenterText(
+		self.widgets.skills.Train.label,
+		nil,
+		nil,
+		0,
+		text,
+		UI.identityScale,
+		UI.invIdentityScale
+	)
+	
+	x = x + buttonWidth + buttonSpace
 	
 	self.widgets.skills.Purchase = UI:CreateStylePushButton(
-		{ x, y, buttonWidth, buttonHeight },
+		{ x, y, buttonWidth2, self.menuButtonSize[2]/1.5 },
 		function () self:OnPurchaseButtonPressed() end,
 		{ pressed = self.sfx.Button, highlight={on={0,0,0,0}} },
 		self.widgets.skills.Root
@@ -195,26 +211,15 @@ function Arm.SpawnSkills(self)
 		UI.invIdentityScale
 	)
 	
-	--x = x + buttonWidth
+	self.skillPointsLabelRect = {x, y+(self.menuButtonSize[2]/1.5), buttonWidth2, 0}
+	self.skillPointsLabelRect[4] = self.skillsRootWorkspaceSize[4] - self.skillPointsLabelRect[2]
+	self.widgets.skills.SkillPointsLabel = UI:CreateWidget("TextLabel", {
+		rect=self.skillPointsLabelRect,
+		typeface=self.typefaces.SkillPoints
+	})
 	
-	self.widgets.skills.Train = UI:CreateStylePushButton(
-		{ x, y+buttonHeight, buttonWidth, buttonHeight },
-		function () self:OnTrainButtonPressed() end,
-		{ pressed = self.sfx.Button, highlight={on={0,0,0,0}} },
-		self.widgets.skills.Root
-	)
-	self.widgets.skills.Train:SetBlendWithParent(true)
-	
-	local text = StringTable.Get("SKILL_TRAIN")
-	UI:LineWrapCenterText(
-		self.widgets.skills.Train.label,
-		nil,
-		nil,
-		0,
-		text,
-		UI.identityScale,
-		UI.invIdentityScale
-	)
+	self.widgets.skills.SkillPointsLabel:SetBlendWithParent(true)
+	self.widgets.skills.Root:AddChild(self.widgets.skills.SkillPointsLabel)
 	
 	self:SpawnSkillsTree(skillsTreeImageRect, scrollBar)
 	

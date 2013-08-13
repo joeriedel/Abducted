@@ -201,6 +201,8 @@ function Arm.CreateMenu(self)
 	size[1] = size[1] * scale[1]
 	size[2] = size[2] * scale[2] * 0.92
 	
+	self.menuButtonSize = {size[1], size[2]}
+	
 	local x = 7 * scale[1]
 	local y = 0
 	

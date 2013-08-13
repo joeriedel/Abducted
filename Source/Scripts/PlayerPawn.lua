@@ -621,28 +621,6 @@ function PlayerPawn.Kill(self, instigator, killMessage)
 end
 
 function PlayerPawn.CheckTappedOn(self, e)
-
-	local pos = self:WorldPos()
-	
-	local set = PlayerPawn.AnimationStates[self.animState]
-	
-	if (set.tapAdjust) then
-		pos = VecAdd(pos, {0, 0, set.tapAdjust})
-	else
-		pos = VecAdd(pos, {0, 0, 64})
-	end
-	
-	local screen, r = World.Project(pos)
-	if (r) then
-		local dx = screen[1] - e.data[1]
-		local dy = screen[2] - e.data[2]
-		local dd = math.sqrt(dx*dx + dy*dy)
-		local maxDist = UI.systemScreen.diagonal * 0.7/20
-		if (dd <= maxDist) then
-			return true
-		end
-	end
-	
 	return false
 end
 

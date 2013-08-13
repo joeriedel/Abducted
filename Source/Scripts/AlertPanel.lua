@@ -126,7 +126,7 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 	UI:HCenterLabel(self.widgets.title, {0, 0, panelRect[3], panelRect[4]})
 			
 	text = StringTable.Get(msg)
-	UI:LineWrapLJustifyText(
+	UI:LineWrapCenterLJustifyText(
 		self.widgets.text,
 		nil,
 		true,

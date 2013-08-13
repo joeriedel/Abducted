@@ -106,7 +106,7 @@ function MainMenu.News.Layout(self, news)
 			-- layout header stuff.
 			if (v.title) then
 				local w = UI:CreateWidget("TextLabel", {rect={xInset,yOffset,8,8}, typeface=MainMenu.typefaces.Gold})
-				local r = UI:LineWrapLJustifyText(w, maxWidth, true, lineSpace, v.title)
+				local r = UI:LineWrapCenterLJustifyText(w, maxWidth, true, lineSpace, v.title)
 				
 				w:SetBlendWithParent(true)
 				self.widgets.vlist:AddItem(w)
@@ -117,7 +117,7 @@ function MainMenu.News.Layout(self, news)
 			
 			if (v.text) then
 				local w = UI:CreateWidget("TextLabel", {rect={xInset,yOffset,8,8}, typeface=MainMenu.typefaces.Normal})
-				local r = UI:LineWrapLJustifyText(w, maxWidth, true, lineSpace, v.text)
+				local r = UI:LineWrapCenterLJustifyText(w, maxWidth, true, lineSpace, v.text)
 				
 				w:SetBlendWithParent(true)
 				self.widgets.vlist:AddItem(w)

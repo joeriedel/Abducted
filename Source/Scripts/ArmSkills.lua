@@ -46,13 +46,10 @@ function Arm.SpawnSkills(self)
 	
 	if (UI.mode == kGameUIMode_Mobile) then
 		if (UI.screenWidth == 960) then
-			self.skillsFontScale = {0.75, 0.75}
+--			self.skillsFontScale = {0.75, 0.75}
 		end
 	end
 	
-	--local buttonFontH = UI:FontAdvanceSize(UI.typefaces.StandardButton, self.skillsFontScale)
-	--local buttonHeight = buttonFontH + 48*UI.identityScale[1]
-	--local footerItemSpace = 0--4 * UI.identityScale[2]
 	local skillPointsFontH = UI:FontAdvanceSize(self.typefaces.SkillPoints, self.skillsFontScale)
 		
 	self.skillsTreeRect = {
@@ -119,11 +116,18 @@ function Arm.SpawnSkills(self)
 	self.skillsDescriptionRect = {
 		self.skillsTextRect[1],
 		self.skillsTitleRect[2] + self.skillsTitleRect[4] + (10*UI.identityScale[2]),
-		self.skillsTextRect[3] - scrollGap,
+		self.skillsTextRect[3],
 		0
 	}
 	
-	self.skillsDescriptionRect[4] = self.skillsRootWorkspaceSize[4] - self.skillsDescriptionRect[2]
+	self.skillsDescriptionRect[4] = self.skillsRootWorkspaceSize[4] - self.skillsDescriptionRect[2] - self.skillsTreeFooter[4] - (10*UI.identityScale[2])
+	
+	self.skillsDescriptionArea = {
+		0,
+		0,
+		self.skillsDescriptionRect[3] - scrollGap,
+		self.skillsDescriptionRect[4]
+	}
 	
 	w = UI:CreateWidget("MatWidget",
 		{rect={self.skillsTitleRect[1], self.skillsTitleRect[2]+self.skillsTitleRect[4], self.skillsTextRect[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
@@ -140,6 +144,47 @@ function Arm.SpawnSkills(self)
 	self.widgets.skills.Title = UI:CreateWidget("TextLabel", {rect=self.skillsTitleRect,typeface=self.typefaces.SkillTitle})
 	self.widgets.skills.Title:SetBlendWithParent(true)
 	self.widgets.skills.Root:AddChild(self.widgets.skills.Title)
+	
+	self.widgets.skills.DescriptionList = UI:CreateWidget("VListWidget", {rect=self.skillsDescriptionRect})
+	
+	if (scrollBar) then
+		UI:CreateVListWidgetScrollBar(
+			self.widgets.skills.DescriptionList,
+			24,
+			24,
+			8
+		)
+	end
+	
+	self.widgets.skills.DescriptionList:SetClipRect({self.skillsDescriptionRect[1],self.skillsDescriptionRect[2],self.skillsDescriptionArea[3],self.skillsDescriptionArea[4]})
+	self.widgets.skills.DescriptionList:SetEndStops({0, self.skillsDescriptionRect[4]*0.1})
+	self.widgets.skills.Root:AddChild(self.widgets.skills.DescriptionList)
+	
+	self.widgets.skills.ShortDescriptionText = UI:CreateWidget("TextLabel", {rect=self.skillsDescriptionArea,typeface=self.typefaces.SkillDescription})
+	self.widgets.skills.ShortDescriptionText:SetBlendWithParent(true)
+	self.widgets.skills.DescriptionList:AddItem(self.widgets.skills.ShortDescriptionText)
+	
+	self.widgets.skills.DescriptionDivider = UI:CreateWidget("MatWidget",
+		{rect={0, 0, self.skillsDescriptionArea[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
+	)
+	self.widgets.skills.DescriptionDivider:SetBlendWithParent(true)
+	self.widgets.skills.DescriptionDivider:SetVisible(false)
+	self.widgets.skills.DescriptionList:AddItem(self.widgets.skills.DescriptionDivider)
+	
+	self.widgets.skills.StatsText = UI:CreateWidget("TextLabel", {rect=self.skillsDescriptionArea,typeface=self.typefaces.SkillStats})
+	self.widgets.skills.StatsText:SetBlendWithParent(true)
+	self.widgets.skills.DescriptionList:AddItem(self.widgets.skills.StatsText)
+	
+	self.widgets.skills.StatsDivider = UI:CreateWidget("MatWidget",
+		{rect={0, 0, self.skillsDescriptionArea[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
+	)
+	self.widgets.skills.StatsDivider:SetBlendWithParent(true)
+	self.widgets.skills.StatsDivider:SetVisible(false)
+	self.widgets.skills.DescriptionList:AddItem(self.widgets.skills.StatsDivider)
+	
+	self.widgets.skills.LongDescriptionText = UI:CreateWidget("TextLabel", {rect=self.skillsDescriptionArea,typeface=self.typefaces.SkillDetails})
+	self.widgets.skills.LongDescriptionText:SetBlendWithParent(true)
+	self.widgets.skills.DescriptionList:AddItem(self.widgets.skills.LongDescriptionText)
 	
 	local y = self.skillsTreeFooter[2] + self.skillsTreeFooter[4] - self.menuButtonSize[2]
 	local buttonSpace = 16 * UI.identityScale[1]
@@ -190,6 +235,8 @@ function Arm.SpawnSkills(self)
 		UI.invIdentityScale
 	)
 	
+	self.widgets.skills.Train:SetVisible(false)
+	
 	x = x + buttonWidth + buttonSpace
 	
 	self.widgets.skills.Purchase = UI:CreateStylePushButton(
@@ -210,6 +257,8 @@ function Arm.SpawnSkills(self)
 		UI.identityScale,
 		UI.invIdentityScale
 	)
+	
+	self.widgets.skills.Purchase:SetVisible(false)
 	
 	self.skillPointsLabelRect = {x, y+(self.menuButtonSize[2]/1.5), buttonWidth2, 0}
 	self.skillPointsLabelRect[4] = self.skillsRootWorkspaceSize[4] - self.skillPointsLabelRect[2]
@@ -258,6 +307,7 @@ function Arm.CreateSkillInterace(self, skill)
 	w:AddChild(skillIcon)
 	
 	skill.Graphics.Icon.SkillIcon = skillIcon
+	skill.Graphics.Icon.SkillRect = skillRect
 	
 	if (skill.Graphics.Lines) then
 	
@@ -305,8 +355,8 @@ function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
 		)
 	end
 	
-	self.widgets.skills.SkillsTree:SetClipRect(self.skillsTreeArea)
-	self.widgets.skills.SkillsTree:SetEndStops({0, self.skillsTreeArea[4]*0.1})
+	self.widgets.skills.SkillsTree:SetClipRect(self.skillsTreeRect)
+	self.widgets.skills.SkillsTree:SetEndStops({0, self.skillsTreeRect[4]*0.1})
 	
 	local w = UI:CreateWidget("MatWidget", {rect=imageRect, material=self.gfx.SkillsBackground})
 	w:SetBlendWithParent(true)
@@ -329,9 +379,6 @@ function Arm.UpdateSkillsUI(self)
 end
 
 function Arm.UpdateSkillUI(self, skill)
-
-	
-
 end
 
 function Arm.UpdateSkillPointsLabel(self)
@@ -382,7 +429,7 @@ function Arm.SelectSkill(self, skill)
 	self.selectedSkill = skill
 	Arm:HighlightSkill()
 	
-	UI:LineWrapLJustifyText(
+	UI:LineWrapAlignTopLJustifyText(
 		self.widgets.skills.Title, 
 		self.skillsTitleRect[3],
 		false,
@@ -390,6 +437,76 @@ function Arm.SelectSkill(self, skill)
 		StringTable.Get(skill.Title),
 		self.skillsFontScale
 	)
+	
+	local r = UI:LineWrapAlignTopLJustifyText(
+		self.widgets.skills.ShortDescriptionText, 
+		self.skillsDescriptionArea[3],
+		true,
+		0,
+		StringTable.Get(skill.ShortDescription),
+		self.skillsFontScale
+	)
+	
+	self.widgets.skills.DescriptionDivider:MoveTo({0, r[2]+r[4]}, {0,0})
+	self.widgets.skills.DescriptionDivider:SetVisible(true)
+	r[4] = r[4] + (10*UI.identityScale[2])
+	
+	local level = skill:CurrentLevel()
+	local text = ""
+	
+	if (skill.Stats) then
+		text = skill:Stats(level)
+	end
+	
+	if (skill[level+1]) then
+		text = text.."\n\n"..StringTable.Get("SKILL_NEXT_LEVEL").."\n"
+		
+		if (skill.Stats) then
+			text = text.."\n"..skill:Stats(level+1)
+		end
+		
+		text = text.."\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost).." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		
+		self.widgets.skills.Purchase:SetVisible(true)
+	else
+		self.widgets.skills.Purchase:SetVisible(false)
+	end
+	
+	self.widgets.skills.Train:SetVisible(true)
+	
+	self.widgets.skills.StatsText:SetRect({0,r[2]+r[4], self.skillsDescriptionRect[3], 8})
+	
+	r = UI:LineWrapAlignTopLJustifyText(
+		self.widgets.skills.StatsText, 
+		self.skillsDescriptionArea[3],
+		true,
+		0,
+		text,
+		self.skillsFontScale
+	)
+	
+	if (skill.LongDescription) then
+		self.widgets.skills.StatsDivider:SetVisible(true)
+		self.widgets.skills.LongDescriptionText:SetVisible(true)
+		
+		self.widgets.skills.StatsDivider:MoveTo({0,r[2]+r[4]}, {0,0})
+		r[4] = r[4] + (10*UI.identityScale[1])
+		self.widgets.skills.LongDescriptionText:SetRect({0,r[2]+r[4],self.skillsDescriptionRect[3],8})
+		
+		UI:LineWrapAlignTopLJustifyText(
+			self.widgets.skills.LongDescriptionText, 
+			self.skillsDescriptionArea[3],
+			true,
+			0,
+			StringTable.Get(skill.LongDescription),
+			self.skillsFontScale
+		)
+	else
+		self.widgets.skills.StatsDivider:SetVisible(false)
+		self.widgets.skills.LongDescriptionText:SetVisible(false)
+	end
+	
+	self.widgets.skills.DescriptionList:RecalcLayout()
 end
 
 function Arm.HighlightSkill(self, skill)

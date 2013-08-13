@@ -803,13 +803,13 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 	local size = 0
 	local widestLine = 0
 	
-	for k,line  in pairs(lines) do
-	
-		local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
-		for k,v in pairs(strings) do
-		
+	for k,line in pairs(lines) do
+		if (line:len() > 0) then
+			local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
+			for k,v in pairs(strings) do
+					
 				local w, h = UI:StringDimensions(font, v, fontScale)
-											
+									
 				local string = {
 					x = 0,
 					y = size,
@@ -822,6 +822,9 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 				size = size + lineSpace
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
+			end
+		else
+			size = size + lineSpace
 		end
 	end
 	
@@ -849,7 +852,7 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 	return r
 end
 
-function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines, fontScale, invFontScale)
+function UI.LineWrapCenterLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines, fontScale, invFontScale)
 
 	if (type(lines) == "string") then
 		lines = string.split(lines, "\n")
@@ -882,11 +885,11 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 	local size = 0
 	local widestLine = 0
 		
-	for k,line  in pairs(lines) do
-	
-		local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
-		for k,v in pairs(strings) do
-				
+	for k,line in pairs(lines) do
+		if (line:len() > 0) then
+			local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
+			for k,v in pairs(strings) do
+					
 				local w, h = UI:StringDimensions(font, v, fontScale)
 								
 				local string = {
@@ -900,6 +903,9 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 				size = size + lineSpace
 				widestLine = Max(widestLine, w)
 				table.insert(labelStrings, string)
+			end
+		else
+			size = size + lineSpace
 		end
 	end
 	
@@ -910,6 +916,86 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 	end
 	
 	local y = (r[4] - size) / 2
+		
+	for k,v in pairs(labelStrings) do
+		v.y = v.y + y
+	end
+	
+	label:SetText(labelStrings)
+	
+	if (not sizeToFit) then
+	-- return the size we would have been had we auto-sized
+		r[3] = widestLine
+		r[4] = size
+	end
+	
+	return r
+end
+
+function UI.LineWrapAlignTopLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, lines, fontScale, invFontScale)
+
+	if (type(lines) == "string") then
+		lines = string.split(lines, "\n")
+	end
+	
+	if (fontScale == nil) then
+		fontScale = UI.fontScale
+	end
+	
+	if (invFontScale == nil) then
+		invFontScale = {1/fontScale[1], 1/fontScale[2]}
+	end
+	
+	if (lineSpace < 0) then
+		lineSpace = -lineSpace -- absolute
+	else
+		lineSpace = lineSpace * fontScale[2]
+	end
+	
+	local r = label:Rect()
+	local font = label:Typeface()
+	
+	if (maxWidth == nil) then
+		maxWidth = r[3]
+	end
+	
+	lineSpace = lineSpace + UI:FontAdvanceSize(font, fontScale)
+	
+	local labelStrings = {}
+	local size = 0
+	local widestLine = 0
+		
+	for k,line in pairs(lines) do
+		if (line:len() > 0) then
+			local strings = UI:WordWrap(font, line, maxWidth, invFontScale)
+			for k,v in pairs(strings) do
+					
+				local w, h = UI:StringDimensions(font, v, fontScale)
+								
+				local string = {
+					x = 0,
+					y = size,
+					text = v,
+					scaleX = fontScale[1],
+					scaleY = fontScale[2]
+				}
+				
+				size = size + lineSpace
+				widestLine = Max(widestLine, w)
+				table.insert(labelStrings, string)
+			end
+		else
+			size = size + lineSpace
+		end
+	end
+	
+	if (sizeToFit) then
+		r[3] = widestLine
+		r[4] = size
+		label:SetRect(r)
+	end
+	
+	local y = 0
 		
 	for k,v in pairs(labelStrings) do
 		v.y = v.y + y

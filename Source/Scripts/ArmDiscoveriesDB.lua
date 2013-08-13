@@ -188,7 +188,7 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 		local sw,sh = UI:StringDimensions(state.titleTypeface, title)
 		
 		if (sw > self.discoveriesDBArea[3]) then
-			rect = UI:LineWrapLJustifyText(w.label, self.discoveriesDBArea[3], true, 0, title)
+			rect = UI:LineWrapCenterLJustifyText(w.label, self.discoveriesDBArea[3], true, 0, title)
 		else
 			UI:SetLabelText(w.label, title)
 			rect = UI:SizeLabelToContents(w.label)
@@ -214,7 +214,7 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 	else
 		-- just make a plain text label
 		w = UI:CreateWidget("TextLabel", {rect=rect, typeface=state.titleTypeface})
-		rect = UI:LineWrapLJustifyText(w, self.discoveriesDBArea[3], true, 0, title)
+		rect = UI:LineWrapCenterLJustifyText(w, self.discoveriesDBArea[3], true, 0, title)
 		self.widgets.db.Discoveries:AddItem(w)
 		w:SetBlendWithParent(true)
 		w:Unmap() -- mark gc

@@ -80,6 +80,7 @@ function Arm.SpawnShared(self)
 	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
 	self.typefaces.SkillTitle = World.Load("UI/SkillTitle_TF")
 	self.typefaces.SkillDescription = World.Load("UI/SkillDescription_TF")
+	self.typefaces.SkillDetails = World.Load("UI/SkillDetails_TF")
 	self.typefaces.SkillStats = World.Load("UI/SkillStats_TF")
 	self.typefaces.SkillPoints = World.Load("UI/SkillPoints_TF")
 	

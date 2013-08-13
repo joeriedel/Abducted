@@ -11,7 +11,8 @@ PlayerSkills.Data = {}
 
 PlayerSkills.Data.FastHands = {
 	Title = "SKILL_FASTHANDS_TITLE",
-	Description = "SKILL_FASTHANDS_DESCRIPTION",
+	ShortDescription = "SKILL_FASTHANDS_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_FASTHANDS_LONG_DESCRIPTION",
 	Graphics = {
 			Icon = {
 				Material="UI/manipulate_default1_M",
@@ -29,8 +30,11 @@ PlayerSkills.Data.FastHands = {
 				}
 			}
 	},
-	Stats = function(level)
-		return nil
+	Stats = function(skill, level)
+		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].CoolDown)
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.FastHands
 	end,
 	[0] = {
 		CoolDown = 9,

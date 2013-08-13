@@ -19,7 +19,6 @@ pak0 {
 	Ep1/Ep1Database
 	Ep1/dustmotevolume1
 	Ep1/rainvolume1
-	UI/ArmTestChat
 
 	// Shared
 	Objects/big_tentacle1
@@ -29,6 +28,7 @@ pak0 {
 	Objects/crushed_down_pylon1
 	Objects/crushed_up_pylon1
 	Objects/podshield1
+	Objects/bugslime1
 	Objects/terminalglow1_M
 	Objects/terminalglow2_M
 	Objects/alien_metadata1
@@ -63,7 +63,6 @@ pak0 {
 	UI/finger_shadow_M
 	UI/Globals
 	UI/ArmChat
-	UI/TerminalPuzzlesBigFont_TF
 	UI/ChatChoice_TF
 	UI/Chat_TF
 	UI/ChatLocked_TF
@@ -109,6 +108,7 @@ pak0 {
 	UI/puzzle_level4_M
 	UI/puzzle_button_background1_M
 	UI/puzzle_button_background_pressed1_M
+	UI/puzzle_success_bkg_M
 	UI/return_arrow_pressed_M
 	UI/return_arrow_M
 	UI/manipulate_button_M
@@ -127,6 +127,7 @@ pak0 {
 	UI/arm_buttons_M
 	UI/arm_buttons_overbright_M
 	UI/arm_button_M
+	UI/arm_buttons_solid_M
 	UI/arm_button_pressed_M
 	UI/arm_button_signaled_M
 	UI/arm_screen1_M
@@ -136,6 +137,37 @@ pak0 {
 	UI/generic_icon_base_pressed_M
 	UI/right_arrow_M
 	UI/right_arrow_pressed_M
+
+	UI/horizline1_M
+	UI/level1_M
+	UI/level2_M
+	UI/level3_M
+	UI/level4_M
+	UI/straight2_M
+	UI/curve2L_M
+	UI/curve3J_M
+	UI/SkillDescription_TF
+	UI/SkillPoints_TF
+	UI/SkillStats_TF
+	UI/SkillTitle_TF
+	UI/manipulate_default1_M
+	UI/pulse_default1_M
+	UI/shield_default1_M
+	UI/selection_highlighter1_M
+	UI/straight1_M
+	UI/squiggle1_M
+	UI/squiggle2_M
+	UI/curve1_M
+	UI/curve2_M
+	UI/vertlines2_M
+	UI/backgroundplate1_M
+	
+	UI/TerminalPuzzlesFont_TF
+	UI/TerminalPuzzlesScoreFont_TF
+	UI/TerminalPuzzlesScoreFont2_TF
+	UI/TerminalPuzzlesTimeFont_TF
+	UI/TerminalPuzzlesTimeFontFlash_TF
+	UI/TerminalPuzzlesTimeFontRed_TF
 
 	// Main menu
 	UI/MMGoldLarge_TF
@@ -201,6 +233,8 @@ pak0 {
 	Audio/Mus06-Lochness
 	Audio/Mus00-Stinger
 
+	Audio/dpad
+
 	// Puzzles
 	Puzzles/reflex-greenparticle1_M
 	Puzzles/reflex-block1_M
@@ -240,8 +274,13 @@ pak0 {
 	Puzzles/glyph26_M
 	Puzzles/glyph27_M
 	Puzzles/reflex-checkerboard1_M
+	Puzzles/goalparticles_M
+	Puzzles/playerparticles_M
+	Puzzles/spiderparticles_M
+	Puzzles/reflex-goal_open_M
+	Puzzles/trail_M
 
-	Reflex-Game/reflex-mark-current_M
+	/*Reflex-Game/reflex-mark-current_M
 	Reflex-Game/reflex-mark-start_M
 	Reflex-Game/reflex-mark-end_M
 	Reflex-Game/reflex-symbol-a_M
@@ -257,7 +296,7 @@ pak0 {
 	Reflex-Game/reflex-board_M
 	Reflex-Game/reflex-border_M
 	
-	Memory-Game/memory-board_M
+	Memory-Game/memory-board_M*/
 
 	// Sounds
 	Audio/armbutton

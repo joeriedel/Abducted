@@ -42,15 +42,9 @@ function Arm.SpawnSkills(self)
 	skillsTreeImageRect[3] = width
 	skillsTreeImageRect[4] = height
 	
-	self.skillsFontScale = {1,1}
+	self.unityFontScale = {1,1}
 	
-	if (UI.mode == kGameUIMode_Mobile) then
-		if (UI.screenWidth == 960) then
---			self.skillsFontScale = {0.75, 0.75}
-		end
-	end
-	
-	local skillPointsFontH = UI:FontAdvanceSize(self.typefaces.SkillPoints, self.skillsFontScale)
+	local skillPointsFontH = UI:FontAdvanceSize(self.typefaces.SkillPoints, self.unityFontScale)
 		
 	self.skillsTreeRect = {
 		0,
@@ -384,7 +378,7 @@ end
 function Arm.UpdateSkillPointsLabel(self)
 
 	local text = StringTable.Get("SKILL_POINTS").." "..tostring(PlayerSkills.SkillPoints)
-	UI:SetLabelText(self.widgets.skills.SkillPointsLabel, text, self.skillsFontScale)
+	UI:SetLabelText(self.widgets.skills.SkillPointsLabel, text, self.unityFontScale)
 	UI:CenterLabel(self.widgets.skills.SkillPointsLabel, self.skillPointsLabelRect)
 	
 end
@@ -435,7 +429,7 @@ function Arm.SelectSkill(self, skill)
 		false,
 		0,
 		StringTable.Get(skill.Title),
-		self.skillsFontScale
+		self.unityFontScale
 	)
 	
 	local r = UI:LineWrapAlignTopLJustifyText(
@@ -443,8 +437,7 @@ function Arm.SelectSkill(self, skill)
 		self.skillsDescriptionArea[3],
 		true,
 		0,
-		StringTable.Get(skill.ShortDescription),
-		self.skillsFontScale
+		StringTable.Get(skill.ShortDescription)
 	)
 	
 	self.widgets.skills.DescriptionDivider:MoveTo({0, r[2]+r[4]}, {0,0})
@@ -465,7 +458,7 @@ function Arm.SelectSkill(self, skill)
 			text = text.."\n"..skill:Stats(level+1)
 		end
 		
-		text = text.."\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost).." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		text = text.."\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost)
 		
 		self.widgets.skills.Purchase:SetVisible(true)
 	else
@@ -481,8 +474,7 @@ function Arm.SelectSkill(self, skill)
 		self.skillsDescriptionArea[3],
 		true,
 		0,
-		text,
-		self.skillsFontScale
+		text
 	)
 	
 	if (skill.LongDescription) then
@@ -498,8 +490,7 @@ function Arm.SelectSkill(self, skill)
 			self.skillsDescriptionArea[3],
 			true,
 			0,
-			StringTable.Get(skill.LongDescription),
-			self.skillsFontScale
+			StringTable.Get(skill.LongDescription)
 		)
 	else
 		self.widgets.skills.StatsDivider:SetVisible(false)

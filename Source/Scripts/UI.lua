@@ -860,7 +860,7 @@ function UI.LineWrapLJustifyText(self, label, maxWidth, sizeToFit, lineSpace, li
 	end
 	
 	if (invFontScale == nil) then
-		invFontScale = UI.invFontScale
+		invFontScale = {1/fontScale[1], 1/fontScale[2]}
 	end
 	
 	if (lineSpace < 0) then

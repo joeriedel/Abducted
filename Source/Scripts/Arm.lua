@@ -50,6 +50,23 @@ function Arm.SpawnShared(self)
 	self.gfx.LogTabPressed = World.Load("UI/tab-selection-log-pressed_M")
 	self.gfx.CharPortrait = World.Load(GameDB.portrait)
 	self.gfx.SkillsBackground = World.Load("UI/backgroundplate1_M")
+	self.gfx.SkillsHighlight = World.Load("UI/selection_highlighter1_M")
+	self.gfx.SkillsThinVertLines2 = World.Load("UI/vertlines2_M")
+	self.gfx.SkillsVertLines2 = World.Load("UI/straight1_M")
+	self.gfx.SkillsHorzLines2 = World.Load("UI/straight2_M")
+	self.gfx.SkillsHorzLine1 = World.Load("UI/horizline1_M")
+	self.gfx.SkillsCurve2L = World.Load("UI/curve2L_M")
+	self.gfx.SkillsCurve3J = World.Load("UI/curve3J_M")
+	self.gfx.SkillsSquiggle = World.Load("UI/squiggle2_M")
+	self.gfx.SkillsCurve1 = World.Load("UI/curve1_M")
+	self.gfx.SkillsCurve2 = World.Load("UI/curve2_M")
+	self.gfx.SkillLevel = {
+		World.Load("UI/level1_M"),
+		World.Load("UI/level2_M"),
+		World.Load("UI/level3_M"),
+		World.Load("UI/level4_M")
+	}
+	
 --self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
 	
 	self.typefaces = {}
@@ -61,6 +78,10 @@ function Arm.SpawnShared(self)
 	self.typefaces.LogEvent = World.Load("UI/LogEvent_TF")
 	self.typefaces.LogDiscovery = World.Load("UI/LogDiscovery_TF")
 	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
+	self.typefaces.SkillTitle = World.Load("UI/SkillTitle_TF")
+	self.typefaces.SkillDescription = World.Load("UI/SkillDescription_TF")
+	self.typefaces.SkillStats = World.Load("UI/SkillStats_TF")
+	self.typefaces.SkillPoints = World.Load("UI/SkillPoints_TF")
 	
 	self.sfx = {}
 	self.sfx.ArmIntro = World.Load("Audio/armintro1")

@@ -147,6 +147,7 @@ pak0 {
 	UI/curve2L_M
 	UI/curve3J_M
 	UI/SkillDescription_TF
+	UI/SkillDetails_TF
 	UI/SkillPoints_TF
 	UI/SkillStats_TF
 	UI/SkillTitle_TF

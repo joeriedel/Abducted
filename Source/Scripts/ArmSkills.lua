@@ -152,6 +152,7 @@ function Arm.SpawnSkills(self)
 	
 	self.widgets.skills.DescriptionList:SetClipRect({self.skillsDescriptionRect[1],self.skillsDescriptionRect[2],self.skillsDescriptionArea[3],self.skillsDescriptionArea[4]})
 	self.widgets.skills.DescriptionList:SetEndStops({0, self.skillsDescriptionRect[4]*0.1})
+	self.widgets.skills.DescriptionList:SetBlendWithParent(true)
 	self.widgets.skills.Root:AddChild(self.widgets.skills.DescriptionList)
 	
 	self.widgets.skills.ShortDescriptionText = UI:CreateWidget("TextLabel", {rect=self.skillsDescriptionArea,typeface=self.typefaces.SkillDescription})
@@ -292,7 +293,7 @@ function Arm.CreateSkillInterace(self, skill)
 	local h = d[2] * self.SkillsTreeScale
 	local skillRect = {0,0,iconRect[3],0}
 	
-	skillRect[1] = iconRect[4] - h - (16 * UI.identityScale[2])
+	skillRect[2] = iconRect[4] - h - (8 * UI.identityScale[2])
 	skillRect[4] = h
 		
 	local skillIcon = UI:CreateWidget("MatWidget", {rect=skillRect})
@@ -370,9 +371,40 @@ end
 
 function Arm.UpdateSkillsUI(self)
 	self:UpdateSkillPointsLabel()
+	self:UpdateSkillUI(PlayerSkills.Data.FastHands)
 end
 
 function Arm.UpdateSkillUI(self, skill)
+	local level = skill:CurrentLevel()
+	if (level > 0) then
+		skill.Graphics.Icon.Widget:SetVisible(true)
+		
+		if (skill.Graphics.Lines) then
+			for k,v in pairs(skill.Graphics.Lines) do
+				v.Widget:SetVisible(true)
+			end
+		end
+		
+		local skillMaterial = self.gfx.SkillLevel[level]
+		if (skillMaterial) then
+			skill.Graphics.Icon.SkillIcon:SetVisible(true)
+			local d = skillMaterial:Dimensions()
+			local r = {0,0,d[1]*self.SkillsTreeScale,d[2]*self.SkillsTreeScale}
+			skill.Graphics.Icon.SkillIcon:SetMaterial(skillMaterial)
+			r = CenterRectInRect(r, skill.Graphics.Icon.SkillRect)
+			skill.Graphics.Icon.SkillIcon:SetRect(r)
+		else
+			skill.Graphics.Icon.SkillIcon:SetVisible(false)
+		end
+	else
+		skill.Graphics.Icon.Widget:SetVisible(false)
+		skill.Graphics.Icon.SkillIcon:SetVisible(false)
+		if (skill.Graphics.Lines) then
+			for k,v in pairs(skill.Graphics.Lines) do
+				v.Widget:SetVisible(false)
+			end
+		end
+	end
 end
 
 function Arm.UpdateSkillPointsLabel(self)
@@ -416,7 +448,55 @@ function Arm.OnTrainButtonPressed(self)
 end
 
 function Arm.OnPurchaseButtonPressed(self)
+	local level = self.selectedSkill:CurrentLevel()
+	local cost = self.selectedSkill[level+1].Cost
+	
+	if (cost > PlayerSkills.SkillPoints) then
+		local title = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TITLE")
+		local msg = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TEXT"):format(cost, PlayerSkills.SkillPoints)
+		
+		AlertPanel:YesNo(
+			title,
+			msg,
+			function (result)
+				if (result == AlertPanel.YesButton) then
+					self:OnStoreButtonPressed()
+				end
+			end,
+			nil,
+			false
+		)
+	else
+	
+		local title = StringTable.Get("SKILL_CONFIRM_TITLE")
+		local msg = StringTable.Get("SKILL_CONFIRM_TEXT")
+		local skillName = StringTable.Get(self.selectedSkill.Title)
+		
+		msg = msg:format(cost, skillName, level+1)
+		
+		AlertPanel:OKCancel(
+			title,
+			msg,
+			function (result)
+				if (result == AlertPanel.YesButton) then
+					self:UpgradeSkill(self.selectedSkill, cost)
+				end
+			end,
+			nil,
+			false
+		)
+	end
+end
 
+function Arm.UpgradeSkill(self, skill, cost)
+	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
+		PlayerSkills.SkillPoints = PlayerSkills.SkillPoints - cost
+		self:UpdateSkillPointsLabel()
+	end
+	
+	skill:Upgrade()
+	self:UpdateSkillUI(skill)
+	self:SelectSkill(skill)
 end
 
 function Arm.SelectSkill(self, skill)

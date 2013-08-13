@@ -105,10 +105,14 @@ function AlertPanel.ButtonPressed(widget, e)
 	AlertPanel:Dismiss(widget.code)
 end
 
-function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
+function AlertPanel.Run(self, title, msg, buttons, callback, screenRect, useStringTable)
 	
 	if (screenRect == nil) then
 		screenRect = UI.fullscreenRect
+	end
+	
+	if (useStringTable == nil) then
+		useStringTable = true
 	end
 	
 	UI:CenterWidget(self.widgets.panel, screenRect)
@@ -121,12 +125,20 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 	local buttonRect = self.widgets.buttonA:Rect()
 	local panelRect = self.widgets.panel:Rect()
 	
-	local text = StringTable.Get(title)
+	local text = title
+	if (useStringTable) then
+		text = StringTable.Get(title)
+	end
+	
 	UI:SetLabelText(self.widgets.title, text)
 	UI:HCenterLabel(self.widgets.title, {0, 0, panelRect[3], panelRect[4]})
 			
-	text = StringTable.Get(msg)
-	UI:LineWrapCenterLJustifyText(
+	text = msg
+	if (useStringTable) then
+		text = StringTable.Get(msg)
+	end
+	
+	local r = UI:LineWrapCenterLJustifyText(
 		self.widgets.text,
 		nil,
 		true,
@@ -135,6 +147,8 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 		UI.fontScale,
 		UI.invFontScale
 	)
+	
+	UI:HCenterWidget(self.widgets.text, {0, 0, panelRect[3], panelRect[4]})
 	
 	text = StringTable.Get(buttons[1][1])
 	UI:LineWrapCenterText(
@@ -206,11 +220,11 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect)
 
 end
 
-function AlertPanel.OK(self, title, msg, callback, screenRect)
-	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback, screenRect)
+function AlertPanel.OK(self, title, msg, callback, screenRect, useStringTable)
+	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback, screenRect, useStringTable)
 end
 
-function AlertPanel.OKCancel(self, title, msg, screenRect)
+function AlertPanel.OKCancel(self, title, msg, callback, screenRect, useStringTable)
 	AlertPanel:Run(
 		title,
 		msg, 
@@ -219,11 +233,12 @@ function AlertPanel.OKCancel(self, title, msg, screenRect)
 			{"ALERT_PANEL_CANCEL", r=AlertPanel.CancelButton}
 		}, 
 		callback,
-		screenRect
+		screenRect,
+		useStringTable
 	)
 end
 
-function AlertPanel.YesNo(self, title, msg, callback, screenRect)
+function AlertPanel.YesNo(self, title, msg, callback, screenRect, useStringTable)
 	AlertPanel:Run(
 		title,
 		msg, 
@@ -232,6 +247,7 @@ function AlertPanel.YesNo(self, title, msg, callback, screenRect)
 			{"ALERT_PANEL_NO", r=AlertPanel.NoButton}
 		}, 
 		callback,
-		screenRect
+		screenRect,
+		useStringTable
 	)
 end

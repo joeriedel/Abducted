@@ -351,7 +351,7 @@ function ReflexGame.InitUI(self)
 	if (UI.mode == kGameUIMode_Mobile) then
 		self.widgets.dpad = {}
 		
-		local dpadButtonSize = 64*UI.identityScale[1]
+		local dpadButtonSize = 72*UI.identityScale[1]
 		local dpadSize = dpadButtonSize*3
 		local dpadPad = 16*UI.identityScale[1]
 		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])

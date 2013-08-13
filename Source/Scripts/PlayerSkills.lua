@@ -25,7 +25,6 @@ PlayerSkills.Data.FastHands = {
 				},
 				{
 					Material="SkillsCurve2",
-					Rotation=90,
 					Pos={527,54}
 				}
 			}
@@ -35,6 +34,9 @@ PlayerSkills.Data.FastHands = {
 	end,
 	CurrentLevel = function(skill)
 		return PlayerSkills.FastHands
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.FastHands = PlayerSkills.FastHands + 1
 	end,
 	[0] = {
 		CoolDown = 9,
@@ -346,7 +348,7 @@ function PlayerSkills.Load(self)
 	self.shieldUnlocked = Persistence.ReadBool(SaveGame, "shieldUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
 	self.pulseUnlocked = Persistence.ReadBool(SaveGame, "pulseUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
 	
-	self.FastHands = 0
+	self.FastHands = Persistence.ReadNumber(SaveGame, "fastHands", 0)
 	self.SkillPoints = Persistence.ReadNumber(SaveGame, "skillPoints", 0)
 	
 	if (PlayerSkills.UnlimitedSkillPointsCheat) then
@@ -354,8 +356,15 @@ function PlayerSkills.Load(self)
 	end
 end
 
+function PlayerSkills.Save(self)
+
+	Persistence.WriteNumber(SaveGame, "fastHands", self.FastHands)
+	Persistence.WriteNumber(SaveGame, "skillPoints", self.SkillPoints)
+	
+end
+
 function PlayerSkills.ManipulateRechargeTime(self)
-	return PlayerSkills.ManipulateRechargeTimes[self.Manipulate+1]
+	return PlayerSkills.Data.FastHands[self.FastHands].CoolDown
 end
 
 function PlayerSkills.ShieldRechargeTime(self, usedTime)

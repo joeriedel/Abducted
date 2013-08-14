@@ -109,7 +109,7 @@ function Arm.SpawnSkills(self)
 	
 	self.skillsDescriptionRect = {
 		self.skillsTextRect[1],
-		self.skillsTitleRect[2] + self.skillsTitleRect[4] + (10*UI.identityScale[2]),
+		self.skillsTitleRect[2] + self.skillsTitleRect[4] + (10*UI.identityScale[2]*2),
 		self.skillsTextRect[3],
 		0
 	}
@@ -299,7 +299,7 @@ function Arm.CreateSkillInterace(self, skill)
 	local skillIcon = UI:CreateWidget("MatWidget", {rect=skillRect})
 	skillIcon:SetBlendWithParent(true)
 	skillIcon:SetVisible(false)
-	w:AddChild(skillIcon)
+	skill.Graphics.Icon.Widget:AddChild(skillIcon)
 	
 	skill.Graphics.Icon.SkillIcon = skillIcon
 	skill.Graphics.Icon.SkillRect = skillRect
@@ -358,7 +358,9 @@ function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
 	self.widgets.skills.SkillsTree:AddItem(w)
 	w:Unmap()
 	
-	self:CreateSkillInterace(PlayerSkills.Data.FastHands)
+	for k,v in pairs(PlayerSkills.Skills) do
+		self:CreateSkillInterace(v)
+	end
 	
 	self.widgets.skills.Highlight = UI:CreateWidget("MatWidget", {rect={0,0,Arm.SkillIconSize[1]*self.SkillsTreeScale, Arm.SkillIconSize[2]*self.SkillsTreeScale},material=self.gfx.SkillsHighlight})
 	self.widgets.skills.Highlight:SetBlendWithParent(true)
@@ -371,7 +373,9 @@ end
 
 function Arm.UpdateSkillsUI(self)
 	self:UpdateSkillPointsLabel()
-	self:UpdateSkillUI(PlayerSkills.Data.FastHands)
+	for k,v in pairs(PlayerSkills.Skills) do
+		self:UpdateSkillUI(v)
+	end
 end
 
 function Arm.UpdateSkillUI(self, skill)
@@ -381,7 +385,12 @@ function Arm.UpdateSkillUI(self, skill)
 		
 		if (skill.Graphics.Lines) then
 			for k,v in pairs(skill.Graphics.Lines) do
-				v.Widget:SetVisible(true)
+				local visible = true
+				if (v.Level and (level < v.Level)) then
+					visible = false
+				end
+				
+				v.Widget:SetVisible(visible)
 			end
 		end
 		
@@ -497,9 +506,13 @@ function Arm.UpgradeSkill(self, skill, cost)
 	skill:Upgrade()
 	self:UpdateSkillUI(skill)
 	self:SelectSkill(skill)
+	
+	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
 end
 
 function Arm.SelectSkill(self, skill)
+
+	self.sfx.SelectSkill:Play(kSoundChannel_UI, 0)
 	self.selectedSkill = skill
 	Arm:HighlightSkill()
 	
@@ -520,16 +533,25 @@ function Arm.SelectSkill(self, skill)
 		StringTable.Get(skill.ShortDescription)
 	)
 	
-	self.widgets.skills.DescriptionDivider:MoveTo({0, r[2]+r[4]}, {0,0})
+	self.widgets.skills.DescriptionDivider:MoveTo({0, r[2]+r[4]+(10*UI.identityScale[2])}, {0,0})
 	self.widgets.skills.DescriptionDivider:SetVisible(true)
-	r[4] = r[4] + (10*UI.identityScale[2])
+	r[4] = r[4] + (10*UI.identityScale[2]*3)
 	
 	local level = skill:CurrentLevel()
 	local text = ""
 	
-	if (skill.Stats) then
-		text = skill:Stats(level)
+	if (level < 1) then
+		text = StringTable.Get("SKILL_UNSKILLED")
+		if (skill.Stats) then
+			text = text.."\n"
+		end
 	end
+	
+	if (skill.Stats) then
+		text = text..skill:Stats(level)
+	end
+	
+	local canPurchase = true
 	
 	if (skill[level+1]) then
 		text = text.."\n\n"..StringTable.Get("SKILL_NEXT_LEVEL").."\n"
@@ -539,12 +561,48 @@ function Arm.SelectSkill(self, skill)
 		end
 		
 		text = text.."\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost)
-		
-		self.widgets.skills.Purchase:SetVisible(true)
 	else
-		self.widgets.skills.Purchase:SetVisible(false)
+		canPurchase = false
 	end
 	
+	
+	if (skill.Requires and (level == 0)) then
+		
+		-- check all prerequisites
+		local num = #skill.Requires
+		
+		local msg = StringTable.Get("SKILL_REQUIRES").." "
+		local skillMsg = StringTable.Get("SKILL_PREREQ")
+		local _and = StringTable.Get("AND")
+		
+		for k,v in pairs(skill.Requires) do
+		
+			local reqSkill = PlayerSkills.Skills[v[1]]
+			local reqLevel = v[2]
+			
+			local s = skillMsg:format(StringTable.Get(reqSkill.Title), reqLevel)
+			
+			if (k > 1) then
+				if (num == 2) then
+					msg = msg.." ".._and.." "..s
+				elseif (k == num) then
+					msg = msg..", ".._and.." "..s
+				else
+					msg = msg..", "..s
+				end
+			else
+				msg = msg..s
+			end
+			
+			canPurchase = canPurchase and (reqSkill:CurrentLevel() >= reqLevel)
+		
+		end
+		
+		text = text.."\n\n"..msg
+		
+	end
+	
+	self.widgets.skills.Purchase:SetVisible(canPurchase)
 	self.widgets.skills.Train:SetVisible(true)
 	
 	self.widgets.skills.StatsText:SetRect({0,r[2]+r[4], self.skillsDescriptionRect[3], 8})
@@ -561,8 +619,8 @@ function Arm.SelectSkill(self, skill)
 		self.widgets.skills.StatsDivider:SetVisible(true)
 		self.widgets.skills.LongDescriptionText:SetVisible(true)
 		
-		self.widgets.skills.StatsDivider:MoveTo({0,r[2]+r[4]}, {0,0})
-		r[4] = r[4] + (10*UI.identityScale[1])
+		self.widgets.skills.StatsDivider:MoveTo({0,r[2]+r[4]+(10*UI.identityScale[2])}, {0,0})
+		r[4] = r[4] + (10*UI.identityScale[1]*3)
 		self.widgets.skills.LongDescriptionText:SetRect({0,r[2]+r[4],self.skillsDescriptionRect[3],8})
 		
 		UI:LineWrapAlignTopLJustifyText(
@@ -578,6 +636,7 @@ function Arm.SelectSkill(self, skill)
 	end
 	
 	self.widgets.skills.DescriptionList:RecalcLayout()
+	self.widgets.skills.DescriptionList:ScrollTo({0,0}, 0)
 end
 
 function Arm.HighlightSkill(self, skill)

@@ -89,6 +89,9 @@ function Arm.SpawnShared(self)
 	self.sfx.Button = UI.sfx.Command2
 	self.sfx.HeartBeat = World.Load("Audio/heartbeat1")
 	self.sfx.Reward = World.Load("Audio/armreward")
+	self.sfx.SelectSkill = World.Load("Audio/selectskill")
+	self.sfx.UpgradeSkill = World.Load("Audio/upgradeskill")
+	
 	self.sfx.HeartBeat:SetLoop(true)
 	
 	Arm:SetupBackgroundAndWorkspaces()

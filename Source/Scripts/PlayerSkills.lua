@@ -7,16 +7,16 @@ PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
 PlayerSkills.UnlimitedSkillPointsCheat = true
 
-PlayerSkills.Data = {}
+PlayerSkills.Skills = {}
 
-PlayerSkills.Data.FastHands = {
-	Title = "SKILL_FASTHANDS_TITLE",
-	ShortDescription = "SKILL_FASTHANDS_SHORT_DESCRIPTION",
-	LongDescription = "SKILL_FASTHANDS_LONG_DESCRIPTION",
+PlayerSkills.Skills.ManipulateRegen = {
+	Title = "SKILL_MANIPULATE_REGEN_TITLE",
+	ShortDescription = "SKILL_MANIPULATE_REGEN_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_MANIPULATE_REGEN_LONG_DESCRIPTION",
 	Graphics = {
 			Icon = {
-				Material="UI/manipulate_default1_M",
-				Pos={416,9}
+				Pos={416,9},
+				Material="UI/manipulate_default1_M"
 			},
 			Lines = {
 				{
@@ -33,10 +33,10 @@ PlayerSkills.Data.FastHands = {
 		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].CoolDown)
 	end,
 	CurrentLevel = function(skill)
-		return PlayerSkills.FastHands
+		return PlayerSkills.ManipulateRegen
 	end,
 	Upgrade = function(skill)
-		PlayerSkills.FastHands = PlayerSkills.FastHands + 1
+		PlayerSkills.ManipulateRegen = PlayerSkills.ManipulateRegen + 1
 	end,
 	[0] = {
 		CoolDown = 9,
@@ -59,11 +59,68 @@ PlayerSkills.Data.FastHands = {
 	}
 }
 
-PlayerSkills.Data.IWillMoveYou = {
+PlayerSkills.MaxShieldTime = 30
+PlayerSkills.Skills.ShieldRegen = {
+	Title = "SKILL_SHIELD_REGEN_TITLE",
+	ShortDescription = "SKILL_SHIELD_REGEN_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_SHIELD_REGEN_LONG_DESCRIPTION",
+	Requires = {
+		{"ManipulateRegen", 1}
+	},
+	Graphics = {
+			Icon = {
+				Pos={213,225},
+				Material="UI/shield_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsCurve2L",
+					Pos={46,  262}  
+				},
+				{
+					Material="SkillsCurve3J",
+					Pos={249,340}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		local pct = math.floor(1.25/skill[level].Multiplier*100)
+		return StringTable.Get("SKILL_RECHARGE_RATE").." "..tostring(pct).."%"
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.ShieldRegen
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.ShieldRegen = PlayerSkills.ShieldRegen + 1
+	end,
+	[0] = {
+		Multiplier = 1.25
+	},
+	{
+		Multiplier = 1,
+		Cost = 300
+	},
+	{
+		Multiplier = 0.666,
+		Cost = 500
+	},
+	{
+		Multiplier = 0.5,
+		Cost = 800
+	},
+	{
+		Multiplier = 0.333,
+		Cost = 1200
+	}
+}
+
+--[[
+
+PlayerSkills.Skills.IWillMoveYou = {
 	Title = "SKILL_IWILLMOVEYOU_TITLE",
 	Description = "SKILL_IWILLMOVEYOU_DESCRIPTION",
 	Requires = {
-		{ "FastHands", 1 }
+		{ "Command", 1 }
 	},
 	[0] = {
 	},
@@ -75,7 +132,7 @@ PlayerSkills.Data.IWillMoveYou = {
 	}
 }
 
-PlayerSkills.Data.GrabAllYouCan = {
+PlayerSkills.Skills.GrabAllYouCan = {
 	Title = "SKILL_GRABALLYOUCAN_TITLE",
 	Description = "SKILL_GRABALLYOUCAN_DESCRIPTION",
 	Requires = {
@@ -91,11 +148,11 @@ PlayerSkills.Data.GrabAllYouCan = {
 	}
 }
 
-PlayerSkills.Data.TheHand = {
+PlayerSkills.Skills.TheHand = {
 	Title = "SKILL_THEHAND_TITLE",
 	Description = "Skill_THEHAND_DESCRIPTION",
 	Requires = {
-		{ "FastHands", 4 },
+		{ "ManipulateRegen", 4 },
 		{ "IWillMoveYou", 2 },
 		{ "GrabAllYouCan", 2 }
 	},
@@ -112,31 +169,7 @@ PlayerSkills.Data.TheHand = {
 	}
 }
 
-PlayerSkills.Data.GimmeBack = {
-	Title = "SKILL_GIMMEBACK_TITLE",
-	Description = "SKILL_GIMMEBACK_DESCRIPTION",
-	[0] = {
-		Multiplier = 0.8
-	},
-	{
-		Multiplier = 1,
-		Cost = 300
-	},
-	{
-		Multiplier = 1.5,
-		Cost = 500
-	},
-	{
-		Multiplier = 2,
-		Cost = 800
-	},
-	{
-		Multiplier = 3,
-		Cost = 1200
-	}
-}
-
-PlayerSkills.Data.GoLong = {
+PlayerSkills.Skills.GoLong = {
 	Title = "SKILL_GOLONG_TITLE",
 	Description = "SKILL_GOLONG_DESCRIPTION",
 	[0] = {
@@ -156,7 +189,7 @@ PlayerSkills.Data.GoLong = {
 	}
 }
 
-PlayerSkills.Data.LetMeEatCake = {
+PlayerSkills.Skills.LetMeEatCake = {
 	Title = "SKILL_LETMEEATCAKE_TITLE",
 	Description = "SKILL_LETMEEATCAKE_DESCRIPTION",
 	[0] = {
@@ -179,7 +212,7 @@ PlayerSkills.Data.LetMeEatCake = {
 	}
 }
 
-PlayerSkills.Data.PowerBubble = {
+PlayerSkills.Skills.PowerBubble = {
 	Title = "SKILL_POWERBUBBLE_TITLE",
 	Description = "SKILL_POWERBUBBLE_DESCRIPTION",
 	[0] = {
@@ -195,7 +228,7 @@ PlayerSkills.Data.PowerBubble = {
 	}
 }
 
-PlayerSkills.Data.Defender = {
+PlayerSkills.Skills.Defender = {
 	Title = "SKILL_DEFENDER_TITLE",
 	Description = "SKILL_DEFENDER_DESCRIPTION",
 	[0] = {
@@ -211,7 +244,7 @@ PlayerSkills.Data.Defender = {
 	}
 }
 
-PlayerSkills.Data.QuickDraw = {
+PlayerSkills.Skills.QuickDraw = {
 	Title = "SKILL_QUICKDRAW_TITLE",
 	Description = "SKILL_QUICKDRAW_DESCRIPTION",
 	[0] = {
@@ -235,7 +268,7 @@ PlayerSkills.Data.QuickDraw = {
 	}
 }
 
-PlayerSkills.Data.BigHit = {
+PlayerSkills.Skills.BigHit = {
 	Title = "SKILL_BIGHIT_TITLE",
 	Description = "SKILL_BIGHIT_DESCRIPTION",
 	[0] = {
@@ -251,7 +284,7 @@ PlayerSkills.Data.BigHit = {
 	}
 }
 
-PlayerSkills.Data.DropYourWeapon = {
+PlayerSkills.Skills.DropYourWeapon = {
 	Title = "SKILL_DROPYOURWEAPON_TITLE",
 	Description = "SKILL_DROPYOURWEAPON_DESCRIPTION",
 	[0] = {
@@ -270,7 +303,7 @@ PlayerSkills.Data.DropYourWeapon = {
 	}
 }
 
-PlayerSkills.Data.FastestGunInSpace = {
+PlayerSkills.Skills.FastestGunInSpace = {
 	Title = "SKILL_FASTESTGUNINSPACE_TITLE",
 	Description = "SKILL_FASTESTGUNINSPACE_DESCRIPTION",
 	[0] = {
@@ -295,7 +328,7 @@ PlayerSkills.Data.FastestGunInSpace = {
 	}
 }
 
-PlayerSkills.Data.PureEnergy = {
+PlayerSkills.Skills.PureEnergy = {
 	Title = "SKILL_PUREENERGY_TITLE",
 	Description = "SKILL_PUREENERGY_DESCRIPTION",
 	[0] = {
@@ -314,7 +347,7 @@ PlayerSkills.Data.PureEnergy = {
 	}
 }
 
-PlayerSkills.Data.Omega = {
+PlayerSkills.Skills.Omega = {
 	Title = "SKILL_OMEGA_TITLE",
 	Description = "SKILL_OMEGA_DESCRIPTION",
 	[0] = {
@@ -324,12 +357,7 @@ PlayerSkills.Data.Omega = {
 	}
 }
 
-PlayerSkills.MaxShieldTime = 30
-PlayerSkills.ShieldRechargeMultipliers = {
-	1,
-	0.66,
-	0.4
-}
+]]
 
 PlayerSkills.PulseExplodeTime = {8, 10}
 PlayerSkills.PulseRechargeTimes = {
@@ -348,7 +376,8 @@ function PlayerSkills.Load(self)
 	self.shieldUnlocked = Persistence.ReadBool(SaveGame, "shieldUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
 	self.pulseUnlocked = Persistence.ReadBool(SaveGame, "pulseUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
 	
-	self.FastHands = Persistence.ReadNumber(SaveGame, "fastHands", 0)
+	self.ManipulateRegen = Persistence.ReadNumber(SaveGame, "skills/ManipulateRegen", 0)
+	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
 	self.SkillPoints = Persistence.ReadNumber(SaveGame, "skillPoints", 0)
 	
 	if (PlayerSkills.UnlimitedSkillPointsCheat) then
@@ -358,17 +387,18 @@ end
 
 function PlayerSkills.Save(self)
 
-	Persistence.WriteNumber(SaveGame, "fastHands", self.FastHands)
+	Persistence.WriteNumber(SaveGame, "skills/ManipulateRegen", self.ManipulateRegen)
+	Persistence.WriteNumber(SaveGame, "skills/ShieldRegen", self.ShieldRegen)
 	Persistence.WriteNumber(SaveGame, "skillPoints", self.SkillPoints)
 	
 end
 
 function PlayerSkills.ManipulateRechargeTime(self)
-	return PlayerSkills.Data.FastHands[self.FastHands].CoolDown
+	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].CoolDown
 end
 
 function PlayerSkills.ShieldRechargeTime(self, usedTime)
-	return usedTime * PlayerSkills.ShieldRechargeMultipliers[self.Shield+1]
+	return usedTime * PlayerSkills.Skills.ShieldRegen[self.ShieldRegen].Multiplier
 end
 
 function PlayerSkills.PulseRechargeTime(self)

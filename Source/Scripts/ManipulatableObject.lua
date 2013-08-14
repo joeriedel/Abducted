@@ -575,7 +575,7 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		
 		x.entity.model.vision:BlendTo(rgba, time)
 		
-		if (x.entity.skillRequired <= (PlayerSkills.Manipulate+1)) then
+		if (x.entity.skillRequired <= (PlayerSkills:ManipulateSkillLevel()+1)) then
 			ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
 		end
 		
@@ -593,9 +593,9 @@ end
 
 function ManipulatableObject.SelectColor(self)
 		
-	if (self.skillRequired > PlayerSkills.Manipulate+1) then
+	if (self.skillRequired > PlayerSkills:ManipulateSkillLevel()+1) then
 		return {1,0,0,1}
-	elseif (self.skillRequired <= PlayerSkills.Manipulate) then
+	elseif (self.skillRequired <= PlayerSkills:ManipulateSkillLevel()) then
 		return {0,1,0,1}
 	end
 	
@@ -642,7 +642,7 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 		local targetname = x.entity.keys.targetname
 		
-		if (x.entity.visible and (x.entity.skillRequired <= (PlayerSkills.Manipulate+1))) then
+		if (x.entity.visible and (x.entity.skillRequired <= (PlayerSkills:ManipulateSkillLevel()+1))) then
 			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
 			local screen,r = World.Project(world)
 			local dx, dy, dd
@@ -958,7 +958,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 --	local alwaysReset = StringForString(self.keys.reset, "auto")=="always"
 	local neverReset = StringForString(self.keys.reset, "auto")=="never"
 	
-	if (((canReset == nil) and (not neverReset) and (self.skillRequired > PlayerSkills.Manipulate)) or (canReset and (not neverReset))) then
+	if (((canReset == nil) and (not neverReset) and (self.skillRequired > PlayerSkills:ManipulateSkillLevel())) or (canReset and (not neverReset))) then
 		local f = function ()
 			COutLine(kC_Debug, "Manipulatable.Reset")
 			self.manipulate = nil

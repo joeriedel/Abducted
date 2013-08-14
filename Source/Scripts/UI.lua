@@ -1095,7 +1095,7 @@ function UI.FontAdvanceSize(self, font, fontScale)
 		fontScale = UI.fontScale
 	end
 	local a,d = font:AscenderDescender()
-	return a*fontScale[2]
+	return (a-d)*fontScale[2]
 end
 
 function UI.SplitStringAtSize(self, font, text, width, invFontScale)

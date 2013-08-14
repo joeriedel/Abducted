@@ -4,7 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 Arm.CharDBInset = { 32, 16 }
-Arm.CharDBTextSpace = {12, 8}
+Arm.CharDBTextSpace = {12, 0}
 Arm.CharDBSectionHeightPct = 0.42
 Arm.CharDBPulsePctSize = 0.95
 Arm.CharDBPulseInset = 8
@@ -146,7 +146,7 @@ function Arm.SpawnCharacterDB(self)
 		Health Status
 	-----------------------------------------------------------------------------]]
 	
-	local sectionY = charDBSectionHeight + (Arm.CharDBTextSpace[2]) * UI.identityScale[2]
+	local sectionY = charDBSectionHeight + (8 * UI.identityScale[2])
 	y = sectionY
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})
@@ -225,7 +225,7 @@ function Arm.SpawnCharacterDB(self)
 		Time played
 	-----------------------------------------------------------------------------]]
 	
-	sectionY = (charDBSectionHeight*2) + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
+	sectionY = (charDBSectionHeight*2) + (8 * UI.identityScale[2])
 	y = sectionY
 	
 	w = UI:CreateWidget("TextLabel", {rect = {0, y, 8, 8}, typeface = UI.typefaces.StandardButtonDark})

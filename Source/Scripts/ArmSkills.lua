@@ -539,25 +539,28 @@ function Arm.SelectSkill(self, skill)
 	
 	local level = skill:CurrentLevel()
 	local text = ""
-	
-	if (level < 1) then
-		text = StringTable.Get("SKILL_UNSKILLED")
-	end
+	local stats = nil
 	
 	if (skill.Stats) then
-		local stats = skill:Stats(level)
-		if (stats) then
-			if (level < 1) then
-				text = text.."\n\n"
-			end
-			text = text..stats
-		end
+		stats = skill:Stats(level)
 	end
 	
+	if (stats) then
+		if (level < 1) then
+			text = StringTable.Get("SKILL_UNSKILLED").."\n\n"..stats
+		else
+			text = stats
+		end
+	end
+				
 	local canPurchase = true
 	
 	if (skill[level+1]) then
-		text = text.."\n\n"..StringTable.Get("SKILL_NEXT_LEVEL").."\n"
+		if (text:len() > 0) then
+			text = text.."\n\n"
+		end
+		
+		text = text..StringTable.Get("SKILL_NEXT_LEVEL").."\n"
 		
 		if (skill.Stats) then
 			text = text.."\n"..skill:Stats(level+1)

@@ -476,8 +476,10 @@ end
 
 function PlayerPawn.PulseDamage(self, pos)
 
+	local radius = PlayerSkills:PulseKillRadius()
+	
 	-- kill in a radius
-	local radiusBox = {PlayerPawn.PulseKillRadius, PlayerPawn.PulseKillRadius, PlayerPawn.PulseKillRadius}
+	local radiusBox = {radius, radius, radius}
 	local mins = VecSub(pos, radiusBox) 
 	local maxs = VecAdd(pos, radiusBox)
 	

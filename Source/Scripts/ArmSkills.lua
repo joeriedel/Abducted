@@ -89,7 +89,7 @@ function Arm.SpawnSkills(self)
 	w:SetBlendWithParent(true)
 	self.widgets.skills.Root:AddChild(w)
 	
-	local titleSize = self.skillsRootWorkspaceSize[4] * 0.2
+	local titleSize = UI:FontAdvanceSize(self.typefaces.SkillTitle, self.unityFontScale)*2
 	
 	self.skillsTextRect = {
 		self.skillsTreeRect[1] + self.skillsTreeRect[3] + lineSpace,
@@ -542,13 +542,16 @@ function Arm.SelectSkill(self, skill)
 	
 	if (level < 1) then
 		text = StringTable.Get("SKILL_UNSKILLED")
-		if (skill.Stats) then
-			text = text.."\n"
-		end
 	end
 	
 	if (skill.Stats) then
-		text = text..skill:Stats(level)
+		local stats = skill:Stats(level)
+		if (stats) then
+			if (level < 1) then
+				text = text.."\n\n"
+			end
+			text = text..stats
+		end
 	end
 	
 	local canPurchase = true

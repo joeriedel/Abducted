@@ -221,6 +221,7 @@ function Arm.ProcessActionTokens(self, tokens)
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
 			self.rewardSkillPoints = tonumber(tokens[2])
 			Arm:SaveTopicReward(self.topic, "skillpoints")
+			PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 		end
 	elseif (tokens[1] == "unlock_skill") then
 		if (not Arm:CheckTopicReward(self.topic, "unlock_skill")) then
@@ -244,8 +245,6 @@ function Arm.ProcessActionTokens(self, tokens)
 			self:ClearSignal()
 		end
 	end
-
-	SaveGame:Save()
 end
 
 function Arm.ProcessTriggerTokens(self, tokens)
@@ -483,6 +482,8 @@ function Arm.ChatPrompt(self)
 			if (self.clearTopicPending) then
 				Arm:EndHorrorTopic()
 			end
+			PlayerSkills:Save()
+			SaveGame:Save()
 			return
 		end
 	end
@@ -498,6 +499,9 @@ function Arm.ChatPrompt(self)
 		EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED")
 		Arm:ChatLockout() -- until a trigger.
 	end
+	
+	PlayerSkills:Save()
+	SaveGame:Save()
 	
 	-- how many lines?
 	self.promptState = {}

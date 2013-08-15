@@ -1943,21 +1943,18 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
 	elseif (tokens[1] == "award") then
-		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
-			self.rewardSkillPoints = tonumber(tokens[2])
-			Arm:SaveTopicReward(self.topic, "skillpoints")
-		end
+		self.rewardSkillPoints = tonumber(tokens[2])
+		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	elseif (tokens[1] == "unlock_skill") then
-		if (not Arm:CheckTopicReward(self.topic, "unlock_skill")) then
-			self.rewardSkill = tokens[2]
-			Arm:SaveTopicReward(self.topic, "unlock_skill")
-		end
+		self.rewardSkill = tokens[2]
+		
 	elseif (tokens[1] == "discover") then
 		if (Abducted.entity:Discover(tokens[2])) then
 			self.rewardDiscover = tokens[2]
 		end
 	end
 
+	PlayerSkills:Save()
 	SaveGame:Save()
 end
 

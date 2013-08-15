@@ -15,7 +15,7 @@ PlayerSkills.Skills.ManipulateRegen = {
 	LongDescription = "SKILL_MANIPULATE_REGEN_LONG_DESCRIPTION",
 	Graphics = {
 			Icon = {
-				Pos={415,8},
+				Pos={415, 8},
 				Material="UI/manipulate_default1_M"
 			},
 			Lines = {
@@ -25,7 +25,7 @@ PlayerSkills.Skills.ManipulateRegen = {
 				},
 				{
 					Material="SkillsCurve2",
-					Pos={527,54}
+					Pos={527, 54}
 				}
 			}
 	},
@@ -68,22 +68,22 @@ PlayerSkills.Skills.ShieldRegen = {
 	},
 	Graphics = {
 			Icon = {
-				Pos={212,224},
+				Pos={212, 224},
 				Material="UI/shield_default1_M"
 			},
 			Lines = { 
 				{
 					Material="SkillsCurve2L",
-					Pos={46,  262}  
+					Pos={46, 262}  
 				},
 				{
 					Material="SkillsCurve3J",
-					Pos={249,340}
+					Pos={249, 340}
 				}
 			}
 	},
 	Stats = function(skill, level)
-		local pct = math.floor(1.25/skill[level].Multiplier*100)
+		local pct = math.floor(skill[0].Multiplier/skill[level].Multiplier*100)
 		return StringTable.Get("SKILL_RECHARGE_RATE").." "..tostring(pct).."%"
 	end,
 	CurrentLevel = function(skill)
@@ -113,7 +113,9 @@ PlayerSkills.Skills.ShieldRegen = {
 	}
 }
 
+PlayerSkills.kPulseKillRadius = 50
 PlayerSkills.PulseExplodeTime = {8, 10}
+
 PlayerSkills.Skills.PulseRegen = {
 	Title = "SKILL_PULSE_REGEN_TITLE",
 	ShortDescription = "SKILL_PULSE_REGEN_SHORT_DESCRIPTION",
@@ -123,18 +125,18 @@ PlayerSkills.Skills.PulseRegen = {
 	},
 	Graphics = {
 			Icon = {
-				Pos={619,224},
+				Pos={619, 224},
 				Material="UI/pulse_default1_M"
 			},
 			Lines = {
 				{
 					Material="SkillsCurve2L",
-					Pos={527,  342},
+					Pos={527, 342},
 					Rotation = 180
 				},
 				{
 					Material="SkillsCurve3J",
-					Pos={732,262},
+					Pos={732, 262},
 					Rotation = 180
 				}
 			}
@@ -180,14 +182,13 @@ PlayerSkills.Skills.ManipulateSkill = {
 	},
 	Graphics = {
 			Icon = {
-				Pos={415,360},
+				Pos={415, 360},
 				Material="UI/manipulate_default1_M"
 			},
 			Lines = {
 				{
 					Material="SkillsVertLines2",
-					Pos={460,  480},
-					Rotation = 180
+					Pos={460, 480}
 				}
 			}
 	},
@@ -219,14 +220,13 @@ PlayerSkills.Skills.ShieldDuration = {
 	},
 	Graphics = {
 			Icon = {
-				Pos={5 ,360},
+				Pos={5, 360},
 				Material="UI/shield_default1_M"
 			},
 			Lines = {
 				{
 					Material="SkillsVertLines2",
-					Pos={50,  478},
-					Rotation = 180
+					Pos={50, 478}
 				}
 			}
 	},
@@ -253,6 +253,239 @@ PlayerSkills.Skills.ShieldDuration = {
 	},
 	{
 		MaxDuration = 60,
+		Cost = 1200
+	}
+}
+
+PlayerSkills.Skills.PulseDamageRadius = {
+	Title = "SKILL_PULSE_DAMAGE_RADIUS_TITLE",
+	ShortDescription = "SKILL_PULSE_DAMAGE_RADIUS_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_PULSE_DAMAGE_RADIUS_LONG_DESCRIPTION",
+	Requires = {
+		{"PulseRegen", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={821, 365},
+				Material="UI/pulse_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsVertLines2",
+					Pos={867, 485}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		local pct = math.floor(skill[level].Multiplier/skill[0].Multiplier*100)
+		return StringTable.Get("SKILL_DAMAGE_RADIUS").." "..tostring(pct).."%"
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.PulseRadius
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.PulseRadius = PlayerSkills.PulseRadius + 1
+	end,
+	[0] = {
+		Multiplier = 1
+	},
+	{
+		Multiplier = 1.25,
+		Cost = 600
+	},
+	{
+		Multiplier = 1.5,
+		Cost = 900
+	}
+}
+
+PlayerSkills.Skills.PulseShield = {
+	Title = "SKILL_PULSE_SHIELD_TITLE",
+	ShortDescription = "SKILL_PULSE_SHIELD_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_PULSE_SHIELD_LONG_DESCRIPTION",
+	Requires = {
+		{"ShieldDuration", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={4,626},
+				Material="UI/shield_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsCurve2L",
+					Pos={9, 777},
+					Rotation = -90
+				},
+				{ 
+					Material="SkillsHorzLines2",
+					Pos={124, 667}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return StringTable.Get("SKILL_PULSE_SHIELD_UNTRAINED")
+		end
+		return StringTable.Get("SKILL_SHIELD_DURATION_REDUCED"):format(skill[level].TimeCost)
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.PulseShield
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.PulseShield = PlayerSkills.PulseShield + 1
+	end,
+	[0] = {
+	},
+	{
+		TimeCost = 20,
+		Cost = 300
+	},
+	{
+		TimeCost = 15,
+		Cost = 500
+	},
+	{
+		TimeCost = 10,
+		Cost = 800
+	},
+	{
+		TimeCost = 5,
+		Cost = 1200
+	}
+}
+
+PlayerSkills.Skills.Mines = {
+	Title = "SKILL_MINES_TITLE",
+	ShortDescription = "SKILL_MINES_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_MINES_LONG_DESCRIPTION",
+	Requires = {
+		{"PulseDamageRadius", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={822,631},
+				Material="UI/pulse_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsVertLines2",
+					Pos={866, 753}
+				},
+				{ 
+					Material="SkillsHorzLines2",
+					Pos={532, 667}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return nil
+		end
+		return StringTable.Get("SKILL_MINES_LEVEL"..tostring(level))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.Mines
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.Mines = PlayerSkills.Mines + 1
+	end,
+	[0] = {
+		MaxMines = 0
+	},
+	{
+		MaxMines = 1,
+		Cost = 600
+	},
+	{
+		MaxMines = 2,
+		Cost = 900
+	},
+	{
+		MaxMines = 3,
+		Cost = 1200
+	}
+}
+
+PlayerSkills.Skills.MultiManipulate = {
+	Title = "SKILL_MULTI_MANIPULATE_TITLE",
+	ShortDescription = "SKILL_MULTI_MANIPULATE_SHORT_DESCRIPTION",
+	Requires = {
+		{"Mines", 1}, {"ManipulateSkill", 1}, {"PulseShield", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={415, 629},
+				Material="UI/manipulate_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsVertLines2",
+					Pos={460, 751}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		return StringTable.Get("SKILL_MULTI_MANIPULATE_LEVEL"..tostring(level))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.MultiManipulate
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.MultiManipulate = PlayerSkills.MultiManipulate + 1
+	end,
+	[0] = {
+	},
+	{
+		Cost = 900
+	},
+	{
+		Cost = 1500
+	}
+}
+
+PlayerSkills.Skills.PowerBubble = {
+	Title = "SKILL_POWER_BUBBLE_TITLE",
+	ShortDescription = "SKILL_POWER_BUBBLE_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_POWER_BUBBLE_LONG_DESCRIPTION",
+	Requires = {
+		{"PulseShield", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={142, 834},
+				Material="UI/shield_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsSquiggle1",
+					Pos={106, 951}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		local pct = math.floor(skill[level].RangeMultiplier/skill[0].RangeMultiplier*100)
+		return StringTable.Get("SKILL_POWER_BUBBLE_STATS"):format(tostring(pct), tostring(skill[level].Uses))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.PowerBubble
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.PowerBubble = PlayerSkills.PowerBubble + 1
+	end,
+	[0] = {
+		RangeMultiplier = 1,
+		Uses = 1,
+		Cost = 600
+	},
+	{
+		RangeMultiplier = 1.5,
+		Uses = 2,
+		Cost = 900
+	},
+	{
+		RangeMultiplier = 2,
+		Uses = 3,
 		Cost = 1200
 	}
 }
@@ -311,29 +544,6 @@ PlayerSkills.Skills.GoLong = {
 	},
 	{
 		MaxDuration = 60,
-		Cost = 1200
-	}
-}
-
-PlayerSkills.Skills.LetMeEatCake = {
-	Title = "SKILL_LETMEEATCAKE_TITLE",
-	Description = "SKILL_LETMEEATCAKE_DESCRIPTION",
-	[0] = {
-	},
-	{
-		TimeCost = 20,
-		Cost = 300
-	},
-	{
-		TimeCost = 15,
-		Cost = 500
-	},
-	{
-		TimeCost = 10,
-		Cost = 800
-	},
-	{
-		TimeCost = 5,
 		Cost = 1200
 	}
 }
@@ -471,11 +681,17 @@ function PlayerSkills.Load(self)
 	
 	self.ManipulateSkill = Persistence.ReadNumber(SaveGame, "skills/ManipulateSkill", 0)
 	self.ManipulateRegen = Persistence.ReadNumber(SaveGame, "skills/ManipulateRegen", 0)
+	self.MultiManipulate = Persistence.ReadNumber(SaveGame, "skills/MultiManipulate", 0)
 	
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
+	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
 	
+	self.PulseRadius = Persistence.ReadNumber(SaveGame, "skills/PulseRadius", 0)
 	self.PulseRegen = Persistence.ReadNumber(SaveGame, "skills/PulseRegen", 0)
+	self.PulseShield = Persistence.ReadNumber(SaveGame, "skills/PulseShield", 0)
+	
+	self.Mines = Persistence.ReadNumber(SaveGame, "skills/Mines", 0)
 	
 	self.SkillPoints = Persistence.ReadNumber(SaveGame, "skillPoints", 0)
 	
@@ -488,14 +704,26 @@ function PlayerSkills.Save(self)
 	
 	Persistence.WriteNumber(SaveGame, "skills/ManipulateSkill", self.ManipulateSkill)
 	Persistence.WriteNumber(SaveGame, "skills/ManipulateRegen", self.ManipulateRegen)
+	Persistence.WriteNumber(SaveGame, "skills/MultiManipulate", self.MultiManipulate)
 	
 	Persistence.WriteNumber(SaveGame, "skills/ShieldDuration", self.ShieldDuration)
 	Persistence.WriteNumber(SaveGame, "skills/ShieldRegen", self.ShieldRegen)
+	Persistence.WriteNumber(SaveGame, "skills/PowerBubble", self.PowerBubble)
 	
+	Persistence.WriteNumber(SaveGame, "skills/PulseRadius", self.PulseRadius)
 	Persistence.WriteNumber(SaveGame, "skills/PulseRegen", self.PulseRegen)
+	Persistence.WriteNumber(SaveGame, "skills/PulseShield", self.PulseShield)
+	
+	Persistence.WriteNumber(SaveGame, "skills/Mines", self.Mines)
 	
 	Persistence.WriteNumber(SaveGame, "skillPoints", self.SkillPoints)
 	
+end
+
+function PlayerSkills.AwardSkillPoints(self, num)
+	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
+		self.SkillPoints = self.SkillPoints + num
+	end
 end
 
 function PlayerSkills.ManipulateSkillLevel(self)
@@ -504,6 +732,17 @@ end
 
 function PlayerSkills.ManipulateRechargeTime(self)
 	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].CoolDown
+end
+
+function PlayerSkills.NumManipulateActions(self)
+	if (self.MultiManipulate == 2) then
+		return 2
+	elseif (self.MultiManipulate == 1) then
+		if (math.random() < 0.5) then
+			return 2
+		end
+	end
+	return 1;
 end
 
 function PlayerSkills.ShieldRechargeTime(self, usedTime)
@@ -516,6 +755,14 @@ end
 
 function PlayerSkills.MaxShieldTime(self)
 	return PlayerSkills.Skills.ShieldDuration[self.ShieldDuration].MaxDuration
+end
+
+function PlayerSkills.MaxMines(self)
+	return PlayerSkills.Skills.Mines[self.Mines].MaxMines
+end
+
+function PlayerSkills.PulseKillRadius(self)
+	return PlayerSkills.kPulseKillRadius * PlayerSkills.Skills.PulseDamageRadius[self.PulseRadius].Multiplier
 end
 
 function PlayerSkills.ArmUnlocked(self)

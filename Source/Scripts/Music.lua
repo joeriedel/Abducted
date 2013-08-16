@@ -76,7 +76,7 @@ function Music.Play(self, cmd, args)
 		self.active:FadeVolume(1, 1)
 	end
 	
-	World.PostEvent("shiphum fadeto 0.5 1")
+	World.PostEvent("shiphum fadeto 0.25 1")
 end
 
 function Music.Check(self)

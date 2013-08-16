@@ -6,6 +6,7 @@
 PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
 PlayerSkills.UnlimitedSkillPointsCheat = true
+PlayerSkills.RefundFraction = 0.75
 
 PlayerSkills.Skills = {}
 
@@ -30,7 +31,7 @@ PlayerSkills.Skills.ManipulateRegen = {
 			}
 	},
 	Stats = function(skill, level)
-		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].CoolDown)
+		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].Cooldown)
 	end,
 	CurrentLevel = function(skill)
 		return PlayerSkills.ManipulateRegen
@@ -38,24 +39,27 @@ PlayerSkills.Skills.ManipulateRegen = {
 	Upgrade = function(skill)
 		PlayerSkills.ManipulateRegen = PlayerSkills.ManipulateRegen + 1
 	end,
+	Untrain = function(skill)
+		PlayerSkills.ManipulateRegen = 0
+	end,
 	[0] = {
-		CoolDown = 9,
+		Cooldown = 9,
 	},
 	{
 		Cost = 300,
-		CoolDown = 8
+		Cooldown = 8
 	},
 	{
 		Cost = 500,
-		CoolDown = 7
+		Cooldown = 7
 	},
 	{
 		Cost = 800,
-		CoolDown = 6
+		Cooldown = 6
 	},
 	{
 		Cost = 1200,
-		CoolDown = 5
+		Cooldown = 5
 	}
 }
 
@@ -91,6 +95,9 @@ PlayerSkills.Skills.ShieldRegen = {
 	end,
 	Upgrade = function(skill)
 		PlayerSkills.ShieldRegen = PlayerSkills.ShieldRegen + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.ShieldRegen = 0
 	end,
 	[0] = {
 		Multiplier = 1.25
@@ -142,7 +149,7 @@ PlayerSkills.Skills.PulseRegen = {
 			}
 	},
 	Stats = function(skill, level)
-		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].CoolDown)
+		return StringTable.Get("SKILL_COOLDOWN").." "..tostring(skill[level].Cooldown)
 	end,
 	CurrentLevel = function(skill)
 		return PlayerSkills.PulseRegen
@@ -150,23 +157,26 @@ PlayerSkills.Skills.PulseRegen = {
 	Upgrade = function(skill)
 		PlayerSkills.PulseRegen = PlayerSkills.PulseRegen + 1
 	end,
+	Untrain = function(skill)
+		PlayerSkills.PulseRegen = 0
+	end,
 	[0] = {
-		CoolDown = 9
+		Cooldown = 9
 	},
 	{
-		CoolDown = 8,
+		Cooldown = 8,
 		Cost = 300
 	},
 	{
-		CoolDown = 7,
+		Cooldown = 7,
 		Cost = 500
 	},
 	{
-		CoolDown = 6,
+		Cooldown = 6,
 		Cost = 800
 	},
 	{
-		CoolDown = 5,
+		Cooldown = 5,
 		Cost = 1200
 	}
 }
@@ -200,6 +210,9 @@ PlayerSkills.Skills.ManipulateSkill = {
 	end,
 	Upgrade = function(skill)
 		PlayerSkills.ManipulateSkill = PlayerSkills.ManipulateSkill + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.ManipulateSkill = 0
 	end,
 	[0] = {
 	},
@@ -239,6 +252,9 @@ PlayerSkills.Skills.ShieldDuration = {
 	Upgrade = function(skill)
 		HUD:RechargeShield(true) -- instant
 		PlayerSkills.ShieldDuration = PlayerSkills.ShieldDuration + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.ShieldDuration = 0
 	end,
 	[0] = {
 		MaxDuration = 15
@@ -286,6 +302,9 @@ PlayerSkills.Skills.PulseDamageRadius = {
 	Upgrade = function(skill)
 		PlayerSkills.PulseRadius = PlayerSkills.PulseRadius + 1
 	end,
+	Untrain = function(skill)
+		PlayerSkills.PulseRadius = 0
+	end,
 	[0] = {
 		Multiplier = 1
 	},
@@ -299,10 +318,10 @@ PlayerSkills.Skills.PulseDamageRadius = {
 	}
 }
 
-PlayerSkills.Skills.PulseShield = {
-	Title = "SKILL_PULSE_SHIELD_TITLE",
-	ShortDescription = "SKILL_PULSE_SHIELD_SHORT_DESCRIPTION",
-	LongDescription = "SKILL_PULSE_SHIELD_LONG_DESCRIPTION",
+PlayerSkills.Skills.MultiShield = {
+	Title = "SKILL_MULTI_SHIELD_TITLE",
+	ShortDescription = "SKILL_MULTI_SHIELD_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_MULTI_SHIELD_LONG_DESCRIPTION",
 	Requires = {
 		{"ShieldDuration", 1}
 	},
@@ -325,15 +344,20 @@ PlayerSkills.Skills.PulseShield = {
 	},
 	Stats = function(skill, level)
 		if (level < 1) then
-			return StringTable.Get("SKILL_PULSE_SHIELD_UNTRAINED")
+			return StringTable.Get("SKILL_MULTI_SHIELD_UNTRAINED")
+		elseif (level < 3) then
+			return StringTable.Get("SKILL_MULTI_SHIELD_EFFECT1"):format(skill[level].TimeCost)
 		end
-		return StringTable.Get("SKILL_SHIELD_DURATION_REDUCED"):format(skill[level].TimeCost)
+		return StringTable.Get("SKILL_MULTI_SHIELD_EFFECT2"):format(skill[level].TimeCost)
 	end,
 	CurrentLevel = function(skill)
-		return PlayerSkills.PulseShield
+		return PlayerSkills.MultiShield
 	end,
 	Upgrade = function(skill)
-		PlayerSkills.PulseShield = PlayerSkills.PulseShield + 1
+		PlayerSkills.MultiShield = PlayerSkills.MultiShield + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.MultiShield = 0
 	end,
 	[0] = {
 	},
@@ -379,9 +403,6 @@ PlayerSkills.Skills.Mines = {
 			}
 	},
 	Stats = function(skill, level)
-		if (level < 1) then
-			return nil
-		end
 		return StringTable.Get("SKILL_MINES_LEVEL"..tostring(level))
 	end,
 	CurrentLevel = function(skill)
@@ -389,6 +410,9 @@ PlayerSkills.Skills.Mines = {
 	end,
 	Upgrade = function(skill)
 		PlayerSkills.Mines = PlayerSkills.Mines + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.Mines = 0
 	end,
 	[0] = {
 		MaxMines = 0
@@ -411,7 +435,7 @@ PlayerSkills.Skills.MultiManipulate = {
 	Title = "SKILL_MULTI_MANIPULATE_TITLE",
 	ShortDescription = "SKILL_MULTI_MANIPULATE_SHORT_DESCRIPTION",
 	Requires = {
-		{"Mines", 1}, {"ManipulateSkill", 1}, {"PulseShield", 1}
+		{"Mines", 1}, {"ManipulateSkill", 1}, {"MultiShield", 1}
 	},
 	Graphics = {
 			Icon = { 
@@ -434,6 +458,9 @@ PlayerSkills.Skills.MultiManipulate = {
 	Upgrade = function(skill)
 		PlayerSkills.MultiManipulate = PlayerSkills.MultiManipulate + 1
 	end,
+	Untrain = function(skill)
+		PlayerSkills.MultiManipulate = 0
+	end,
 	[0] = {
 	},
 	{
@@ -449,7 +476,7 @@ PlayerSkills.Skills.PowerBubble = {
 	ShortDescription = "SKILL_POWER_BUBBLE_SHORT_DESCRIPTION",
 	LongDescription = "SKILL_POWER_BUBBLE_LONG_DESCRIPTION",
 	Requires = {
-		{"PulseShield", 1}
+		{"MultiShield", 1}
 	},
 	Graphics = {
 			Icon = { 
@@ -473,6 +500,9 @@ PlayerSkills.Skills.PowerBubble = {
 	Upgrade = function(skill)
 		PlayerSkills.PowerBubble = PlayerSkills.PowerBubble + 1
 	end,
+	Untrain = function(skill)
+		PlayerSkills.PowerBubble = 0
+	end,
 	[0] = {
 		RangeMultiplier = 1,
 		Uses = 1,
@@ -490,186 +520,234 @@ PlayerSkills.Skills.PowerBubble = {
 	}
 }
 
---[[
-PlayerSkills.Skills.GrabAllYouCan = {
-	Title = "SKILL_GRABALLYOUCAN_TITLE",
-	Description = "SKILL_GRABALLYOUCAN_DESCRIPTION",
+PlayerSkills.Skills.TriggerHappy = {
+	Title = "SKILL_TRIGGER_HAPPY_TITLE",
+	ShortDescription = "SKILL_TRIGGER_HAPPY_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_TRIGGER_HAPPY_LONG_DESCRIPTION",
 	Requires = {
-		{ "IWillMoveYou", 1 }
+		{"Mines", 1}
 	},
+	Graphics = {
+			Icon = { 
+				Pos={823, 901},
+				Material="UI/pulse_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsSquiggle2",
+					Pos={656, 1020}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return StringTable.Get("SKILL_TRIGGER_HAPPY_UNTRAINED")
+		end
+		local pct1 = math.floor((1-skill[level].DamageMultiplier/skill[0].DamageMultiplier)*100)
+		local pct2 = math.floor((1-skill[level].AreaMultiplier/skill[0].AreaMultiplier)*100)
+		return StringTable.Get("SKILL_TRIGGER_HAPPY_STATS"):format(tostring(skill[level].Window), tostring(pct1), tostring(pct2))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.TriggerHappy
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.TriggerHappy = PlayerSkills.TriggerHappy + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.TriggerHappy = 0
+	end,
 	[0] = {
+		DamageMultiplier = 1,
+		AreaMultiplier = 1
 	},
 	{
-		Cost = 900
+		Window = 1,
+		Cost = 600,
+		DamageMultiplier = 0.25,
+		AreaMultiplier = 0.25
 	},
 	{
-		Cost = 1500
+		Window = 2,
+		Cost = 900,
+		DamageMultiplier = 0.30,
+		AreaMultiplier = 0.30
+	},
+	{
+		Window = 3,
+		Cost = 1200,
+		DamageMultiplier = 0.4,
+		AreaMultiplier = 0.4
 	}
 }
 
 PlayerSkills.Skills.TheHand = {
-	Title = "SKILL_THEHAND_TITLE",
-	Description = "Skill_THEHAND_DESCRIPTION",
+	Title = "SKILL_THE_HAND_TITLE",
+	ShortDescription = "SKILL_THE_HAND_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_THE_HAND_LONG_DESCRIPTION",
 	Requires = {
-		{ "ManipulateRegen", 4 },
-		{ "IWillMoveYou", 2 },
-		{ "GrabAllYouCan", 2 }
+		{"MultiManipulate", 1}
 	},
+	Graphics = {
+			Icon = { 
+				Pos={417, 902},
+				Material="UI/manipulate_default1_M"
+			},
+			Lines = {
+				{
+					Material="SkillsVertLines2",
+					Pos={460, 1023}
+				}
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			StringTable.Get("SKILL_THE_HAND_LEVEL0")
+		end
+		return StringTable.Get("SKILL_THE_HAND_LEVEL"..tonumber(level)):format(skill[level].Cooldown)
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.TheHand
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.TheHand = PlayerSkills.TheHand + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.TheHand = 0
+	end,
 	[0] = {
 	},
 	{
+		Cooldown = 3,
 		Cost = 1500
 	},
 	{
+		Cooldown = 3,
 		Cost = 2100
-	},
-	{
-		Cost = 3000
-	}
-}
-
-PlayerSkills.Skills.GoLong = {
-	Title = "SKILL_GOLONG_TITLE",
-	Description = "SKILL_GOLONG_DESCRIPTION",
-	[0] = {
-		MaxDuration = 15
-	},
-	{
-		MaxDuration = 30,
-		Cost = 600
-	},
-	{
-		MaxDuration = 45,
-		Cost = 900
-	},
-	{
-		MaxDuration = 60,
-		Cost = 1200
-	}
-}
-
-PlayerSkills.Skills.PowerBubble = {
-	Title = "SKILL_POWERBUBBLE_TITLE",
-	Description = "SKILL_POWERBUBBLE_DESCRIPTION",
-	[0] = {
-	},
-	{
-		Cost = 600
-	},
-	{
-		Cost = 900
-	},
-	{
-		Cost = 1200
 	}
 }
 
 PlayerSkills.Skills.Defender = {
 	Title = "SKILL_DEFENDER_TITLE",
-	Description = "SKILL_DEFENDER_DESCRIPTION",
+	ShortDescription = "SKILL_DEFENDER_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_DEFENDER_LONG_DESCRIPTION",
+	Requires = {
+		{"PowerBubble", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={64, 1242},
+				Material="UI/shield_default1_M"
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return StringTable.Get("SKILL_DEFENDER_UNSKILLED")
+		end
+		return StringTable.Get("SKILL_DEFENDER_STATS"):format(tonumber(skill[level].Cooldown))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.Defender
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.Defender = PlayerSkills.Defender + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.Defender = 0
+	end,
 	[0] = {
 	},
 	{
+		Cooldown = 60,
 		Cost = 1500
 	},
 	{
+		Cooldown = 30,
 		Cost = 2100
 	},
 	{
+		Cooldown = 15,
 		Cost = 3000
 	}
 }
 
-PlayerSkills.Skills.BigHit = {
-	Title = "SKILL_BIGHIT_TITLE",
-	Description = "SKILL_BIGHIT_DESCRIPTION",
-	[0] = {
-		Multiplier = 1
-	},
-	{
-		Multiplier = 1.25,
-		Cost = 600
-	},
-	{
-		Multiplier = 1.5,
-		Cost = 900
-	}
-}
-
-PlayerSkills.Skills.DropYourWeapon = {
-	Title = "SKILL_DROPYOURWEAPON_TITLE",
-	Description = "SKILL_DROPYOURWEAPON_DESCRIPTION",
-	[0] = {
-	},
-	{
-		MaxMines = 1,
-		Cost = 600
-	},
-	{
-		MaxMines = 2,
-		Cost = 900
-	},
-	{
-		MaxMines = 4,
-		Cost = 1200
-	}
-}
-
-PlayerSkills.Skills.FastestGunInSpace = {
-	Title = "SKILL_FASTESTGUNINSPACE_TITLE",
-	Description = "SKILL_FASTESTGUNINSPACE_DESCRIPTION",
-	[0] = {
-	},
-	{
-		Window = 1,
-		Cost = 600,
-		DamageMultiplier = 0.5,
-		AreaMultiplier = 0.5
-	},
-	{
-		Window = 2,
-		Cost = 900,
-		DamageMultiplier = 0.5,
-		AreaMultiplier = 0.5
-	},
-	{
-		Window = 3,
-		Cost = 1200,
-		DamageMultiplier = 0.5,
-		AreaMultiplier = 0.5
-	}
-}
-
 PlayerSkills.Skills.PureEnergy = {
-	Title = "SKILL_PUREENERGY_TITLE",
-	Description = "SKILL_PUREENERGY_DESCRIPTION",
+	Title = "SKILL_PURE_ENERGY_TITLE",
+	ShortDescription = "SKILL_PURE_ENERGY_SHORT_DESCRIPTION",
+	Requires = {
+		{"TriggerHappy", 1}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={617, 1185},
+				Material="UI/pulse_default1_M"
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return nil
+		end
+		return StringTable.Get("SKILL_PURE_ENERGY_LEVEL"..tostring(level)):format(tonumber(skill[level].Cooldown))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.PureEnergy
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.PureEnergy = PlayerSkills.PureEnergy + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.PureEnergy = 0
+	end,
 	[0] = {
 	},
 	{
-		CoolDown = 3,
+		Cooldown = 3,
 		Cost = 1500
 	},
 	{
-		CoolDown = 3,
+		Cooldown = 3,
 		Cost = 2100
 	},
 	{
-		CoolDown = 3,
+		Cooldown = 3,
 		Cost = 3000
 	}
 }
 
 PlayerSkills.Skills.Omega = {
 	Title = "SKILL_OMEGA_TITLE",
-	Description = "SKILL_OMEGA_DESCRIPTION",
+	ShortDescription = "SKILL_OMEGA_SHORT_DESCRIPTION",
+	LongDescription = "SKILL_OMEGA_LONG_DESCRIPTION",
+	Requires = {
+		{"TheHand", 2}
+	},
+	Graphics = {
+			Icon = { 
+				Pos={415, 1291},
+				Material="UI/manipulate_default1_M"
+			}
+	},
+	Stats = function(skill, level)
+		if (level < 1) then
+			return nil
+		end
+		return StringTable.Get("SKILL_OMEGA_STATS"):format(tonumber(skill[level].Cooldown))
+	end,
+	CurrentLevel = function(skill)
+		return PlayerSkills.Omega
+	end,
+	Upgrade = function(skill)
+		PlayerSkills.Omega = PlayerSkills.Omega + 1
+	end,
+	Untrain = function(skill)
+		PlayerSkills.Omega = 0
+	end,
 	[0] = {
 	},
 	{
-		Cost = 10000
+		Cost = 10000,
+		Cooldown = 1
 	}
 }
-
-]]
 
 function PlayerSkills.Load(self)
 	self.Pulse = 0
@@ -682,16 +760,21 @@ function PlayerSkills.Load(self)
 	self.ManipulateSkill = Persistence.ReadNumber(SaveGame, "skills/ManipulateSkill", 0)
 	self.ManipulateRegen = Persistence.ReadNumber(SaveGame, "skills/ManipulateRegen", 0)
 	self.MultiManipulate = Persistence.ReadNumber(SaveGame, "skills/MultiManipulate", 0)
+	self.TheHand = Persistence.ReadNumber(SaveGame, "skills/TheHand", 0)
 	
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
 	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
+	self.MultiShield = Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
+	self.Defender = Persistence.ReadNumber(SaveGame, "skills/Defender", 0)
 	
 	self.PulseRadius = Persistence.ReadNumber(SaveGame, "skills/PulseRadius", 0)
 	self.PulseRegen = Persistence.ReadNumber(SaveGame, "skills/PulseRegen", 0)
-	self.PulseShield = Persistence.ReadNumber(SaveGame, "skills/PulseShield", 0)
-	
+	self.TriggerHappy = Persistence.ReadNumber(SaveGame, "skills/TriggerHappy", 0)
+	self.PureEnergy = Persistence.ReadNumber(SaveGame, "skills/PureEnergy", 0)
+		
 	self.Mines = Persistence.ReadNumber(SaveGame, "skills/Mines", 0)
+	self.Omega = Persistence.ReadNumber(SaveGame, "skills/Omega", 0)
 	
 	self.SkillPoints = Persistence.ReadNumber(SaveGame, "skillPoints", 0)
 	
@@ -705,16 +788,21 @@ function PlayerSkills.Save(self)
 	Persistence.WriteNumber(SaveGame, "skills/ManipulateSkill", self.ManipulateSkill)
 	Persistence.WriteNumber(SaveGame, "skills/ManipulateRegen", self.ManipulateRegen)
 	Persistence.WriteNumber(SaveGame, "skills/MultiManipulate", self.MultiManipulate)
+	Persistence.WriteNumber(SaveGame, "skills/TheHand", self.TheHand)
 	
 	Persistence.WriteNumber(SaveGame, "skills/ShieldDuration", self.ShieldDuration)
 	Persistence.WriteNumber(SaveGame, "skills/ShieldRegen", self.ShieldRegen)
 	Persistence.WriteNumber(SaveGame, "skills/PowerBubble", self.PowerBubble)
+	Persistence.WriteNumber(SaveGame, "skills/MultiShield", self.MultiShield)
+	Persistence.WriteNumber(SaveGame, "skills/Defender", self.Defender)
 	
 	Persistence.WriteNumber(SaveGame, "skills/PulseRadius", self.PulseRadius)
 	Persistence.WriteNumber(SaveGame, "skills/PulseRegen", self.PulseRegen)
-	Persistence.WriteNumber(SaveGame, "skills/PulseShield", self.PulseShield)
+	Persistence.WriteNumber(SaveGame, "skills/TriggerHappy", self.TriggerHappy)
+	Persistence.WriteNumber(SaveGame, "skills/PureEnergy", self.PureEnergy)
 	
 	Persistence.WriteNumber(SaveGame, "skills/Mines", self.Mines)
+	Persistence.WriteNumber(SaveGame, "skills/Omega", self.Omega)
 	
 	Persistence.WriteNumber(SaveGame, "skillPoints", self.SkillPoints)
 	
@@ -731,7 +819,7 @@ function PlayerSkills.ManipulateSkillLevel(self)
 end
 
 function PlayerSkills.ManipulateRechargeTime(self)
-	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].CoolDown
+	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].Cooldown
 end
 
 function PlayerSkills.NumManipulateActions(self)
@@ -750,7 +838,7 @@ function PlayerSkills.ShieldRechargeTime(self, usedTime)
 end
 
 function PlayerSkills.PulseRechargeTime(self)
-	return PlayerSkills.Skills.PulseRegen[self.PulseRegen].CoolDown
+	return PlayerSkills.Skills.PulseRegen[self.PulseRegen].Cooldown
 end
 
 function PlayerSkills.MaxShieldTime(self)

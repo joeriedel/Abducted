@@ -955,10 +955,9 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 	self:RemoveFromManipulateList()
 	
 	-- how long do we sit here?
---	local alwaysReset = StringForString(self.keys.reset, "auto")=="always"
-	local neverReset = StringForString(self.keys.reset, "auto")=="never"
+	local alwaysReset = StringForString(self.keys.reset, "auto")=="always"
 	
-	if (((canReset == nil) and (not neverReset) and (self.skillRequired > PlayerSkills:ManipulateSkillLevel())) or (canReset and (not neverReset))) then
+	if (((canReset == nil) and (alwaysReset or (self.skillRequired > PlayerSkills.Manipulate))) or canReset) then
 		local f = function ()
 			COutLine(kC_Debug, "Manipulatable.Reset")
 			self.manipulate = nil

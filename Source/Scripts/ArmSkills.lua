@@ -211,17 +211,17 @@ function Arm.SpawnSkills(self)
 	
 	x = x + buttonWidth + buttonSpace
 	
-	self.widgets.skills.Train = UI:CreateStylePushButton(
+	self.widgets.skills.Refund = UI:CreateStylePushButton(
 		{ x, y, buttonWidth, self.menuButtonSize[2] },
-		function () self:OnTrainButtonPressed() end,
+		function () self:OnRefundButtonPressed() end,
 		{ pressed = self.sfx.Button, highlight={on={0,0,0,0}} },
 		self.widgets.skills.Root
 	)
-	self.widgets.skills.Train:SetBlendWithParent(true)
+	self.widgets.skills.Refund:SetBlendWithParent(true)
 	
-	local text = StringTable.Get("SKILL_TRAIN")
+	local text = StringTable.Get("SKILL_REFUND")
 	UI:LineWrapCenterText(
-		self.widgets.skills.Train.label,
+		self.widgets.skills.Refund.label,
 		nil,
 		nil,
 		0,
@@ -230,7 +230,7 @@ function Arm.SpawnSkills(self)
 		UI.invIdentityScale
 	)
 	
-	self.widgets.skills.Train:SetVisible(false)
+	self.widgets.skills.Refund:SetVisible(Arm:HasTrainedAnySkills())
 	
 	x = x + buttonWidth + buttonSpace
 	
@@ -254,7 +254,7 @@ function Arm.SpawnSkills(self)
 	)
 	
 	self.widgets.skills.Purchase:SetVisible(false)
-	
+		
 	self.skillPointsLabelRect = {x, y+(self.menuButtonSize[2]/1.5), buttonWidth2, 0}
 	self.skillPointsLabelRect[4] = self.skillsRootWorkspaceSize[4] - self.skillPointsLabelRect[2]
 	self.widgets.skills.SkillPointsLabel = UI:CreateWidget("TextLabel", {
@@ -314,6 +314,7 @@ function Arm.CreateSkillInterace(self, skill)
 			
 			local r = {v.Pos[1]*self.SkillsTreeScale,v.Pos[2]*self.SkillsTreeScale,d[1]*self.SkillsTreeScale,d[2]*self.SkillsTreeScale}
 			w = UI:CreateWidget("MatWidget", {rect=r,material=m})
+			w:SetBlendWithParent(true)
 			w:SetVisible(false)
 			
 			if (v.Rotation) then
@@ -440,6 +441,7 @@ function Arm.OnSkillWidgetInputEvent(self, skill, e)
 		if (e.type == kI_TouchCancelled) then
 			self:HighlightSkill() -- reset
 		else
+			self.sfx.SelectSkill:Play(kSoundChannel_UI, 0)
 			self:SelectSkill(skill)
 		end
 		return true
@@ -452,8 +454,66 @@ function Arm.OnStoreButtonPressed(self)
 
 end
 
-function Arm.OnTrainButtonPressed(self)
+function Arm.OnRefundButtonPressed(self)
+	local title = StringTable.Get("SKILL_REFUND_TITLE")
+	local msg = StringTable.Get("SKILL_REFUND_TEXT")
+	local refund = Arm:CalcSkillPointsRefund()
+	msg = msg:format(math.floor(PlayerSkills.RefundFraction*100), refund)
+	
+	AlertPanel:OKCancel(
+		title,
+		msg,
+		function (result)
+			if (result == AlertPanel.YesButton) then
+				self:RefundSkills(refund)
+			end
+		end,
+		nil,
+		false
+	)
+end
 
+function Arm.CalcSkillPointsRefund(self)
+	local refund = 0
+	
+	for k,v in pairs(PlayerSkills.Skills) do
+		local level = v:CurrentLevel()
+		if (level > 0) then
+			for i=1,level do
+				refund = refund + (v[i].Cost * PlayerSkills.RefundFraction)
+			end
+		end
+	end
+	
+	return refund
+end
+
+function Arm.HasTrainedAnySkills(self)
+	for k,v in pairs(PlayerSkills.Skills) do
+		if (v:CurrentLevel() > 0) then
+			return true
+		end
+	end
+	
+	return false
+end
+
+function Arm.RefundSkills(self, refund)
+
+	for k,v in pairs(PlayerSkills.Skills) do
+		v:Untrain()
+	end
+
+	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
+		PlayerSkills.SkillPoints = PlayerSkills.SkillPoints + refund
+	end
+	
+	self:UpdateSkillsUI()
+	local skill = self.selectedSkill
+	self.selectedSkill = nil
+	self:SelectSkill(skill)
+
+	self.widgets.skills.Refund:SetVisible(false)
 end
 
 function Arm.OnPurchaseButtonPressed(self)
@@ -505,14 +565,22 @@ function Arm.UpgradeSkill(self, skill, cost)
 	
 	skill:Upgrade()
 	self:UpdateSkillUI(skill)
+	self.selectedSkill = nil -- force scroll to 0,0
 	self:SelectSkill(skill)
 	
+	self.widgets.skills.Refund:SetVisible(true)
 	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
+	
+	PlayerSkills:Save()
+	SaveGame:Save()
 end
 
 function Arm.SelectSkill(self, skill)
 
-	self.sfx.SelectSkill:Play(kSoundChannel_UI, 0)
+	if (self.selectedSkill ~= skill) then
+		self.widgets.skills.DescriptionList:ScrollTo({0,0}, 0)
+	end
+	
 	self.selectedSkill = skill
 	Arm:HighlightSkill()
 	
@@ -566,7 +634,7 @@ function Arm.SelectSkill(self, skill)
 			text = text.."\n"..skill:Stats(level+1)
 		end
 		
-		text = text.."\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost)
+		text = text.."\n\n"..StringTable.Get("SKILL_COST").." "..tostring(skill[level+1].Cost)
 	else
 		canPurchase = false
 	end
@@ -609,7 +677,6 @@ function Arm.SelectSkill(self, skill)
 	end
 	
 	self.widgets.skills.Purchase:SetVisible(canPurchase)
-	self.widgets.skills.Train:SetVisible(true)
 	
 	self.widgets.skills.StatsText:SetRect({0,r[2]+r[4], self.skillsDescriptionRect[3], 8})
 	
@@ -642,7 +709,6 @@ function Arm.SelectSkill(self, skill)
 	end
 	
 	self.widgets.skills.DescriptionList:RecalcLayout()
-	self.widgets.skills.DescriptionList:ScrollTo({0,0}, 0)
 end
 
 function Arm.HighlightSkill(self, skill)
@@ -658,6 +724,7 @@ function Arm.HighlightSkill(self, skill)
 		hr[1] = r[1]
 		hr[2] = r[2]
 		self.widgets.skills.Highlight:SetRect(hr)
+		self.widgets.skills.SkillsTree:RecalcLayout()
 	else
 		self.widgets.skills.Highlight:SetVisible(false)
 	end

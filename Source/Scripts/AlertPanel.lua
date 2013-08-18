@@ -47,7 +47,7 @@ function AlertPanel.Create(self)
 	local textRect = {
 		48*UI.identityScale[1],
 		titleSize,
-		panelRect[3] - (48*2*UI.identityScale[1]),
+		panelRect[3] - (24*UI.identityScale[1]),
 		panelRect[4] - titleSize - (48*UI.identityScale[2]) - buttonSize[2]
 	}
 	

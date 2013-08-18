@@ -1022,6 +1022,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 		
 		Abducted.entity:EndManipulate()
 		HUD:RechargeManipulate()
+		HUD:ShieldPenalty()
 	end
 	
 	return true

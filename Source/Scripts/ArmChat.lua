@@ -482,8 +482,6 @@ function Arm.ChatPrompt(self)
 			if (self.clearTopicPending) then
 				Arm:EndHorrorTopic()
 			end
-			PlayerSkills:Save()
-			SaveGame:Save()
 			return
 		end
 	end
@@ -499,9 +497,6 @@ function Arm.ChatPrompt(self)
 		EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED")
 		Arm:ChatLockout() -- until a trigger.
 	end
-	
-	PlayerSkills:Save()
-	SaveGame:Save()
 	
 	-- how many lines?
 	self.promptState = {}

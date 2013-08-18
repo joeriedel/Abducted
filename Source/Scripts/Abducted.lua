@@ -78,6 +78,7 @@ function Abducted.LoadState(self)
 	World.FlushInput(true)
 	self.pulse = false
 
+	PlayerSkills:Load()
 	HUD:LoadState()
 	Arm:LoadState()
 	Cinematics:LoadState()
@@ -85,6 +86,7 @@ function Abducted.LoadState(self)
 end
 
 function Abducted.SaveState(self)
+	PlayerSkills:Save()
 	HUD:SaveState()
 	Arm:SaveState()
 	Cinematics:SaveState()
@@ -229,6 +231,7 @@ function Abducted.BeginManipulate(self)
 		self:EndManipulate()
 		return
 	end
+	
 	self.overlays.Manipulate:FadeIn(0.15)
 	self.sfx.ManipulateBegin:FadeVolume(1, 0)
 	self.sfx.ManipulateBegin:Rewind()
@@ -254,6 +257,7 @@ function Abducted.BeginManipulate(self)
 	end
 	
 	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7)
+	HUD:RefreshAvailableActions()
 end
 
 function Abducted.EndManipulate(self, immediate)
@@ -277,6 +281,7 @@ function Abducted.EndManipulate(self, immediate)
 	
 	self.endManipulateTimer:Clean()
 	self.setGameSpeedTimer:Clean()
+	HUD:RefreshAvailableActions()
 end
 
 function Abducted.BeginPulse(self)
@@ -290,6 +295,7 @@ function Abducted.BeginPulse(self)
 	end
 	
 	self.pulse = true
+	HUD:RefreshAvailableActions()
 	World.playerPawn:BeginPulse(self)
 	
 	local f = function()
@@ -308,6 +314,8 @@ function Abducted.EndPulse(self)
 	
 	World.playerPawn:EndPulse()
 	self.pulse = false
+	
+	HUD:RefreshAvailableActions()
 end
 
 function Abducted.DischargePulse(self)
@@ -324,6 +332,7 @@ function Abducted.FirePulse(self, target, normal)
 	World.playerPawn:FirePulse(target, normal)
 	
 	self.pulse = false
+	HUD:RefreshAvailableActions()
 end
 
 function Abducted.PlayerDiedAlertPanelDone(self, result)

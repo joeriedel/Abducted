@@ -261,11 +261,10 @@ function HUD.BeginShield(self, gameTime)
 
 	if (gameTime == nil) then
 		World.playerPawn:BeginShield()
-	end
-	
-	if (gameTime == nil) then
 		gameTime = GameDB.realTime
 	end
+	
+	HUD:RefreshAvailableActions()
 	
 	-- start ticking down the time.
 	self.shieldStartTime = gameTime
@@ -293,6 +292,21 @@ function HUD.BeginShield(self, gameTime)
 	
 end
 
+function HUD.ShieldPenalty(self)
+	if (World.playerPawn.shieldActive) then
+		local penalty = PlayerSkills:ShieldMultiActionTimePenalty()
+		if (penalty > 0) then
+			local maxTime = PlayerSkills:MaxShieldTime()
+			local elapsed = GameDB.realTime - HUD.shieldStartTime
+			if ((elapsed+penalty) >= maxTime) then
+				self:ExpireShield()
+			else
+				HUD.shieldStartTime = HUD.shieldStartTime - penalty -- just like if we started earlier
+			end
+		end
+	end
+end
+
 -- djr, not sure if this is right or will work
 function HUD.MemoryGamePressed(self, widget)
     COutLine(kC_Debug, "Reflex Game Pressed!")
@@ -303,19 +317,20 @@ end
 
 function HUD.RechargePulse(self)
 	self.pulseRechargeTime = PlayerSkills:PulseRechargeTime()
-	self.pulseStart = GameDB.realTime
+	self.pulseStartTime = GameDB.realTime
 	HUD:InternalRechargePulse()
 end
 
 function HUD.InternalRechargePulse(self)
 	-- pulse was fired
 	self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, false)
+	self.pulseEnabled = false
 		
 	self.widgets.PulseCharging:SetVisible(true)
 	self.widgets.PulseCharging:FillCircleTo(0, 0)
 		
 	local f = function ()
-		self.pulseStart = nil
+		self.pulseStartTime = nil
 		if (not HUD.enabled) then
 			return
 		end
@@ -324,14 +339,14 @@ function HUD.InternalRechargePulse(self)
 			self.pulseTimer = nil
 		end
 		self.widgets.PulseCharging:SetVisible(false)
-		self.widgets.Pulse.class:SetEnabled(self.widgets.Pulse, true)
+		HUD:RefreshAvailableActions()
 		HUD:Shimmer(self.widgets.PulseShimmer)
 	end
 	
-	World.globalTimers:Add(f, self.pulseRechargeTime - (GameDB.realTime - self.pulseStart))
+	World.globalTimers:Add(f, self.pulseRechargeTime - (GameDB.realTime - self.pulseStartTime))
 	
 	f = function ()
-		local dd = GameDB.realTime - self.pulseStart
+		local dd = GameDB.realTime - self.pulseStartTime
 		self.widgets.PulseCharging:FillCircleTo(dd / self.pulseRechargeTime, 0)
 	end
 	
@@ -735,7 +750,7 @@ end
 function HUD.RechargeManipulate(self)
 
 	self.manipulateRechargeTime = PlayerSkills:ManipulateRechargeTime()
-	self.manipulateStart = GameDB.realTime
+	self.manipulateStartTime = GameDB.realTime
 	
 	HUD:InternalRechargeManipulate()
 	
@@ -743,12 +758,13 @@ end
 
 function HUD.InternalRechargeManipulate(self)
 	self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, false)
+	self.manipulateEnabled = false
 	
 	self.widgets.ManipulateCharging:SetVisible(true)
 	self.widgets.ManipulateCharging:FillCircleTo(0, 0)
 		
 	local f = function ()
-		self.manipulateStart = nil
+		self.manipulateStartTime = nil
 		if (not HUD.enabled) then
 			return
 		end
@@ -757,14 +773,14 @@ function HUD.InternalRechargeManipulate(self)
 			self.manipulateTimer = nil
 		end
 		self.widgets.ManipulateCharging:SetVisible(false)
-		self.widgets.Manipulate.class:SetEnabled(self.widgets.Manipulate, true)
+		HUD:RefreshAvailableActions()
 		HUD:Shimmer(self.widgets.ManipulateShimmer)
 	end
 	
-	World.globalTimers:Add(f, self.manipulateRechargeTime - (GameDB.realTime - self.manipulateStart))
+	World.globalTimers:Add(f, self.manipulateRechargeTime - (GameDB.realTime - self.manipulateStartTime))
 	
 	f = function ()
-		local dd = GameDB.realTime - self.manipulateStart
+		local dd = GameDB.realTime - self.manipulateStartTime
 		self.widgets.ManipulateCharging:FillCircleTo(dd / self.manipulateRechargeTime, 0)
 	end
 	
@@ -792,7 +808,7 @@ function HUD.ExpireShield(self)
 	HUD:RechargeShield()
 	
 	World.playerPawn:EndShield()
-	
+	HUD:RefreshAvailableActions()
 end
 
 function HUD.RechargeShield(self, instant)
@@ -826,7 +842,7 @@ function HUD.RechargeShield(self, instant)
 		gfx.pressed = self.gfx.ShieldDisabled
 		
 		self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
-		self.widgets.Shield.class:SetEnabled(self.widgets.Shield, self.shieldEnabled)
+		HUD:RefreshAvailableActions()
 		return
 	end
 
@@ -836,6 +852,7 @@ function HUD.RechargeShield(self, instant)
 	}
 	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
 	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
+	self.shieldEnabled = false
 	self.widgets.ShieldCharging:SetVisible(true)
 	
 	local f = function ()
@@ -863,8 +880,7 @@ function HUD.RechargeShield(self, instant)
 		gfx.pressed = self.gfx.ShieldDisabled
 		
 		self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
-		self.widgets.Shield.class:SetEnabled(self.widgets.Shield, self.shieldEnabled)
-	
+		HUD:RefreshAvailableActions()
 		HUD:Shimmer(self.widgets.ShieldShimmer)
 	end
 	
@@ -903,7 +919,7 @@ end
 
 function HUD.Enable(self, items)
 
-	local state = {
+	self.itemState = {
 		arm = false,
 		manipulate = false,
 		shield = false,
@@ -911,14 +927,63 @@ function HUD.Enable(self, items)
 	}
 	
 	for k,v in pairs(items) do
-		state[v] = true
+		self.itemState[v] = true
 	end
 	
-	HUD:EnableArm(state.arm)
-	HUD:EnableManipulate(state.manipulate)
-	HUD:EnableShield(state.shield)
-	HUD:EnablePulse(state.pulse)
+	HUD:RefreshAvailableActions()
+end
 
+function HUD.RefreshAvailableActions(self)
+		
+	if (Game.entity.pulse) then
+		HUD:EnableArm(false)
+		HUD:EnableManipulate(false)
+		if (PlayerSkills.MultiShield >= 3) then
+			if (self.shieldStartTime == nil) then
+				HUD:EnableShield(self.itemState.shield)
+			end
+		else
+			HUD:EnableShield(false)
+		end
+	elseif (Game.entity.manipulate) then
+		HUD:EnableArm(false)
+		HUD:EnablePulse(false)
+		if (PlayerSkills.MultiShield >= 1) then
+			if (self.shieldStartTime == nil) then
+				HUD:EnableShield(self.itemState.shield)
+			end
+		else
+			HUD:EnableShield(false)
+		end
+	elseif (World.playerPawn.shieldActive) then
+		HUD:EnableArm(false)
+		if (PlayerSkills.MultiShield >= 3) then
+			if (self.pulseStartTime == nil) then
+				HUD:EnablePulse(self.itemState.pulse)
+			end
+		else
+			HUD:EnablePulse(false)
+		end
+		if (PlayerSkills.MultiShield >= 1) then
+			if (self.manipulateStartTime == nil) then
+				HUD:EnableManipulate(self.itemState.manipulate)
+			end
+		else
+			HUD:EnableManipulate(false)
+		end
+	else
+		HUD:EnableArm(self.itemState.arm)
+		if (self.shieldStartTime == nil) then
+			HUD:EnableShield(self.itemState.shield)
+		end
+		if (self.manipulateStartTime == nil) then
+			HUD:EnableManipulate(self.itemState.manipulate)
+		end
+		if (self.pulseStartTime == nil) then
+			HUD:EnablePulse(self.itemState.pulse)
+		end
+	end
+	
 end
 
 function HUD.EnableArm(self, enable)
@@ -978,11 +1043,6 @@ function HUD.EnableShield(self, enable)
 	self.shieldEnabled = enable
 	
 	if (self.shieldStartTime and (not World.playerPawn.dead)) then
-		if (not enabled) then
-			if (World.playerPawn.shieldActive) then
-				HUD:ExpireShield()
-			end
-		end
 		return
 	end
 		
@@ -1078,9 +1138,9 @@ function HUD.SaveManipulateState(self)
 
 	Persistence.WriteBool(SaveGame, "HUDManipulateEnabled", self.manipulateEnabled)
 	
-	if (self.manipulateStart) then
+	if (self.manipulateStartTime) then
 		Persistence.WriteString(SaveGame, "HUDManipulateState", "charging")
-		Persistence.WriteNumber(SaveGame, "HUDManipulateTime", self.manipulateStart)
+		Persistence.WriteNumber(SaveGame, "HUDManipulateTime", self.manipulateStartTime)
 		Persistence.WriteNumber(SaveGame, "HUDManipulateRechargeTime", self.manipulateRechargeTime)
 	else
 		Persistence.DeleteKey(SaveGame, "HUDManipulateState")
@@ -1103,11 +1163,11 @@ function HUD.LoadManipulateState(self)
 	
 	local state = Persistence.ReadString(SaveGame, "HUDManipulateState")
 	if (state == "charging") then
-		self.manipulateStart = Persistence.ReadNumber(SaveGame, "HUDManipulateTime")
+		self.manipulateStartTime = Persistence.ReadNumber(SaveGame, "HUDManipulateTime")
 		self.manipulateRechargeTime = Persistence.ReadNumber(SaveGame, "HUDManipulateRechargeTime")
 		HUD:InternalRechargeManipulate()
 	else
-		self.manipulateStart = nil
+		self.manipulateStartTime = nil
 	end
 
 end
@@ -1171,9 +1231,9 @@ function HUD.SavePulseState(self)
 
 	Persistence.WriteBool(SaveGame, "HUDPulseEnabled", self.pulseEnabled)
 	
-	if (self.pulseStart) then
+	if (self.pulseStartTime) then
 		Persistence.WriteString(SaveGame, "HUDPulseState", "charging")
-		Persistence.WriteNumber(SaveGame, "HUDPulseTime", self.pulseStart)
+		Persistence.WriteNumber(SaveGame, "HUDPulseTime", self.pulseStartTime)
 		Persistence.WriteNumber(SaveGame, "HUDPulseRechargeTime", self.pulseRechargeTime)
 	else
 		Persistence.DeleteKey(SaveGame, "HUDPulseState")
@@ -1196,11 +1256,11 @@ function HUD.LoadPulseState(self)
 	
 	local state = Persistence.ReadString(SaveGame, "HUDPulseState")
 	if (state == "charging") then
-		self.pulseStart = Persistence.ReadNumber(SaveGame, "HUDPulseTime")
+		self.pulseStartTime = Persistence.ReadNumber(SaveGame, "HUDPulseTime")
 		self.pulseRechargeTime = Persistence.ReadNumber(SaveGame, "HUDPulseRechargeTime")
 		HUD:InternalRechargePulse()
 	else
-		self.pulseStart = nil
+		self.pulseStartTime = nil
 	end
 
 end
@@ -1220,4 +1280,5 @@ function HUD.LoadState(self)
 	HUD:LoadManipulateState()
 	HUD:LoadShieldState()
 	HUD:LoadPulseState()
+	HUD:RefreshAvailableActions()
 end

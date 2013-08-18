@@ -354,12 +354,14 @@ PlayerSkills.Skills.MultiShield = {
 		return PlayerSkills.MultiShield
 	end,
 	Upgrade = function(skill)
+		HUD:RechargeShield(true) -- instant
 		PlayerSkills.MultiShield = PlayerSkills.MultiShield + 1
 	end,
 	Untrain = function(skill)
 		PlayerSkills.MultiShield = 0
 	end,
 	[0] = {
+		TimeCost = 0
 	},
 	{
 		TimeCost = 20,
@@ -819,6 +821,9 @@ function PlayerSkills.ManipulateSkillLevel(self)
 end
 
 function PlayerSkills.ManipulateRechargeTime(self)
+	if (self.Omega > 0) then
+		return 1
+	end
 	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].Cooldown
 end
 
@@ -834,15 +839,28 @@ function PlayerSkills.NumManipulateActions(self)
 end
 
 function PlayerSkills.ShieldRechargeTime(self, usedTime)
+	if (self.Omega > 0) then
+		return 1
+	end
 	return usedTime * PlayerSkills.Skills.ShieldRegen[self.ShieldRegen].Multiplier
 end
 
 function PlayerSkills.PulseRechargeTime(self)
+	if (self.Omega > 0) then
+		return 1
+	end
 	return PlayerSkills.Skills.PulseRegen[self.PulseRegen].Cooldown
 end
 
 function PlayerSkills.MaxShieldTime(self)
 	return PlayerSkills.Skills.ShieldDuration[self.ShieldDuration].MaxDuration
+end
+
+function PlayerSkills.ShieldMultiActionTimePenalty(self)
+	if (self.Omega > 0) then
+		return 0
+	end
+	return PlayerSkills.Skills.MultiShield[self.MultiShield].TimeCost
 end
 
 function PlayerSkills.MaxMines(self)

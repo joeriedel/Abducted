@@ -395,29 +395,30 @@ function Bug.UpdateRandomMove(self, moveCompleteCallback)
 		return
 	end
 	
-	for i=1,5 do
-		local d = FloatRand(self.moveRange[1], self.moveRange[2])
-		local angle = FloatRand(self.angle+self.turnRange[1], self.angle+self.turnRange[2])
-		if (i > 1) then
-			angle = angle + 180 -- stuck
-		end
-		
-		angle = WrapAngle(angle)
+	for i=0,3 do
+		for k=1,2 do
+			local d = FloatRand(self.moveRange[1], self.moveRange[2])
+			local angle = FloatRand(self.angle+self.turnRange[1], self.angle+self.turnRange[2])
+			angle = angle + (i*90)
 				
-		local fp, d = self:TraceMove(d, angle, true, self.traceMoveStep)
-		
-		if (fp) then
-			if (self:ZigZagToTarget(fp)) then
-				self.angle = angle
-				self.busy = true
-				self.floorMoveCallback = moveCompleteCallback
-				if (Bug.DebugMessages) then
-					COutLine(kC_Debug, "Bug.RandomMove")
+			angle = WrapAngle(angle)
+					
+			local fp, d = self:TraceMove(d, angle, true, self.traceMoveStep)
+			
+			if (fp) then
+				if (self:ZigZagToTarget(fp)) then
+					self.angle = angle
+					self.busy = true
+					self.floorMoveCallback = moveCompleteCallback
+					if (Bug.DebugMessages) then
+						COutLine(kC_Debug, "Bug.RandomMove")
+					end
+					return -- success
+				else
+					COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - CreateFloorMove() failed.")
+					self:Stop()
+					break
 				end
-				return -- success
-			else
-				COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - CreateFloorMove() failed.")
-				break
 			end
 		end
 	end

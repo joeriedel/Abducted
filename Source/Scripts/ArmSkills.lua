@@ -570,9 +570,6 @@ function Arm.UpgradeSkill(self, skill, cost)
 	
 	self.widgets.skills.Refund:SetVisible(true)
 	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
-	
-	PlayerSkills:Save()
-	SaveGame:Save()
 end
 
 function Arm.SelectSkill(self, skill)

@@ -1947,15 +1947,11 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	elseif (tokens[1] == "unlock_skill") then
 		self.rewardSkill = tokens[2]
-		
 	elseif (tokens[1] == "discover") then
 		if (Abducted.entity:Discover(tokens[2])) then
 			self.rewardDiscover = tokens[2]
 		end
 	end
-
-	PlayerSkills:Save()
-	SaveGame:Save()
 end
 
 function PuzzleScoreScreen.DoRetryQuitScreen(self, layer, retry, quit)

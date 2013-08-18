@@ -319,8 +319,16 @@ function Abducted.EndPulse(self)
 end
 
 function Abducted.DischargePulse(self)
-	World.playerPawn:DischargePulse()
+	local exploded, fired = World.playerPawn:DischargePulse()
 	self.pulse = false
+	
+	if (fired) then
+		HUD:ShieldPenalty()
+	end
+	
+	if (not exploded) then
+		HUD:RefreshAvailableActions()
+	end
 end
 
 function Abducted.FirePulse(self, target, normal)
@@ -332,6 +340,7 @@ function Abducted.FirePulse(self, target, normal)
 	World.playerPawn:FirePulse(target, normal)
 	
 	self.pulse = false
+	HUD:ShieldPenalty()
 	HUD:RefreshAvailableActions()
 end
 

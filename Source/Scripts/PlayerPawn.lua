@@ -561,7 +561,7 @@ function PlayerPawn.DischargePulse(self)
 
 	if (math.random() < 0.5) then
 		self:PulseExplode()
-		return
+		return true, false
 	end
 	
 	local randomAngle = FloatRand(0, 359)
@@ -580,11 +580,12 @@ function PlayerPawn.DischargePulse(self)
 	
 	if (trace and (not trace.startSolid)) then
 		self:FirePulse(trace.traceEnd, trace.normal)
-		return
+		return false, true
 	end
 	
 	self.pulseActive = false
 	self:EndPulse()
+	return false, false
 end
 
 function PlayerPawn.PulseExplode(self)

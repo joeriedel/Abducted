@@ -299,9 +299,15 @@ function HUD.ShieldPenalty(self)
 			local maxTime = PlayerSkills:MaxShieldTime()
 			local elapsed = GameDB.realTime - HUD.shieldStartTime
 			if ((elapsed+penalty) >= maxTime) then
-				self:ExpireShield()
+				self:ExpireShield(maxTime)
 			else
 				HUD.shieldStartTime = HUD.shieldStartTime - penalty -- just like if we started earlier
+				local f = function ()
+					HUD:ExpireShield()
+				end
+				
+				self.shieldExpiryTimer:Clean()
+				self.shieldExpiryTimer = World.globalTimers:Add(f, PlayerSkills:MaxShieldTime() - (elapsed+penalty))
 			end
 		end
 	end
@@ -787,7 +793,7 @@ function HUD.InternalRechargeManipulate(self)
 	self.manipulateTimer = World.globalTimers:Add(f, 0, true)
 end
 
-function HUD.ExpireShield(self)
+function HUD.ExpireShield(self, timeUsed)
 
 	if (self.shieldTimer) then
 		self.shieldTimer:Clean()
@@ -798,9 +804,11 @@ function HUD.ExpireShield(self)
 		self.shieldExpiryTimer:Clean()
 		self.shieldExpiryTimer = nil
 	end
-
-	local timeUsed = Min(GameDB.realTime - self.shieldStartTime, PlayerSkills:MaxShieldTime())
-		
+	
+	if (timeUsed == nil) then
+		timeUsed = Min(GameDB.realTime - self.shieldStartTime, PlayerSkills:MaxShieldTime())
+	end
+	
 	self.shieldRechargeTime = PlayerSkills:ShieldRechargeTime(timeUsed)
 	self.shieldStartTime = GameDB.realTime
 	self.shieldRechargeFrac = (PlayerSkills:MaxShieldTime() - timeUsed) / PlayerSkills:MaxShieldTime()

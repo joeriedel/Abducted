@@ -766,7 +766,7 @@ function PlayerSkills.Load(self)
 	
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
-	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
+	self.PowerBubble = 1--Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
 	self.MultiShield = Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
 	self.Defender = Persistence.ReadNumber(SaveGame, "skills/Defender", 0)
 	

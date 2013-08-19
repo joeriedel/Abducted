@@ -41,7 +41,9 @@ function HUD.Load(self)
 			PulseEnabled = "UI/pulse_button_M",
 			PulseFlashing = "UI/pulse_button_flashing_M",
 			ShieldDisabled = "UI/shield_button_charging_M",
-			ShieldEnabled = "UI/shield_button_M"
+			ShieldEnabled = "UI/shield_button_M",
+			PowerBubble = "UI/power_bubble_M",
+			PowerBubbleDisabled = "UI/power_bubble_disabled_M"
 		}
 	else
 		self.gfx = {
@@ -57,7 +59,9 @@ function HUD.Load(self)
 			PulseFlashing = "UI/pulse_button_flashing_pc_M",
 			ShieldDisabled = "UI/shield_button_charging_pc_M",
 			ShieldEnabled = "UI/shield_button_pc_M",
-			ActionBar = "UI/action_bar_pc_M"
+			ActionBar = "UI/action_bar_pc_M",
+			PowerBubble = "UI/power_bubble_pc_M",
+			PowerBubbleDisabled = "UI/power_bubble_disabled_pc_M"
 		}
 	end
 	map(self.gfx, World.Load)
@@ -136,6 +140,22 @@ function HUD.Load(self)
 	
 	self.widgets.ShieldShimmer = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.RechargeShimmer})
 	self.widgets.ShieldShimmer:SetVisible(false)
+	
+	local size = UI:MaterialSize(self.gfx.PowerBubble, {0, 0})
+	self.widgets.PowerBubble = UIPushButton:Create(
+		{0, 0, size[3]*0.85, size[4]*0.85},
+		{ -- we go to disabled state when pulse is fired
+			enabled = self.gfx.PowerBubble,
+			disabled = self.gfx.PowerBubbleDisabled,
+			pressed = self.gfx.PowerBubbleDisabled
+		},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:PowerBubblePressed() end},
+		nil,
+		self.widgets.Root
+	)
+	
+	self.widgets.PowerBubble:SetVisible(false)
 	
 	self.widgets.Pulse = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
@@ -257,6 +277,10 @@ function HUD.PulsePressed(self)
 	Game.entity:BeginPulse()
 end
 
+function HUD.PowerBubblePressed(self)
+	COutLine(kC_Debug, "Power Bubble Pressed!")
+end
+
 function HUD.BeginShield(self, gameTime)
 
 	if (gameTime == nil) then
@@ -357,6 +381,46 @@ function HUD.InternalRechargePulse(self)
 	end
 	
 	self.pulseTimer = World.globalTimers:Add(f, 0, true)
+end
+
+function HUD.ShowPulseModes(self, show)
+
+	if (UI.mode == kGameUIMode_Mobile) then
+		HUD:ShowPulseModesMobile(show)
+	end
+
+end
+
+function HUD.ShowPulseModesMobile(self, show)
+
+	local r = self.widgets.Arm:Rect()
+	local space = 8 * UI.identityScale[1]
+	local startY = r[2] + r[4] + space*4
+	
+	local blendTime = 0.2
+	local rollOutTime = 0.2
+		
+	if (PlayerSkills.PowerBubble > 0) then
+		
+		local z = self.widgets.PowerBubble:Rect()
+		z[1] = -z[3]
+		z[2] = startY
+			
+		if (show) then
+			self.widgets.PowerBubble:SetVisible(true)
+			self.widgets.PowerBubble:BlendTo({1,1,1,0}, 0)
+			self.widgets.PowerBubble:BlendTo({1,1,1,1}, blendTime)
+									
+			self.widgets.PowerBubble:MoveTo(z, {0,0})
+			self.widgets.PowerBubble:MoveTo({0, startY}, {rollOutTime, 0})
+			
+			startY = startY - z[4] - space
+		else
+			self.widgets.PowerBubble:MoveTo(z, {rollOutTime,0})
+			self.widgets.PowerBubble:BlendTo({1,1,1,0}, blendTime)
+		end
+	end
+
 end
 
 function HUD.Layout(self)

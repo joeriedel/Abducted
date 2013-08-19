@@ -306,6 +306,7 @@ function Abducted.BeginPulse(self)
 	end
 	
 	self.pulse = true
+	HUD:ShowPulseModes(true)
 	HUD:RefreshAvailableActions()
 	World.playerPawn:BeginPulse(self)
 	
@@ -326,6 +327,7 @@ function Abducted.EndPulse(self)
 	World.playerPawn:EndPulse()
 	self.pulse = false
 	
+	HUD:ShowPulseModes(false)
 	HUD:RefreshAvailableActions()
 end
 
@@ -336,6 +338,8 @@ function Abducted.DischargePulse(self)
 	if (fired) then
 		HUD:ShieldPenalty()
 	end
+	
+	HUD:ShowPulseModes(false)
 	
 	if (not exploded) then
 		HUD:RefreshAvailableActions()
@@ -349,9 +353,11 @@ function Abducted.FirePulse(self, target, normal)
 	end
 	
 	World.playerPawn:FirePulse(target, normal)
+	World.playerPawn:PulseDamage(target)
 	
 	self.pulse = false
 	HUD:ShieldPenalty()
+	HUD:ShowPulseModes(false)
 	HUD:RefreshAvailableActions()
 end
 

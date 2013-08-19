@@ -385,9 +385,14 @@ function PlayerPawn.EndManipulate(self)
 	self.disableAnimTick = false
 end
 
-function PlayerPawn.BeginShield(self)
+function PlayerPawn.BeginShield(self, powerBubble)
 
+	if (powerBubble == nil) then
+		powerBubble = false
+	end
+	
 	self.shieldActive = true
+	self.powerBubble = powerBubble
 	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
 		
 	local f = function()
@@ -410,6 +415,7 @@ end
 function PlayerPawn.EndShield(self)
 
 	self.shieldActive = false
+	self.powerBubble = false
 	self.shield.dm:BlendTo({0,0,0,0}, 0.15)
 	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
 	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0.15)
@@ -507,8 +513,7 @@ end
 
 function PlayerPawn.FirePulse(self, target, normal)
 	self:PulseLight(VecAdd(target, VecScale(normal, 32)))
-	self:PulseDamage(target)
-	
+		
 	local localPos = self.model.dm:BonePos(self.model.handBone)
 	local start = self.model.dm:WorldBonePos(self.model.handBone)
 	local ray = VecSub(target, start)
@@ -580,6 +585,7 @@ function PlayerPawn.DischargePulse(self)
 	
 	if (trace and (not trace.startSolid)) then
 		self:FirePulse(trace.traceEnd, trace.normal)
+		self:PulseDamage(trace.traceEnd)
 		return false, true
 	end
 	
@@ -605,6 +611,12 @@ function PlayerPawn.PulseExplode(self)
 	end
 	
 	self:Kill()
+end
+
+function PlayerPawn.PowerBubble(self)
+
+	
+
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage)

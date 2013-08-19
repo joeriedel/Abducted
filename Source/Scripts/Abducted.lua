@@ -237,6 +237,7 @@ function Abducted.BeginManipulate(self)
 	self.sfx.ManipulateBegin:Rewind()
 	self.sfx.ManipulateBegin:Play(kSoundChannel_UI, 0)
 	self.manipulate = true
+	self.numAvailableManipulateActions = PlayerSkills:NumManipulateActions()
 	ManipulatableObject.NotifyManipulate(true)
 	World.playerPawn:NotifyManipulate(true)
 	
@@ -246,18 +247,28 @@ function Abducted.BeginManipulate(self)
 	
 	World.FlushInput(true)
 	
+	self:ExtendManipulateWindow()
+	
 	local f = function ()
-		self:EndManipulate()
-	end
-	
-	self.endManipulateTimer = World.gameTimers:Add(f, 1.8)
-	
-	f = function ()
 		World.SetGameSpeed(1, 0)
 	end
 	
 	self.setGameSpeedTimer = World.gameTimers:Add(f, 0.7)
 	HUD:RefreshAvailableActions()
+end
+
+function Abducted.ExtendManipulateWindow(self)
+
+	if (self.endManipulateTimer) then
+		self.endManipulateTimer:Clean()
+	end
+	
+	local f = function ()
+		self:EndManipulate()
+	end
+	
+	self.endManipulateTimer = World.gameTimers:Add(f, 1.8)
+
 end
 
 function Abducted.EndManipulate(self, immediate)

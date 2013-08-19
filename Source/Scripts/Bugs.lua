@@ -436,7 +436,7 @@ function Bug.PlayerInSpawnerRadius(self)
 
 	local playerFP = World.playerPawn:FloorPosition()
 	
-	if ((playerFP == nil) or (self.floor ~= playerFP.floor) or (PlayerPawn.GodMode)) then
+	if ((playerFP == nil) or (self.floor ~= playerFP.floor)) then
 		return false -- don't seek player when on a different floor
 	end
 	
@@ -636,6 +636,12 @@ function Bug.SeekPlayerAttack(self)
 		return false
 	end
 	
+	if (self.group) then
+		if (World.playerPawn.shieldActive) then
+			return false
+		end
+	end
+	
 	-- close enough to seek attack?
 	local selfPos = self:WorldPos()
 	local playerPos = World.playerPawn:WorldPos()
@@ -652,7 +658,7 @@ function Bug.SeekPlayerAttack(self)
 		end
 		
 		if (not self.group) then
-			if (VecDot(v, playerFwd) < 0.85) then -- mostly not really behind enough
+			if (VecDot(v, playerFwd) < 0.6) then -- not behind enough
 				return false
 			end
 		end
@@ -773,7 +779,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 end
 
 function Bug.CheckGroupAttack(self)
-	if (World.playerPawn.dead or PlayerPawn.GodMode) then
+	if (World.playerPawn.dead or World.playerPawn.shieldActive or PlayerPawn.GodMode) then
 		return false
 	end
 	

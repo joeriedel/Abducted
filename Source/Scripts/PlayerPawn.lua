@@ -600,11 +600,15 @@ function PlayerPawn.PulseExplode(self)
 	self:PulseLight(pos)
 	self:PulseDamage(self:WorldPos())
 	
+	if (self.shieldActive) then
+		self:EndShield()
+	end
+	
 	self:Kill()
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage)
-	if (self.dead or PlayerPawn.GodMode) then
+	if (self.dead or PlayerPawn.GodMode or self.shieldActive) then
 		return
 	end
 	self.dead = true
@@ -612,9 +616,6 @@ function PlayerPawn.Kill(self, instigator, killMessage)
 	self.customAnim = false
 	self.disableAnimTick = false
 	
-	if (self.shieldActive) then
-		self:EndShield()
-	end
 	self:SetMoveType(kMoveType_None)
 	self:PlayAnim(self:LookupAnimation("death"), self.model)
 	

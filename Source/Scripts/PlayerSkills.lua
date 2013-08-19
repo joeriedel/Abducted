@@ -835,7 +835,7 @@ function PlayerSkills.NumManipulateActions(self)
 			return 2
 		end
 	end
-	return 1;
+	return 1
 end
 
 function PlayerSkills.ShieldRechargeTime(self, usedTime)

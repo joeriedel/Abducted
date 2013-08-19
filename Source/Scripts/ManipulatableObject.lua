@@ -84,6 +84,7 @@ function ManipulatableObject.Spawn(self)
 	self.canAttack = false
 	self.enableManipulateShimmer = false
 	self.didManipulateShimmer = false
+	self.activationRange = NumberForString(self.keys.range, 450)
 	self.swipePos = {0, 0, 0}
 	
 	self:Show(BoolForString(self.keys.visible, true))
@@ -565,7 +566,27 @@ function ManipulatableObject.NotifyManipulate(enabled)
 	
 	ManipulatableObjectUI:Notify(enabled)
 	
+	local playerPos = World.playerPawn:WorldPos()
+	Abducted.entity.numActiveManipulables = 0
+	
 	local f = function (x)
+	
+		if (x.entity.manipulateShimmerTimer) then
+			x.entity.manipulateShimmerTimer:Clean()
+			x.entity.manipulateShimmerTimer = nil
+		end
+		
+		if (enabled and (x.entity.activationRange > 0)) then
+			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
+			local dd = VecMag(VecSub(world, playerPos))
+			if (dd > x.entity.activationRange) then
+				x.entity.inRange = false
+				return
+			end
+		end
+		
+		x.entity.inRange = true
+
 		local rgba
 		if (enabled) then
 			rgba = x.entity:SelectColor()
@@ -576,12 +597,10 @@ function ManipulatableObject.NotifyManipulate(enabled)
 		x.entity.model.vision:BlendTo(rgba, time)
 		
 		if (x.entity.skillRequired <= (PlayerSkills:ManipulateSkillLevel()+1)) then
+			if (enabled) then
+				Abducted.entity.numActiveManipulables = Abducted.entity.numActiveManipulables + 1
+			end
 			ManipulatableObjectUI:NotifyObject(x.entity, enabled, time)
-		end
-		
-		if (x.entity.manipulateShimmerTimer) then
-			x.entity.manipulateShimmerTimer:Clean()
-			x.entity.manipulateShimmerTimer = nil
 		end
 	end
 	
@@ -642,7 +661,7 @@ function ManipulatableObject.FindSwipeTarget(g)
 	
 		local targetname = x.entity.keys.targetname
 		
-		if (x.entity.visible and (x.entity.skillRequired <= (PlayerSkills:ManipulateSkillLevel()+1))) then
+		if (x.entity.visible and x.entity.inRange and (x.entity.skillRequired <= (PlayerSkills:ManipulateSkillLevel()+1))) then
 			local world = VecAdd(x.entity.manipulateShift, x.entity.manipulateTarget:WorldPos())
 			local screen,r = World.Project(world)
 			local dx, dy, dd
@@ -1020,8 +1039,18 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 			World.PostEvent(self.keys.on_manipulated)
 		end
 		
-		Abducted.entity:EndManipulate()
-		HUD:RechargeManipulate()
+		Abducted.entity.numActiveManipulables = Abducted.entity.numActiveManipulables - 1
+		Abducted.entity.numAvailableManipulateActions = Abducted.entity.numAvailableManipulateActions -1
+		
+		if ((Abducted.entity.numAvailableManipulateActions < 1) or 
+			(Abducted.entity.numActiveManipulables < 1)) then
+		
+			Abducted.entity:EndManipulate()
+			HUD:RechargeManipulate()
+		else
+			Abducted.entity:ExtendManipulateWindow()
+		end
+		
 		HUD:ShieldPenalty()
 	end
 	

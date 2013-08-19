@@ -97,6 +97,7 @@ function ManipulatableObjectUI.NotifyObject(self, entity, enabled, time)
 	self.nextPanel = self.nextPanel + 1
 	
 	w = ManipulatableObjectUI.Widgets[w]
+	w.used = false
 	w:BlendTo({1,1,1,0}, 0)
 	w:SetVisible(true)
 	w:BlendTo({1,1,1,1}, 0.3)
@@ -161,14 +162,7 @@ function ManipulatableObjectUI.NotifySingle(self)
 		if (w) then
 			self.target = w
 			w.circle:SetMaterial(self.gfx.CenterPressed)
-			w.left.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.left.label:BlendTo({1,1,1,1}, 0.1)
-			w.right.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.right.label:BlendTo({1,1,1,1}, 0.1)
-			w.up.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.up.label:BlendTo({1,1,1,1}, 0.1)
-			w.down.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.down.label:BlendTo({1,1,1,1}, 0.1)
+			self:ShowTarget(w, true)
 		end
 	end
 
@@ -188,54 +182,70 @@ function ManipulatableObjectUI.HandleAction(self, action)
 		if (action == kAction_ManipulateLeft) then
 			if (self.target.target:CanManipulateDir("left")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
+				self:ShowTarget(self.target, false)
 				self.target.left.pressed = true
 				self.target.left.class:SetGfxState(self.target.left, true)
 				self.target.target:DoManipulateCommand("left")
+				self.target = nil
 			end
 		elseif (action == kAction_ManipulateRight) then
 			if (self.target.target:CanManipulateDir("right")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
+				self:ShowTarget(self.target, false)
 				self.target.right.pressed = true
 				self.target.right.class:SetGfxState(self.target.right, true)
 				self.target.target:DoManipulateCommand("right")
+				self.target = nil
 			end
 		elseif (action == kAction_ManipulateUp) then
 			if (self.target.target:CanManipulateDir("up")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
+				self:ShowTarget(self.target, false)
 				self.target.up.pressed = true
 				self.target.up.class:SetGfxState(self.target.up, true)
 				self.target.target:DoManipulateCommand("up")
+				self.target = nil
 			end
 		elseif (action == kAction_ManipulateDown) then
 			if (self.target.target:CanManipulateDir("down")) then
 				UI.sfx.Command2:Play(kSoundChannel_UI, 0)
+				self:ShowTarget(self.target, false)
 				self.target.down.pressed = true
 				self.target.down.class:SetGfxState(self.target.down, true)
 				self.target.target:DoManipulateCommand("down")
+				self.target = nil
 			end
 		end
 	else
-	
 		local w = ManipulatableObjectUI.Widgets[action]
-		if (w) then
+		if (w and (not w.used)) then
 			self.target = w
+			w.used = true
 			w.circle:SetMaterial(self.gfx.CenterPressed)
 			UI.sfx.Command:Play(kSoundChannel_UI, 0)
-			
-			w.left.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.left.label:BlendTo({1,1,1,1}, 0.1)
-			w.right.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.right.label:BlendTo({1,1,1,1}, 0.1)
-			w.up.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.up.label:BlendTo({1,1,1,1}, 0.1)
-			w.down.bkg:BlendTo({1,1,1,1}, 0.1)
-			w.down.label:BlendTo({1,1,1,1}, 0.1)
+			self:ShowTarget(w, true)
 		end
-	
 	end
 	
-	
 	return true
+end
+
+function ManipulatableObjectUI.ShowTarget(self, w, show)
+	local v = nil
+	if (show) then
+		v = {1,1,1,1}
+	else
+		v = {1,1,1,0}
+	end
+	
+	w.left.bkg:BlendTo(v, 0.1)
+	w.left.label:BlendTo(v, 0.1)
+	w.right.bkg:BlendTo(v, 0.1)
+	w.right.label:BlendTo(v, 0.1)
+	w.up.bkg:BlendTo(v, 0.1)
+	w.up.label:BlendTo(v, 0.1)
+	w.down.bkg:BlendTo(v, 0.1)
+	w.down.label:BlendTo(v, 0.1)
 end
 
 function ManipulatableObjectUI.UpdateUI(self)

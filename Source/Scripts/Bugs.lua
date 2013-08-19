@@ -357,6 +357,10 @@ function Bug.BugBrain(self)
 		return
 	end
 	
+	if (World.playerPawn:CheckPowerBubbleKill(self, self:WorldPos())) then
+		return
+	end
+	
 	if (not self:SeekSpawner()) then
 		self:SeekPlayer() -- keep player within range OR attack
 	end
@@ -636,12 +640,17 @@ function Bug.SeekPlayerAttack(self)
 		return false
 	end
 	
-	if (self.group) then
-		if (World.playerPawn.shieldActive) then
+	if (World.playerPawn.shieldActive) then
+		if (not self.group) then
+			-- single bugs are too stupid they are gonna get zapped
+			if (not World.playerPawn.powerBubble) then
+				return false -- can't pass shield
+			end
+		else
 			return false
 		end
 	end
-	
+		
 	-- close enough to seek attack?
 	local selfPos = self:WorldPos()
 	local playerPos = World.playerPawn:WorldPos()

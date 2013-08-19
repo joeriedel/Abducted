@@ -279,6 +279,7 @@ end
 
 function HUD.PowerBubblePressed(self)
 	COutLine(kC_Debug, "Power Bubble Pressed!")
+	Game.entity:PowerBubble()
 end
 
 function HUD.BeginShield(self, gameTime)
@@ -393,9 +394,10 @@ end
 
 function HUD.ShowPulseModesMobile(self, show)
 
-	local r = self.widgets.Arm:Rect()
+	local r = self.widgets.Pulse:Rect()
+	local pulseIconCenter = {r[1] + r[3]/2, r[2] + r[4]/2}
 	local space = 8 * UI.identityScale[1]
-	local startY = r[2] + r[4] + space*4
+	local startY = r[2] + r[4] + space
 	
 	local blendTime = 0.2
 	local rollOutTime = 0.2
@@ -403,8 +405,8 @@ function HUD.ShowPulseModesMobile(self, show)
 	if (PlayerSkills.PowerBubble > 0) then
 		
 		local z = self.widgets.PowerBubble:Rect()
-		z[1] = -z[3]
-		z[2] = startY
+		z[1] = pulseIconCenter[1] - (z[3]/2)
+		z[2] = pulseIconCenter[2] - (z[4]/2)
 			
 		if (show) then
 			self.widgets.PowerBubble:SetVisible(true)
@@ -412,11 +414,11 @@ function HUD.ShowPulseModesMobile(self, show)
 			self.widgets.PowerBubble:BlendTo({1,1,1,1}, blendTime)
 									
 			self.widgets.PowerBubble:MoveTo(z, {0,0})
-			self.widgets.PowerBubble:MoveTo({0, startY}, {rollOutTime, 0})
+			self.widgets.PowerBubble:MoveTo({z[1], startY}, {0, rollOutTime})
 			
-			startY = startY - z[4] - space
+			startY = startY + z[4]
 		else
-			self.widgets.PowerBubble:MoveTo(z, {rollOutTime,0})
+			self.widgets.PowerBubble:MoveTo(z, {0,rollOutTime})
 			self.widgets.PowerBubble:BlendTo({1,1,1,0}, blendTime)
 		end
 	end

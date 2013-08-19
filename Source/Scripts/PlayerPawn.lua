@@ -385,14 +385,10 @@ function PlayerPawn.EndManipulate(self)
 	self.disableAnimTick = false
 end
 
-function PlayerPawn.BeginShield(self, powerBubble)
+function PlayerPawn.BeginShield(self)
 
-	if (powerBubble == nil) then
-		powerBubble = false
-	end
-	
 	self.shieldActive = true
-	self.powerBubble = powerBubble
+	self.powerBubble = false
 	self.shield.dm:ScaleTo({1.07,1.07,1.07}, 0.1)
 		
 	local f = function()
@@ -512,6 +508,19 @@ function PlayerPawn.PulseDamage(self, pos)
 end
 
 function PlayerPawn.FirePulse(self, target, normal)
+	local f = function()
+		self:EndPulse()
+	end
+	
+	self.pulseSounds.Hum:Stop()
+	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
+	self:InternalFirePulse(target, normal).Seq(f)
+	self.pulseActive = false
+	HUD:RechargePulse()
+	
+end
+
+function PlayerPawn.InternalFirePulse(self, target, normal)
 	self:PulseLight(VecAdd(target, VecScale(normal, 32)))
 		
 	local localPos = self.model.dm:BonePos(self.model.handBone)
@@ -548,17 +557,8 @@ function PlayerPawn.FirePulse(self, target, normal)
 	
 	World.gameTimers:Add(f, 0.1)
 	
-	f = function()
-		self:EndPulse()
-	end
-	
-	self.pulseActive = false
-	self.pulseSounds.Hum:Stop()
-	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
-	
 	local anim = self:LookupAnimation("pulse_fire")
-	self:PlayAnim(anim , self.model).Seq(f)
-	HUD:RechargePulse()
+	return self:PlayAnim(anim , self.model)
 	
 end
 
@@ -600,10 +600,10 @@ function PlayerPawn.PulseExplode(self)
 	self.pulseSounds.Explode:Play(kSoundChannel_FX, 0)
 	
 	local angle = self:TargetAngles()[3]
-	local fwd = RotateVecZ({0,0,1}, angle)
+	local fwd = RotateVecZ({1,0,0}, angle)
 	local pos = VecAdd(self:WorldPos(), VecAdd(VecScale(fwd, 64), {0,0,72}))
 	
-	self:PulseLight(pos)
+	self:InternalFirePulse(pos)
 	self:PulseDamage(self:WorldPos())
 	
 	if (self.shieldActive) then
@@ -615,8 +615,43 @@ end
 
 function PlayerPawn.PowerBubble(self)
 
+	local angle = self:TargetAngles()[3]
+	local fwd = RotateVecZ({1,0,0}, angle)
+	local pos = VecAdd(self:WorldPos(), VecAdd(VecScale(fwd, 64), {0,0,72}))
 	
+	self:FirePulse(pos, VecNeg(fwd))
+	self:StartPowerBubble()
+end
 
+function PlayerPawn.CheckPowerBubbleKill(self, target, targetPos)
+	if (self.powerBubble) then
+		local pos = self:WorldPos()
+		local dd = VecMag(VecSub(pos, targetPos))
+		if (dd <= PlayerSkills:PowerBubbleZapRange()) then
+			if (target.PulseKill) then
+				target:PulseKill(self)
+			elseif (target.Kill) then
+				target:Kill(self)
+			end
+			COutLine(kC_Debug, "PowerBubble - Zap!")
+			self.powerBubbleZaps = self.powerBubbleZaps - 1
+			if (self.powerBubbleZaps < 1) then
+				self:EndPowerBubble()
+			end
+			return true
+		end
+	end
+	
+	return false
+end
+
+function PlayerPawn.StartPowerBubble(self)
+	self.powerBubble = true
+	self.powerBubbleZaps = PlayerSkills:PowerBubbleZapCount()
+end
+
+function PlayerPawn.EndPowerBubble(self)
+	self.powerBubble = false
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage)

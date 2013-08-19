@@ -493,7 +493,10 @@ PlayerSkills.Skills.PowerBubble = {
 			}
 	},
 	Stats = function(skill, level)
-		local pct = math.floor(skill[level].RangeMultiplier/skill[0].RangeMultiplier*100)
+		if (level < 1) then
+			return nil
+		end
+		local pct = math.floor(skill[level].RangeMultiplier/skill[1].RangeMultiplier*100)
 		return StringTable.Get("SKILL_POWER_BUBBLE_STATS"):format(tostring(pct), tostring(skill[level].Uses))
 	end,
 	CurrentLevel = function(skill)
@@ -505,7 +508,7 @@ PlayerSkills.Skills.PowerBubble = {
 	Untrain = function(skill)
 		PlayerSkills.PowerBubble = 0
 	end,
-	[0] = {
+	{
 		RangeMultiplier = 1,
 		Uses = 1,
 		Cost = 600
@@ -766,7 +769,7 @@ function PlayerSkills.Load(self)
 	
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
-	self.PowerBubble = 1--Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
+	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
 	self.MultiShield = Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
 	self.Defender = Persistence.ReadNumber(SaveGame, "skills/Defender", 0)
 	
@@ -869,6 +872,20 @@ end
 
 function PlayerSkills.PulseKillRadius(self)
 	return PlayerSkills.kPulseKillRadius * PlayerSkills.Skills.PulseDamageRadius[self.PulseRadius].Multiplier
+end
+
+function PlayerSkills.PowerBubbleZapRange(self)
+	if (self.PowerBubble < 1) then
+		return 0
+	end
+	return PlayerSkills.Skills.PowerBubble[self.PowerBubble].RangeMultiplier * 30
+end
+
+function PlayerSkills.PowerBubbleZapCount(self)
+	if (self.PowerBubble < 1) then
+		return 0
+	end
+	return PlayerSkills.Skills.PowerBubble[self.PowerBubble].Uses
 end
 
 function PlayerSkills.ArmUnlocked(self)

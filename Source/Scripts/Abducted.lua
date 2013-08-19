@@ -361,6 +361,28 @@ function Abducted.FirePulse(self, target, normal)
 	HUD:RefreshAvailableActions()
 end
 
+function Abducted.PowerBubble(self)
+	if (self.pulseTimer) then
+		self.pulseTimer:Clean()
+		self.pulseTimer = nil
+	end
+		
+	local f = function()
+		World.playerPawn:PowerBubble()
+	end
+	
+	if (not World.playerPawn.shieldActive) then
+		HUD:BeginShield()
+		World.gameTimers:Add(f, 0.1)
+	else
+		f()
+	end
+	
+	self.pulse = false
+	HUD:ShowPulseModes(false)
+	HUD:RefreshAvailableActions()
+end
+
 function Abducted.PlayerDiedAlertPanelDone(self, result)
 	if (result == AlertPanel.YesButton) then
 		self:DoLoadCheckpoint()

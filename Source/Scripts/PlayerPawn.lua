@@ -561,6 +561,7 @@ function PlayerPawn.PulseDamage(self, pos)
 	local baseDamage = PlayerSkills:PulseDamage()
 	local radius = PlayerSkills:PulseDamageRadius()
 	local maxDamageRadius = radius*0.25
+	local oneMinusMaxDamageRadius = radius-maxDamageRadius
 	
 	-- damage in a radius
 	local radiusBox = {radius, radius, radius}
@@ -584,7 +585,7 @@ function PlayerPawn.PulseDamage(self, pos)
 				local damage = baseDamage
 				
 				if (dd > maxDamageRadius) then
-					damage = (maxDamageRadius-dd)/maxDamageRadius*baseDamage
+					damage = (oneMinusMaxDamageRadius-dd)/oneMinusMaxDamageRadius*baseDamage
 				end
 				
 				if (damage > 0) then

@@ -349,6 +349,7 @@ end
 
 function HUD.RapidPulsePressed(self)
 	COutLine(kC_Debug, "Rapid Pulse Pressed!")
+	Game.entity:RapidPulse()
 end
 
 function HUD.BeginShield(self, gameTime)
@@ -1194,6 +1195,7 @@ function HUD.RechargeShield(self, instant)
 		enabled = self.gfx.ShieldEnabled,
 		disabled = self.gfx.ShieldDisabled
 	}
+	
 	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
 	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
 	self.shieldEnabled = false

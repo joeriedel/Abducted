@@ -234,6 +234,7 @@ info_bug_spawner = BugSpawner
 Bug = Entity:New()
 Bug.KillMessages = { "BUG_KILLED_MESSAGE1" }
 Bug.DebugMessages = false
+Bug.Health = 25
 
 function Bug.Spawn(self)
 
@@ -277,6 +278,7 @@ function Bug.Spawn(self)
 		self.zigZagDist = {40, 80}
 	end
 	
+	self.health = Bug.Health
 	self.stompDistance = 35
 	
 	self.sounds = {}
@@ -1039,31 +1041,35 @@ function Bug.Remove(self)
 	self:Delete() -- mark for gc
 end
 
-function Bug.PulseKill(self)
-	-- messy!
-	self.dead = true
-	self.think = nil
-	self:Stop()
-	self:SetMoveType(kMoveType_None)
-	self.sounds.Squish:Play(kSoundChannel_FX, 0)
+function Bug.PulseDamage(self, damage)
+	self.health = self.health - damage
 	
-	if (self.group) then
-		self.model:BlendToState("pulsedeath")
-	else
-		self.model.dm:SetVisible(false)
+	if (self.health < 0) then
+		-- messy!
+		self.dead = true
+		self.think = nil
+		self:Stop()
+		self:SetMoveType(kMoveType_None)
+		self.sounds.Squish:Play(kSoundChannel_FX, 0)
+		
+		if (self.group) then
+			self.model:BlendToState("pulsedeath")
+		else
+			self.model.dm:SetVisible(false)
+		end
+		
+		self.guts.dm:SetVisible(true)
+		
+		if (self.spawner) then
+			self.spawner:NotifyDead(self)
+		end
+		
+		local f = function()
+			self:Remove()
+		end
+		
+		World.gameTimers:Add(f, 20) -- remove us in 20 seconds
 	end
-	
-	self.guts.dm:SetVisible(true)
-	
-	if (self.spawner) then
-		self.spawner:NotifyDead(self)
-	end
-	
-	local f = function()
-		self:Remove()
-	end
-	
-	World.gameTimers:Add(f, 20) -- remove us in 20 seconds
 end
 
 info_bug = Bug

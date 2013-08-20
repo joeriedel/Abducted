@@ -346,6 +346,7 @@ function Abducted.BeginPulse(self)
 	end
 	
 	self.pulse = true
+	self.pulseCount = 0
 	HUD:ShowPulseModes(true)
 	HUD:RefreshAvailableActions()
 	World.playerPawn:BeginPulse(self)
@@ -354,7 +355,7 @@ function Abducted.BeginPulse(self)
 		self:DischargePulse()
 	end
 	
-	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.PulseExplodeTime[1], PlayerSkills.PulseExplodeTime[2]))
+	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.kPulseExplodeTime[1], PlayerSkills.kPulseExplodeTime[2]))
 	
 end
 
@@ -364,11 +365,20 @@ function Abducted.EndPulse(self)
 		self.pulseTimer = nil
 	end
 	
+	if (self.rapidFireWindow) then
+		self.rapidFireWindow:Clean()
+		self.rapidFireWindow = nil
+	end
+	
 	World.playerPawn:EndPulse()
 	self.pulse = false
 	
 	HUD:ShowPulseModes(false)
 	HUD:RefreshAvailableActions()
+	
+	if (self.pulseCount > 0) then
+		HUD:RechargePulse()
+	end
 end
 
 function Abducted.DischargePulse(self)
@@ -376,7 +386,9 @@ function Abducted.DischargePulse(self)
 	self.pulse = false
 	
 	if (fired) then
-		HUD:ShieldPenalty()
+		if (PlayerSkills.PureEnergy < 3) then
+			HUD:ShieldPenalty()
+		end
 	end
 	
 	HUD:ShowPulseModes(false)
@@ -392,16 +404,44 @@ function Abducted.FirePulse(self, target, normal)
 		self.pulseTimer = nil
 	end
 	
-	World.playerPawn:FirePulse(target, normal)
-	World.playerPawn:PulseDamage(target)
+	self.pulseCount = self.pulseCount + 1
 	
-	self.pulse = false
-	HUD:ShieldPenalty()
-	HUD:ShowPulseModes(false)
-	HUD:RefreshAvailableActions()
+	if (HUD.pulseMode == "Rapid") then
+	
+		if (self.rapidFireWindow == nil) then
+			local f = function()
+				self:EndPulse()
+			end
+			self.rapidFireWindow = World.gameTimers:Add(f, PlayerSkills:RapidFireWindow())
+		end
+	
+		World.playerPawn:RapidFirePulse(target, normal)
+		World.playerPawn:PulseDamage(target)
+		
+	else
+	
+		World.playerPawn:FirePulse(target, normal)
+		World.playerPawn:PulseDamage(target)
+		
+		self.pulse = false
+	end
+	
+	if (self.pulseCount == 1) then
+		if (PlayerSkills.PureEnergy < 3) then
+			HUD:ShieldPenalty()
+		end
+	
+		HUD:ShowPulseModes(false)
+		HUD:RefreshAvailableActions()
+	end
 end
 
 function Abducted.PowerBubble(self)
+
+	if (World.playerPawn.customMove or World.playerPawn.bugStun) then
+		return -- busy
+	end
+	
 	if (self.pulseTimer) then
 		self.pulseTimer:Clean()
 		self.pulseTimer = nil
@@ -421,6 +461,29 @@ function Abducted.PowerBubble(self)
 	self.pulse = false
 	HUD:ShowPulseModes(false)
 	HUD:RefreshAvailableActions()
+end
+
+function Abducted.RapidPulse(self)
+	if (World.playerPawn.customMove or World.playerPawn.bugStun) then
+		return -- busy
+	end
+	
+	if (HUD.pulseMode ~= "Rapid") then
+		if (HUD.pulseMode == "Mines") then
+			HUD:DetonateMines()
+			HUD.widgets.DropMine.class:SetEnabled(HUD.widgets.DropMine, true)
+		end
+		HUD:SwitchPulseMode("Rapid")
+	else
+		HUD:SwitchPulseMode("Normal")
+	end
+	
+	if (PlayerSkills.PureEnergy < 2) then
+		HUD:RechargePulse()
+	end
+	
+	HUD:ShowPulseModes(false)
+	self:EndPulse()
 end
 
 function Abducted.PlayerDiedAlertPanelDone(self, result)

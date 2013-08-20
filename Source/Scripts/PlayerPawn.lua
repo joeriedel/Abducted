@@ -13,7 +13,6 @@ PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 400
 PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
-PlayerPawn.PulseKillRadius = 50
 PlayerPawn.GodMode = false
 
 PlayerPawn.AnimationStates = {
@@ -182,7 +181,7 @@ function PlayerPawn.Spawn(self)
 	self.pulseSounds = {
 		Hum = World.LoadSound("Audio/AFX_PulseCycleLoop"),
 		Explode = World.LoadSound("Audio/AFX_ShieldImpactAggressive"),
-		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact")
+		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact", 3)
 	}
 	
 	self.pulseSounds.Hum:SetLoop(true)
@@ -496,9 +495,11 @@ end
 
 function PlayerPawn.PulseDamage(self, pos)
 
-	local radius = PlayerSkills:PulseKillRadius()
+	local baseDamage = PlayerSkills:PulseDamage()
+	local radius = PlayerSkills:PulseDamageRadius()
+	local maxDamageRadius = radius*0.25
 	
-	-- kill in a radius
+	-- damage in a radius
 	local radiusBox = {radius, radius, radius}
 	local mins = VecSub(pos, radiusBox) 
 	local maxs = VecAdd(pos, radiusBox)
@@ -506,16 +507,26 @@ function PlayerPawn.PulseDamage(self, pos)
 	local targets = World.BBoxTouching(mins, maxs, kEntityClass_Monster)
 	
 	local bugs = false
-	
+		
 	if (targets) then
 		for k,v in pairs(targets) do
-			if (v.PulseKill) then
+			if (v.PulseDamage) then
 				if (not bugs) then
 					if (v.keys.classname == "info_bug") then
 						bugs = true
 					end
 				end
-				v:PulseKill()
+				
+				local dd = VecMag(VecSub(pos, v:WorldPos()))
+				local damage = baseDamage
+				
+				if (dd > maxDamageRadius) then
+					damage = (maxDamageRadius-dd)/maxDamageRadius*baseDamage
+				end
+				
+				if (damage > 0) then
+					v:PulseDamage(damage)
+				end
 			end
 		end
 	end
@@ -538,9 +549,17 @@ function PlayerPawn.FirePulse(self, target, normal)
 	
 end
 
+function PlayerPawn.RapidFirePulse(self, target, normal)
+	self.pulseSounds.Hum:Stop()
+	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
+	self:InternalFirePulse(target, normal)
+end
+
 function PlayerPawn.InternalFirePulse(self, target, normal)
-	self:PulseLight(VecAdd(target, VecScale(normal, 32)))
-		
+	if (Abducted.entity.pulseCount == 1) then -- only on first shot
+		self:PulseLight(VecAdd(target, VecScale(normal, 32)))
+	end
+	
 	local localPos = self.model.dm:BonePos(self.model.handBone)
 	local start = self.model.dm:WorldBonePos(self.model.handBone)
 	local ray = VecSub(target, start)
@@ -576,7 +595,7 @@ function PlayerPawn.InternalFirePulse(self, target, normal)
 	World.gameTimers:Add(f, 0.1)
 	
 	local anim = self:LookupAnimation("pulse_fire")
-	return self:PlayAnim(anim , self.model)
+	return self:PlayAnim(anim, self.model)
 	
 end
 
@@ -621,7 +640,7 @@ function PlayerPawn.PulseExplode(self)
 	local fwd = RotateVecZ({1,0,0}, angle)
 	local pos = VecAdd(self:WorldPos(), VecAdd(VecScale(fwd, 64), {0,0,72}))
 	
-	self:InternalFirePulse(pos)
+	self:InternalFirePulse(pos, fwd, VecNeg(fwd))
 	self:PulseDamage(self:WorldPos())
 	
 	if (self.shieldActive) then
@@ -646,9 +665,7 @@ function PlayerPawn.CheckPowerBubbleKill(self, target, targetPos)
 		local pos = self:WorldPos()
 		local dd = VecMag(VecSub(pos, targetPos))
 		if (dd <= PlayerSkills:PowerBubbleZapRange()) then
-			if (target.PulseKill) then
-				target:PulseKill(self)
-			elseif (target.Kill) then
+			if (target.Kill) then
 				target:Kill(self)
 			end
 			COutLine(kC_Debug, "PowerBubble - Zap!")

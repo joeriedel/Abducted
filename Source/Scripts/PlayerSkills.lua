@@ -7,6 +7,9 @@ PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
 PlayerSkills.UnlimitedSkillPointsCheat = true
 PlayerSkills.RefundFraction = 0.75
+PlayerSkills.kPulseBaseDamageRadius = 50
+PlayerSkills.kPulseBaseDamage = 100
+PlayerSkills.kPulseExplodeTime = {8, 10}
 
 PlayerSkills.Skills = {}
 
@@ -119,9 +122,6 @@ PlayerSkills.Skills.ShieldRegen = {
 		Cost = 1200
 	}
 }
-
-PlayerSkills.kPulseKillRadius = 50
-PlayerSkills.PulseExplodeTime = {8, 10}
 
 PlayerSkills.Skills.PulseRegen = {
 	Title = "SKILL_PULSE_REGEN_TITLE",
@@ -562,6 +562,7 @@ PlayerSkills.Skills.TriggerHappy = {
 		PlayerSkills.TriggerHappy = 0
 	end,
 	[0] = {
+		Window = 0,
 		DamageMultiplier = 1,
 		AreaMultiplier = 1
 	},
@@ -769,7 +770,7 @@ function PlayerSkills.Load(self)
 	
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
-	self.PowerBubble = 1--Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
+	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
 	self.MultiShield = 4--Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
 	self.Defender = Persistence.ReadNumber(SaveGame, "skills/Defender", 0)
 	
@@ -852,7 +853,14 @@ function PlayerSkills.PulseRechargeTime(self)
 	if (self.Omega > 0) then
 		return 1
 	end
+	if (self.PureEnergy > 0) then
+		return PlayerSkills.Skills.PureEnergy[self.PureEnergy].Cooldown
+	end
 	return PlayerSkills.Skills.PulseRegen[self.PulseRegen].Cooldown
+end
+
+function PlayerSkills.RapidFireWindow(self)
+	return PlayerSkills.Skills.TriggerHappy[self.TriggerHappy].Window
 end
 
 function PlayerSkills.MaxShieldTime(self)
@@ -870,8 +878,20 @@ function PlayerSkills.MaxMines(self)
 	return PlayerSkills.Skills.Mines[self.Mines].MaxMines
 end
 
-function PlayerSkills.PulseKillRadius(self)
-	return PlayerSkills.kPulseKillRadius * PlayerSkills.Skills.PulseDamageRadius[self.PulseRadius].Multiplier
+function PlayerSkills.PulseDamageRadius(self)
+	local r = PlayerSkills.kPulseBaseDamageRadius * PlayerSkills.Skills.PulseDamageRadius[self.PulseRadius].Multiplier
+	if (HUD.pulseMode == "Rapid") then
+		r = r * PlayerSkills.Skills.TriggerHappy[self.TriggerHappy].AreaMultiplier
+	end
+	return r
+end
+
+function PlayerSkills.PulseDamage(self)
+	local r = PlayerSkills.kPulseBaseDamage
+	if (HUD.pulseMode == "Rapid") then
+		r = r * PlayerSkills.Skills.TriggerHappy[self.TriggerHappy].DamageMultiplier
+	end
+	return r
 end
 
 function PlayerSkills.PowerBubbleZapRange(self)

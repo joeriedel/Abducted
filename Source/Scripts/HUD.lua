@@ -28,6 +28,12 @@ function HUD.Load(self)
 	self.widgets = {}
 	self.widgets.Root = UI:CreateRoot(UI.kLayer_HUD)
 	
+	HUD.mobileInset = 75 * UI.identityScale[1]
+	HUD.mobileButtonSpace = 8 * UI.identityScale[2]
+	HUD.mobileButtonY = 22
+	
+	HUD.pulseMode = "Normal"
+	
 	if (UI.mode == kGameUIMode_Mobile) then
 		self.gfx = {
 			Arm = "UI/arm_button_M",
@@ -43,7 +49,14 @@ function HUD.Load(self)
 			ShieldDisabled = "UI/shield_button_charging_M",
 			ShieldEnabled = "UI/shield_button_M",
 			PowerBubble = "UI/power_bubble_M",
-			PowerBubbleDisabled = "UI/power_bubble_disabled_M"
+			PowerBubbleDisabled = "UI/power_bubble_disabled_M",
+			DropMine = "UI/dropmine_M",
+			DropMineDisabled = "UI/dropmine_disabled_M",
+			RapidPulse = "UI/rapid_pulse_M",
+			RapidPulseFlashing = "UI/rapid_pulse_flashing_M",
+			RapidPulseDisabled = "UI/rapid_pulse_disabled_M",
+			TNTBox = "UI/tntbox_M",
+			TNTBoxDisabled = "UI/tntbox_disabled_M"
 		}
 	else
 		self.gfx = {
@@ -61,10 +74,24 @@ function HUD.Load(self)
 			ShieldEnabled = "UI/shield_button_pc_M",
 			ActionBar = "UI/action_bar_pc_M",
 			PowerBubble = "UI/power_bubble_pc_M",
-			PowerBubbleDisabled = "UI/power_bubble_disabled_pc_M"
+			PowerBubbleDisabled = "UI/power_bubble_disabled_pc_M",
+			DropMine = "UI/dropmine_pc_M",
+			DropMineDisabled = "UI/dropmine_disabled_pc_M",
+			RapidPulse = "UI/rapid_pulse_pc_M",
+			RapidPulseFlashing = "UI/rapid_pulse_flashing_pc_M",
+			RapidPulseDisabled = "UI/rapid_pulse_disabled_pc_M",
+			TNTBox = "UI/tntbox_pc_M",
+			TNTBoxDisabled = "UI/tntbox_disabled_pc_M"
 		}
 	end
 	map(self.gfx, World.Load)
+	
+	self.pulseFlashing = self.gfx.PulseFlashing
+	self.pulseGfx = {
+		enabled = self.gfx.PulseEnabled,
+		disabled = self.gfx.PulseDisabled,
+		pressed = self.gfx.PulseDisabled
+	}
 	
 	self.sfx = {}
 	
@@ -141,7 +168,8 @@ function HUD.Load(self)
 	self.widgets.ShieldShimmer = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.RechargeShimmer})
 	self.widgets.ShieldShimmer:SetVisible(false)
 	
-	local size = UI:MaterialSize(self.gfx.PowerBubble, {0, 0})
+	local size = UI:MaterialSize(self.gfx.PowerBubble)
+	
 	self.widgets.PowerBubble = UIPushButton:Create(
 		{0, 0, size[3]*0.85, size[4]*0.85},
 		{ -- we go to disabled state when pulse is fired
@@ -156,6 +184,36 @@ function HUD.Load(self)
 	)
 	
 	self.widgets.PowerBubble:SetVisible(false)
+	
+	self.widgets.DropMine = UIPushButton:Create(
+		{0, 0, size[3]*0.85, size[4]*0.85},
+		{ -- we go to disabled state when pulse is fired
+			enabled = self.gfx.DropMine,
+			disabled = self.gfx.DropMineDisabled,
+			pressed = self.gfx.DropMineDisabled
+		},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:DropMinePressed() end},
+		nil,
+		self.widgets.Root
+	)
+	
+	self.widgets.DropMine:SetVisible(false)
+	
+	self.widgets.RapidPulse = UIPushButton:Create(
+		{0, 0, size[3]*0.85, size[4]*0.85},
+		{ -- we go to disabled state when pulse is fired
+			enabled = self.gfx.RapidPulse,
+			disabled = self.gfx.RapidPulseDisabled,
+			pressed = self.gfx.RapidPulseDisabled
+		},
+		{ pressed = UI.sfx.Command },
+		{pressed=function (widget) HUD:RapidPulsePressed() end},
+		nil,
+		self.widgets.Root
+	)
+	
+	self.widgets.RapidPulse:SetVisible(false)
 	
 	self.widgets.Pulse = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
@@ -282,6 +340,17 @@ function HUD.PowerBubblePressed(self)
 	Game.entity:PowerBubble()
 end
 
+function HUD.DropMinePressed(self)
+	COutLine(kC_Debug, "Drop Mine Pressed!")
+	if ((self.pulseMode == "Mines") or Game.entity.pulse) then -- sanity check
+		Game.entity:DropMine()
+	end
+end
+
+function HUD.RapidPulsePressed(self)
+	COutLine(kC_Debug, "Rapid Pulse Pressed!")
+end
+
 function HUD.BeginShield(self, gameTime)
 
 	if (gameTime == nil) then
@@ -362,16 +431,24 @@ function HUD.InternalRechargePulse(self)
 		
 	local f = function ()
 		self.pulseStartTime = nil
-		if (not HUD.enabled) then
-			return
-		end
 		if (self.pulseTimer) then
 			self.pulseTimer:Clean()
 			self.pulseTimer = nil
 		end
+		if (not HUD.enabled) then
+			return
+		end
 		self.widgets.PulseCharging:SetVisible(false)
 		HUD:RefreshAvailableActions()
 		HUD:Shimmer(self.widgets.PulseShimmer)
+		
+		if (self.pulseMode == "Mines") then
+			local maxMines = PlayerSkills:MaxMines()
+			local numMines = World.playerPawn:NumMines()
+			if (numMines < maxMines) then
+				self.widgets.DropMine.class:SetEnabled(self.widgets.DropMine, true)
+			end
+		end
 	end
 	
 	World.globalTimers:Add(f, self.pulseRechargeTime - (GameDB.realTime - self.pulseStartTime))
@@ -392,15 +469,159 @@ function HUD.ShowPulseModes(self, show)
 
 end
 
+function HUD.NotifyZeroMines(self)
+	if (self.pulseMode == "Mines") then
+		HUD:SwitchPulseMode("Normal")
+		HUD:ShowPulseModes(false)
+		self.widgets.DropMine.class:SetEnabled(self.widgets.DropMine, true)
+	end
+end
+
+function HUD.SwitchPulseMode(self, mode)
+
+	if (self.pulseMode == mode) then
+		return
+	end
+	
+	self.pulseMode = mode
+	
+	if (mode == "Mines") then
+	
+		self.pulseGfx = {
+			enabled = self.gfx.TNTBox,
+			disabled = self.gfx.TNTBoxDisabled,
+			pressed = self.gfx.TNTBoxDisabled
+		}
+	
+		-- Main pulse button becomes a tnt detonate box
+		self.widgets.Pulse.class:ChangeGfx(
+			self.widgets.Pulse,
+			self.pulseGfx
+		)
+		
+		self.widgets.PulseCharging:SetMaterial(self.gfx.TNTBox)
+		
+	elseif (mode == "Rapid") then
+	
+		-- swap pulse with rapid pulse
+		
+		self.pulseGfx = {
+			enabled = self.gfx.RapidPulse,
+			disabled = self.gfx.RapidPulseDisabled,
+			pressed = self.gfx.RapidPulseDisabled
+		}
+			
+		self.widgets.Pulse.class:ChangeGfx(
+			self.widgets.Pulse,
+			self.pulseGfx			
+		)
+		
+		self.widgets.PulseCharging:SetMaterial(self.gfx.RapidPulse)
+		
+		self.widgets.RapidPulse.class:ChangeGfx(
+			self.widgets.RapidPulse,
+			{
+				enabled = self.gfx.PulseEnabled,
+				disabled = self.gfx.PulseDisabled,
+				pressed = self.gfx.PulseDisabled
+			}
+		)
+		
+		self.pulseFlashing = self.gfx.RapidPulseFlashing
+	
+	else
+	
+		self.pulseFlashing = self.gfx.PulseFlashing
+		
+		self.pulseGfx = {
+			enabled = self.gfx.PulseEnabled,
+			disabled = self.gfx.PulseDisabled,
+			pressed = self.gfx.PulseDisabled
+		}
+	
+		self.widgets.Pulse.class:ChangeGfx(
+			self.widgets.Pulse,
+			self.pulseGfx
+		)
+		
+		self.widgets.PulseCharging:SetMaterial(self.gfx.PulseEnabled)
+		
+		self.widgets.RapidPulse.class:ChangeGfx(
+			self.widgets.RapidPulse,
+			{
+				enabled = self.gfx.RapidPulse,
+				disabled = self.gfx.RapidPulseDisabled,
+				pressed = self.gfx.RapidPulseDisabled
+			}
+		)
+		
+	end
+
+end
+
+function HUD.DetonateMines(self)
+	World.playerPawn:DetonateMines()
+end
+
 function HUD.ShowPulseModesMobile(self, show)
 
 	local r = self.widgets.Pulse:Rect()
 	local pulseIconCenter = {r[1] + r[3]/2, r[2] + r[4]/2}
 	local space = 8 * UI.identityScale[1]
 	local startY = r[2] + r[4] + space
-	
+	local buttonRect = self.widgets.PowerBubble:Rect()
 	local blendTime = 0.2
-	local rollOutTime = 0.2
+	local rollOutTime = 0.2	
+	
+	-- pyramid setup
+	local kButtonPositions = {
+		{ -- 1 button
+			{
+				pulseIconCenter[1] - buttonRect[3]/2,
+				startY
+			}
+		},
+		{ -- 2 buttons
+			{
+				pulseIconCenter[1] - buttonRect[3],
+				startY
+			},
+			{
+				pulseIconCenter[1],
+				startY
+			}
+		},
+		{ -- 3 buttons
+			{
+				pulseIconCenter[1] - buttonRect[3],
+				startY
+			},
+			{
+				pulseIconCenter[1],
+				startY
+			},
+			{
+				pulseIconCenter[1] - buttonRect[3]/2,
+				startY + buttonRect[4] + space
+			}
+		}
+	}
+	
+	local kNumButtons = 0
+	
+	if (PlayerSkills.PowerBubble > 0) then
+		kNumButtons = kNumButtons + 1
+	end
+	
+	if (PlayerSkills.Mines > 0) then
+		kNumButtons = kNumButtons + 1
+	end
+	
+	if (PlayerSkills.TriggerHappy > 0) then
+		kNumButtons = kNumButtons + 1
+	end
+	
+	local buttonIdx = 1
 		
 	if (PlayerSkills.PowerBubble > 0) then
 		
@@ -414,12 +635,60 @@ function HUD.ShowPulseModesMobile(self, show)
 			self.widgets.PowerBubble:BlendTo({1,1,1,1}, blendTime)
 									
 			self.widgets.PowerBubble:MoveTo(z, {0,0})
-			self.widgets.PowerBubble:MoveTo({z[1], startY}, {0, rollOutTime})
+			self.widgets.PowerBubble:MoveTo(kButtonPositions[kNumButtons][buttonIdx], {rollOutTime, rollOutTime})
 			
-			startY = startY + z[4]
+			buttonIdx = buttonIdx + 1
 		else
-			self.widgets.PowerBubble:MoveTo(z, {0,rollOutTime})
+			self.widgets.PowerBubble:MoveTo(z, {rollOutTime, rollOutTime})
 			self.widgets.PowerBubble:BlendTo({1,1,1,0}, blendTime)
+		end
+	end
+	
+	if (PlayerSkills.Mines > 0) then
+	
+		if (HUD.pulseMode == "Mines") then
+			-- don't touch the mines button in mines mode
+			buttonIdx = buttonIdx + 1
+		else
+		
+			local z = self.widgets.DropMine:Rect()
+			z[1] = pulseIconCenter[1] - (z[3]/2)
+			z[2] = pulseIconCenter[2] - (z[4]/2)
+				
+			if (show) then
+				self.widgets.DropMine:SetVisible(true)
+				self.widgets.DropMine:BlendTo({1,1,1,0}, 0)
+				self.widgets.DropMine:BlendTo({1,1,1,1}, blendTime)
+										
+				self.widgets.DropMine:MoveTo(z, {0,0})
+				self.widgets.DropMine:MoveTo(kButtonPositions[kNumButtons][buttonIdx], {rollOutTime, rollOutTime})
+				
+				buttonIdx = buttonIdx + 1
+			else
+				self.widgets.DropMine:MoveTo(z, {rollOutTime, rollOutTime})
+				self.widgets.DropMine:BlendTo({1,1,1,0}, blendTime)
+			end
+		end
+	end
+	
+	if (PlayerSkills.TriggerHappy > 0) then
+		
+		local z = self.widgets.RapidPulse:Rect()
+		z[1] = pulseIconCenter[1] - (z[3]/2)
+		z[2] = pulseIconCenter[2] - (z[4]/2)
+			
+		if (show) then
+			self.widgets.RapidPulse:SetVisible(true)
+			self.widgets.RapidPulse:BlendTo({1,1,1,0}, 0)
+			self.widgets.RapidPulse:BlendTo({1,1,1,1}, blendTime)
+									
+			self.widgets.RapidPulse:MoveTo(z, {0,0})
+			self.widgets.RapidPulse:MoveTo(kButtonPositions[kNumButtons][buttonIdx], {rollOutTime, rollOutTime})
+			
+			buttonIdx = buttonIdx + 1
+		else
+			self.widgets.RapidPulse:MoveTo(z, {rollOutTime, rollOutTime})
+			self.widgets.RapidPulse:BlendTo({1,1,1,0}, blendTime)
 		end
 	end
 
@@ -437,12 +706,12 @@ function HUD.Layout(self)
 end
 
 function HUD.LayoutMobile(self)
-	local y = 42
+	local y = HUD.mobileButtonY
 	if (PlayerSkills:ManipulateUnlocked()) then
-		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
+		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth - HUD.mobileInset, y)
 		self.widgets.ManipulateCharging:SetRect(r)
 		self.widgets.ManipulateShimmer:SetRect(r)
-		y = y + r[4] + (24 * UI.identityScale[2])
+		y = y + r[4] + HUD.mobileButtonSpace
 		self.widgets.Manipulate:SetVisible(true)
 		self.widgets.ManipulateCharging:SetVisible(false)
 		self.widgets.ManipulateShimmer:SetVisible(false)
@@ -452,10 +721,10 @@ function HUD.LayoutMobile(self)
 		self.widgets.ManipulateShimmer:SetVisible(false)
 	end
 	if (PlayerSkills:ShieldUnlocked()) then
-		local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+		local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth - HUD.mobileInset, y)
 		self.widgets.ShieldCharging:SetRect(r)
 		self.widgets.ShieldShimmer:SetRect(r)
-		y = y + r[4] + (24 * UI.identityScale[2])
+		y = y + r[4] + HUD.mobileButtonSpace
 		self.widgets.Shield:SetVisible(true)
 		self.widgets.ShieldCharging:SetVisible(false)
 		self.widgets.ShieldShimmer:SetVisible(false)
@@ -465,7 +734,7 @@ function HUD.LayoutMobile(self)
 		self.widgets.ShieldShimmer:SetVisible(false)
 	end
 	if (PlayerSkills:PulseUnlocked()) then
-		local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+		local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth - HUD.mobileInset, y)
 		self.widgets.PulseCharging:SetRect(r)
 		self.widgets.PulseShimmer:SetRect(r)
 		self.widgets.Pulse:SetVisible(true)
@@ -606,12 +875,12 @@ function HUD.AnimateUnlockMobile(self, items)
 		end
 	end
 
-	local y = 42
+	local y = HUD.mobileButtonY
 	if (PlayerSkills:ManipulateUnlocked()) then
-		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth, y)
+		local r = UI:RAlignWidget(self.widgets.Manipulate, UI.screenWidth - HUD.mobileInset, y)
 		self.widgets.ManipulateCharging:SetRect(r)
 		self.widgets.ManipulateShimmer:SetRect(r)
-		y = y + r[4] + (24 * UI.identityScale[2])
+		y = y + r[4] + HUD.mobileButtonSpace
 		self.widgets.Manipulate:SetVisible(true)
 		if (items.manipulate) then
 			self.widgets.Manipulate:ScaleTo({0,0}, {0,0})
@@ -627,10 +896,10 @@ function HUD.AnimateUnlockMobile(self, items)
 	
 	if (PlayerSkills:ShieldUnlocked()) then
 		if (items.shield) then
-			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth - HUD.mobileInset, y)
 			self.widgets.ShieldCharging:SetRect(r)
 			self.widgets.ShieldShimmer:SetRect(r)
-			y = y + r[4] + (24 * UI.identityScale[2])
+			y = y + r[4] + HUD.mobileButtonSpace
 			self.widgets.Shield:ScaleTo({0,0}, {0,0})
 			self.widgets.Shield:ScaleTo({1,1}, {0.3, 0.3})
 			self.widgets.Shield:SetVisible(true)
@@ -642,18 +911,18 @@ function HUD.AnimateUnlockMobile(self, items)
 			end
 		else
 			local oldRect = self.widgets.Shield:Rect()
-			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth, y)
+			local r = UI:RAlignWidget(self.widgets.Shield, UI.screenWidth - HUD.mobileInset, y)
 			self.widgets.Shield:SetRect(oldRect)
 			self.widgets.Shield:MoveTo({r[1], r[2]}, {0.3, 0.3})
 			self.widgets.ShieldCharging:MoveTo({r[1], r[2]}, {0.3, 0.3})
 			self.widgets.ShieldShimmer:MoveTo({r[1], r[2]}, {0.3, 0.3})
-			y = y + r[4] + (24 * UI.identityScale[2])
+			y = y + r[4] + HUD.mobileButtonSpace
 		end
 	end
 	
 	if (PlayerSkills:PulseUnlocked()) then
 		if (items.pulse) then
-			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth - HUD.mobileInset, y)
 			self.widgets.PulseCharging:SetRect(r)
 			self.widgets.PulseShimmer:SetRect(r)
 			self.widgets.Pulse:ScaleTo({0,0}, {0,0})
@@ -667,7 +936,7 @@ function HUD.AnimateUnlockMobile(self, items)
 			end
 		else
 			local oldRect = self.widgets.Pulse:Rect()
-			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth, y)
+			local r = UI:RAlignWidget(self.widgets.Pulse, UI.screenWidth - HUD.mobileInset, y)
 			self.widgets.Pulse:SetRect(oldRect)
 			self.widgets.Pulse:MoveTo({r[1], r[2]}, {0.3, 0.3})
 			self.widgets.PulseCharging:MoveTo({r[1], r[2]}, {0.3, 0.3})
@@ -806,13 +1075,11 @@ function HUD.UpdatePulseButton(self)
 	local flashing = Game.entity.pulse
 	if (flashing ~= self.widgets.Pulse.flashing) then
 		self.widgets.Pulse.flashing = flashing
-		local gfx = {}
+		local gfx = nil
 		if (flashing) then
-			gfx.enabled = self.gfx.PulseFlashing
+			gfx = {enabled = self.pulseFlashing}
 		else
-			gfx.enabled = self.gfx.PulseEnabled
-			gfx.disabled = self.gfx.PulseDisabled
-			gfx.pressed = self.gfx.PulseDisabled
+			gfx = self.pulseGfx
 		end
 		
 		self.widgets.Pulse.class:ChangeGfx(self.widgets.Pulse, gfx)
@@ -888,6 +1155,9 @@ end
 function HUD.RechargeShield(self, instant)
 
 	if (instant) then
+		self.shieldCharging = false
+		self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, true)
+		
 		if (World.playerPawn.shieldActive) then
 			World.playerPawn:EndShield()
 		end
@@ -927,11 +1197,15 @@ function HUD.RechargeShield(self, instant)
 	self.widgets.Shield.class:ChangeGfx(self.widgets.Shield, gfx)
 	self.widgets.Shield.class:SetEnabled(self.widgets.Shield, false)
 	self.shieldEnabled = false
+	self.shieldCharging = true
 	self.widgets.ShieldCharging:SetVisible(true)
+	self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, false)
 	
 	local f = function ()
 		self.shieldStartTime = nil
-	
+		self.shieldCharging = false
+		self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, true)
+		
 		if (self.shieldTimer) then
 			self.shieldTimer:Clean()
 			self.shieldTimer = nil
@@ -1008,6 +1282,10 @@ function HUD.Enable(self, items)
 end
 
 function HUD.RefreshAvailableActions(self)
+
+	if (not HUD.enabled) then
+		return
+	end
 		
 	if (Game.entity.pulse) then
 		HUD:EnableArm(false)
@@ -1087,7 +1365,7 @@ function HUD.SignalArm(self, signal)
 end
 
 function HUD.EnableManipulate(self, enable)
-	if (self.manipulateEnabled == enable) then
+	if (HUD.enabled and (self.manipulateEnabled == enable)) then
 		return
 	end
 	
@@ -1110,14 +1388,24 @@ function HUD.EnableManipulate(self, enable)
 end
 
 function HUD.EnableShield(self, enable)
-	if (self.shieldEnabled == enable) then
+	if (HUD.enabled and (self.shieldEnabled == enable)) then
 		return
 	end
 	
 	self.shieldEnabled = enable
 	
-	if (self.shieldStartTime and (not World.playerPawn.dead)) then
+	if (self.shieldStartTime and (not World.playerPawn.dead) and HUD.enabled) then
 		return
+	end
+	
+	if (self.shieldTimer) then
+		self.shieldTimer:Clean()
+		self.shieldTimer = nil
+	end
+	
+	if (self.shieldExpiryTimer) then
+		self.shieldExpiryTimer:Clean()
+		self.shieldExpiryTimer = nil
 	end
 		
 	local gfx = {}
@@ -1131,7 +1419,7 @@ function HUD.EnableShield(self, enable)
 end
 
 function HUD.EnablePulse(self, enable)
-	if (self.pulseEnabled == enable) then
+	if (HUD.enabled and (self.pulseEnabled == enable)) then
 		return
 	end
 	
@@ -1142,11 +1430,7 @@ function HUD.EnablePulse(self, enable)
 		self.pulseTimer = nil
 	end
 	
-	local gfx = {}
-	
-	gfx.enabled = self.gfx.PulseEnabled
-	gfx.disabled = self.gfx.PulseDisabled
-	gfx.pressed = self.gfx.PulseDisabled
+	local gfx = self.pulseGfx
 	
 	self.widgets.PulseCharging:SetVisible(false)
 	self.widgets.Pulse.class:ChangeGfx(self.widgets.Pulse, gfx)
@@ -1266,6 +1550,7 @@ end
 
 function HUD.LoadShieldState(self)
 
+	self.shieldCharging = false
 	self.shieldEnabled = Persistence.ReadBool(SaveGame, "HUDShieldEnabled", false)
 	
 	if (self.shieldTimer) then
@@ -1348,6 +1633,13 @@ end
 
 function HUD.LoadState(self)
 	HUD.enabled = true
+	self.widgets.PowerBubble:SetVisible(false)
+	self.widgets.DropMine:SetVisible(false)
+	self.widgets.RapidPulse:SetVisible(false)
+	self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, true)
+	self.widgets.DropMine.class:SetEnabled(self.widgets.DropMine, true)
+	self.widgets.RapidPulse.class:SetEnabled(self.widgets.RapidPulse, true)
+	HUD:SwitchPulseMode("Normal")
 --	HUD.visible = Persistence.ReadBool(SaveGame, "HUDVisible", true)
 	HUD:SetVisible(true)
 	HUD:Layout()

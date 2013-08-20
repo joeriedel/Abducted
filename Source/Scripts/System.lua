@@ -330,16 +330,24 @@ World.TempSpawn [ THINK ONLY ]
 --]]
 
 function World.TempSpawn(keys)
+	return World.AsyncTempSpawn(keys, false)
+end
 
+function World.AsyncTempSpawn(keys, async)
+
+	if (async == nil) then
+		async = true
+	end
+	
 	local entity = World.coroutine_entity
 	
 	if (entity == nil) then
-		COutLine(kC_Error, "ERROR: World.TempSpawn() was not called from an entity coroutine!")
+		COutLine(kC_Error, "ERROR: World.AsyncTempSpawn() was not called from an entity coroutine!")
 		return nil
 	end
 	
 	COutLine(kC_Debug, "Spawning -- %s", keys.classname)
-	local state = System.CreateTempSpawnTask(entity, keys)
+	local state = System.CreateTempSpawnTask(entity, keys, async)
 	
 	local thinkTime = entity:NextThink()
 	entity:SetNextThink(0)

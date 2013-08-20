@@ -114,7 +114,7 @@ function BugSpawner.Think(self)
 		keys.intro_angle = self.keys.intro_angle
 	end
 	
-	local bug = World.TempSpawn(keys)
+	local bug = World.AsyncTempSpawn(keys)
 	bug.listItem = LL_Append(self.bugs, {bug=bug})
 	bug.spawner = self
 	
@@ -1004,6 +1004,10 @@ function Bug.Despawn(self)
 end
 
 function Bug.Kill(self, instigator)
+	if (self.dead) then
+		return
+	end
+	
 	self:SetMoveType(kMoveType_None)
 	self.model.dm:SetVisible(false)
 	self.guts.dm:SetVisible(true)

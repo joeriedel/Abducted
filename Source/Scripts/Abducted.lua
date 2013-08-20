@@ -223,7 +223,7 @@ function Abducted.InputKeyAction(self, e)
 end
 
 function Abducted.BeginManipulate(self)
-	if (World.playerPawn.customMove) then
+	if (World.playerPawn.customMove or World.playerPawn.bugStun) then
 		return -- busy
 	end
 	
@@ -295,9 +295,49 @@ function Abducted.EndManipulate(self, immediate)
 	HUD:RefreshAvailableActions()
 end
 
-function Abducted.BeginPulse(self)
-	if (World.playerPawn.customMove) then
+function Abducted.DropMine(self)
+
+	if (World.playerPawn.customMove or World.playerPawn.bugStun) then
 		return -- busy
+	end
+
+	local maxMines = PlayerSkills:MaxMines()
+	local numMines = World.playerPawn:NumMines() + 1
+	if (numMines >= maxMines) then
+		HUD.widgets.DropMine.class:SetEnabled(HUD.widgets.DropMine, false)
+	end
+	
+	if (numMines == 1) then
+		HUD:SwitchPulseMode("Mines")
+		HUD:ShowPulseModes(false)
+		self:EndPulse() --< ends pulse cycle
+	end
+	
+	if (PlayerSkills.Omega < 1) then
+		HUD.widgets.DropMine.class:SetEnabled(HUD.widgets.DropMine, false)
+		HUD:RechargePulse()
+	end
+	
+	local f = function()
+		World.playerPawn:DropMine()
+	end
+	
+	World.gameTimers:Add(f, 0) -- must be done in a Think
+
+end
+
+function Abducted.BeginPulse(self)
+	if (World.playerPawn.customMove or World.playerPawn.bugStun) then
+		return -- busy
+	end
+	
+	if (HUD.pulseMode == "Mines") then
+		HUD:DetonateMines()
+		HUD:SwitchPulseMode("Normal")
+		HUD:ShowPulseModes(false)
+		HUD:RechargePulse()
+		HUD.widgets.DropMine.class:SetEnabled(HUD.widgets.DropMine, true)
+		return
 	end
 	
 	if (self.pulse) then

@@ -79,6 +79,24 @@ function PlayerPawn.Spawn(self)
 	COutLine(kC_Debug, "PlayerPawn:Spawn")
 	Entity.Spawn(self)
 	
+	self:Precache("Objects/mine")
+	self:Precache("Audio/mine_activate")
+	self:Precache("Audio/mine_hum")
+	self:Precache("Audio/mine_armed")
+	self:Precache("Audio/mine_explode")
+	self:Precache("Audio/mine_tripped")
+	
+	self.mineDrop = World.LoadSound("Audio/mine_drop")
+	self:AttachSound(self.mineDrop)
+	
+	self.mineMaterials = {
+		Default = World.Load("Objects/mine_M"),
+		Armed = World.Load("Objects/mine_armed_M"),
+		Tripped = World.Load("Objects/mine_tripped_M")
+	}
+	
+	self.numActiveMines = 0
+	
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	self:SetLightInteractionFlags(kLightInteractionFlag_Player)
 	self:SetCameraShift({0,0,64})
@@ -655,7 +673,7 @@ function PlayerPawn.EndPowerBubble(self)
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage)
-	if (self.dead or PlayerPawn.GodMode or self.shieldActive) then
+	if (self.dead or PlayerPawn.GodMode--[[ or self.shieldActive]]) then
 		return
 	end
 	self.dead = true
@@ -667,6 +685,10 @@ function PlayerPawn.Kill(self, instigator, killMessage)
 	self:PlayAnim(self:LookupAnimation("death"), self.model)
 	
 	self:AbortBugAction()
+	
+	if (self.shieldActive) then
+		self:EndShield()
+	end
 	
 	Game.entity:PlayerDied(killMessage)
 end
@@ -766,6 +788,58 @@ function PlayerPawn.PlayCinematicAnim(self, args)
 			blend.Seq(f)
 		else
 			f()
+		end
+	end
+end
+
+function PlayerPawn.NumMines(self)
+	return self.numActiveMines
+end
+
+function PlayerPawn.DropMine(self)
+	self:Stop()
+	
+	self.mines = self.mines or {}
+	self.numActiveMines = self.numActiveMines + 1
+	
+	self.mineDrop:Play(kSoundChannel_FX, 0)
+	
+	local pos = self:WorldPos()
+	local floorZ = pos[3]
+	pos[3] = pos[3] + 32
+	
+	local keys = {
+		classname = "info_mine",
+		origin = Vec3ToString(pos)
+	}
+	
+	local mine = World.TempSpawn(keys)
+	mine:DropToFloor(floorZ)
+	
+	table.insert(self.mines, mine)
+	mine.idx = #self.mines
+	
+	return self.numActiveMines
+end
+
+function PlayerPawn.DetonateMines(self)
+	self:Stop()
+	local mines = self.mines
+	self.mines = nil
+	self.numActiveMines = 0
+	
+	for k,v in pairs(mines) do
+		v:Trip()
+	end
+end
+
+function PlayerPawn.RemoveMine(self, mine)
+	if (self.mines) then
+		self.numActiveMines = self.numActiveMines - 1
+		table.remove(self.mines, mine.idx)
+		if (self.numActiveMines == 0) then
+			self.mines = nil
+			HUD:NotifyZeroMines()
 		end
 	end
 end
@@ -1254,7 +1328,8 @@ function PlayerPawn.LoadState(self, state)
 	self.dead = false
 	self.disableAnimTick = false
 	self.state = "idle"
-	
+	self.mines = nil
+		
 	self.pulseSounds.Hum:Stop()
 	
 	if (self.activeShieldSound) then

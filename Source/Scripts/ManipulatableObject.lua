@@ -80,12 +80,15 @@ function ManipulatableObject.Spawn(self)
 	self.manipulateWindow = NumberForString(self.keys.manipulate_window, 5)
 	self.manipulateDamage = BoolForString(self.keys.manipulate_damage, false)
 	
+	self.attackDamage = NumberForString(self.keys.attack_damage, 100)
+	
 	self.enabled = false
 	self.canAttack = false
 	self.enableManipulateShimmer = false
 	self.didManipulateShimmer = false
 	self.activationRange = NumberForString(self.keys.range, 450)
 	self.swipePos = {0, 0, 0}
+	self.wasBlocked = false
 	
 	self:Show(BoolForString(self.keys.visible, true))
 	
@@ -328,9 +331,28 @@ function ManipulatableObject.OnDamage(self, targets)
 		killMsg = self.killedMessages[IntRand(1, #self.killedMessages)]
 	end
 
+	local blocked = false
+	
 	for k,v in pairs(targets) do
-		if ((not v.dead) and v.Kill) then
-			v:Kill(self, killMsg)
+		if ((not v.dead) and v.Damage) then
+			local shieldOn = v.shieldActive == true
+			
+			v:Damage(self.attackDamage, self, killMsg)
+		
+			shieldOn = shieldOn or (v.shieldActive == true)
+			
+			if (shieldOn and (not v.dead)) then
+				-- they blocked our hit
+				blocked = true
+			end
+		end
+	end
+	
+	if (blocked and (not self.wasBlocked)) then
+		self.wasBlocked = true
+		local blend = self:PlayAnim("attack_blocked", self.model)
+		if (blend) then
+			blend.Seq(ManipulatableObject.AttackFinish)
 		end
 	end
 
@@ -496,6 +518,7 @@ function ManipulatableObject.Attack(self)
 	self.think = nil
 	self.hitPlayer = false
 	self.canAttack = false
+	self.wasBlocked = false
 	self.nextAttackTime = nil
 	local args = Tokenize(self.attackArgs)
 	

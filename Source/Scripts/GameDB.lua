@@ -215,6 +215,9 @@ function GameDB.ClearChatLockout(self)
 end
 
 function GameDB.IncrementTime(self, dt)
+-- GameDB.realTime tracks the actual elapsed time in a game. It is serialized
+-- with checkpoints so it should be used as the time base for anything that needs
+-- to persist.
 	self.realTime = self.realTime + dt
 	self:UpdateTimes()
 end

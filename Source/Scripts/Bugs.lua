@@ -1005,46 +1005,37 @@ function Bug.Despawn(self)
 	self:Remove()	
 end
 
-function Bug.Kill(self, instigator)
+function Bug.Damage(self, damage, instigator)
+
 	if (self.dead) then
 		return
 	end
 	
-	self:SetMoveType(kMoveType_None)
-	self.model.dm:SetVisible(false)
-	self.guts.dm:SetVisible(true)
-	self.think = nil
-	self.dead = true
-	self.sounds.Squish:Play(kSoundChannel_FX, 0)
-	
-	if (self.spawner) then
-		self.spawner:NotifyDead(self)
+	self.health = self.health - damage
+	if (self.health <= 0) then
+		self:SetMoveType(kMoveType_None)
+		self.model.dm:SetVisible(false)
+		self.guts.dm:SetVisible(true)
+		self.think = nil
+		self.dead = true
+		self.sounds.Squish:Play(kSoundChannel_FX, 0)
+		
+		if (self.spawner) then
+			self.spawner:NotifyDead(self)
+		end
+		
+		local f = function()
+			self:Remove()
+		end
+		
+		World.gameTimers:Add(f, 20) -- remove us in 20 seconds
 	end
-	
-	local f = function()
-		self:Remove()
-	end
-	
-	World.gameTimers:Add(f, 20) -- remove us in 20 seconds
-end
-
-function Bug.Remove(self)
-	if (self.spawner) then
-		self.spawner:NotifyRemove(self)
-	end
-	
-	self:SetMoveType(kMoveType_None)
-	self.model.dm:SetVisible(false)
-	self.guts.dm:SetVisible(false)
-	self.think = nil
-	self.dead = true
-	self:Delete() -- mark for gc
 end
 
 function Bug.PulseDamage(self, damage)
 	self.health = self.health - damage
 	
-	if (self.health < 0) then
+	if (self.health <= 0) then
 		-- messy!
 		self.dead = true
 		self.think = nil
@@ -1070,6 +1061,19 @@ function Bug.PulseDamage(self, damage)
 		
 		World.gameTimers:Add(f, 20) -- remove us in 20 seconds
 	end
+end
+
+function Bug.Remove(self)
+	if (self.spawner) then
+		self.spawner:NotifyRemove(self)
+	end
+	
+	self:SetMoveType(kMoveType_None)
+	self.model.dm:SetVisible(false)
+	self.guts.dm:SetVisible(false)
+	self.think = nil
+	self.dead = true
+	self:Delete() -- mark for gc
 end
 
 info_bug = Bug

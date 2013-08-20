@@ -880,6 +880,13 @@ function PlayerSkills.ShieldMultiActionTimePenalty(self)
 	return PlayerSkills.Skills.MultiShield[self.MultiShield].TimeCost
 end
 
+function PlayerSkills.ShieldAutoActivateCooldown(self)
+	if (self.Defender < 1) then
+		return 0
+	end
+	return PlayerSkills.Skills.Defender[self.Defender].Cooldown
+end
+
 function PlayerSkills.MaxMines(self)
 	return PlayerSkills.Skills.Mines[self.Mines].MaxMines
 end

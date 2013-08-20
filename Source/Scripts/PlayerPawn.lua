@@ -14,6 +14,7 @@ PlayerPawn.kAccel = 400
 PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
 PlayerPawn.GodMode = false
+PlayerPawn.kMaxShieldDamage = 100
 
 PlayerPawn.AnimationStates = {
 	default = {
@@ -150,11 +151,45 @@ function PlayerPawn.Spawn(self)
 	)
 	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	
+	self.shieldSpriteSpark = World.CreateSpriteBatch(1, 1)
+	self.shieldSpriteSpark.material = World.Load("FX/shieldspritespark_M")
+	self.shieldSpriteSpark.dm = self:AttachDrawModel(self.shieldSpriteSpark, self.shieldSpriteSpark.material)
+	self.shieldSpriteSpark.dm:SetBounds(self:Mins(), self:Maxs())
+	self.shieldSpriteSpark.sprite = self.shieldSpriteSpark.dm:AllocateSprite()
+	self.shieldSpriteSpark.dm:SetSpriteData(
+		self.shieldSpriteSpark.sprite,
+		{
+			pos = {0, 0, 68}, -- relative to drawmodel
+			size = {148, 158},
+			rgba = {1, 1, 1, 1},
+			rot = 0
+		}
+	)
+	self.shieldSpriteSpark.dm:BlendTo({0,0,0,0}, 0)
+	
+	self.shieldSpriteDamaged = World.CreateSpriteBatch(1, 1)
+	self.shieldSpriteDamaged.material = World.Load("FX/shieldspritedamaged_M")
+	self.shieldSpriteDamaged.dm = self:AttachDrawModel(self.shieldSpriteDamaged, self.shieldSpriteDamaged.material)
+	self.shieldSpriteDamaged.dm:SetBounds(self:Mins(), self:Maxs())
+	self.shieldSpriteDamaged.sprite = self.shieldSpriteDamaged.dm:AllocateSprite()
+	self.shieldSpriteDamaged.dm:SetSpriteData(
+		self.shieldSpriteDamaged.sprite,
+		{
+			pos = {0, 0, 68}, -- relative to drawmodel
+			size = {148, 158},
+			rgba = {1, 1, 1, 1},
+			rot = 0
+		}
+	)
+	self.shieldSpriteDamaged.dm:BlendTo({0,0,0,0}, 0)
+	
 	self.shieldSounds = {
 		Activate = World.LoadSound("Audio/AFX_ShieldActivate"),
 		Hum = World.LoadSound("Audio/AFX_ShieldHum"),
 		Deactivate = World.LoadSound("Audio/AFX_ShieldDeactivate"),
-		Spark = World.LoadSound("Audio/AFX_ShieldImpactLight", 3)
+		Spark = World.LoadSound("Audio/AFX_ShieldSpark", 3),
+		ImpactLight = World.LoadSound("Audio/AFX_ShieldImpactLight", 2),
+		ImpactHard = World.LoadSound("Audio/AFX_ShieldImpactAggressive")
 	}
 	
 	self.shieldSounds.Hum:SetLoop(true)
@@ -233,6 +268,7 @@ function PlayerPawn.Spawn(self)
 	self.shieldActive = false
 	self.manipulateActive = false
 	self.pulseActive = false
+	self.shieldAutoActivateTime = 0
 	
 	local io = {
 		Save = function()
@@ -441,6 +477,33 @@ function PlayerPawn.EndShield(self)
 	
 	self:SetSpeeds()
 	self:StopShieldSound()
+end
+
+function PlayerPawn.ShowShieldDamage(self)
+
+	self.shieldSpriteDamaged.dm:BlendTo({1,1,1,1}, 0.1)
+	
+	local f = function()
+		self.shieldSpriteDamaged.dm:BlendTo({0,0,0,0}, 0.15)
+	end
+
+	World.gameTimers:Add(f, 0.5)
+
+end
+
+function PlayerPawn.ShieldSpark(self)
+
+	if (self.shieldSparkTimer) then
+		self.shieldSparkTimer:Clean()
+	end
+
+	self.shieldSpriteSpark.dm:BlendTo({1,1,1,1}, 0.1)
+
+	local f = function()
+		self.shieldSpriteSpark.dm:BlendTo({0,0,0,0}, 0.1)
+	end
+
+	self.shieldSparkTimer = World.gameTimers:Add(f, 0.1)
 end
 
 function PlayerPawn.Stop(self)
@@ -689,10 +752,65 @@ function PlayerPawn.EndPowerBubble(self)
 	self.powerBubble = false
 end
 
-function PlayerPawn.Kill(self, instigator, killMessage)
+function PlayerPawn.Damage(self, damage, instigator, killMessage)
 	if (self.dead or PlayerPawn.GodMode--[[ or self.shieldActive]]) then
 		return
 	end
+	
+	if (self.shieldActive) then
+		if (damage <= PlayerPawn.kMaxShieldDamage) then
+			self.shieldSounds.ImpactLight:Play(kSoundChannel_FX, 0)
+			self:ShieldSpark()
+			return
+		end
+		
+		-- This damage amount overloaded our shield
+		-- Play an flickering shield effect to show that it blocked the damage
+		-- but it shorted out
+		HUD:ExpireShield(PlayerSkills:MaxShieldTime())
+		self.shieldSounds.ImpactHard:Play(kSoundChannel_FX, 0)
+		self:ShowShieldDamage()
+		self:ShieldSpark()
+		
+		if (damage < (PlayerPawn.kMaxShieldDamage*2)) then
+		-- doesn't kill us
+			self:PlayUninterruptable("damage_stun")
+			return
+		end
+	elseif (PlayerSkills.Defender > 0) then
+		-- Auto activate shield defense
+		local cd = PlayerSkills:ShieldAutoActivateCooldown()
+		local elapsed = GameDB.realTime - self.shieldAutoActivateTime
+		if ((elapsed >= cd) or (self.shieldAutoActivateTime == 0)) then
+			self.shieldAutoActivateTime = GameDB.realTime
+			if (damage <= PlayerPawn.kMaxShieldDamage) then
+				self:BeginShield()
+				self.shieldSounds.ImpactLight:Play(kSoundChannel_FX, 0)
+				self:ShieldSpark()
+				return
+			end
+			
+			-- This damage amount overloaded our shield
+			-- Play an flickering shield effect to show that it blocked the damage
+			-- but it shorted out
+			HUD:ExpireShield(PlayerSkills:MaxShieldTime())
+			self.shieldSounds.ImpactHard:Play(kSoundChannel_FX, 0)
+			self:ShowShieldDamage()
+			self:ShieldSpark()
+			
+			if (damage < (PlayerPawn.kMaxShieldDamage*2)) then
+			-- doesn't kill us
+				self:PlayUninterruptable("damage_stun")
+				return
+			end
+		end
+	end
+	
+	self:Kill(instigator, killMessage)
+end
+
+function PlayerPawn.Kill(self, instigator, killMessage)
+	
 	self.dead = true
 	
 	self.customAnim = false
@@ -769,6 +887,29 @@ function PlayerPawn.Teleport(self, userId, facing)
 	else
 		COutLine(kC_Debug, "ERROR: PlayerPawn(teleport) there is no waypoint with a userid of '%s'.", userId)
 	end
+end
+
+function PlayerPawn.PlayUninterruptable(self, anim)
+	local anim = self:LookupAnimation(anim)
+
+	self.disableAnimTick = true
+	self.customMove = true
+	self.state = nil
+	self:Stop()
+	
+	local blend = self:PlayAnim(anim, self.model)
+	if (blend) then
+		local f = function()
+			if (not self.dead) then
+				self.disableAnimTick = false
+				self.customMove = false
+				self:TickPhysics()
+			end
+		end
+		return blend.Seq(f)
+	end
+	
+	return nil
 end
 
 function PlayerPawn.PlayCinematicAnim(self, args)
@@ -877,34 +1018,25 @@ function PlayerPawn.BugStun(self, callback)
 		Abducted.entity:EndPulse()
 	end
 	
-	local anim = self:LookupAnimation("bug_stun")
-
-	self.disableAnimTick = true
-	self.customMove = true
-	self.state = nil
-	self.bugStun = true
-	self.bugStunCallback = callback
-	self:Stop()
-	
-	self.bugSounds.Stun:Play(kSoundChannel_FX, 0)
-	
-	local blend = self:PlayAnim(anim, self.model)
-	if (blend) then
-		local f = function()
-			if (not self.dead) then
-				self.bugStun = false
-				self.disableAnimTick = false
-				self.customMove = false
-				self.bugStunCallback = nil
-				self:EnableFlags(kPhysicsFlag_Friction, false) -- resume walking
-				self:TickPhysics()
-				if (callback) then
-					callback()
-				end
+	local f = function()
+		if (not self.dead) then
+			self.bugStun = false
+			self.bugStunCallback = nil
+			if (callback) then
+				callback()
 			end
 		end
+	end
+	
+	self.bugStun = true
+	self.bugStunCallback = callback
+	
+	local blend = self:PlayUninterruptable("bug_stun")
+	if (blend) then
 		blend.Seq(f)
 	end
+	
+	self.bugSounds.Stun:Play(kSoundChannel_FX, 0)
 end
 
 function PlayerPawn.BugStomp(self, callback)
@@ -1214,11 +1346,13 @@ function PlayerPawn.DoShieldSpark(self)
 	
 	local num = IntRand(1, 3)
 	self.shieldSounds.Spark:Play(kSoundChannel_FX, 0)
+	self:ShieldSpark()
 	
 	if (num > 1) then
 		local spark = function()
 			if (self.shieldActive) then
 				self.shieldSounds.Spark:Play(kSoundChannel_FX, 0)
+				self:ShieldSpark()
 			end
 		end
 		
@@ -1334,6 +1468,7 @@ function PlayerPawn.SaveState(self)
 		shieldActive = tostring(self.shieldActive),
 		animState = self.animState,
 		facing = tostring(vertex.pos[3]),
+		sheidlAutoActiveTime = tostring(self.shieldAutoActivateTime),
 		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
 	}
 	
@@ -1348,6 +1483,13 @@ function PlayerPawn.LoadState(self, state)
 	self.mines = nil
 		
 	self.pulseSounds.Hum:Stop()
+	self.shieldSpriteDamaged.dm:BlendTo({0,0,0,0}, 0)
+	self.shieldSpriteSpark.dm:BlendTo({0,0,0,0}, 0)
+	
+	if (self.shieldSparkTimer) then
+		self.shieldSparkTimer:Clean()
+		self.shieldSparkTimer = nil
+	end
 	
 	if (self.activeShieldSound) then
 		self.activeShieldSound:Stop()
@@ -1371,6 +1513,8 @@ function PlayerPawn.LoadState(self, state)
 		self.shield.dm:BlendTo({0,0,0,0}, 0)
 		self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	end
+	
+	self.shieldAutoActivateTime = tonumber(state.shieldAutoActivateTime)
 	
 	self:Show(state.visible == "true")
 	

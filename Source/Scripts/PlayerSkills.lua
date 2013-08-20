@@ -771,15 +771,15 @@ function PlayerSkills.Load(self)
 	self.ShieldDuration = Persistence.ReadNumber(SaveGame, "skills/ShieldDuration", 0)
 	self.ShieldRegen = Persistence.ReadNumber(SaveGame, "skills/ShieldRegen", 0)
 	self.PowerBubble = Persistence.ReadNumber(SaveGame, "skills/PowerBubble", 0)
-	self.MultiShield = 4--Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
+	self.MultiShield = Persistence.ReadNumber(SaveGame, "skills/MultiShield", 0)
 	self.Defender = Persistence.ReadNumber(SaveGame, "skills/Defender", 0)
 	
 	self.PulseRadius = Persistence.ReadNumber(SaveGame, "skills/PulseRadius", 0)
 	self.PulseRegen = Persistence.ReadNumber(SaveGame, "skills/PulseRegen", 0)
-	self.TriggerHappy = 1--Persistence.ReadNumber(SaveGame, "skills/TriggerHappy", 0)
+	self.TriggerHappy = Persistence.ReadNumber(SaveGame, "skills/TriggerHappy", 0)
 	self.PureEnergy = Persistence.ReadNumber(SaveGame, "skills/PureEnergy", 0)
 		
-	self.Mines = 1--Persistence.ReadNumber(SaveGame, "skills/Mines", 0)
+	self.Mines = Persistence.ReadNumber(SaveGame, "skills/Mines", 0)
 	self.Omega = Persistence.ReadNumber(SaveGame, "skills/Omega", 0)
 	
 	self.SkillPoints = Persistence.ReadNumber(SaveGame, "skillPoints", 0)
@@ -821,12 +821,18 @@ function PlayerSkills.AwardSkillPoints(self, num)
 end
 
 function PlayerSkills.ManipulateSkillLevel(self)
+	if (self.TheHand >= 2) then
+		return 99
+	end
 	return self.ManipulateSkill
 end
 
 function PlayerSkills.ManipulateRechargeTime(self)
 	if (self.Omega > 0) then
 		return 1
+	end
+	if (self.TheHand > 0) then
+		return 3
 	end
 	return PlayerSkills.Skills.ManipulateRegen[self.ManipulateRegen].Cooldown
 end

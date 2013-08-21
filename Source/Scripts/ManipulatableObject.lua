@@ -1124,7 +1124,8 @@ function ManipulatableObject.LookInDir(self, dir)
 		0, -- hold time
 		1,  -- max weight (how much towards the target we look, 1 = all the way)
 		1, -- smooth factor for in time, these serve to "tighten" or "loosen" the motion
-		1 -- smooth factor for out time
+		1, -- smooth factor for out time
+		0  -- never cull this look target based on view angle
 	)
 	
 end

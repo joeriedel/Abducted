@@ -55,7 +55,7 @@ function HUD.Print(self, icon, text, callback, useStringTable)
 		self.printer:PrintLeftAligned(
 			icon,
 			text,
-			1,
+			0.5,
 			3,
 			3,
 			1,
@@ -1693,6 +1693,7 @@ end
 
 function HUD.LoadState(self)
 	HUD.enabled = true
+	HUD.printer:Clear()
 	self.widgets.PowerBubble:SetVisible(false)
 	self.widgets.DropMine:SetVisible(false)
 	self.widgets.RapidPulse:SetVisible(false)

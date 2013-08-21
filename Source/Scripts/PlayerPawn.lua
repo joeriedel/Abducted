@@ -624,6 +624,17 @@ function PlayerPawn.InternalFirePulse(self, target, normal)
 		self:PulseLight(VecAdd(target, VecScale(normal, 32)))
 	end
 	
+	World.viewController:BlendToLookTarget(
+		target, -- target position to "look" at
+		0.2, -- in time
+		0.2, -- out time
+		0, -- hold time
+		0.6,  -- max weight (how much towards the target we look, 1 = all the way)
+		1.4, -- smooth factor for in time, these serve to "tighten" or "loosen" the motion
+		1.4, -- smooth factor for out time
+		0  -- never cull this look target based on view angle
+	)
+	
 	local localPos = self.model.dm:BonePos(self.model.handBone)
 	local start = self.model.dm:WorldBonePos(self.model.handBone)
 	local ray = VecSub(target, start)

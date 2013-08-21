@@ -223,13 +223,14 @@ function ViewController.AddLookTarget(self, target, shift, fov)
 	end
 	
 	local id = self:BlendToLookTarget(
-		VecAdd(target:WorldPos(), shift),
-		1,
-		1,
-		-1,
-		0.6,
-		1,
-		1
+		VecAdd(target:WorldPos(), shift), -- target position to "look" at
+		1, -- in time
+		1, -- out time
+		-1, -- hold time
+		0.6, -- max weight (how much towards the target we look, 1 = all the way)
+		1, -- smooth factor for in time, these serve to "tighten" or "loosen" the motion
+		1, -- smooth factor for out time
+		0.57 -- cull this look target based on view angle
 	)
 	
 	if (fov) then

@@ -88,9 +88,9 @@ function HUD.Load(self)
 	self.widgets = {}
 	self.widgets.Root = UI:CreateRoot(UI.kLayer_HUD)
 	
-	HUD.mobileInset = 75 * UI.identityScale[1]
-	HUD.mobileButtonSpace = 8 * UI.identityScale[2]
-	HUD.mobileButtonY = 22
+	HUD.mobileInset = 28 * UI.identityScale[1]
+	HUD.mobileButtonSpace = 16 * UI.identityScale[2]
+	HUD.mobileButtonY = 35 * UI.identityScale[2]
 	
 	HUD.pulseMode = "Normal"
 	
@@ -231,7 +231,7 @@ function HUD.Load(self)
 	local size = UI:MaterialSize(self.gfx.PowerBubble)
 	
 	self.widgets.PowerBubble = UIPushButton:Create(
-		{0, 0, size[3]*0.85, size[4]*0.85},
+		{0, 0, size[3], size[4]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.PowerBubble,
 			disabled = self.gfx.PowerBubbleDisabled,
@@ -246,7 +246,7 @@ function HUD.Load(self)
 	self.widgets.PowerBubble:SetVisible(false)
 	
 	self.widgets.DropMine = UIPushButton:Create(
-		{0, 0, size[3]*0.85, size[4]*0.85},
+		{0, 0, size[3], size[4]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.DropMine,
 			disabled = self.gfx.DropMineDisabled,
@@ -261,7 +261,7 @@ function HUD.Load(self)
 	self.widgets.DropMine:SetVisible(false)
 	
 	self.widgets.RapidPulse = UIPushButton:Create(
-		{0, 0, size[3]*0.85, size[4]*0.85},
+		{0, 0, size[3], size[4]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.RapidPulse,
 			disabled = self.gfx.RapidPulseDisabled,
@@ -629,8 +629,8 @@ function HUD.ShowPulseModesMobile(self, show)
 	local r = self.widgets.Pulse:Rect()
 	local pulseIconCenter = {r[1] + r[3]/2, r[2] + r[4]/2}
 	local space = 8 * UI.identityScale[1]
-	local startY = r[2] + r[4] + space
 	local buttonRect = self.widgets.PowerBubble:Rect()
+	local startY = r[2] + (r[4]-buttonRect[4])/2
 	local blendTime = 0.2
 	local rollOutTime = 0.2	
 	
@@ -638,32 +638,32 @@ function HUD.ShowPulseModesMobile(self, show)
 	local kButtonPositions = {
 		{ -- 1 button
 			{
-				pulseIconCenter[1] - buttonRect[3]/2,
+				r[1] - buttonRect[3],
 				startY
 			}
 		},
 		{ -- 2 buttons
 			{
-				pulseIconCenter[1] - buttonRect[3],
+				r[1] - buttonRect[3],
 				startY
 			},
 			{
-				pulseIconCenter[1],
-				startY
+				pulseIconCenter[1] - buttonRect[3],
+				startY + buttonRect[4] + space
 			}
 		},
 		{ -- 3 buttons
 			{
-				pulseIconCenter[1] - buttonRect[3],
+				r[1] - buttonRect[3],
 				startY
 			},
 			{
-				pulseIconCenter[1],
-				startY
+				pulseIconCenter[1] - buttonRect[3],
+				startY + buttonRect[4]
 			},
 			{
 				pulseIconCenter[1] - buttonRect[3]/2,
-				startY + buttonRect[4] + space
+				startY + (buttonRect[4]+space)*2
 			}
 		}
 	}

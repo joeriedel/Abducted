@@ -13,6 +13,8 @@ PlayerSkills.kPulseExplodeTime = {8, 10}
 
 PlayerSkills.Skills = {}
 
+cv_allskills = CVarFunc("allskills", "_cv_allskills")
+
 PlayerSkills.Skills.ManipulateRegen = {
 	Title = "SKILL_MANIPULATE_REGEN_TITLE",
 	ShortDescription = "SKILL_MANIPULATE_REGEN_SHORT_DESCRIPTION",
@@ -180,8 +182,6 @@ PlayerSkills.Skills.PulseRegen = {
 		Cost = 1200
 	}
 }
-
-
 
 PlayerSkills.Skills.ManipulateSkill = {
 	Title = "SKILL_MANIPULATE_SKILL_TITLE",
@@ -754,6 +754,36 @@ PlayerSkills.Skills.Omega = {
 		Cooldown = 1
 	}
 }
+
+function _cv_allskills()
+
+	PlayerSkills:GiveAllSkills()
+	
+end
+
+function PlayerSkills.GiveAllSkills(self)
+
+	self.ManipulateSkill = 2
+	self.ManipulateRegen = 4
+	self.MultiManipulate = 2
+	self.TheHand = 2
+	self.ShieldDuration = 3
+	self.ShieldRegen = 4
+	self.PowerBubble = 3
+	self.MultiShield = 4
+	self.Defender = 3
+	self.PulseRadius = 2
+	self.PulseRegen = 4
+	self.TriggerHappy = 3
+	self.PureEnergy = 3
+	self.Mines = 3
+	self.Omega = 1
+	
+	Arm:UpdateSkillsUI()
+	
+	HUD:Print(nil, "All Skills Enabled", nil, false)
+	
+end
 
 function PlayerSkills.Load(self)
 	self.Pulse = 0

@@ -307,7 +307,7 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 	
 	for k,v in pairs(block.widgets) do
 	
-		v:SetRect({iconRect[3], v.y, textArea, self.lineAdvance})
+		v:SetRect({iconRect[3], v.y, maxWidth, self.lineAdvance})
 	
 	end
 	
@@ -320,7 +320,7 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 		
 	LL_Insert(self.usedBlocks, block)
 		
-	local blockRect = {iconRect[3], 0, textArea, height}
+	local blockRect = {iconRect[3], 0, maxWidth+iconRect[3], height}
 	return block, blockRect
 end
 

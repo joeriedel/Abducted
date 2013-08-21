@@ -29,11 +29,13 @@ function HUD.CreatePrinter(self)
 		local rect = self.widgets.Arm:Rect()
 		
 		HUD.printerRect = {
-			8*UI.identityScale[1],
-			rect[2] + rect[4] + 8,
+			0,
+			8,
 			UI.screenWidth * 0.4,
 			UI.screenHeight
 		}
+		
+		HUD.printerRect[1] = (UI.screenWidth - HUD.printerRect[3])/2
 	else
 		HUD.printerRect = {
 			0,
@@ -52,7 +54,7 @@ end
 function HUD.Print(self, icon, text, callback, useStringTable)
 
 	if (UI.mode == kGameUIMode_Mobile) then
-		self.printer:PrintLeftAligned(
+		self.printer:PrintHCentered(
 			icon,
 			text,
 			0.5,

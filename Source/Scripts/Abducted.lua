@@ -64,6 +64,9 @@ end
 
 function Abducted.SaveCheckpoint(self)
 	if (not World.playerPawn.dead) then
+		if (self.showCheckpointNotification) then
+			HUD:Print(nil, "CHECKPOINT_SAVED")
+		end
 		GameDB:SaveCheckpoint()
 	end
 end

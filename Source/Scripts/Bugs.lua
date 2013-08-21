@@ -806,7 +806,7 @@ function Bug.CheckGroupAttack(self)
 	end
 	
 	local killMessage = Bug.KillMessages[IntRand(1, #Bug.KillMessages)]
-	World.playerPawn:Kill(killMessage)
+	World.playerPawn:Damage(50, self, killMessage)
 	World.playerPawn.bugSounds.Eaten:Play(kSoundChannel_FX, 0)
 	
 	-- crawl over her body
@@ -854,7 +854,7 @@ function Bug.CheckStomp(self)
 	end
 
 	local f = function()
-		self:Kill(World.playerPawn)
+		self:Damage(Bug.Health, World.playerPawn)
 	end
 
 	self.think = nil

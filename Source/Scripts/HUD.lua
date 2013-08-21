@@ -12,11 +12,69 @@ function HUD.Spawn(self)
 	HUD.enabled = true
 	HUD.visible = true
 	
+	HUD:CreatePrinter()
+		
 	World.globalTimers:Add(
 		function () HUD:Think() end,
 		0,
 		true
 	)
+end
+
+function HUD.CreatePrinter(self)
+
+	local typeface = World.Load("UI/HUD_TF")
+	
+	if (UI.mode == kGameUIMode_Mobile) then
+		local rect = self.widgets.Arm:Rect()
+		
+		HUD.printerRect = {
+			8*UI.identityScale[1],
+			rect[2] + rect[4] + 8,
+			UI.screenWidth * 0.4,
+			UI.screenHeight
+		}
+	else
+		HUD.printerRect = {
+			0,
+			0,
+			UI.screenWidth * 0.4,
+			UI.screenHeight
+		}
+		
+		HUD.printerRect[1] = UI.screenWidth - HUD.printerRect[3]
+	end
+	
+	HUD.printer = TextPrinter:New(typeface, HUD.printerRect, 5, 50, nil, UI.widgets.hudprint.Root)
+
+end
+
+function HUD.Print(self, icon, text, callback, useStringTable)
+
+	if (UI.mode == kGameUIMode_Mobile) then
+		self.printer:PrintLeftAligned(
+			icon,
+			text,
+			1,
+			3,
+			3,
+			1,
+			callback,
+			useStringTable
+		)
+	else
+		self.printer:PrintRightAligned(
+			icon,
+			text,
+			1,
+			3,
+			3,
+			1,
+			callback,
+			useStringTable
+		)
+	end
+	
 end
 
 function HUD.SetVisible(self, visible)

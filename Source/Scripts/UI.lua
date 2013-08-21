@@ -18,12 +18,11 @@ UI.kLayer_SolveGame = 9
 UI.kLayer_SolveGame2 = 10
 UI.kLayer_SolveGame3 = 11
 UI.kLayer_SolveGame4 = 12
-UI.kLayer_LB = 13
+UI.kLayer_HUDPrint = 13
 UI.kLayer_AlertPanel = 14
-UI.kLayer_Notifications = 15
-UI.kLayer_Feedback = 16
-UI.kLayer_FX = 17
-UI.kLayer_Debug = 18
+UI.kLayer_Feedback = 15
+UI.kLayer_FX = 16
+UI.kLayer_Debug = 17
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -156,6 +155,7 @@ end
 
 function UI.LoadShared(self)
 	self.gfx.Solid = World.Load("UI/Solid_M")
+	self.gfx.CaretBlink = World.Load("UI/CaretBlink_M")
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
 	self.gfx.SolidButton = World.Load("UI/arm_buttons_solid_M")
@@ -184,6 +184,8 @@ end
 
 function UI.InitMap(self)
 	UI:CreateInteractiveLayer()
+	UI:CreateHUDPrintLayer()
+	
 	self.gfx.Glyphs = {}
 	
 	for i=1,27 do
@@ -203,6 +205,11 @@ end
 function UI.CreateInteractiveLayer(self)
 	self.widgets.interactive = {}
 	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive, UI.InteractiveLayerOnInputEvent)
+end
+
+function UI.CreateHUDPrintLayer(self)
+	self.widgets.hudprint = {}
+	self.widgets.hudprint.Root = UI:CreateRoot(UI.kLayer_HUDPrint)
 end
 
 function UI.CreateFeedbackLayer(self)

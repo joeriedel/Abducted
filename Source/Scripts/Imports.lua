@@ -29,6 +29,7 @@ Import("GameDB")
 Import("EventLog")
 Import("FlyCam")
 Import("PostFX")
+Import("TextPrinter")
 
 -- // Entities // --
 Import("Entity")

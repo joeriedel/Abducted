@@ -159,6 +159,9 @@ function Game.OnEvent(self, cmd, args)
 			self:OnMainMenuCommand(cmds, args)
 		end
 		return true
+	elseif (cmd == "hudprint") then
+		HUD:Print(nil, args)
+		return true
 	elseif (cmd == "load") then
 		self:LoadLevel(args)
 		return true

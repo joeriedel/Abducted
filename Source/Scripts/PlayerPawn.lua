@@ -1045,7 +1045,7 @@ function PlayerPawn.BugStun(self, callback)
 	
 	local blend = self:PlayUninterruptable("bug_stun")
 	if (blend) then
-		blend.Seq(f)
+		blend.And(f)
 	end
 	
 	self.bugSounds.Stun:Play(kSoundChannel_FX, 0)

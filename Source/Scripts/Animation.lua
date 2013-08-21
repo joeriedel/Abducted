@@ -68,7 +68,9 @@ function Animation.Play(entity, state, model, restart)
 				model:BlendToState(x, nil, restart, entity, blend)
 			end
 		end
+		
 		LL_Append(entity.animationStates.chain, {seq=state})
+		
 		return blend
 	end
 	

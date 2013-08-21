@@ -420,6 +420,14 @@ function Bug.UpdateRandomMove(self, moveCompleteCallback)
 						COutLine(kC_Debug, "Bug.RandomMove")
 					end
 					return -- success
+				elseif (self:ExecuteMove(fp)) then
+					self.angle = angle
+					self.busy = true
+					self.floorMoveCallback = moveCompleteCallback
+					if (Bug.DebugMessages) then
+						COutLine(kC_Debug, "Bug.RandomMove")
+					end
+					return -- success
 				else
 					COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - CreateFloorMove() failed.")
 					self:Stop()

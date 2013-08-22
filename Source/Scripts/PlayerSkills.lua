@@ -7,8 +7,8 @@ PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
 PlayerSkills.UnlimitedSkillPointsCheat = true
 PlayerSkills.RefundFraction = 0.75
-PlayerSkills.kPulseBaseDamageRadius = 50
-PlayerSkills.kPulseBaseDamage = 100
+PlayerSkills.kPulseBaseDamageRadius = 80
+PlayerSkills.kPulseBaseDamage = 120
 PlayerSkills.kPulseExplodeTime = {8, 10}
 
 PlayerSkills.Skills = {}

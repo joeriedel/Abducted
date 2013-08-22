@@ -38,16 +38,14 @@ function Light.Spawn(self)
 	local specularColor = Vec3ForString(self.keys.specularColor, {1,1,1})
 	self.light:SetSpecularColor(specularColor)
 	
---	local shadowColor = {0,0,0,1}
---	self.light:SetShadowColor(shadowColor)
-	
 	self.light:SetPos(self:WorldPos())
 	
 	local radius = NumberForString(self.keys.radius, 400)
 	self.light:SetRadius(radius)
 	
 	self.intensity = NumberForString(self.keys.intensity, 1)
-	self.light:SetIntensity(self.intensity)
+	self.light:SetIntensity(math.max(0, self.intensity))
+	self.light:SetShadowWeight(self.intensity)
 	
 	local flags = NumberForString(self.keys.flags, 59)
 	local style = 0
@@ -66,20 +64,15 @@ function Light.Spawn(self)
 	
 	self.light:SetStyle(style)
 	
-	style = StringForString(self.keys.style, "none")
-	if (style == "pslow") then
-        self:SlowPulse() --SlowPulse()
-    elseif (style == "pfast") then
-        self:FastPulse() --FastPulse()
-    elseif (style == "fslow") then
-        self:SlowFlash() --SlowFlash()
-    elseif (style == "ffast") then
-        self:FastFlash() --Fastflash()
-	elseif (style == "wiflicker") then -- intermittent flickering
-		self:WeakIntermittentFlicker()
-	elseif (style == "siflicker") then -- intermittent flickering
-		self:StrongIntermittentFlicker()
-    end
+	self:SetStyle(StringForString(self.keys.style, "none"))
+	
+	local state = StringForString(self.keys.state, "on")
+	
+	if (state == "on") then
+		self:TurnOn(0)
+	else
+		self:TurnOff(0)
+	end
 	
 	local interactions = 0
 	
@@ -98,6 +91,66 @@ function Light.Spawn(self)
 	self.light:SetInteractionFlags(interactions)
 	
 	self.light:Link()
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
+end
+
+function Light.TurnOn(self, time)
+	if (self.state == "on") then
+		return
+	end
+	
+	self.state = "on"
+	self.light:FadeTo(1, time)
+	
+end
+
+function Light.TurnOff(self, time)
+	if (self.state == "off") then
+		return
+	end
+	
+	self.state = "off"
+	self.light:FadeTo(0, time)
+end
+
+function Light.SetStyle(self, style)
+	if (self.style == style) then
+		return
+	end
+	
+	if (style == "none") then
+		self.think = nil
+		self.light:SetIntensity(self.intensity)
+	elseif (style == "pslow") then
+        self:SlowPulse() --SlowPulse()
+    elseif (style == "pfast") then
+        self:FastPulse() --FastPulse()
+    elseif (style == "fslow") then
+        self:SlowFlash() --SlowFlash()
+    elseif (style == "ffast") then
+        self:FastFlash() --Fastflash()
+	elseif (style == "wiflicker") then -- intermittent flickering
+		self:WeakIntermittentFlicker()
+	elseif (style == "siflicker") then -- intermittent flickering
+		self:StrongIntermittentFlicker()
+	elseif (style == "lightning") then
+		self:Lightning()
+	else
+		return false -- unrecognized style
+    end
+    
+    self.style = style
+    return true
 end
 
 function Light.SlowPulse(self)
@@ -105,6 +158,7 @@ function Light.SlowPulse(self)
 		{ intensity = 0, time = 3 },
 		{ intensity = self.intensity, time = 3 }
 	}
+	self.think = nil
 	self.light:AnimateIntensity(steps, true)
 end
 
@@ -113,6 +167,7 @@ function Light.FastPulse(self)
 		{ intensity = 0, time = .25 },
 		{ intensity = self.intensity, time = .25 }
 	}
+	self.think = nil
 	self.light:AnimateIntensity(steps, true)
 end
 
@@ -123,6 +178,7 @@ function Light.SlowFlash(self)
         { intensity = self.intensity, time = 0 },
         { intensity = self.intensity, time = .25 }
 	}
+	self.think = nil
 	self.light:AnimateIntensity(steps, true)
 end
 
@@ -133,7 +189,81 @@ function Light.FastFlash(self)
         { intensity = self.intensity, time = 0},
         { intensity = self.intensity, time = .125}
 	}
+	self.think = nil
 	self.light:AnimateIntensity(steps, true)
+end
+
+function Light.AddLightningCommands(self, flickerTable, numFlashes, speed, holdTime, fadeOutTime, intensityScale)
+
+	for i=1,numFlashes do
+		
+		local step = {
+			intensity = self.intensity * FloatRand(intensityScale, 1)
+		}
+		
+		step.time = FloatRand(speed[1], speed[2])
+		
+		table.insert(flickerTable, step)
+		
+		if (i == numFlashes) then
+			-- hold this intenstiy
+			step.time = FloatRand(holdTime[1], holdTime[2])
+			table.insert(flickerTable, step)
+			step.intensity = 0
+			step.time = FloatRand(fadeOutTime[1], fadeOutTime[2])
+			table.insert(flickerTable, step)
+		end
+	
+	end
+
+end
+
+function Light.Lightning(self, singleShot)
+
+	if (self.lighting == nil) then
+		self.lighting = {}
+		for i=1,5 do -- generate 5 sets of random lighting
+			local steps = {}
+			self:AddLightningCommands(
+				steps,
+				IntRand(12, 18),
+				{0.05, 0.08},
+				{0.5, 0.7},
+				{0.3, 0.6},
+				0
+			)
+			table.insert(self.lighting, steps)
+		end
+	end
+	
+	self.flickers = self.lighting
+	self.nextFlicker = IntRand(1, #self.lighting)
+	
+	if (singleShot) then
+		self.mode = "singleshot"
+	else
+		self.mode = "continuous"
+	end
+	
+	self.think = Light.LightningThink
+	self:think()
+	
+end
+
+function Light.LightningThink(self)
+
+	if (self.nextFlicker > #self.flickers) then
+		self.nextFlicker = 1
+	end
+	self.light:AnimateIntensity(self.flickers[self.nextFlicker], false)
+	
+	if (self.mode == "singleshot") then
+		self.think = nil
+	else
+		self.nextFlicker = self.nextFlicker + 1
+		self:SetNextThink(FloatRand(3, 7))
+	end
+	
 end
 
 function Light.AddFlickerCommands(self, flickerTable, duration, intensityScale)
@@ -156,15 +286,18 @@ end
 
 function Light.WeakIntermittentFlicker(self)
 
-	self.nextFlicker = 1
-	self.flickers = {}
-	self.mode = "hold"
-	
-	for i=1,5 do -- generate 5 sets of randoms flickers
-		local steps = {}
-		self:AddFlickerCommands(steps, 2, 0.8)
-		table.insert(self.flickers, steps)
+	if (self.wiflickers == nil) then
+		self.wiflickers = {}
+		for i=1,5 do -- generate 5 sets of random flickers
+			local steps = {}
+			self:AddFlickerCommands(steps, 2, 0.8)
+			table.insert(self.wiflickers, steps)
+		end
 	end
+	
+	self.nextFlicker = 1
+	self.flickers = self.wiflickers
+	self.mode = "hold"
 	
 	self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full to start
 	
@@ -175,15 +308,18 @@ end
 
 function Light.StrongIntermittentFlicker(self)
 
-	self.nextFlicker = 1
-	self.flickers = {}
-	self.mode = "hold"
-	
-	for i=1,5 do -- generate 5 sets of randoms flickers
-		local steps = {}
-		self:AddFlickerCommands(steps, 2, 0.2) -- NOTE: Strong flicker means the light gets closer to black (intensityScale is 0.2)
-		table.insert(self.flickers, steps)
+	if (self.siflickers == nil) then
+		self.siflickers = {}
+		for i=1,5 do -- generate 5 sets of random flickers
+			local steps = {}
+			self:AddFlickerCommands(steps, 2, 0.2) -- NOTE: Strong flicker means the light gets closer to black (intensityScale is 0.2)
+			table.insert(self.siflickers, steps)
+		end
 	end
+	
+	self.nextFlicker = 1
+	self.flickers = self.siflickers
+	self.mode = "hold"
 	
 	self.light:AnimateIntensity({{intensity=self.intensity, time=0}}, false) -- light is on at full to start
 	
@@ -214,6 +350,43 @@ end
 
 function Light.OnEvent(self, cmd, args)
 	COutLineEvent("Light", cmd, args)
+	
+	if (cmd == "on") then
+		self:TurnOn(tonumber(args))
+		return true
+	elseif (cmd == "off") then
+		self:TurnOff(tonumber(args))
+		return true
+	elseif (cmd == "style") then
+		self:SetStyle(args)
+		return true
+	elseif (cmd == "flashlightning") then
+		self:Lightning(true)
+		return rtue
+	end
+end
+
+function Light.SaveState(self)
+	local state = {
+		state = self.state,
+		style = self.style
+	}
+	
+	return state
+end
+
+function Light.LoadState(self, state)
+	self.state = nil
+	self.style = nil
+	self.think = nil
+	
+	if (state.state == "on") then
+		self:TurnOn(0)
+	else
+		self:TurnOff(0)
+	end
+	
+	self:SetStyle(state.style)
 end
 
 info_dynlight = Light

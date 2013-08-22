@@ -5,13 +5,21 @@
 
 TextPrinter = Class:New()
 
-function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lineSpace, root, timeBase)
+function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lineSpace, root, fontScale, timeBase)
 
 	local self = Class.New(TextPrinter)
 	self.typeface = typeface
 	
 	if (timeBase == nil) then
 		timeBase = World.globalTimers
+	end
+	
+	if (fontScale == nil) then
+		self.fontScale = UI.fontScale
+		self.invFontScale = UI.invFontScale
+	else
+		self.fontScale = fontScale
+		self.invFontScale = {1/fontScale[1], 1/fontScale[2]}
 	end
 	
 	self.timers = timeBase
@@ -23,14 +31,14 @@ function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lin
 		root:AddChild(self.panel)
 	end
 	
-	local ascenderSize = typeface:AscenderDescender() * UI.fontScale[2]
+	local ascenderSize = typeface:AscenderDescender() * self.fontScale[2]
 	self.caretSize = {
 		ascenderSize * 0.75,
 		ascenderSize
 	}
 	
 	self.caretSpace = 8*UI.identityScale[1]
-	self.lineAdvance = UI:FontAdvanceSize(typeface)
+	self.lineAdvance = UI:FontAdvanceSize(typeface, self.fontScale)
 
 	if (lineSpace) then
 		self.lineAdvance = self.lineAdvance + (lineSpace*UI.identityScale[1])
@@ -59,6 +67,13 @@ function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lin
 	self.freeIcons = LL_New()
 
 	return self
+end
+
+function TextPrinter.SetRect(self, rect)
+
+	self.panel:SetRect(rect)
+	self.panelRect = {0, 0, rect[3], rect[4]}
+
 end
 
 function TextPrinter.Clear(self)
@@ -271,7 +286,7 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 	
 	for k,line in pairs(lines) do
 		if (line:len() > 0) then
-			local strings = UI:WordWrap(self.typeface, line, textArea)
+			local strings = UI:WordWrap(self.typeface, line, textArea, self.invFontScale)
 			
 			for k,v in pairs(strings) do
 				local w = self:GetTextWidget()
@@ -281,7 +296,7 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 				w.done = false
 				w.y = height
 						
-				local lineWidth = UI:StringDimensions(self.typeface, v)
+				local lineWidth = UI:StringDimensions(self.typeface, v, self.fontScale)
 				maxWidth = math.max(lineWidth, maxWidth)
 				
 				if (k == #block.lines) then
@@ -347,9 +362,9 @@ function TextPrinter.TickBlock(self, block, dt)
 		local chars = utf32:sub(1, block.char)
 		local utf8 = System.UTF32To8(chars)
 				
-		UI:SetLabelText(w, utf8)
+		UI:SetLabelText(w, utf8, self.fontScale)
 		
-		local lineWidth = UI:StringDimensions(self.typeface, utf8)
+		local lineWidth = UI:StringDimensions(self.typeface, utf8, self.fontScale)
 		
 		-- move caret after character
 		self.caret:MoveTo({block.x+lineWidth+self.caretSpace, block.y+w.y}, {0,0})
@@ -367,10 +382,6 @@ function TextPrinter.TickBlock(self, block, dt)
 				if (block.caretEndDelay > 0) then
 					local f = function()
 						self:FinishBlock(block)
-					end
-					if (block.callback) then
-						block.callback()
-						block.callback = nil
 					end
 					self.caret:SetMaterial(UI.gfx.CaretBlink)
 					block.timer = self.timers:Add(f, block.caretEndDelay)
@@ -406,7 +417,7 @@ function TextPrinter.AnimateBlock(self, block)
 		block.timer = self.timers:Add(f, block.caretStartDelay)
 	else
 		self.caret:SetMaterial(UI.gfx.Solid)
-		block.timer = self.timers:Add(tick, 0)
+		block.timer = self.timers:Add(tick, 0, true)
 	end
 
 end
@@ -442,7 +453,7 @@ function TextPrinter.FinishBlock(self, block)
 	for k,v in pairs(block.lines) do
 		local w = block.widgets[k]
 		if (not w.done) then
-			UI:SetLabelText(w, System.UTF32To8(v))
+			UI:SetLabelText(w, System.UTF32To8(v), self.fontScale)
 			w.done = true
 		end
 	end
@@ -475,7 +486,7 @@ function TextPrinter.QueueBlockFade(self, block)
 			self:FadeBlock(block)
 		end
 		block.timer = self.timers:Add(f, block.timeToLive)
-	else
+	elseif (block.timeToLive == 0) then
 		self:FadeBlock(block)
 	end
 

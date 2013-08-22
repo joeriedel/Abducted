@@ -1696,6 +1696,7 @@ end
 function HUD.LoadState(self)
 	HUD.enabled = true
 	HUD.printer:Clear()
+	HUD.printer.timers = World.globalTimers
 	self.widgets.PowerBubble:SetVisible(false)
 	self.widgets.DropMine:SetVisible(false)
 	self.widgets.RapidPulse:SetVisible(false)

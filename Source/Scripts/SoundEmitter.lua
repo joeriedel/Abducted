@@ -155,7 +155,7 @@ end
 
 function SoundEmitter.SaveState(self)
 	local state = {
-		on = tostring(self.on)
+		on = tostring(self.on and self.sound:Playing())
 	}
 	
 	state.volume = tostring(self.volume)

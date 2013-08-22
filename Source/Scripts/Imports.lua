@@ -30,6 +30,7 @@ Import("EventLog")
 Import("FlyCam")
 Import("PostFX")
 Import("TextPrinter")
+Import("TitleCrawl")
 
 -- // Entities // --
 Import("Entity")

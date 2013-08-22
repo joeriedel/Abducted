@@ -23,7 +23,7 @@ function MainMenu.Initialize(self)
 	
 	self.think = Game.Think
 	self:SetNextThink(0)
-	
+
 end
 
 function MainMenu.Load(self)
@@ -120,6 +120,10 @@ function MainMenu.InitUI(self)
 	self:InitNewGame()
 	self:InitLoadGame()
 	
+end
+
+function MainMenu.OnLevelStart(self)
+	UI:FadeIn(1)
 end
 
 function MainMenu.PlayCinematic(self, name, flags, xfadeCamera)

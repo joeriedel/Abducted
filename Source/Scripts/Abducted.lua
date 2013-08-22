@@ -20,6 +20,7 @@ function Abducted.Initialize(self)
 	PlayerInput:Spawn()
 	HUD:Spawn()
 	Arm:Spawn()
+	TitleCrawl:Spawn()
 	ManipulatableObjectUI:Spawn()
 	TerminalScreen.StaticInit()
 	
@@ -31,7 +32,6 @@ end
 
 function Abducted.PostSpawn(self)
 	Game.PostSpawn(self)
-	Cinematics:PlayLevelCinematics()
 end
 
 function Abducted.OnLevelStart(self)
@@ -39,14 +39,41 @@ function Abducted.OnLevelStart(self)
 	if (GameDB:LoadingSaveGame()) then
 		COutLine(kC_Debug, "Loading checkpoint!")
 		self:LoadCheckpoint()
+		UI:FadeIn(1)
+		TitleCrawl:Clear()
 	else
-		local f = function()
-			self.showCheckpointNotification = false
-			World.RequestGenerateSaveGame()
-		end
-		World.globalTimers:Add(f, 0.25) -- let scripts and stuff fire to set states
+		local title = World.worldspawn.keys.title or "MISSING_TITLE"
+		local subtitle = World.worldspawn.keys.subtitle or World.worldspawn.keys.mappath
+			
+		World.PauseGame(true)
+		TitleCrawl:Print(title, subtitle, function() self:FinishTitleCrawl() end)
 	end
 	
+end
+
+function Abducted.FinishTitleCrawl(self)
+	UI:BlendTo({1,1,1,1}, 0.3)
+	
+	local f = function()
+		UI:BlendTo({1,1,1,0}, 0.3)
+		TitleCrawl:Clear()
+		self:StartGame()
+	end
+	
+	World.globalTimers:Add(f, 0.3)
+end
+
+function Abducted.StartGame(self)
+	World.PauseGame(false)
+	
+	local f = function()
+		local f = function()
+			self:VisibleCheckpoint()
+		end
+		World.globalTimers:Add(f, 0.25)
+	end
+	
+	Cinematics:PlayLevelCinematics(f)
 end
 
 function Abducted.VisibleCheckpoint(self)
@@ -59,6 +86,8 @@ function Abducted.LoadCheckpoint(self)
 	World.globalTimers = TimerList:Create()
 	World.gameTimers.time = Game.time or 0
 	World.globalTimers.time = Game.sysTime or 0
+	TitleCrawl.titlePrinter.timers = World.globalTimers
+	TitleCrawl.subtitlePrinter.timers = World.globalTimers
 	GameDB:LoadCheckpoint()
 end
 

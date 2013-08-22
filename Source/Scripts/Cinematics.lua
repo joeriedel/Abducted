@@ -8,7 +8,7 @@ Cinematics.busy = 0
 Cinematics.Active = LL_New()
 Cinematics.Persistent = LL_New()
 
-function Cinematics.Play(self, args, time, originEntity)
+function Cinematics.Play(self, args, time, originEntity, callback)
 		
 	x = Tokenize(args)
 	local animateCamera = not FindArrayElement(x, "camera=no")
@@ -50,6 +50,9 @@ function Cinematics.Play(self, args, time, originEntity)
 				if (item.persistent) then
 					LL_Remove(Cinematics.Persistent, item.persistent)
 				end
+				if (callback) then
+					callback()
+				end
 			end
 		}
 		if (not World.PlayCinematic(x[1], flags, 0, originEntity, Game.entity, callbacks)) then
@@ -58,6 +61,9 @@ function Cinematics.Play(self, args, time, originEntity)
 				LL_Remove(Cinematics.Persistent, item.persistent)
 			end
 			time = nil
+			if (callback) then
+				callback()
+			end
 		end
 	else
 		local callbacks = {
@@ -73,6 +79,9 @@ function Cinematics.Play(self, args, time, originEntity)
 				if (Cinematics.busy == 0) then
 					HUD:SetVisible(true)
 				end
+				if (callback) then
+					callback()
+				end
 			end
 		}
 		
@@ -87,6 +96,9 @@ function Cinematics.Play(self, args, time, originEntity)
 				LL_Remove(Cinematics.Persistent, item.persistent)
 			end
 			time = nil
+			if (callback) then
+				callback()
+			end
 		end
 	end
 	
@@ -117,11 +129,11 @@ function Cinematics.Stop(self, name)
 
 end
 
-function Cinematics.PlayLevelCinematics(self)
+function Cinematics.PlayLevelCinematics(self, introCompleteCallback)
 	World.PlayCinematic("environment", kCinematicFlag_CanPlayForever, 0)
 	World.PlayCinematic("environment_loop", kCinematicFlag_Loop, 0)
 	if (not GameDB.loadingCheckpoint) then
-		Cinematics:Play("intro")
+		Cinematics:Play("intro", nil, nil, introCompleteCallback)
 	end
 end
 

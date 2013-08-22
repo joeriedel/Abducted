@@ -127,7 +127,9 @@ function Arm.SpawnSkills(self)
 		{rect={self.skillsTitleRect[1], self.skillsTitleRect[2]+self.skillsTitleRect[4], self.skillsTextRect[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
 	)
 	w:SetBlendWithParent(true)
+	w:SetVisible(false)
 	self.widgets.skills.Root:AddChild(w)
+	self.widgets.skills.Line1 = w
 	
 	w = UI:CreateWidget("MatWidget",
 		{rect={self.skillsTreeRect[1], self.skillsTreeRect[2]+self.skillsTreeRect[4], self.skillsRootWorkspaceSize[3], 10*UI.identityScale[2]}, material=self.gfx.SkillsHorzLine1}
@@ -597,6 +599,8 @@ function Arm.SelectSkill(self, skill)
 		0,
 		StringTable.Get(skill.ShortDescription)
 	)
+	
+	self.widgets.skills.Line1:SetVisible(true)
 	
 	self.widgets.skills.DescriptionDivider:MoveTo({0, r[2]+r[4]+(10*UI.identityScale[2])}, {0,0})
 	self.widgets.skills.DescriptionDivider:SetVisible(true)

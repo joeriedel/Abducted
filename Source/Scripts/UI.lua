@@ -22,7 +22,8 @@ UI.kLayer_SolveGame4 = 13
 UI.kLayer_AlertPanel = 14
 UI.kLayer_Feedback = 15
 UI.kLayer_FX = 16
-UI.kLayer_Debug = 17
+UI.kLayer_TitleCrawl = 17
+UI.kLayer_Debug = 18
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -146,10 +147,6 @@ function UI.Spawn(self)
 	
 end
 
-function UI.OnLevelStart(self)
-	UI:FadeIn(1)
-end
-
 function UI.Think(self)
 end
 
@@ -185,6 +182,7 @@ end
 function UI.InitMap(self)
 	UI:CreateInteractiveLayer()
 	UI:CreateHUDPrintLayer()
+	UI:CreateTitleCrawlLayer()
 	
 	self.gfx.Glyphs = {}
 	
@@ -210,6 +208,11 @@ end
 function UI.CreateHUDPrintLayer(self)
 	self.widgets.hudprint = {}
 	self.widgets.hudprint.Root = UI:CreateRoot(UI.kLayer_HUDPrint)
+end
+
+function UI.CreateTitleCrawlLayer(self)
+	self.widgets.titlecrawl = {}
+	self.widgets.titlecrawl.Root = UI:CreateRoot(UI.kLayer_TitleCrawl)
 end
 
 function UI.CreateFeedbackLayer(self)

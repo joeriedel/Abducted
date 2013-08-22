@@ -17,7 +17,21 @@ GameDB.Portraits = {
 	"UI/portrait3_M",
 	"UI/portrait4_M"
 }
+
+function GameDB.ValidCheckpoint(self)
+
+	-- we may have old checkpoint data from a previously loaded map if
+	-- we crashed or otherwise were interrupted before the intro cinematics
+	-- of this map completed.
+	--
+	-- In this case we never got passed that point so don't load checkpoint state
+	-- from an old map into this one!
 	
+	local checkpointmap = Persistence.ReadString(SaveGame, "checkpointmap")
+	return checkpointmap and (checkpointmap == World.worldspawn.keys.mappath)
+	
+end
+
 function GameDB.Load(self)
 
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
@@ -29,6 +43,11 @@ function GameDB.Load(self)
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
+		
+	Persistence.WriteBool(Session, "loadCheckpoint", false)
+	Session:Save()
+	
+	self.loadingCheckpoint = self.loadingCheckpoint and self:ValidCheckpoint()
 	
 	self:LoadTime()
 	self:LoadChatLockouts()
@@ -43,6 +62,7 @@ end
 function GameDB.SaveCheckpoint(self)
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
+	Persistence.WriteString(SaveGame, "checkpointmap", World.worldspawn.keys.mappath)
 	GameDB:SaveEvents()
 	GameDB:SavePeristentObjects()
 	Game.entity:SaveState()
@@ -50,10 +70,8 @@ function GameDB.SaveCheckpoint(self)
 end
 
 function GameDB.LoadCheckpoint(self)
-	World.MarkTempEntsForGC()
 	GameDB:Load()
-	Persistence.WriteBool(Session, "loadCheckpoint", false)
-	Session:Save()
+	World.MarkTempEntsForGC()
 	self.loadingCheckpoint = true
 	TerminalScreen.CancelUI()
 	Game.entity:LoadState()

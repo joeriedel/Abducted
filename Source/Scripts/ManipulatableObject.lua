@@ -359,8 +359,13 @@ function ManipulatableObject.OnDamage(self, targets)
 end
 
 function ManipulatableObject.Dormant(self)
-	COutLine(kC_Debug, "ManipulatableObject.Dormant")
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Dormant - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
 	
+	COutLine(kC_Debug, "ManipulatableObject.Dormant")
+
 	self.awake = false
 	
 	self.think = nil
@@ -382,6 +387,11 @@ function ManipulatableObject.Dormant(self)
 end
 
 function ManipulatableObject.Dormant2(self)
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Dormant2 - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
+	
 	COutLine(kC_Debug, "ManipulatableObject.Dormant2")
 	
 	self.awake = false
@@ -408,6 +418,11 @@ function ManipulatableObject.Dormant2(self)
 end
 
 function ManipulatableObject.Sleep(self)
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Sleep - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
+	
 	COutLine(kC_Debug, "ManipulatableObject.Sleep")
 	
 	self.think = nil
@@ -441,7 +456,13 @@ function ManipulatableObject.Sleep(self)
 end
 
 function ManipulatableObject.Awaken(self)
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Awaken - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
+	
 	COutLine(kC_Debug, "ManipulatableObject.Awaken")
+	
 	self.think = nil
 	self.awake = true
 	self.canAttack = true
@@ -479,6 +500,11 @@ function ManipulatableObject.Awaken(self)
 end
 
 function ManipulatableObject.Idle(self)
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Idle - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
+	
 	COutLine(kC_Debug, "ManipulatableObject.Idle")
 	self.think = nil
 	self.awake = true
@@ -508,6 +534,11 @@ function ManipulatableObject.Idle(self)
 end
 
 function ManipulatableObject.Attack(self)
+	if (self.saveManipulateDir) then
+		COutLine(kC_Debug, "ManipulatableObject.Attack - Ignored, object permanently manipualated.")
+		return -- we have been permanently manipulated, ignore changes in state
+	end
+	
 	if (not (self.canAttack and self.canDamage)) then
 		COutLine(kC_Debug, "ManipulatableObject.Attack(ignored): cannot attack right now.")
 		return

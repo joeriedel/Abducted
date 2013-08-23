@@ -86,8 +86,12 @@ function Abducted.LoadCheckpoint(self)
 	World.globalTimers = TimerList:Create()
 	World.gameTimers.time = Game.time or 0
 	World.globalTimers.time = Game.sysTime or 0
-	TitleCrawl.titlePrinter.timers = World.globalTimers
-	TitleCrawl.subtitlePrinter.timers = World.globalTimers
+	if (TitleCrawl.titlePrinter) then
+		TitleCrawl.titlePrinter.timers = World.globalTimers
+	end
+	if (TitleCrawl.subtitlePrinter) then
+		TitleCrawl.subtitlePrinter.timers = World.globalTimers
+	end
 	GameDB:LoadCheckpoint()
 end
 

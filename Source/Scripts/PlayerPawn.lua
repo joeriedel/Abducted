@@ -1492,6 +1492,7 @@ function PlayerPawn.LoadState(self, state)
 	
 	self.dead = false
 	self.disableAnimTick = false
+	self.bugStun = false
 	self.state = "idle"
 	self.mines = nil
 		

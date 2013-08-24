@@ -50,6 +50,7 @@ function Abducted.OnLevelStart(self)
 			TitleCrawl:Print(title, subtitle, function() self:FinishTitleCrawl() end)
 		else
 			UI:FadeIn(1)
+			TitleCrawl:Clear()
 			self:StartGame()
 		end
 	end

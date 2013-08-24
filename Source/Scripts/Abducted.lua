@@ -178,6 +178,9 @@ function Abducted.InputGestureFilter(self, g)
 end
 
 function Abducted.OnInputEvent(self, e)
+	if (TitleCrawl.Active) then
+		return true -- eat it
+	end
 	if (Arm.active) then
 		return false
 	end

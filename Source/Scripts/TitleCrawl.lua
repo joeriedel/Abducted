@@ -4,6 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 TitleCrawl = Class:New()
+TitleCrawl.Active = true
 
 function TitleCrawl.Spawn(self)
 
@@ -23,7 +24,7 @@ function TitleCrawl.Spawn(self)
 end
 
 function TitleCrawl.Print(self, title, subtitle, callback)
-
+	
 	local f = function()
 		
 		local f = function()
@@ -59,6 +60,7 @@ function TitleCrawl.Clear(self)
 	UI.widgets.titlecrawl.Root:RemoveChild(self.titlePrinter.panel)
 	UI.widgets.titlecrawl.Root:RemoveChild(self.subtitlePrinter.panel)
 	UI.widgets.titlecrawl.Root:SetVisible(false)
+	TitleCrawl.Active = false
 	
 	self.titlePrinter = nil
 	self.subtitlePrinter = nil

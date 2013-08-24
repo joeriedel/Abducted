@@ -213,6 +213,7 @@ end
 function UI.CreateTitleCrawlLayer(self)
 	self.widgets.titlecrawl = {}
 	self.widgets.titlecrawl.Root = UI:CreateRoot(UI.kLayer_TitleCrawl)
+	self.widgets.titlecrawl.Root:SetOpaqueLayerInput(true) -- eats all input
 end
 
 function UI.CreateFeedbackLayer(self)

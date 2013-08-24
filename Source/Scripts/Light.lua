@@ -44,7 +44,7 @@ function Light.Spawn(self)
 	self.light:SetRadius(radius)
 	
 	self.intensity = NumberForString(self.keys.intensity, 1)
-	self.light:SetIntensity(math.max(0, self.intensity))
+	self.light:SetIntensity(0, self.intensity)
 	self.light:SetShadowWeight(self.intensity)
 	
 	local flags = NumberForString(self.keys.flags, 59)

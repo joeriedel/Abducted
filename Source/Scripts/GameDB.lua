@@ -164,24 +164,39 @@ function GameDB.LoadTime(self)
 	
 end
 
-function GameDB.Discover(self, name)
+function GameDB.Discover(self, name, unlock)
 
 	local discovered = self:CheckDiscovery(name)
-	if (discovered) then
-		return false
+	if (unlock) then
+		if (discovered == "unlocked") then
+			return false
+		end
+	else
+		if (discovered) then
+			return false
+		end
 	end
 
-	self.numDiscoveries = self.numDiscoveries + 1
-	Persistence.WriteNumber(SaveGame, "numDiscoveries", self.numDiscoveries)
-	Persistence.WriteBool(SaveGame, "discovery", true, name)
+	if (unlock) then
+		self.numDiscoveries = self.numDiscoveries + 1
+		Persistence.WriteNumber(SaveGame, "numDiscoveries", self.numDiscoveries)
+		Persistence.WriteBool(SaveGame, "discovery", "unlocked", name)
+	else
+		Persistence.WriteBool(SaveGame, "discovery", "mystery", name)
+	end
 	
 	self.discoveryTime = self.realTime
 	Persistence.WriteNumber(SaveGame, "lastDiscoveryTime", self.discoveryTime)
 	return true
+	
 end
 
 function GameDB.CheckDiscovery(self, name)
-	return Persistence.ReadBool(SaveGame, "discovery", false, name)
+	return Persistence.ReadString(SaveGame, "discovery", nil, name)
+end
+
+function GameDB.CheckDiscoveryUnlocked(self, name)
+	return self:CheckDiscovery(name) == "unlocked"
 end
 
 function GameDB.LoadChatLockouts(self)

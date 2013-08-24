@@ -42,11 +42,16 @@ function Abducted.OnLevelStart(self)
 		UI:FadeIn(1)
 		TitleCrawl:Clear()
 	else
-		local title = World.worldspawn.keys.title or "MISSING_TITLE"
+		local title = World.worldspawn.keys.title
 		local subtitle = World.worldspawn.keys.subtitle or World.worldspawn.keys.mappath
-			
-		World.PauseGame(true)
-		TitleCrawl:Print(title, subtitle, function() self:FinishTitleCrawl() end)
+		
+		if (title and subtitle) then
+			World.PauseGame(true)
+			TitleCrawl:Print(title, subtitle, function() self:FinishTitleCrawl() end)
+		else
+			UI:FadeIn(1)
+			self:StartGame()
+		end
 	end
 	
 end

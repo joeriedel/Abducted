@@ -5,7 +5,7 @@
 
 UI = Class:New()
 UI.kLayer_Mask = 0
-UI.kLayer_UI = 1
+UI.kLayer_Discoveries = 1
 UI.kLayer_MainMenu = 2
 UI.kLayer_HUD = 2 -- not used at same time as main menu
 UI.kLayer_Interactive = 3
@@ -183,6 +183,7 @@ function UI.InitMap(self)
 	UI:CreateInteractiveLayer()
 	UI:CreateHUDPrintLayer()
 	UI:CreateTitleCrawlLayer()
+	UI:CreateDiscoveriesLayer()
 	
 	self.gfx.Glyphs = {}
 	
@@ -203,6 +204,11 @@ end
 function UI.CreateInteractiveLayer(self)
 	self.widgets.interactive = {}
 	self.widgets.interactive.Root = UI:CreateRoot(UI.kLayer_Interactive, UI.InteractiveLayerOnInputEvent)
+end
+
+function UI.CreateDiscoveriesLayer(self)
+	self.widgets.discoveries = {}
+	self.widgets.discoveries.Root = UI:CreateRoot(UI.kLayer_Discoveries)
 end
 
 function UI.CreateHUDPrintLayer(self)

@@ -94,25 +94,28 @@ function Arm.LoadLog(self)
 		local typeface = nil
 		
 		if (v.style == "!ARM_REPLY") then
-			text = kEventLogArm.." "..v.text
+			text = kEventLogArm.." "..StringTable.Get(v.text)
 			typeface = self.typefaces.Chat
 		elseif (v.style == "!ARM_LOCKED_REPLY") then
-			text = kEventLogArm.." "..v.text
+			text = kEventLogArm.." "..StringTable.Get(v.text)
 			typeface = self.typefaces.ChatLocked
 		elseif (v.style == "!ARM_ASK") then
-			text = kEventLogYou.." "..v.text
+			text = kEventLogYou.." "..StringTable.Get(v.text)
 			typeface = self.typefaces.LogArmAsk
 		elseif (v.style == "!ARM_LOCKED") then
 			text = kEventLogArmLocked
 			typeface = self.typefaces.ChatLocked
 		elseif (v.style == "!DISCOVERY") then
-			text = StringTable.Get(strings[2])
-			typeface = self.typefaces.LogDiscovery
-		elseif (v.style == "!DISCOVERY_TEXT") then
-			text = strings[2]
+			local strings = v.text:split(";")
+			map(strings, StringTable.Get)
+			if (strings[2]) then
+				text = string.format(strings[1], select(2, unpack(strings)))
+			else
+				text = strings[1]
+			end
 			typeface = self.typefaces.LogDiscovery
 		else
-			text = StringTable.Get(strings[2])
+			text = StringTable.Get(v.text)
 			typeface = self.typefaces.LogEvent
 		end
 		

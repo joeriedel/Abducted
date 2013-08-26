@@ -1135,8 +1135,12 @@ function PlayerPawn.Show(self, show)
 
 end
 
-function PlayerPawn.EnterArm(self)
+function PlayerPawn.EnterArm(self, mode, dbTopic)
 
+	if (mode == nil) then
+		mode = "chat"
+	end
+	
 	Abducted.entity.eatInput = true
 	
 	local anim = self:LookupAnimation("arm_pose_standing")
@@ -1145,7 +1149,7 @@ function PlayerPawn.EnterArm(self)
 	local callbacks = {
 		OnTag = function(self, tag)
 			if (tag == "@arm_transition") then
-				Arm:Start("chat")
+				Arm:Start(mode, dbTopic)
 			else
 				World.PostEvent(tag)
 			end

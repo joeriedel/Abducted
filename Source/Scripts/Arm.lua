@@ -444,7 +444,7 @@ function Arm.ResetWidgets(self)
 	Arm:SkillsReset()
 end
 
-function Arm.Start(self, mode)
+function Arm.Start(self, mode, dbTopic)
 	
 	self.active = true
 	self.intro = true
@@ -454,6 +454,12 @@ function Arm.Start(self, mode)
 	self.talk = false
 	self.introMode = mode
 	self.changeConversationCount = 0
+	
+	if (mode == "db") then
+		self.introDBTopic = dbTopic
+	else
+		self.introDBTopic = nil
+	end
 	
 	self:ResetWidgets()
 	
@@ -727,7 +733,15 @@ function Arm.SwitchMode(self, mode)
 	if (mode == "chat") then
 		self:SwitchToChat()
 	elseif (mode == "db") then
-		self:SwitchToDB()
+		if (self.introDBTopic) then
+			local topic = self.introDBTopic
+			self.introDBTopic = nil
+			self.mode = nil
+			self:SwapToTalk()
+			self:OpenDatabaseItem(topic)
+		else
+			self:SwitchToDB()
+		end
 	elseif (mode == "powers") then
 		self:SwitchToSkills()
 	end

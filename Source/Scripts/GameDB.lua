@@ -74,6 +74,7 @@ function GameDB.LoadCheckpoint(self)
 	World.MarkTempEntsForGC()
 	self.loadingCheckpoint = true
 	TerminalScreen.CancelUI()
+	Discovery.ResetUIForCheckpoint()
 	Game.entity:LoadState()
 	GameDB:LoadPersistentObjects()
 	GameDB:LoadEvents()
@@ -164,7 +165,13 @@ function GameDB.LoadTime(self)
 	
 end
 
-function GameDB.Discover(self, name, unlock)
+function GameDB.Discover(self, name, unlock, visible)
+
+	local dbItem = Arm.Discoveries[name]
+	if (not dbItem) then
+		COutLine(kC_Error, "There is no '%s' in the database.", name)
+		return false
+	end
 
 	local discovered = self:CheckDiscovery(name)
 	if (unlock) then
@@ -175,6 +182,29 @@ function GameDB.Discover(self, name, unlock)
 		if (discovered) then
 			return false
 		end
+	end
+	
+	-- add log text
+	local logTitle = nil
+	local logEntry = nil
+
+	if (unlock or (dbItem.mysteryTitle == nil)) then
+		logTitle = dbItem.title
+		logEntry = dbItem.logText
+	else
+		logTitle = dbItem.mysteryTitle
+		logEntry = dbItem.mysteryLogText
+	end
+	
+	EventLog:AddEvent(
+		GameDB:ArmDateString(), 
+		"!DISCOVERY",
+		logEntry
+	)
+	
+	if (visible) then
+		local text = StringTable.Get("EVENT_LOG_DISCOVERED_ITEM"):format(StringTable.Get(logTitle))
+		HUD:Print(nil, text, nil, false)
 	end
 
 	if (unlock) then

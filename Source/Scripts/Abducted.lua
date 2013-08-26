@@ -23,6 +23,7 @@ function Abducted.Initialize(self)
 	TitleCrawl:Spawn()
 	ManipulatableObjectUI:Spawn()
 	TerminalScreen.StaticInit()
+	Discovery.StaticInit()
 	
 	self.think = Abducted.Think
 	self:SetNextThink(0)
@@ -577,7 +578,7 @@ function Abducted.PlayerDied(self, killMessage)
 end
 
 function Abducted.Discover(self, name)
-	return GameDB:Discover(name)
+	return GameDB:Discover(name, true, true)
 end
 
 function Abducted.UnlockTopic(self, name)

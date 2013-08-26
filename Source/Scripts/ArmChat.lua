@@ -229,7 +229,7 @@ function Arm.ProcessActionTokens(self, tokens)
 			Arm:SaveTopicReward(self.topic, "unlock_skill")
 		end
 	elseif (tokens[1] == "discover") then
-		if (Abducted.entity:Discover(tokens[2])) then
+		if (GameDB:Discover(tokens[2], true)) then
 			self.rewardDiscover = tokens[2]
 		end
 	elseif (tokens[1] == "clear_topic") then
@@ -487,9 +487,9 @@ function Arm.ChatPrompt(self)
 	end
 	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
 		if (lock) then
-			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED_REPLY", promptText)
+			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED_REPLY", self.prompt[1])
 		else
-			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_REPLY", promptText)
+			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_REPLY", self.prompt[1])
 		end
 	end
 	
@@ -740,7 +740,7 @@ function Arm.DisplayChoices(self)
 		
 		local r = {0, 0, size[1], size[2]}
 		local f = function(widget)
-			Arm:ChoiceSelected(widget, self.choices[k], prompt, text)
+			Arm:ChoiceSelected(widget, self.choices[k], prompt)
 		end
 		
 		local w = UI:CreateStylePushButton(
@@ -817,7 +817,7 @@ function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 	self.changeConversationCount = 0
 	
 	-- add event
-	EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_ASK", text)
+	EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_ASK", prompt[1])
 	
 	-- disable all choices
 	for k,v in pairs(self.choiceWidgets) do

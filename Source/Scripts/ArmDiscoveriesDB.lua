@@ -16,19 +16,20 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_POD_TITLE",
 		text = "ARM_DISCOVERY_POD",
 		index = 2,
-		chat = "Genesis2"
+		chat = "Tentacles",
+		logText = "ARM_DISCOVERY_POD_LOG",
+		discoveryPopupText = "ARM_DISCOVERY_POD_POPUP"
 	},
 	Tentacles = {
 		picture = "UI/discovery_tentacles_M",
 		title = "ARM_DISCOVERY_TENTACLES_TITLE",
 		text = "ARM_DISCOVERY_TENTACLES",
-		index = 3,
-		chat = "Tentacles",
-		logText = "ARM_DISCOVERY_TENTANCLES_LOG",
 		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
 		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
 		mysteryChat = "Tentacles",
-		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG"
+		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG",
+		index = 3,
+		chat = "Tentacles"
 	},
 	Terminals = {
 		picture = "UI/discovery_terminals_M",
@@ -137,6 +138,12 @@ function Arm.ClearDiscoveries(self)
 		for k,v in pairs(self.discoveryList) do
 			if (v.button) then
 				v.button:Unmap() -- mark gc
+				if (v.button.label) then
+					v.button.label:Unmap()
+				end
+				if (v.button.highlight) then	
+					v.button.highlight:Unmap()
+				end
 			end
 		end
 		self.discoveryList = nil
@@ -150,7 +157,7 @@ function Arm.DiscoveryPressed(self, discovery)
 	Arm:TalkPressed()
 end
 
-function Arm.LayoutDiscovery(self, discovery, section, state)
+function Arm.LayoutDiscovery(self, discovery, unlocked, section, state)
 
 	-- discoveries have a title, a picture, and a description
 	local y = 0
@@ -165,15 +172,34 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 		self.discoveriesDBArea[3],
 		state.titleAdvance
 	}
+	
+	if (discovery.mysteryTitle == nil) then
+		unlocked = true
+	end
 
 	local w
-	local title = StringTable.Get(discovery.title)
-	if (discovery.chat) then
+	local title = nil
+
+	if (unlocked) then
+		title = StringTable.Get(discovery.title)
+	else
+		title = StringTable.Get(discovery.mysteryTitle)
+	end
+	
+	local chat = nil
+	
+	if (unlocked or (discovery.mysteryChat == nil)) then
+		chat = discovery.chat
+	else
+		chat = discovery.mysteryChat
+	end
+	
+	if (chat) then
 		title = title.." "..StringTable.Get("ARM_DISCOVERY_TALK_ABOUT_THIS")
 	end
 	local underlineY
 	
-	if (discovery.chat) then
+	if (chat) then
 		w = UI:CreateStylePushButton(
 			rect,
 			f,
@@ -258,7 +284,14 @@ function Arm.LayoutDiscovery(self, discovery, section, state)
 	
 	-- insert text
 	
-	local text = StringTable.Get(discovery.text)
+	local text = nil
+	if (unlocked or (discovery.mysteryText == nil)) then
+		text = discovery.text
+	else
+		text = discovery.mysteryText
+	end
+	
+	local text = StringTable.Get(text)
 	text = string.split(text, "\n")
 
 	local modelStrings = {}
@@ -372,9 +405,12 @@ function Arm.LoadDiscoveries(self)
 	self.discoveryTime = GameDB.discoveryTime
 	self.discoveryList = {}
 	
+	local unlocked = {}
+	
 	for k,v in pairs(Arm.Discoveries) do
 		if (GameDB:CheckDiscovery(k)) then
 			self.discoveryList[v.index] = v
+			unlocked[v.index] = GameDB:CheckDiscoveryUnlocked(k)
 		end
 	end
 	
@@ -382,16 +418,14 @@ function Arm.LoadDiscoveries(self)
 		y = 0,
 		titleSpace = 8*UI.identityScale[2],
 		advance = UI:FontAdvanceSize(self.typefaces.Chat),
---		titleAdvance = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (12 * UI.identityScale[2]),
 		titleTypeface = self.typefaces.LogArmAsk,
---		titleUnderline = UI:FontAdvanceSize(self.typefaces.LogArmAsk) + (6 * UI.identityScale[2]),
 		typeface = self.typefaces.Chat,
 		sound = self.sfx.Button,
 		discoverySpace = 32 * UI.identityScale[2]
 	}
 	
 	for k,v in pairs(self.discoveryList) do
-		self:LayoutDiscovery(v, v, state)
+		self:LayoutDiscovery(v, unlocked[k], v, state)
 	end
 	
 	self.widgets.db.Discoveries:RecalcLayout()

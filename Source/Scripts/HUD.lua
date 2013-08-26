@@ -82,6 +82,8 @@ end
 function HUD.SetVisible(self, visible)
 	self.visible = visible
 	self.widgets.Root:SetVisible(visible)
+	UI.widgets.discoveries.Root:SetVisible(visible)
+	UI.widgets.hudprint.Root:SetVisible(visible)
 end
 
 function HUD.Load(self)

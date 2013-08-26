@@ -538,13 +538,13 @@ function TerminalScreen.StaticInit()
 	w:ScaleTo({0,0}, {0,0})
 	TerminalScreen.Widgets.Glyph = w
 		
-	local bounds = 0.1
+	local bounds = 0.025
 	
 	TerminalScreen.ScreenBounds = {
 		bounds * UI.screenWidth,
 		bounds * UI.screenHeight,
-		UI.screenWidth - (bounds * UI.screenWidth),
-		UI.screenHeight - (bounds * UI.screenHeight)
+		UI.screenWidth - (bounds * UI.screenWidth * 2),
+		UI.screenHeight - (bounds * UI.screenHeight * 2)
 	}
 	
 	local solvePos = nil

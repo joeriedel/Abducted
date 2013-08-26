@@ -38,6 +38,13 @@ function PlayerInput.OnInputEvent(self, e)
 				if ((UI.mode == kGameUIMode_Mobile) and World.playerPawn:CheckTappedOn(e.original)) then
 					World.playerPawn:Stop()
 					action = true
+				elseif (Discovery.CheckTouch(e)) then
+					action = true
+					self.touch = nil
+					UI:ShowFinger(true, 0)
+					UI:ShowFinger(false, 0.5)
+					World.FlushInput(true)
+					World.playerPawn:Stop()
 				else
 					action = self:TapMove(e.original.data[1], e.original.data[2])
 				end

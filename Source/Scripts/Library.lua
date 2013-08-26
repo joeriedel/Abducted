@@ -75,16 +75,16 @@ end
 
 function BoundRect(rect, bounds)
 	
-	if ((rect[1]+rect[3]) > bounds[3]) then
-		rect[1] = bounds[3] - rect[3]
+	if ((rect[1]+rect[3]) > (bounds[1]+bounds[3])) then
+		rect[1] = (bounds[1]+bounds[3]) - rect[3]
 	end
 	
-	if ((rect[2]+rect[4]) > bounds[4]) then
-		rect[2] = bounds[4] - rect[4]
+	if ((rect[2]+rect[4]) > (bounds[2]+bounds[4])) then
+		rect[2] = (bounds[2]+bounds[4]) - rect[4]
 	end
 
 	if (rect[1] < bounds[1]) then
-		rect[1] = 0
+		rect[1] = bounds[1]
 	end
 	
 	if (rect[2] < bounds[2]) then

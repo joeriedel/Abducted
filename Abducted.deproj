@@ -34,6 +34,9 @@
     <filename>Source\Scripts\ArmEventDB.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ArmSkills.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Bugs.lua</filename>
   </file>
   <file>
@@ -47,6 +50,9 @@
   </file>
   <file>
     <filename>Source\Scripts\DebugUI.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\Discovery.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\Engine.lua</filename>
@@ -91,6 +97,9 @@
     <filename>Source\Scripts\KeyMapping.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\KillVolume.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Library.lua</filename>
   </file>
   <file>
@@ -124,6 +133,9 @@
     <filename>Source\Scripts\MemoryGame.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Mine.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Music.lua</filename>
   </file>
   <file>
@@ -148,6 +160,9 @@
     <filename>Source\Scripts\ReflexGame.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\ReflexGameLevels.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\SCExecContext.lua</filename>
   </file>
   <file>
@@ -169,7 +184,13 @@
     <filename>Source\Scripts\TerminalScreen.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\TextPrinter.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Timers.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\TitleCrawl.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\TouchTrigger.lua</filename>

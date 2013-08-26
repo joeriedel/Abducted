@@ -510,6 +510,13 @@ function PlayerPawn.Stop(self)
 	self:EnableFlags(kPhysicsFlag_Friction, true)
 end
 
+function PlayerPawn.LookAt(self, pos)
+
+	local v = VecSub(pos, self:WorldPos())
+	self:SetFacing(LookAngles(VecNorm(v))[3])
+
+end
+
 function PlayerPawn.BeginPulse(self)
 	self.pulseActive = true
 	self.disableAnimTick = true

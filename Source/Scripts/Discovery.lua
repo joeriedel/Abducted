@@ -313,6 +313,7 @@ function Discovery.OpenUI(self)
 			GameDB:Discover(self.databaseId, false, true)
 			self:LayoutUI()
 			self:AnimateOpenUI()
+			self:AddLookTarget()
 		end
 		TerminalScreen.CancelUI(f)
 	end
@@ -328,6 +329,32 @@ end
 
 function Discovery.CloseUI(self, callback)
 	self:AnimateCloseUI(callback)
+	self:RemoveLookTarget()
+end
+
+function Discovery.AddLookTarget(self)
+
+	assert(self.lookTargetId == nil)
+	self.lookTargetId = World.viewController:BlendToLookTarget(
+		self.pos,
+		0.8,
+		0.8,
+		-1,
+		0.8,
+		1,
+		1,
+		0.57
+	)
+	
+	World.playerPawn:LookAt(self.pos)
+
+end
+
+function Discovery.RemoveLookTarget(self)
+	if (self.lookTargetId) then
+		World.viewController:FadeOutLookTarget(self.lookTargetId, 0.2)
+		self.lookTargetId = nil
+	end
 end
 
 function Discovery.UpdateUI(self)
@@ -454,6 +481,7 @@ function Discovery.ResetUIForCheckpoint()
 			Discovery.Popup.animateTimer:Clean()
 			Discovery.Popup.animateTimer = nil
 		end
+		Discovery.Popup.lookTargetId = nil
 		Discovery.Popup = nil
 	end
 	Discovery.Active = LL_New()

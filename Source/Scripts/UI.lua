@@ -1055,7 +1055,7 @@ end
 function UI.SizeLabelToContents(self, label, x, y)
 
 	local d = label:Dimensions()
-	-- NOTE: dimensions are real-size scale here.
+	-- NOTE: dimensions are UI scale here.
 	
 	local r = label:Rect()
 	

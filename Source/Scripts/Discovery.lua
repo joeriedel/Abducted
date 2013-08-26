@@ -7,6 +7,7 @@ Discovery = Entity:New()
 Discovery.Active = LL_New()
 Discovery.Popup = nil
 Discovery.Widgets = {}
+Discovery.kSkillReward = 25
 -- 720p sizes
 Discovery.kUISize = {300, 400}
 Discovery.kArrowSize = {20, 32}
@@ -108,7 +109,7 @@ function Discovery.CheckPlayerProximity(self)
 
 end
 
-function Discovery.LayoutUI(self)
+function Discovery.LayoutUI(self, awardSkillPoints)
 
 	local title = nil
 	local text = nil
@@ -137,7 +138,7 @@ function Discovery.LayoutUI(self)
 	end
 	
 	local kBorderSize = Discovery.kUIBorder * UI.identityScale[1]
-	local kDialogWidth = Discovery.kUISize[1] - (kBorderSize * 2)
+	local kDialogWidth = (Discovery.kUISize[1]*UI.identityScale[1]) - (kBorderSize * 2)
 	local kButtonHeight = Discovery.kButtonHeight * UI.identityScale[2]
 	
 	title = StringTable.Get(title)
@@ -150,10 +151,35 @@ function Discovery.LayoutUI(self)
 		title
 	)
 	
+	r[1] = Discovery.kUIBorder * UI.identityScale[1]
 	r[2] = Discovery.kUIBorder * UI.identityScale[1]
 	Discovery.Widgets.Title:SetRect(r)
 	
-	r[2] = r[2] + r[4] + 10*UI.identityScale[1]
+	r[2] = r[2] + r[4]
+	
+	if (awardSkillPoints) then
+		local rect = {kBorderSize, r[2]+8*UI.identityScale[1], kDialogWidth, Discovery.Widgets.SkillReward.Height}
+		Discovery.Widgets.SkillReward:SetVisible(true)
+		Discovery.Widgets.SkillReward:BlendTo({1,1,1,0}, 0)
+		Discovery.Widgets.SkillReward:SetRect(rect)
+		r[2] = r[2] + 8*UI.identityScale[1] + Discovery.Widgets.SkillReward.Height
+		
+		local text = "+"..tostring(Discovery.kSkillReward)
+		if (Discovery.kSkillReward > 1) then
+			text = text.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+		else
+			text = text.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
+		end
+		
+		UI:SetLabelText(Discovery.Widgets.SkillReward, text)
+		UI:SizeLabelToContents(Discovery.Widgets.SkillReward)
+		rect = UI:HCenterLabel(Discovery.Widgets.SkillReward, rect)
+		Discovery.Widgets.SkillReward.pos = {rect[1], rect[2]}
+	else
+		Discovery.Widgets.SkillReward:SetVisible(false)
+	end
+
+	r[2] = r[2] + 10*UI.identityScale[1]
 	
 	Discovery.Widgets.Line1:SetRect({0,r[2],Discovery.kUISize[1],10*UI.identityScale[1]})
 	
@@ -203,7 +229,7 @@ function Discovery.LayoutUI(self)
 		
 end
 
-function Discovery.AnimateOpenUI(self)
+function Discovery.AnimateOpenUI(self, awardSkillPoints)
 
 	if (self.animateTimer) then	
 		self.animateTimer:Clean()
@@ -243,8 +269,25 @@ function Discovery.AnimateOpenUI(self)
 			Discovery.Widgets.Line2:BlendTo({1,1,1,1}, 0.3)
 			Discovery.Widgets.Button:BlendTo({1,1,1,1}, 0.3)
 			Abducted.entity.eatInput = false
-			self.animateTimer = nil
 			self.busy = false
+			
+			if (awardSkillPoints) then
+			
+				local f = function()
+				
+					Arm.sfx.Reward:Play(kSoundChannel_UI, 0)
+					local w = Discovery.Widgets.SkillReward
+					w:MoveTo({w.pos[1], w.pos[2]+w.Height}, {0,0})
+					w:MoveTo({w.pos[1], w.pos[2]}, {0,0.3})
+					w:BlendTo({1,1,1,1}, 0.1)
+					self.animateTime = nil
+					
+				end
+			
+				self.animateTimer = World.globalTimers:Add(f, 0.4)
+			else
+				self.animateTimer = nil
+			end
 			
 		end
 		
@@ -301,6 +344,7 @@ function Discovery.AnimateCloseUI(self, callback)
 	Discovery.Widgets.Line1:BlendTo({1,1,1,0}, 0.3)
 	Discovery.Widgets.Line2:BlendTo({1,1,1,0}, 0.3)
 	Discovery.Widgets.Button:BlendTo({1,1,1,0}, 0.3)
+	Discovery.Widgets.SkillReward:BlendTo({1,1,1,0}, 0.3)
 	self.animateTimer = World.globalTimers:Add(f, 0.3)
 
 end
@@ -310,15 +354,16 @@ function Discovery.OpenUI(self)
 	local f = function()
 		Discovery.Popup = self
 		local f = function()
-			GameDB:Discover(self.databaseId, false, true)
-			self:LayoutUI()
-			self:AnimateOpenUI()
+			local awardSkillPoints = GameDB:Discover(self.databaseId, false, true)
+			self:LayoutUI(awardSkillPoints)
+			self:AnimateOpenUI(awardSkillPoints)
 			self:AddLookTarget()
 		end
 		TerminalScreen.CancelUI(f)
 	end
 	if (Discovery.Popup) then
 		if (Discovery.Popup == self) then
+			Abducted.entity.eatInput = false
 			return
 		end
 		Discovery.Popup:CloseUI(f)
@@ -340,7 +385,7 @@ function Discovery.AddLookTarget(self)
 		0.8,
 		0.8,
 		-1,
-		0.8,
+		0.7,
 		1,
 		1,
 		0.57
@@ -454,7 +499,13 @@ function Discovery.StaticInit()
 	Discovery.Widgets.Text = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=textTF})
 	Discovery.Widgets.Scroll:AddItem(Discovery.Widgets.Text)
 	Discovery.Widgets.Text:SetBlendWithParent(true)
-		
+	
+	local textTF = Arm.typefaces.ChatReward
+	Discovery.Widgets.SkillReward = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=textTF})
+	Discovery.Widgets.SkillReward.Height = UI:FontAdvanceSize(textTF)
+	Discovery.Widgets.Root:AddChild(Discovery.Widgets.SkillReward)
+	Discovery.Widgets.SkillReward:SetBlendWithParent(true)
+			
 	Discovery.Widgets.Line1 = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=Arm.gfx.SkillsHorzLine1})
 	Discovery.Widgets.Line2 = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=Arm.gfx.SkillsHorzLine1})
 	

@@ -848,23 +848,35 @@ function UI.LineWrapCenterText(self, label, maxWidth, sizeToFit, lineSpace, line
 	if (sizeToFit) then
 		r[3] = maxWidth
 		r[4] = size
-		label:SetRect(r)
 	end
 	
 	local y = (r[4] - size) / 2
 	
+	local minX = 999999
+	local maxX = -999999
+	local minY = y
+	
 	for k,v in pairs(labelStrings) do
 		v.y = v.y + y
 		v.x = (r[3] - v.w) / 2
+		minX = math.min(minX, v.x)
+		maxX = math.max(maxX, v.x+v.w)
 	end
 	
-	label:SetText(labelStrings)
-	
-	if (not sizeToFit) then
+	if (sizeToFit) then
+		for k,v in pairs(labelStrings) do
+			v.x = v.x - minX
+		end
+		r[1] = minX
+		r[3] = maxX - minX
+		label:SetRect(r)
+	else
 	-- return the size we would have been had we auto-sized
 		r[3] = maxWidth
 		r[4] = size
 	end
+	
+	label:SetText(labelStrings)
 	
 	return r
 end

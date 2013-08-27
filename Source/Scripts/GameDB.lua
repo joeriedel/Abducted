@@ -165,7 +165,7 @@ function GameDB.LoadTime(self)
 	
 end
 
-function GameDB.Discover(self, name, unlock, visible)
+function GameDB.Discover(self, name, source, unlock, visible)
 
 	local dbItem = Arm.Discoveries[name]
 	if (not dbItem) then
@@ -189,21 +189,25 @@ function GameDB.Discover(self, name, unlock, visible)
 	local logEntry = nil
 
 	if (unlock or (dbItem.mysteryTitle == nil)) then
-		logTitle = dbItem.title
-		logEntry = dbItem.logText
+		logTitle = dbItem.title or "MISSING TITLE TEXT!"
+		if (dbItem.logText) then
+			logEntry = dbItem.logText[source] or dbItem.logText.all or "MISSING LOG TEXT!"
+		else
+			logEntry = "MISSING LOG TEXT!"
+		end
 	else
 		logTitle = dbItem.mysteryTitle
-		logEntry = dbItem.mysteryLogText
+		logEntry = dbItem.mysteryLogText or "MISSING MYSTERY LOG TEXT!"
 	end
 	
 	EventLog:AddEvent(
 		GameDB:ArmDateString(), 
 		"!DISCOVERY",
-		logEntry
+		name..";"..logEntry
 	)
 	
 	if (visible) then
-		local text = StringTable.Get("EVENT_LOG_DISCOVERED_ITEM"):format(StringTable.Get(logTitle))
+		local text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(logTitle).."."
 		HUD:Print(nil, text, nil, false)
 	end
 

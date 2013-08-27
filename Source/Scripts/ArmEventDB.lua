@@ -51,6 +51,12 @@ function Arm.EnterLogDB(self, enter, callback, time)
 		time = 0
 	end
 	
+	if (self.eventLogButtons) then
+		for k,v in pairs(self.eventLogButtons) do
+			v.class:ResetHighlight(v, true)
+		end
+	end
+	
 	if (enter) then
 		Arm:LoadLog()
 		self.widgets.db.EventLog:BlendTo({1,1,1,1}, time)
@@ -65,12 +71,31 @@ function Arm.EnterLogDB(self, enter, callback, time)
 	end
 end
 
+function Arm.UnmapEventLogButtons(self)
+
+	if (self.eventLogButtons) then
+		for k,v in pairs(self.eventLogButtons) do
+			if (v.highlight) then
+				v.highlight:Unmap()
+			end
+			if (v.label) then
+				v.label:Unmap()
+			end
+			v:Unmap()
+		end
+	end
+	
+	self.eventLogButtons = {}
+	
+end
+
 function Arm.LoadLog(self)
 
 	if (self.logTime >= EventLog.time) then
 		return
 	end
 	
+	self:UnmapEventLogButtons()
 	self.widgets.db.EventLog:Clear()
 	
 	local events = EventLog:LoadList()
@@ -92,28 +117,69 @@ function Arm.LoadLog(self)
 		
 		local text = nil
 		local typeface = nil
+		local buttonFn = nil
+		local buttonLabel = nil
 		
 		if (v.style == "!ARM_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(v.text)
+			text = kEventLogArm.." "..Arm:FindChatString(v.text)
 			typeface = self.typefaces.Chat
 		elseif (v.style == "!ARM_LOCKED_REPLY") then
-			text = kEventLogArm.." "..StringTable.Get(v.text)
+			text = kEventLogArm.." "..Arm:FindChatString(v.text)
 			typeface = self.typefaces.ChatLocked
 		elseif (v.style == "!ARM_ASK") then
-			text = kEventLogYou.." "..StringTable.Get(v.text)
+			text = kEventLogYou.." "..Arm:FindChatString(v.text)
 			typeface = self.typefaces.LogArmAsk
 		elseif (v.style == "!ARM_LOCKED") then
 			text = kEventLogArmLocked
 			typeface = self.typefaces.ChatLocked
 		elseif (v.style == "!DISCOVERY") then
 			local strings = v.text:split(";")
+			local dbId = strings[1]
+			
+			local dbItem = Arm.Discoveries[dbId]
+			local dbItemTitle = nil
+			if (dbItem) then
+				local unlocked = GameDB:CheckDiscoveryUnlocked(dbId)
+				
+				if (unlocked or (dbItem.mysteryTitle == nil)) then
+					dbItemTitle = StringTable.Get(dbItem.title)
+				else
+					dbItemTitle = StringTable.Get(dbItem.mysteryTitle)
+				end
+			end
+			
+			local strings2 = {}
+			for i=2,#strings do
+				table.insert(strings2, strings[i])
+			end
+			strings = strings2
 			map(strings, StringTable.Get)
 			if (strings[2]) then
 				text = string.format(strings[1], select(2, unpack(strings)))
 			else
 				text = strings[1]
 			end
+			
+			if (dbItemTitle) then
+				text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..dbItemTitle..". "..text
+			end
+			
 			typeface = self.typefaces.LogDiscovery
+			buttonFn = function()
+				Arm.mode = nil -- hack
+				Arm:OpenDatabaseItem(dbId)
+			end
+			buttonLabel = StringTable.Get("DISCOVERY_OPEN_DB")
+		elseif (v.style == "!TOPIC") then
+			local topicName = Arm:FindChatString(v.text)
+			text = StringTable.Get("EVENT_LOG_NEW_TOPIC"):format(topicName)
+			typeface = self.typefaces.LogUnlockTopic
+			buttonFn = function()
+				self.requestedTopic = v.text
+				self.topic = nil
+				Arm:TalkPressed()
+			end
+			buttonLabel = StringTable.Get("EVENT_LOG_TALK_ABOUT"):format(topicName)
 		else
 			text = StringTable.Get(v.text)
 			typeface = self.typefaces.LogEvent
@@ -130,24 +196,84 @@ function Arm.LoadLog(self)
 			scaleY = UI.fontScale[2]
 		}
 		
-		text = UI:WordWrap(typeface, text, marginSpace)
-		
 		local yOfs = 0
 		
-		for k,v in pairs(text) do
+		local strings = text:split("\n")
 		
-			local s = {
-				x = textMargin,
-				y = yOfs,
-				text = v,
-				scaleX = UI.fontScale[1],
-				scaleY = UI.fontScale[2]
-			}
-			
-			yOfs = yOfs + advance
-			
-			table.insert(modelStrings, s)
+		for kk, vv in pairs(strings) do
+			if (vv:len() > 0) then
+				text = UI:WordWrap(typeface, vv, marginSpace)
+				
+				for k,v in pairs(text) do
+				
+					local s = {
+						x = textMargin,
+						y = yOfs,
+						text = v,
+						scaleX = UI.fontScale[1],
+						scaleY = UI.fontScale[2]
+					}
+					
+					yOfs = yOfs + advance
+					
+					table.insert(modelStrings, s)
+				
+				end
+			else
+				yOfs = yOfs + advance
+			end
+		end
 		
+		local buttonSpace = 0
+		
+		if (buttonFn) then
+					
+			local b = UI:CreateStylePushButton(
+				{0, 0, 8, 8},
+				buttonFn,
+				{
+					fontSize="small",
+					--background = false,
+					highlight = { 
+						on = {0.75, 0.75, 0.75, 1}, 
+						time = 0.2 
+					}, 
+					pressed = self.sfx.Button
+				}
+			)
+			
+			local labelRect = UI:LineWrapCenterText(
+				b.label,
+				marginSpace,
+				true,
+				0,
+				buttonLabel
+			)
+			
+			local buttonRect = ExpandRect(
+				labelRect, 
+				16*UI.identityScale[1],
+				16*UI.identityScale[2]
+			)
+			
+			buttonRect[3] = buttonRect[1] + buttonRect[3]
+			buttonRect[4] = buttonRect[2] + buttonRect[4]
+			buttonRect[1] = 0
+			buttonRect[2] = 0
+			
+			labelRect = CenterRectInRect(labelRect, buttonRect)
+			b.label:SetRect(labelRect)
+			
+			buttonRect[1] = textMargin + (marginSpace-buttonRect[3])/2
+			buttonRect[2] = y + yOfs + 8*UI.identityScale[2]
+			b:SetRect(buttonRect)
+			b.highlight:SetRect({0,0,buttonRect[3],buttonRect[4]})
+			
+			self.widgets.db.EventLog:AddItem(b)
+			b:SetBlendWithParent(true)
+			table.insert(self.eventLogButtons, b)
+			
+			buttonSpace = buttonRect[4] + 8*UI.identityScale[2]
 		end
 		
 		local w = UI:CreateWidget("TextLabel", {rect={0, y, self.eventDBWorkspaceSize[3], yOfs}, typeface=typeface})
@@ -156,7 +282,7 @@ function Arm.LoadLog(self)
 		w:SetText(modelStrings)
 		w:Unmap() -- mark for gc
 		
-		y = y + yOfs + (Arm.EventDBTextSpace[2] * UI.fontScale[2])
+		y = y + yOfs + (Arm.EventDBTextSpace[2] * UI.fontScale[2]) + buttonSpace
 	end
 	
 	self.widgets.db.EventLog:RecalcLayout()

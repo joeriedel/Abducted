@@ -578,7 +578,7 @@ function Abducted.PlayerDied(self, killMessage)
 end
 
 function Abducted.Discover(self, name)
-	return GameDB:Discover(name, true, true)
+	return GameDB:Discover(name, "world", true, true)
 end
 
 function Abducted.UnlockTopic(self, name)

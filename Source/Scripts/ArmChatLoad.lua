@@ -41,6 +41,16 @@ function Arm.LinkDialogDB(self, db)
 	return data
 end
 
+function Arm.FindChatString(self, text)
+	for k,v in pairs(Arm.Chats.Loaded) do
+		local z = StringTable.Get(text, v.stringTable, true)
+		if (z) then
+			return z
+		end
+	end
+	return StringTable.Get(text)
+end
+
 function Arm.TopicIsProcedural(self, topic)
 	return bit.band(topic.flags, kArmChatFlag_Procedural) ~= 0
 end
@@ -105,6 +115,12 @@ function Arm.UnlockTopic(self, name, topic)
 		else
 			Arm:LinkProceduralChat(topic.name, topic)
 		end
+		
+		EventLog:AddEvent(
+			GameDB:ArmDateString(),
+			"!TOPIC",
+			topic.name
+		)
 		
 		return true
 	end

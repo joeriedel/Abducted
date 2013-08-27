@@ -213,7 +213,7 @@ function Arm.ProcessActionTokens(self, tokens)
 		self:ProcessTriggerTokens(tokens)
 	elseif (tokens[1] == "unlock_topic") then
 		if (Arm:UnlockTopic(tokens[2])) then
-			self.rewardTopic = {tokens[2], tokens[3]}
+			self.rewardTopic = tokens[2]
 		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
@@ -229,7 +229,7 @@ function Arm.ProcessActionTokens(self, tokens)
 			Arm:SaveTopicReward(self.topic, "unlock_skill")
 		end
 	elseif (tokens[1] == "discover") then
-		if (GameDB:Discover(tokens[2], true)) then
+		if (GameDB:Discover(tokens[2], "arm", true)) then
 			self.rewardDiscover = tokens[2]
 		end
 	elseif (tokens[1] == "clear_topic") then
@@ -276,7 +276,7 @@ function Arm.CreateRewardActionButton(self, text, inset, maxWidth, f)
 			end
 		end,
 		{
-			background = false,
+			--background = false,
 			highlight = { 
 				on = {0.75, 0.75, 0.75, 1}, 
 				time = 0.2 
@@ -295,9 +295,9 @@ function Arm.CreateRewardActionButton(self, text, inset, maxWidth, f)
 	
 	-- expand the button around the label
 	local buttonRect = {
-		self.chatPos[1]+inset, 
+		self.chatPos[1]+inset-Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1], 
 		self.chatPos[2],
-		r[3],
+		r[3]+Arm.ChatChoiceButtonPadd[1]*UI.identityScale[1]*2,
 		r[4]+Arm.ChatChoiceButtonPadd[2]*UI.identityScale[2]
 	}
 	
@@ -377,11 +377,11 @@ function Arm.CreateRewardText(self)
 	if (self.rewardTopic) then
 		local rewardTopic = self.rewardTopic -- this may change as the conversation does so record it
 		local w, r = self:CreateRewardActionButton(
-			"> "..StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]), 
+			"> "..StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(self.rewardTopic), 
 			inset,
 			maxWidth,
 			function ()
-				self.requestedTopic = rewardTopic[1]
+				self.requestedTopic = rewardTopic
 				Arm:StartConversation()
 			end
 		)
@@ -397,7 +397,7 @@ function Arm.CreateRewardText(self)
 		local dbItem = Arm.Discoveries[rewardDiscover]
 		if (dbItem) then
 			local w, r = self:CreateRewardActionButton(
-				"> "..StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title), 
+				"> "..StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title), 
 				inset,
 				maxWidth,
 				function ()
@@ -469,7 +469,6 @@ function Arm.ChatPrompt(self)
 	
 	if (self.topic.action) then
 		local actions = string.split(self.topic.action, ";")
-		Arm:ProcessActions(actions)
 		lock = FindArrayElement(actions, "lock")
 		
 		if (self.horrorTopic) then
@@ -479,13 +478,15 @@ function Arm.ChatPrompt(self)
 		end
 		
 		if (FindArrayElement(actions, "abort")) then
+			Arm:ProcessActions(actions)
 			if (self.clearTopicPending) then
 				Arm:EndHorrorTopic()
 			end
 			return
 		end
 	end
-	if (self.prompt[1] ~= "WHAT_WOULD_YOU_LIKE_TO_TALK_ABOUT?") then
+	
+	if (self.prompt[1] ~= "What would you like to talk about?") then
 		if (lock) then
 			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED_REPLY", self.prompt[1])
 		else
@@ -493,6 +494,11 @@ function Arm.ChatPrompt(self)
 		end
 	end
 	
+	if (self.topic.action) then
+		local actions = string.split(self.topic.action, ";")
+		Arm:ProcessActions(actions)
+	end
+		
 	if (lock) then
 		EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED")
 		Arm:ChatLockout() -- until a trigger.

@@ -1852,8 +1852,7 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	end
 	
 	if (self.rewardTopic) then
-		self.widgets.TopicLabel:SetText(StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
-		--UI:SetLabelText(self.widgets.TopicLabel, StringTable.Get("ARM_REWARD_TOPIC").." "..StringTable.Get(self.rewardTopic[2]))
+		self.widgets.TopicLabel:SetText(StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(self.rewardTopic))
 		UI:SizeLabelToContents(self.widgets.TopicLabel)
 		local r = UI:HCenterLabel(self.widgets.TopicLabel, self.successScreenRect)
 		table.insert(self.widgets.items, self.widgets.TopicLabel)
@@ -1863,8 +1862,7 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	if (self.rewardDiscover) then
 		local dbItem = Arm.Discoveries[self.rewardDiscover]
 		if (dbItem) then
-			self.widgets.DiscoverLabel:SetText(StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
-			--UI:SetLabelText(self.widgets.DiscoverLabel, StringTable.Get("ARM_REWARD_DISCOVERY").." "..StringTable.Get(dbItem.title))
+			self.widgets.DiscoverLabel:SetText(StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title))
 			UI:SizeLabelToContents(self.widgets.DiscoverLabel)
 			local r = UI:HCenterLabel(self.widgets.DiscoverLabel, self.successScreenRect)
 			table.insert(self.widgets.items, self.widgets.DiscoverLabel)
@@ -1874,7 +1872,6 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
 	
 	if (self.rewardMessage) then
 		self.widgets.MessageLabel:SetText(StringTable.Get(self.rewardMessage))
-		--UI:SetLabelText(self.widgets.MessageLabel, StringTable.Get(self.rewardMessage))
 		UI:SizeLabelToContents(self.widgets.MessageLabel)
 		local r = UI:HCenterLabel(self.widgets.MessageLabel, self.successScreenRect)
 		table.insert(self.widgets.items, self.widgets.MessageLabel)
@@ -1938,7 +1935,7 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 
 	if (tokens[1] == "unlock_topic") then
 		if (Arm:UnlockTopic(tokens[2])) then
-			self.rewardTopic = {tokens[2], tokens[3]}
+			self.rewardTopic = tokens[2]
 		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
@@ -1948,7 +1945,7 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "unlock_skill") then
 		self.rewardSkill = tokens[2]
 	elseif (tokens[1] == "discover") then
-		if (GameDB:Discover(tokens[2], true)) then
+		if (GameDB:Discover(tokens[2], "terminal", true)) then
 			self.rewardDiscover = tokens[2]
 		end
 	end

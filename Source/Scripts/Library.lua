@@ -600,7 +600,7 @@ function StringTable.Get(name, stringTable, useDefault, default, language)
 	end
 	
 	local x = default
-	if name then
+	if (name) then
 		local z = stringTable:Find(name, language)
 		if (z == nil) then
 			if (not useDefault) then

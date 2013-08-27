@@ -3,40 +3,122 @@
 -- Author: Joe Riedel
 -- See Abducted/LICENSE for licensing terms
 
+
+--[[ 
+
+Some quick documentation on how these should be setup
+
+These discoveries can be unlocked in a variety of ways so in order to customize the
+event log, which is essentially a first-person narration of events, context of how things
+are discovered are important.
+
+In a discovery the following items MUST exist:
+	picture, title, text, index
+	
+	picture: the picture to display for the discovery in the DB
+	title: the name of the object to be displayed
+	text: the text description of the discovered object.
+	index: the numerical order that the discovery should appear in.
+	
+	
+The following items are OPTIONAL:
+
+	chat, discoveryPopupText, mysteryTitle, mysteryText
+	mysteryChat, mysteryLogText, logText
+
+	chat: 	the name of the conversation topic to start if the user selects
+			"talk about this". If this is ommitted then the DB entry will not
+			have a link to the arm and "talk about this" will not be appended 
+			to the title.
+			
+	discoveryPopupText: used by a discovery entity in the floating popup window.
+	
+	mysteryTitle: if this is present then when an item is discovered in the world via
+				a discovery entity it will be "locked" and only the mystery text items
+				will be used until the users talks to the arm about it.
+				
+				If this is present the following items are required:
+				
+					mysteryText, mysteryChat, mysteryLogText
+					
+				mysteryText: the text description used in the discovery popup, and the DB
+				mysteryLogText: the text inserted into the event log when the item is first
+								discovered.
+				mysteryChat: the chat topic to activate when the user "talks" about it in the
+								DB. This topic typically will have a "discover" action somewhere
+								in it to fully unlock the discovery.
+			
+	logText: log text is an array with several optional members:
+		logText = {
+			all = "STRING",
+			arm = "STRING",
+			terminal = "STRING",
+			world = "STRING"
+		}
+		
+		Depending on the context of how the user discovers this item, the appropriate
+		string table entry will be inserted into the event log.
+		
+		all: 	used if text for the specific context wasn't found, i.e. this is the default text
+				to use. If the discovery is only discoverable from one place OR the flavor texts
+				don't make sense then just use an "all" text version.
+				
+		arm:	if a conversation tree contains a discover action then the item will be discovered
+				in the context of the "arm", and this text will be used in the event log.
+				
+				"The Arm told me about a substance called Computronium".
+				
+		terminal: if a terminal puzzles reward actions contain a discover action then the item will
+				be discovered in the context of a "terminal", and this text will be used in the
+				event log.
+				
+				"I downloaded information from a terminal about a substance called Computronium. 
+				 Maybe the Arm knows more about it."
+				
+		world:	if the object is discovered using an discovery entity in the world, or otherwise
+				discovered from a script event, then the context will be "world" and this text
+				will be used in the event log.
+				
+				"I found this strange looking substance while I was wandering the ship. The Arm told me it is
+				 called Computronium. Maybe the Arm knows more about it."
+
+]]
 Arm.Discoveries = {
 	Bugs = {
 		picture = "UI/discovery_bugs_M",
 		title = "ARM_DISCOVERY_BUGS_TITLE",
 		text = "ARM_DISCOVERY_BUGS",
-		index = 1,
-		chat = "Genesis1"
+		index = 1
 	},
 	Pod = {
 		picture = "UI/discovery_pod_M",
 		title = "ARM_DISCOVERY_POD_TITLE",
 		text = "ARM_DISCOVERY_POD",
 		index = 2,
-		chat = "Tentacles",
-		logText = "ARM_DISCOVERY_POD_LOG",
+		logText = {
+			all = "ARM_DISCOVERY_POD_LOG"
+		},
 		discoveryPopupText = "ARM_DISCOVERY_POD_POPUP"
 	},
 	Tentacles = {
 		picture = "UI/discovery_tentacles_M",
-		title = "ARM_DISCOVERY_TENTACLES_TITLE",
+		title = "ARM_TOPIC_TENTACLES",
 		text = "ARM_DISCOVERY_TENTACLES",
 		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
 		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
 		mysteryChat = "Tentacles",
 		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG",
+		logText = {
+			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
+		},
 		index = 3,
-		chat = "Tentacles"
+		chat = "ARM_TOPIC_TENTACLES"
 	},
 	Terminals = {
 		picture = "UI/discovery_terminals_M",
 		title = "ARM_DISCOVERY_TERMINALS_TITLE",
 		text = "ARM_DISCOVERY_TERMINALS",
-		index = 4,
-		chat = "Genesis4"
+		index = 4
 	}
 }
 

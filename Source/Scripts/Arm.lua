@@ -79,6 +79,7 @@ function Arm.SpawnShared(self)
 	self.typefaces.LogEvent = World.Load("UI/LogEvent_TF")
 	self.typefaces.LogDiscovery = World.Load("UI/LogDiscovery_TF")
 	self.typefaces.LogArmAsk = World.Load("UI/LogArmAsk_TF")
+	self.typefaces.LogUnlockTopic = World.Load("UI/LogUnlockTopic_TF")
 	self.typefaces.SkillTitle = World.Load("UI/SkillTitle_TF")
 	self.typefaces.SkillDescription = World.Load("UI/SkillDescription_TF")
 	self.typefaces.SkillDetails = World.Load("UI/SkillDetails_TF")
@@ -373,7 +374,7 @@ function Arm.OpenDatabaseItem(self, item)
 	self.widgets.Database.state.pressed = true
 	self.widgets.Database.class:SetGfxState(self.widgets.Database)
 	self.widgets.Database.state.pressed = false
-	Arm:ClearButtonHighlights(self.widgets.Database)
+	Arm:ClearButtonHighlights()
 	Arm:SwitchMode("db")
 end
 

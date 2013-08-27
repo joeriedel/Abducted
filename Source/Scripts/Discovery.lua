@@ -9,7 +9,7 @@ Discovery.Popup = nil
 Discovery.Widgets = {}
 Discovery.kSkillReward = 25
 -- 720p sizes
-Discovery.kUISize = {300, 400}
+Discovery.kUISize = {300, 500}
 Discovery.kArrowSize = {20, 32}
 Discovery.kButtonHeight = 90
 Discovery.kUIBorder = 8
@@ -151,7 +151,7 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 		title
 	)
 	
-	r[1] = Discovery.kUIBorder * UI.identityScale[1]
+	r[1] = r[1] + Discovery.kUIBorder * UI.identityScale[1]
 	r[2] = Discovery.kUIBorder * UI.identityScale[1]
 	Discovery.Widgets.Title:SetRect(r)
 	
@@ -162,7 +162,7 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 		Discovery.Widgets.SkillReward:SetVisible(true)
 		Discovery.Widgets.SkillReward:BlendTo({1,1,1,0}, 0)
 		Discovery.Widgets.SkillReward:SetRect(rect)
-		r[2] = r[2] + 8*UI.identityScale[1] + Discovery.Widgets.SkillReward.Height
+		r[2] = r[2] + 8*UI.identityScale[1]
 		
 		local text = "+"..tostring(Discovery.kSkillReward)
 		if (Discovery.kSkillReward > 1) then
@@ -171,21 +171,33 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 			text = text.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
 		end
 		
-		UI:SetLabelText(Discovery.Widgets.SkillReward, text)
-		UI:SizeLabelToContents(Discovery.Widgets.SkillReward)
+		text = text.."\n"..StringTable.Get("ARM_REWARD_DISCOVERY")
+		
+		local textRect = UI:LineWrapCenterText(
+			Discovery.Widgets.SkillReward,
+			kDialogWidth,
+			true,
+			0,
+			text
+		)
+		
+		r[2] = r[2] + textRect[4]
+		Discovery.Widgets.SkillReward.Height = textRect[4]
+		
 		rect = UI:HCenterLabel(Discovery.Widgets.SkillReward, rect)
 		Discovery.Widgets.SkillReward.pos = {rect[1], rect[2]}
+		Discovery.Widgets.SkillReward:SetClipRect(rect)
 	else
 		Discovery.Widgets.SkillReward:SetVisible(false)
 	end
 
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
-	Discovery.Widgets.Line1:SetRect({0,r[2],Discovery.kUISize[1],10*UI.identityScale[1]})
+	Discovery.Widgets.Line1:SetRect({0,r[2],Discovery.kUISize[1]*UI.identityScale[1],10*UI.identityScale[1]})
 	
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
-	local textArea = Discovery.kUISize[2] - r[2] - kButtonHeight - 10*UI.identityScale[1]
+	local textArea = (Discovery.kUISize[2]*UI.identityScale[2]) - r[2] - kButtonHeight - 10*UI.identityScale[1]
 	local textRect = {kBorderSize, r[2], kDialogWidth, textArea}
 	
 	Discovery.Widgets.Scroll:SetRect(textRect)
@@ -200,18 +212,21 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 	
 	text = StringTable.Get(text)
 	
-	UI:LineWrapCenterLJustifyText(
+	local scrollTextRect = UI:LineWrapAlignTopLJustifyText(
 		Discovery.Widgets.Text,
-		textRect[3],
+		textRect[3]-kBorderSize*4,
 		true,
 		0,
 		text
 	)
 	
+	scrollTextRect[1] = kBorderSize*2
+	Discovery.Widgets.Text:SetRect(scrollTextRect)
+	
 	Discovery.Widgets.Scroll:RecalcLayout()
 	
 	r[2] = textRect[2] + textRect[4]
-	Discovery.Widgets.Line2:SetRect({0,r[2],Discovery.kUISize[1],10*UI.identityScale[1]})
+	Discovery.Widgets.Line2:SetRect({0,r[2],Discovery.kUISize[1]*UI.identityScale[1],10*UI.identityScale[1]})
 	
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
@@ -221,7 +236,7 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 	
 	UI:LineWrapCenterText(
 		Discovery.Widgets.Button.label,
-		nil,
+		kDialogWidth*0.9,
 		nil,
 		0,
 		StringTable.Get("DISCOVERY_OPEN_DB")
@@ -279,7 +294,7 @@ function Discovery.AnimateOpenUI(self, awardSkillPoints)
 					local w = Discovery.Widgets.SkillReward
 					w:MoveTo({w.pos[1], w.pos[2]+w.Height}, {0,0})
 					w:MoveTo({w.pos[1], w.pos[2]}, {0,0.3})
-					w:BlendTo({1,1,1,1}, 0.1)
+					w:BlendTo({1,1,1,1}, 0.3)
 					self.animateTime = nil
 					
 				end
@@ -354,7 +369,7 @@ function Discovery.OpenUI(self)
 	local f = function()
 		Discovery.Popup = self
 		local f = function()
-			local awardSkillPoints = GameDB:Discover(self.databaseId, false, true)
+			local awardSkillPoints = GameDB:Discover(self.databaseId, "world", false, true)
 			self:LayoutUI(awardSkillPoints)
 			self:AnimateOpenUI(awardSkillPoints)
 			self:AddLookTarget()
@@ -412,10 +427,10 @@ function Discovery.UpdateUI(self)
 	
 	if (self.left) then
 		arrowRect[1] = p[1] - arrowRect[3]
-		panelRect[1] = arrowRect[1] - panelRect[3] + 4
+		panelRect[1] = arrowRect[1] - panelRect[3]
 	else
 		arrowRect[1] = p[1]
-		panelRect[1] = arrowRect[1] + arrowRect[3] - 4
+		panelRect[1] = arrowRect[1] + arrowRect[3]
 	end
 	
 	arrowRect[2] = p[2] - arrowRect[4]/2
@@ -473,7 +488,7 @@ function Discovery.StaticInit()
 	Discovery.Widgets.Arrow:BlendTo({1,1,1,0}, 0)
 	
 	material = World.Load("UI/DiscoveryBackground_M")
-	Discovery.Widgets.Root = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kUISize[1], Discovery.kUISize[2]}, material=material, OnInputEvent=UI.EatInput})
+	Discovery.Widgets.Root = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kUISize[1]*UI.identityScale[1], Discovery.kUISize[2]*UI.identityScale[2]}, material=material, OnInputEvent=UI.EatInput})
 	UI.widgets.discoveries.Root:AddChild(Discovery.Widgets.Root)
 	Discovery.Widgets.Root:SetVisible(false)
 	Discovery.Widgets.Root:SetHAlign(kHorizontalAlign_Center)

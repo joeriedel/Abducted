@@ -368,13 +368,10 @@ function Discovery.OpenUI(self)
 	Abducted.entity.eatInput = true
 	local f = function()
 		Discovery.Popup = self
-		local f = function()
-			local awardSkillPoints = GameDB:Discover(self.databaseId, "world", false, true)
-			self:LayoutUI(awardSkillPoints)
-			self:AnimateOpenUI(awardSkillPoints)
-			self:AddLookTarget()
-		end
-		TerminalScreen.CancelUI(f)
+		local awardSkillPoints = GameDB:Discover(self.databaseId, "world", false, true)
+		self:LayoutUI(awardSkillPoints)
+		self:AnimateOpenUI(awardSkillPoints)
+		self:AddLookTarget()
 	end
 	if (Discovery.Popup) then
 		if (Discovery.Popup == self) then
@@ -400,7 +397,7 @@ function Discovery.AddLookTarget(self)
 		0.8,
 		0.8,
 		-1,
-		0.7,
+		0.9,
 		1,
 		1,
 		0.57

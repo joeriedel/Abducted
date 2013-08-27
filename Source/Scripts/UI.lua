@@ -5,25 +5,26 @@
 
 UI = Class:New()
 UI.kLayer_Mask = 0
-UI.kLayer_Discoveries = 1
-UI.kLayer_MainMenu = 2
-UI.kLayer_HUD = 2 -- not used at same time as main menu
-UI.kLayer_Interactive = 3
-UI.kLayer_HUDPrint = 4
-UI.kLayer_Arm = 5
-UI.kLayer_HackGame = 6
-UI.kLayer_HackGame2 = 7
-UI.kLayer_HackGame3 = 8
-UI.kLayer_HackGame4 = 9
-UI.kLayer_SolveGame = 10
-UI.kLayer_SolveGame2 = 11
-UI.kLayer_SolveGame3 = 12
-UI.kLayer_SolveGame4 = 13
-UI.kLayer_AlertPanel = 14
-UI.kLayer_Feedback = 15
-UI.kLayer_FX = 16
-UI.kLayer_TitleCrawl = 17
-UI.kLayer_Debug = 18
+UI.kLayer_World = 1
+UI.kLayer_HUDPrint = 2
+UI.kLayer_Discoveries = 3
+UI.kLayer_MainMenu = 4
+UI.kLayer_HUD = 5 -- not used at same time as main menu
+UI.kLayer_Interactive = 6
+UI.kLayer_Arm = 7
+UI.kLayer_HackGame = 8
+UI.kLayer_HackGame2 = 9
+UI.kLayer_HackGame3 = 10
+UI.kLayer_HackGame4 = 11
+UI.kLayer_SolveGame = 12
+UI.kLayer_SolveGame2 = 13
+UI.kLayer_SolveGame3 = 14
+UI.kLayer_SolveGame4 = 15
+UI.kLayer_AlertPanel = 16
+UI.kLayer_Feedback = 17
+UI.kLayer_FX = 18
+UI.kLayer_TitleCrawl = 19
+UI.kLayer_Debug = 20
 
 function UI.Spawn(self)
 	UI.entity = self
@@ -180,6 +181,7 @@ function UI.LoadShared(self)
 end
 
 function UI.InitMap(self)
+	UI:CreateWorldLayer()
 	UI:CreateInteractiveLayer()
 	UI:CreateHUDPrintLayer()
 	UI:CreateTitleCrawlLayer()
@@ -199,6 +201,11 @@ function UI.InitMap(self)
 		self.typefaces.ActionBar = World.Load("UI/ActionBarLabel_TF")
 		self.gfx.KeyLabelBackground = World.Load("UI/MMItemBackground2_M")
 	end
+end
+
+function UI.CreateWorldLayer(self)
+	self.widgets.world = {}
+	self.widgets.world.Root = UI:CreateRoot(UI.kLayer_World)
 end
 
 function UI.CreateInteractiveLayer(self)

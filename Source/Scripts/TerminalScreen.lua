@@ -5,7 +5,7 @@
 
 TerminalScreen = Entity:New()
 TerminalScreen.MaxTouchDistancePct = 1/8
-TerminalScreen.TouchPosShift = {0,0,48}
+TerminalScreen.TouchPosShift = {70,0,120}
 TerminalScreen.ButtonPosShift = {1.5/10, 1/10}
 TerminalScreen.ButtonSize = {1.5/15, 1.5/15}
 TerminalScreen.PopupEntity = nil
@@ -46,6 +46,8 @@ function TerminalScreen.Spawn(self)
 	self.model.glow2:ScaleTo(scale, 0)
 	self.model.glow2:SetBounds(self:Mins(), self:Maxs())
 	self.model.glow2:BlendTo({1,1,1,0}, 0)
+	
+	self.glyphPos = VecAdd(self:WorldPos(), RotateVecZ(TerminalScreen.TouchPosShift, self:Angles().pos[3] - 90))
 	
 	self.alienSkin1 = World.Load("Shared/alienskin1_M")
 	self.terminalFlash1 = World.Load("Objects/terminalglow1_M")
@@ -258,17 +260,12 @@ function TerminalScreen.UpdateUI()
 		return
 	end
 	if (TerminalScreen.PopupEntity) then
-		local worldPos = World.playerPawn:WorldPos()
-		local p, r = World.Project(VecAdd(worldPos, TerminalScreen.TouchPosShift))
+		local p, r = World.Project(TerminalScreen.PopupEntity.glyphPos)
 		p = UI:MapToUI(p)
 		
-		local shiftX = TerminalScreen.ButtonPosShift[1] * UI.identityScale[1] * UI.screenWidth
-		local shiftY = TerminalScreen.ButtonPosShift[2] * UI.identityScale[2] * UI.screenHeight
-		
-		local wpos = {p[1]+shiftX, p[2]-shiftY}
 		r = TerminalScreen.Widgets.Glyph:Rect()
-		r[1] = wpos[1] - r[3]
-		r[2] = wpos[2] - r[4]
+		r[1] = p[1] - r[3]/2
+		r[2] = p[2] - r[4]/2
 		BoundRect(r, TerminalScreen.ScreenBounds)
 		TerminalScreen.Widgets.Glyph:SetRect(r)
 	end
@@ -625,7 +622,7 @@ function TerminalScreen.CreateButton(center, text, typeface, gfx, handler)
 			highlight = {on={0,0,0,0}, off = {0,0,0,0}, overbright = {1,1,1,1}, time = 0.1, overbrightTime = 0.1},
 			label = {typeface=typeface}
 		},
-		UI.widgets.interactive.Root
+		UI.widgets.world.Root
 	)
 	
 	UI:SetLabelText(w.label, text)

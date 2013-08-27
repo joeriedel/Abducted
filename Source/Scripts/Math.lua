@@ -484,8 +484,9 @@ function QuatRotateVec(q, v)
 	local qx =  (q[4]*v[1]) + (q[2]*v[3]) - (q[3]*v[2])
 	local qy =  (q[4]*v[2]) - (q[1]*v[3]) + (q[3]*v[1])
 	local qz =  (q[4]*v[3]) + (q[1]*v[2]) - (q[2]*v[1])
-	v[1] = -(qw*q[1]) + (qx*q[4]) - (qy*q[3]) + (qz*q[2])
-	v[2] = -(qw*q[2]) + (qx*q[3]) + (qy*q[4]) - (qz*q[1])
-	v[3] = -(qw*q[3]) - (qx*q[2]) + (qy*q[1]) + (qz*q[4])
-	return v
+	local vv = {}
+	vv[1] = -(qw*q[1]) + (qx*q[4]) - (qy*q[3]) + (qz*q[2])
+	vv[2] = -(qw*q[2]) + (qx*q[3]) + (qy*q[4]) - (qz*q[1])
+	vv[3] = -(qw*q[3]) - (qx*q[2]) + (qy*q[1]) + (qz*q[4])
+	return vv
 end

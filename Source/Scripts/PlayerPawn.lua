@@ -221,6 +221,12 @@ function PlayerPawn.Spawn(self)
 	
 	self.pulseSounds.Hum:SetLoop(true)
 	
+	self.pulseSparks = World.Load("FX/pulseimpactsparks")
+	self.pulseSparks:SetMaxParticles(250)
+	self.pulseSparks.dm = self:AttachDrawModel(self.pulseSparks)
+	self.pulseSparks.dm:SetPositionMode(kParticleEmitterDrawModelPositionMode_World)
+	self.pulseSparks.dm:SetBounds(self:Mins(), self:Maxs())
+	
 	self.bugSounds = {
 		Stun = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
 		Eaten = World.LoadSound("Audio/EFX_IdleBugSwarm_rev1"),
@@ -608,28 +614,34 @@ function PlayerPawn.PulseDamage(self, pos)
 	end
 end
 
-function PlayerPawn.FirePulse(self, target, normal)
+function PlayerPawn.FirePulse(self, target, normal, sparks)
 	local f = function()
 		self:EndPulse()
 	end
 	
 	self.pulseSounds.Hum:Stop()
 	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
-	self:InternalFirePulse(target, normal).Seq(f)
+	self:InternalFirePulse(target, normal, sparks).Seq(f)
 	self.pulseActive = false
 	HUD:RechargePulse()
 	
 end
 
-function PlayerPawn.RapidFirePulse(self, target, normal)
+function PlayerPawn.RapidFirePulse(self, target, normal, sparks)
 	self.pulseSounds.Hum:Stop()
 	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
-	self:InternalFirePulse(target, normal)
+	self:InternalFirePulse(target, normal, sparks)
 end
 
-function PlayerPawn.InternalFirePulse(self, target, normal)
+function PlayerPawn.InternalFirePulse(self, target, normal, sparks)
 	if (Abducted.entity.pulseCount == 1) then -- only on first shot
 		self:PulseLight(VecAdd(target, VecScale(normal, 32)))
+	end
+	
+	if ((sparks==true) or (sparks==nil)) then
+		self.pulseSparks.dm:SetWorldPos(target)
+		self.pulseSparks.dm:SetLocalDir(normal)
+		self.pulseSparks:Spawn(50)
 	end
 	
 	World.viewController:BlendToLookTarget(
@@ -909,7 +921,7 @@ function PlayerPawn.Teleport(self, userId, facing)
 	end
 end
 
-function PlayerPawn.PlayUninterruptable(self, anim)
+function PlayerPawn.PlayUninterruptable(self, anim, callback)
 	local anim = self:LookupAnimation(anim)
 
 	self.disableAnimTick = true
@@ -926,7 +938,11 @@ function PlayerPawn.PlayUninterruptable(self, anim)
 				self:TickPhysics()
 			end
 		end
-		return blend.Seq(f)
+		blend = blend.Seq(f)
+		if (callback) then
+			blend = blend.Seq(callback)
+		end
+		return blend
 	end
 	
 	return nil
@@ -1020,6 +1036,27 @@ function PlayerPawn.RemoveMine(self, mine)
 			HUD:NotifyZeroMines()
 		end
 	end
+end
+
+function PlayerPawn.SmackMetadata(self, callback)
+	if (self.bugStun) then
+		return false
+	end
+	if (Abducted.entity.manipulate) then
+		return false
+	end
+	
+	if (Abducted.entity.pulse) then
+		return false
+	end
+	
+	self:PlayUninterruptable("smack_metadata")
+		
+	if (callback) then
+		World.globalTimers:Add(callback, 0.4)
+	end
+	
+	return true
 end
 
 function PlayerPawn.BugStun(self, callback)

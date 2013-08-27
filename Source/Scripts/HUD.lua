@@ -31,7 +31,7 @@ function HUD.CreatePrinter(self)
 		HUD.printerRect = {
 			0,
 			8,
-			UI.screenWidth * 0.6,
+			UI.screenWidth * 0.5,
 			UI.screenHeight
 		}
 		
@@ -40,7 +40,7 @@ function HUD.CreatePrinter(self)
 		HUD.printerRect = {
 			0,
 			0,
-			UI.screenWidth * 0.6,
+			UI.screenWidth * 0.5,
 			UI.screenHeight
 		}
 		

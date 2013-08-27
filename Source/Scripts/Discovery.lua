@@ -441,6 +441,10 @@ end
 
 function Discovery.CheckTouched(self, e)
 	local p, r = World.Project(self.pos)
+	if (not r) then
+		return false
+	end
+	
 	p = UI:MapToUI(p)
 	
 	local dx = p[1]-e.data[1]

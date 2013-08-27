@@ -74,6 +74,10 @@ end
 
 function PlayerInput.TapPulse(self, x, y)
 
+	if (self:TapMetadata(x,y)) then
+		return true
+	end
+
 	local a = World.Unproject({x, y, 0})
 	local b = World.Unproject({x, y, 1})
 	
@@ -85,9 +89,46 @@ function PlayerInput.TapPulse(self, x, y)
 	
 	trace = World.LineTrace(trace)
 	if (trace and not (trace.startSolid)) then
-		Game.entity:FirePulse(trace.traceEnd, trace.normal)
+		local playerTrace = {
+			start = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift()),
+			_end = trace.traceEnd,
+			contents = bit.bor(kContentsFlag_Solid, kContentsFlag_Clip)
+		}
+		
+		playerTrace = World.LineTrace(playerTrace) or trace
+		Game.entity:FirePulse(playerTrace.traceEnd, playerTrace.normal)
+		return true
 	end
 	
+	return false
+	
+end
+
+function PlayerInput.TapMetadata(self, x, y)
+
+	local target = Metadata.CheckPulseTargets(x, y)
+	
+	if (target) then
+	
+		-- did we hit something first?
+		local trace = {
+			start = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift()),
+			_end = target.pos,
+			contents = bit.bor(kContentsFlag_Solid, kContentsFlag_Clip)
+		}
+	
+		if (World.LineTrace(trace) == nil) then
+			COutLine(kC_Debug, "Pulse - hit metadata entity!")
+			local normal = VecSub(trace.start, trace._end)
+			normal = VecNorm(normal)
+			Game.entity:FirePulse(target.pos, normal, false)
+			target:Explode()
+			return true
+		end
+	end
+	
+	return false
+
 end
 
 function PlayerInput.TapMove(self, x, y)

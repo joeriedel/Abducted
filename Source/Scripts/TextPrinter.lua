@@ -311,11 +311,10 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 					height = height + self.lineAdvance
 				end
 			end
-		else
-			if (k ~= #lines) then
-				height = height + self.lineAdvance
-			end
-		end		
+		end
+		if (k ~= #lines) then
+			height = height + self.lineAdvance
+		end
 	end
 	
 	height = math.max(height, iconRect[4])

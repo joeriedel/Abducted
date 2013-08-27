@@ -75,6 +75,8 @@ function GameDB.LoadCheckpoint(self)
 	self.loadingCheckpoint = true
 	TerminalScreen.CancelUI()
 	Discovery.ResetUIForCheckpoint()
+	Metadata.ResetForCheckpoint()
+	PostFX.ResetForCheckpoint()
 	Game.entity:LoadState()
 	GameDB:LoadPersistentObjects()
 	GameDB:LoadEvents()

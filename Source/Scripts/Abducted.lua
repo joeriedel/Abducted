@@ -444,7 +444,7 @@ function Abducted.DischargePulse(self)
 	end
 end
 
-function Abducted.FirePulse(self, target, normal)
+function Abducted.FirePulse(self, target, normal, sparks)
 	if (self.pulseTimer) then
 		self.pulseTimer:Clean()
 		self.pulseTimer = nil
@@ -461,12 +461,12 @@ function Abducted.FirePulse(self, target, normal)
 			self.rapidFireWindow = World.gameTimers:Add(f, PlayerSkills:RapidFireWindow())
 		end
 	
-		World.playerPawn:RapidFirePulse(target, normal)
+		World.playerPawn:RapidFirePulse(target, normal, sparks)
 		World.playerPawn:PulseDamage(target)
 		
 	else
 	
-		World.playerPawn:FirePulse(target, normal)
+		World.playerPawn:FirePulse(target, normal, sparks)
 		World.playerPawn:PulseDamage(target)
 		
 		self.pulse = false

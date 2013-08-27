@@ -143,6 +143,10 @@ kMaterialTimingMode_TM_Relative = 1
 kMaterialWidgetDrawMode_Rect = 0
 kMaterialWidgetDrawMode_Circle = 1
 
+-- Particle Emitter PositionModes
+kParticleEmitterDrawModelPositionMode_Local = 0
+kParticleEmitterDrawModelPositionMode_World = 1
+
 -- String table languages
 kLangId_EN = 0
 kLangId_FR = 1

@@ -62,7 +62,7 @@ function TerminalScreen.Spawn(self)
 	self.enabled = BoolForString(self.keys.enabled, false)
 	self.activateRadius = NumberForString(self.keys.activate_radius, 200)
 	self.hackDifficulty = NumberForString(self.keys.hack_difficulty, 1)
-	self.solveDifficulty = NumberForString(self.keys.solve_difficulty, 1)
+	self.solveGlyphs = {}
 	self.hackActions = self.keys.hack_success_actions
 	self.solveActions = self.keys.solve_success_actions
 	self.downgraded = false
@@ -102,6 +102,12 @@ function TerminalScreen.Spawn(self)
 	}
 	
 	GameDB.PersistentObjects[self.keys.uuid] = io
+end
+
+function TerminalScreen.RegisterGlyph(self, glyphNum)
+
+	table.insert(self.solveGlyphs, glyphNum)
+
 end
 
 function TerminalScreen.CheckProximity(self, playerPos)
@@ -345,7 +351,9 @@ end
 
 function TerminalScreen.ShowUI(self)
 
-	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, self.solveDifficulty)
+	assert(#self.solveGlyphs > 0)
+
+	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, #self.solveGlyphs)
 	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Hack, self.hackDifficulty)
 	
 	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
@@ -406,7 +414,7 @@ function TerminalScreen.DoSolveGame(self)
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
-			ReflexGame:InitGame(self.solveDifficulty)
+			ReflexGame:InitGame(#self.solveGlpyhs)
 			ReflexGame:ShowBoard(true)
 			
 			local f = function ()

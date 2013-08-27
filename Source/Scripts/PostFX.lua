@@ -17,6 +17,10 @@ function PostFX.Init()
 	PostFX.gfx = {}
 	PostFX.gfx.Brightpass = World.Load("FX/Brightpass_M")
 	PostFX.gfx.Bloom = World.Load("FX/Bloom_M")
+	PostFX.gfx.TerminalFlash = World.Load("FX/terminalflash2_M")
+	
+	PostFX.TerminalFlash = World.CreateScreenOverlay(PostFX.gfx.TerminalFlash)
+	PostFX.TerminalFlash:FadeOut(0)
 	
 	if (PostFX.kFastBlur) then
 		PostFX.gfx.FastBlur = World.Load("FX/FastBlur_M")
@@ -56,6 +60,10 @@ function PostFX.Init()
 	World.SetPostProcessEffectScale(PostFX.kBloom, {scale, scale})
 	World.EnablePostProcessEffect(PostFX.kBloom, PostFX.BloomEnable)
 
+end
+
+function PostFX.ResetForCheckpoint()
+	PostFX.TerminalFlash:FadeOut(0)
 end
 
 cv_postfx_bloom = CVarFunc("r_togglebloom", "_cv_postfx_blur_func")

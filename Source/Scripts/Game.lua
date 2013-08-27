@@ -162,6 +162,14 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "hudprint") then
 		HUD:Print(nil, args)
 		return true
+	elseif (cmd == "log") then
+		if (args) then
+			HUD:Print(nil, "HUD_LOG_UPDATED")
+			EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", args)
+		else
+			COutLine(kC_Debug, "@world log command requires string argument!")
+		end
+		return true
 	elseif (cmd == "load") then
 		self:LoadLevel(args)
 		return true

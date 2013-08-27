@@ -74,12 +74,12 @@ function KillVolume.KillThink(self)
 	if (touching) then
 		for i=1,#touching do
 			local entity = touching[i]
-			if (entity.Kill and (not entity.dead)) then
+			if (entity.Damage and (not entity.dead)) then
 				local msg = nil
 				if (entity:ClassBits() == kEntityClass_Player) then
 					msg = self.keys.killed_player_msg
 				end
-				entity:Kill(self, msg)
+				entity:Damage(999, self, msg)
 			end
 		end
 	end

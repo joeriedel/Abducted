@@ -351,15 +351,15 @@ end
 
 function TerminalScreen.ShowUI(self)
 
-	assert(#self.solveGlyphs > 0)
-
-	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, #self.solveGlyphs)
-	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Hack, self.hackDifficulty)
-	
-	TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
-	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
 	TerminalScreen.Widgets.Return:BlendTo({1,1,1,1}, 0.2)
 	
+	TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Hack, self.hackDifficulty)
+	TerminalScreen.Widgets.Hack:BlendTo({1,1,1,1}, 0.2)
+	
+	if (#self.solveGlyphs > 0) then
+		TerminalScreen.SetButtonDifficulty(TerminalScreen.Widgets.Solve, #self.solveGlyphs)
+		TerminalScreen.Widgets.Solve:BlendTo({1,1,1,1}, 0.2)
+	end
 end
 
 function TerminalScreen.HideUI(callback)

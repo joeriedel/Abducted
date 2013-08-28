@@ -9,15 +9,15 @@ function ReflexGame.CreateLevel1x1(self)
 	
 	level.name = "1x1"
 	
-	level.antivirusSpiderSpawnRate = {5, 10}
-	level.antivirusSpiderSpeed = {70, 100}
+	level.antivirusSpiderSpawnRate = {7, 13}
+	level.antivirusSpiderSpeed = {50, 90}
 	level.antivirusSpiderLifetime = {300, 300}
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 5 -- grid squares
     level.blackholeSpeed = {50, 50}
     level.blockChaseTime = 1 -- delay before blocks start eating player line
     level.blockGrowTime = 1
-    level.time = 40
+    level.time = 120
 	
 	level.board = {
 		-- row 0
@@ -29,7 +29,6 @@ function ReflexGame.CreateLevel1x1(self)
 		, { x=11, y=1, img="blocker_green" }
 		-- row 2
 		, { x=3, y=2, img="blocker_green" }
-		, { x=4, y=2, img="cell_02" }
 		, { x=8, y=2, img="blocker_green" }	
 		, { x=11, y=2, img="blocker_green" }		
 		, { x=12, y=2, img="blocker_green" }	
@@ -37,11 +36,9 @@ function ReflexGame.CreateLevel1x1(self)
 		, { x=5, y=3, img="blocker_green" }
 		-- row 4
 		, { x=12, y=4, img="blocker_green" }
-		, { x=13, y=4, img="cell_04" }
 		, { x=8, y=4, img="blackhole", heading={ 0,1 } }
 		-- row 5
 		, { x=6, y=5, img="blocker_green" }
-		, { x=13, y=5, img="cell_03" }
 		-- row 6
 		, { x=2, y=6, img="blocker_green" }
 		, { x=3, y=6, img="blocker_green" }

@@ -257,7 +257,7 @@ PlayerSkills.Skills.ShieldDuration = {
 		PlayerSkills.ShieldDuration = 0
 	end,
 	[0] = {
-		MaxDuration = 15
+		MaxDuration = 20
 	},
 	{
 		MaxDuration = 30,

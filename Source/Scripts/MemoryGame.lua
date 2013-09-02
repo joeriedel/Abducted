@@ -6,8 +6,12 @@
 MemoryGame = Class:New()
 MemoryGame.active = false
 
-kMGPhase_DiscoverPattern = 0
-kMGPhase_MatchTiles = 1
+kMGPhase_AnimateOpening = 0
+kMGPhase_ShuffleSmallTiles = 1
+kMGPhase_DiscoverPattern = 2
+kMGPhase_AnimateTransition = 3
+kMGPhase_FindPattern = 4
+kMGPhase_GameOver = 99
 
 function MemoryGame.DebugStart(self)
     MemoryGame:InitGame("memory-game: debug_start", 1, 1)
@@ -15,39 +19,40 @@ function MemoryGame.DebugStart(self)
     MemoryGame:StartGame()
 end
 
-function MemoryGame.Spawn(self)
-	MemoryGame.entity = self
+function MemoryGame.FlattenList(self,list)
+    local temp = {}
+    for i,v in ipairs(list) do
+        table.insert(temp,v)
+    end
+    return temp
 end
 
-function MemoryGame.PostSpawn(self)
-
-	if (Game.entity.type == "Map") then
-
-		self:LoadMaterials()
---		self:InitUI()
-	
-	end
+function MemoryGame.Spawn(self)
+	MemoryGame.entity = self
+		
+	self:LoadMaterials()
+	self:InitUI()
 	
 	-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
 
 end
 
 function MemoryGame.ShowBoard(self, show)
-	local self = MemoryGame.entity
+	self = MemoryGame.entity
 	-- NOTE: show board is called *after* InitGame
 	-- InitGame should get the board ready to be seen
---	self.widgets.root:SetVisible(show)
-	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
+	self.widgets.root:SetVisible(show)
+	World.DrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function MemoryGame.InitGame(self, playerSkill, terminalSkill)
-	local self = MemoryGame.entity
+function MemoryGame.InitGame(self, gameType, playerSkill, terminalSkill)
+	self = MemoryGame.entity
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 end
 
 function MemoryGame.StartGame(self, gameCompleteCallback)
-	local self = MemoryGame.entity
+	self = MemoryGame.entity
 	
 	MemoryGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
@@ -71,84 +76,211 @@ function MemoryGame.EndGame(self, result)
 end
 
 function MemoryGame.ResetGame(self)
-	local self = MemoryGame.entity
+	self = MemoryGame.entity
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
 	MemoryGame.active = false
 end
 
-function MemoryGame.CreateLevel1x1(self)
-	local level = {}
-	
-	level.name = "1x1"
-	
-	level.state = kMGPhase_DiscoverPattern;
-	level.rows = 2
-	
-	level.goal = { "symbol_a", "symbol_b", "symbol_c", "symbol_d" }
+function MemoryGame.RandomizeBoard(self,level,legend)
+    local all = {}
+    for iy=1,level.INDEX_MAX_Y do
+        for ix=1,level.INDEX_MAX_X do
+            local gi = math.random(self.NUM_GLYPHS)
+            local name = string.format("cell_%02i",gi)
+            table.insert(level.board,{x=ix, y=iy, img=name})
+            all[gi] = name
+        end
+    end
 
-	level.board = {
-        "symbol_a"
-        , "symbol_b"
-        , "symbol_c"
-        , "symbol_d"
-		}
-	
-	return level
+    if (not legend) then
+        local all_array = self:FlattenList(all)
+
+--        COutLine(kC_Debug,"All Count: %i",#all_array)
+        while (#level.legend < 3) do
+            local i = math.random(#all_array)
+            local v = all_array[i]
+            table.insert(level.legend,v)
+            table.remove(all_array,i)
+            all_array = self:FlattenList(all_array)
+        end
+    else
+        level.legend = legend
+
+        local x = math.random(level.INDEX_MAX_X)
+        local y = math.random(level.INDEX_MAX_Y)
+
+        if (math.random(100) < 50) then
+            if (x >= level.INDEX_MAX_X - #legend) then
+                x = level.INDEX_MAX_X - #legend
+            end
+
+            -- suppose we could do diagonal
+            local counter = 1
+            for xi=x,x + #legend-1 do
+                for i,v in ipairs(level.board) do
+                    if (v.x == xi and v.y == y) then
+--                    COutLine(kC_Debug,"phase 2 - legend imprint: index: %i and x,y: %i, %i:",index,xi,y)
+                        local refImage = legend[counter]
+                        counter = counter + 1
+                        v.img = refImage
+                        break
+                    end
+                end
+            end
+        else
+            if (y > level.INDEX_MAX_Y - #legend) then
+                y = level.INDEX_MAX_Y - #legend
+            end
+
+            -- suppose we could do diagonal
+            local counter = 1
+            for yi=y,y + #legend-1 do
+                for i,v in ipairs(level.board) do
+                    if (v.x == x and v.y == yi) then
+--                    COutLine(kC_Debug,"phase 2 - legend imprint: index: %i and x,y: %i, %i:",index,xi,y)
+                        local refImage = legend[counter]
+                        counter = counter + 1
+                        v.img = refImage
+                        break
+                    end
+                end
+            end
+        end
+    end
 end
+
+function MemoryGame.ShuffleBoard(self)
+    local newPieces = {}
+
+    for iy=1,self.state.level.INDEX_MAX_Y do
+        for ix=1,self.state.level.INDEX_MAX_X do
+            local i = math.random(#self.state.level.board)
+            local v = self.state.level.board[i]
+--            COutLine(kC_Debug,"b: %i, i: %i",#self.state.level.board,i)
+            local bv = {x=ix, y=iy, img=v.img }
+            local index = self:ConvertCoordToIndex(ix,iy)
+            local w = self.widgets.grid[index]
+            w:SetMaterial(self.gfx[bv.img])
+            w.state = self:CreateState(bv.img,bv)
+            table.insert(newPieces,bv)
+            table.remove(self.state.level.board,i)
+            self.state.level.board = self:FlattenList(self.state.level.board)
+        end
+    end
+    self.state.level.board = newPieces
+end
+
+function MemoryGame.CreateBoardSmall(self)
+    local level = {}
+
+    level.name = "Small"
+    level.time = 120
+    level.INDEX_MAX_X = self.SMALL_INDEX_MAX_X
+    level.INDEX_MAX_Y = self.SMALL_INDEX_MAX_Y
+    level.CELL_SCALE = self.SMALL_CELL_SCALE
+    level.board = {}
+    level.legend = {}
+
+    self:RandomizeBoard(level,nil)
+
+    return level
+end
+
+function MemoryGame.CreateBoardLarge(self,legend)
+    local level = {}
+
+    level.name = "Large"
+    level.time = 120
+    level.INDEX_MAX_X = self.LARGE_INDEX_MAX_X
+    level.INDEX_MAX_Y = self.LARGE_INDEX_MAX_Y
+    level.CELL_SCALE = self.LARGE_CELL_SCALE
+    level.board = {}
+    level.legend = {}
+
+    self:RandomizeBoard(level,legend)
+
+    return level
+end
+
 
 function MemoryGame.CreateBoards(self)
-	self.db = { }
-	self.db.levels = { }    
+    self.db = { }
+    self.db.levels = { }
 
-    -- djr, these are just using the same map system as reflex
-	self.db.levels = {  { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		, { self:CreateLevel1x1(), self:CreateLevel1x1(), self:CreateLevel1x1() }
-		}
+    self.db.levels = {  { self:CreateBoardSmall(), self:CreateBoardSmall() }
+    }
 end
+
+--function MemoryGame.CheckTouch(self, v, x, y)
+--    return CheckWorldTouch(
+--        v:WorldPos(),
+--        x,
+--        y,
+--        (.75 * UI.systemScreen.diagonal)
+--    )
+--end
 
 function MemoryGame.OnInputEvent(self,e)
-	local self = MemoryGame.entity
+    self = MemoryGame.entity
 
--- djr, disabling this for now
---	if (e.type == kI_KeyDown) then
---		--COutLine(kC_Debug,"key=%i",e.data[1])
---		if (e.data[1] == kKeyCode_I) then
---			--COutLine(kC_Debug,"moving widget")
---			self.state.heading.x = 0
---			self.state.heading.y = -1
---			--UI:MoveWidgetByCenter(self.widgets.current,UI.screenWidth/2, UI.screenHeight/2)
---			return true
---		end
---		if (e.data[1] == kKeyCode_K) then
---			self.state.heading.x = 0
---			self.state.heading.y = 1
---			return true
---		end
---		if (e.data[1] == kKeyCode_J) then
---			self.state.heading.x = -1
---			self.state.heading.y = 0
---			return true
---		end
---		if (e.data[1] == kKeyCode_L) then
---			self.state.heading.x = 1
---			self.state.heading.y = 0
---			return true
---		end
---	end
-	
-	return false
+    COutLine(kC_Debug,"OnInputEvent - call")
+
+    if (not Input.IsTouchBegin(e)) then
+        return false
+    end
+
+    COutLine(kC_Debug,"OnInputEvent - begin")
+
+    local best
+    local x = e.data[1]
+    local y = e.data[2]
+    for k,v in ipairs(self.widgets.cells) do
+        COutLine(kC_Debug,"OnInputEvent - widget")
+        local r = v:Rect()
+        if (x >= r[1] and x <= (r[1] + r[3]) and y >= r[2] and y <= (r[2] + r[4])) then
+            best = v
+        end
+    end
+
+    if (best) then
+        COutLine(kC_Debug,"OnInputEvent - found")
+
+        e = UI:MapInputEvent(e)
+        if (self.state.phase == kMGPhase_DiscoverPattern or self.state.phase == kMGPhase_FindPattern) then
+            if (self.state.phaseGlyphsCounter < #self.widgets.goals) then
+                COutLine(kC_Debug,"begin glph code")
+                local glyphsCounter = self.state.phaseGlyphsCounter + 1
+                local refImage = self.state.level.legend[glyphsCounter]
+                if (self.state.phase == kMGPhase_DiscoverPattern) then
+                    -- we just assume the input is correct since legend glyphs are created inside game right now
+                    local w = self.widgets.goals[glyphsCounter]
+                    w:SetMaterial(self.gfx[refImage])
+                    self.state.phaseGlyphsCounter = glyphsCounter
+                elseif (self.state.phase == kMGPhase_FindPattern) then
+                    local handled = false
+                    COutLine(kC_Debug,"identify click: %s",best.state.architype)
+                    if (best.state.architype == refImage) then
+                        COutLine(kC_Debug,"matched click: %s",best.state.architype)
+                        self.state.phaseGlyphsCounter = glyphsCounter
+                        UI:AckFinger(e.data)
+                        handled = true
+                    end
+
+                    if (not handled) then
+                        -- some kind of reset here (watch video send email)
+                        UI:AckFinger(e.data)
+                    end
+                end
+            end
+        end
+    end
+
+    return (best ~= nil)
 end
 
-function MemoryGame.OnInputGesture(self,g)
-	local self = MemoryGame.entity
+--function MemoryGame.OnInputGesture(self,g)
+--	self = MemoryGame.entity
 
 --  djr, disabling this for now (joe added this i think)
 --	if (g.id ~= kIG_Line) then
@@ -169,116 +301,221 @@ function MemoryGame.OnInputGesture(self,g)
 --		self.state.heading.x = 0
 --		self.state.heading.y = -1
 --	end
-	
-	return true
+--
+--	return true
+--end
+
+function MemoryGame.ChangeLevel(self,level)
+    self.state.level = level
+    COutLine(kC_Debug, "memory.level.name=" .. self.state.level.name)
+
+    self.REFLEX_BOARD_OFFSET = {self.screen[1] -  level.CELL_SCALE - 20, self.screen[2] - level.CELL_SCALE - 20 + 100}
+    self.REFLEX_CELL_SIZE = {level.CELL_SCALE*UI.identityScale[1], level.CELL_SCALE*UI.identityScale[1] }
+    self.INDEX_MAX_X = level.INDEX_MAX_X
+    self.INDEX_MAX_Y = level.INDEX_MAX_Y
+    self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + 0 * self.REFLEX_CELL_SIZE[1]
+    self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + 0 * self.REFLEX_CELL_SIZE[2]
+    self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]
+    self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE[2]
+
+    -- reset the board for next draw
+    for i,k in ipairs(self.widgets.cells) do
+        self.widgets.root:RemoveChild(k)
+    end
+    self.widgets.grid = {}
+    self.widgets.cells = {}
 end
 
 function MemoryGame.InitUI(self)
-	-- constants
-	self.REFLEX_CELL_SIZE = 60
-	self.REFLEX_BOARD_OFFSET =80
-	self.INDEX_MAX_X = 21
-	self.INDEX_MAX_Y = 15
-	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + 0 * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE
-	self.COORD_MAX_Y = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + self.INDEX_MAX_Y * self.REFLEX_CELL_SIZE	
+    -- constants
+    self.SMALL_CELL_SCALE = 150
+    self.SMALL_INDEX_MAX_X = 8
+    self.SMALL_INDEX_MAX_Y = 4
 
-	self:CreateBoards()	
-	
-	-- define structure: self.state
-	local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
-	self.state = { }	
-	self.state.victory = { }
-	self.state.current = { }	
-	self.state.gameOver = false
-	self.state.currentMove = 1
-	self.state.gameOverTimer = 2	
-	self.state.victory = false
-	self.state.level = level
-	self.state.goalCounter = 1
-	
-	-- define structure self.widgets
-	self.widgets = {}
-	self.widgets.goals = { }
-	self.widgets.board = { }		
-	self.widgets.grid = { }
-	self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=MemoryGame.OnInputEvent, OnInputGesture=MemoryGame.OnInputGesture})
-	World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
-	
-	self.widgets.root:SetVisible(false)
+    self.LARGE_CELL_SCALE = 90
+    self.LARGE_INDEX_MAX_X = 12
+    self.LARGE_INDEX_MAX_Y = 6
 
--- djr, border might not be needed
---	self.widgets.border = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.border})
-	self.widgets.board = UI:CreateWidget("MatWidget", {rect={0,0,UI.screenWidth,UI.screenHeight}, material=self.gfx.board})
-	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
--- djr, border might not be needed
---	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
--- djr, border might not be needed
---	self.widgets.root:AddChild(self.widgets.border)
-	self.widgets.root:AddChild(self.widgets.board)
+    self.PHASE0_LEGEND_REVEAL_TIMER = 1
+    self.PHASE1_BOARD_SHUFFLE_TIMER = .125
+    self.PHASE1_BOARD_SHUFFLE_MAX = 48
 
-	COutLine(kC_Debug, "memory.level.name=" .. self.state.level.name)
-	for i,v in ipairs(self.state.level.goal) do 
-		local xo = self.REFLEX_CELL_SIZE/2 + self.REFLEX_CELL_SIZE * (i-1)		
-		local goal = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
-		goal.state = self:CreateState(v)
-		table.insert(self.widgets.goals,goal)
-		self.widgets.root:AddChild(goal)
-		UI:MoveWidgetByCenter(goal, UI.screenWidth/2-(#self.state.level.goal)*self.REFLEX_CELL_SIZE/2+xo, self.REFLEX_CELL_SIZE)		
-	end
-	COutLine(kC_Debug, "Creating Board")	
-	-- board step: board grid is x,y structure
---    for yo = 0, yo < 2, yo = yo + 1 do
---        for xo = 0, xo < self.INDEX_MAX_X, xo = xo + 1 do
---            local v = self.state.level.board[random(#self.state.level.board)];
---            local b = UI:CreateWidget("MatWidget", {rect={0,0,	self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx[v]})
---            b.state = self:CreateState(v.img)
---            self.widgets.root:AddChild(b)
---            self.widgets.grid[index] = b
---            self:SetPositionByGrid(b,v.x,v.y)
---        end
---    end
+    self.NUM_GLPYHS_TO_FIND = 3
 
-	COutLine(kC_Debug, "Board Completed")		
+    self.NUM_GLYPHS = 27
+
+    self:CreateBoards()
+    -- define structure: self.state
+    local level = self.db.levels[1][1] -- load appropriate level based on skill + difficulty
+    self.state = {}
+    self.state.level = level
+    self.state.heading = { }
+    self.state.lastHeading = { }
+    self.state.victory = { }
+    self.state.current = {}
+    self.state.path = {}
+    self.state.pathByCell = { }
+    self.state.heading.x = 0
+    self.state.heading.y = 0
+    self.state.lastHeading.x = 0
+    self.state.lastHeading.y = 0
+    self.state.gameOver = false
+    self.state.currentMove = 1
+    self.state.gameOverTimer = 2
+    self.state.victory = false
+    self.state.timeLeft = level.time
+    self.state.phase = kMGPhase_AnimateOpening
+    self.state.phaseTimer = self.PHASE0_LEGEND_REVEAL_TIMER
+    self.state.phaseShuffles = self.PHASE1_BOARD_SHUFFLE_MAX
+    self.state.phaseGlyphsCounter = 0
+
+    self.state.spawnTimer = level.antivirusSpiderSpawnRate
+    self.state.antivirusSpawnTimer = level.antivirusSpiderSpawnRate
+    self.state.lineTimerEnabledTimer = level.lineTimerEnabledEnabledTimer
+    self.state.lineTimer = 0
+    self.state.goalCounter = 1
+    self.state.lineIndex = 1
+    self.state.fadeInBoardTimer = 2
+    self.state.swipeToMoveTimer = 1
+    self.state.touchWhenReadyTimer = 3
+
+    -- define structure self.widgets
+    self.widgets = {}
+    self.widgets.goals = { }
+    self.widgets.board = { }
+    self.widgets.grid = {}
+    self.widgets.cells = {}
+
+    self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=MemoryGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
+    World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+    self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
+
+    self.widgets.root:SetVisible(false)
+
+    self.widgets.border = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.border})
+    self.widgets.board = UI:CreateWidget("MatWidget", {rect=self.magicBoardRect, material=self.gfx.board})
+    --	UI:MoveWidgetByCenter(self.widgets.board, UI.screenWidth/2, UI.screenHeight/2)
+    --	UI:MoveWidgetByCenter(self.widgets.border, UI.screenWidth/2, UI.screenHeight/2)
+    self.widgets.root:AddChild(self.widgets.border)
+    self.widgets.root:AddChild(self.widgets.board)
+
+    self:ChangeLevel(level)
+
+    COutLine(kC_Debug, "Creating Board")
+    -- board step: board grid is x,y structure
+
+    self.widgets.timeLeftLabel = UI:CreateWidget("TextLabel", {rect={80, 35, UI.screenWidth*.15,UI.screenHeight*.15}, typeface=self.typefaces.TimerText})
+    self.widgets.root:AddChild(self.widgets.timeLeftLabel)
+
+    self.widgets.touchWhenReadyLabel = UI:CreateWidget("TextLabel", {rect={ 320, UI.screenHeight/2 - 65, UI.screenWidth, UI.screenHeight/2 + 20}, typeface=self.typefaces.TouchWhenReadyText})
+    self.widgets.touchWhenReadyLabel:SetText("Touch when ready")
+    self.widgets.touchWhenReadyLabel:BlendTo({1,1,1,0}, 0)
+    self.widgets.root:AddChild(self.widgets.touchWhenReadyLabel)
+
+    self.widgets.swipeToMoveLabel = UI:CreateWidget("TextLabel", {rect={ 60, 500, 500, 100}, typeface=self.typefaces.SwipeToMoveText})
+    self.widgets.swipeToMoveLabel:SetText("Swipe to move - Collect the Glyphs")
+    self.widgets.swipeToMoveLabel:BlendTo({1,1,1,0}, 0)
+    self.widgets.root:AddChild(self.widgets.swipeToMoveLabel)
+
+    self:UpdateHud()
+
+    if (self.widgets.current == nil) then
+        COutLine(kC_Debug,"mark_start NOT FOUND --> ERROR")
+    end
+
+    COutLine(kC_Debug, "Board Completed")
 end
 
 function MemoryGame.LoadMaterials(self)
-	
-	self.gfx = {}
---	self.gfx.antivirus_spider = World.Load("Reflex-Game/reflex-antivirus-spider_M")
-	self.gfx.board = World.Load("Memory-Game/memory-board_M")
--- djr, might not need the border seperate from the board
---	self.gfx.border = World.Load("Memory-Game/memory-border_M")
+    self.gfx = {}
+    self.gfx.blackhole = World.Load("Puzzles/reflex-blackhole1_M");
+    self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
+    self.gfx.blue_glow = World.Load("Puzzles/reflex-blueglow1_M")
+    self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
+    self.gfx.border = World.Load("UI/arm_screen1_M")
 
---	self.gfx.cell_a = World.Load("Reflex-Game/reflex-cell-a_M")
---	self.gfx.cell_b = World.Load("Reflex-Game/reflex-cell-b_M")
---	self.gfx.cell_c = World.Load("Reflex-Game/reflex-cell-c_M")
---	self.gfx.cell_d = World.Load("Reflex-Game/reflex-cell-d_M")
---
---	self.gfx.cell_green = World.Load("Reflex-Game/reflex-cell-green_M")
---
---	self.gfx.mark_current = World.Load("Reflex-Game/reflex-mark-current_M")
---	self.gfx.mark_line_v = self.gfx.mark_current
---	self.gfx.mark_line_h = self.gfx.mark_current
---	self.gfx.mark_end = World.Load("Reflex-Game/reflex-mark-end_M")
---	self.gfx.mark_start = World.Load("Reflex-Game/reflex-mark-start_M")
+    self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
+    self.gfx.mark_line_v = World.Load("Puzzles/reflex-goal1_M")
+    self.gfx.mark_line_h = self.gfx.mark_line_v
+    self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
---	self.gfx.symbol_a = World.Load("Memory-Game/memory-symbol-a_M")
---	self.gfx.symbol_b = World.Load("Memory-Game/memory-symbol-b_M")
---	self.gfx.symbol_c = World.Load("Memory-Game/memory-symbol-c_M")
---	self.gfx.symbol_d = World.Load("Memory-Game/memory-symbol-d_M")
-	
-	self.typefaces = {}
---	self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")				
+    self.gfx.blocker_green = World.Load("Puzzles/reflex-block1_M")
+
+    self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
+    self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
+    self.gfx.cell_03 = World.Load("Puzzles/glyph03_M")
+    self.gfx.cell_04 = World.Load("Puzzles/glyph04_M")
+    self.gfx.cell_05 = World.Load("Puzzles/glyph05_M")
+    self.gfx.cell_06 = World.Load("Puzzles/glyph06_M")
+    self.gfx.cell_07 = World.Load("Puzzles/glyph07_M")
+    self.gfx.cell_08 = World.Load("Puzzles/glyph08_M")
+    self.gfx.cell_09 = World.Load("Puzzles/glyph09_M")
+    self.gfx.cell_10 = World.Load("Puzzles/glyph10_M")
+    self.gfx.cell_11 = World.Load("Puzzles/glyph11_M")
+    self.gfx.cell_12 = World.Load("Puzzles/glyph12_M")
+    self.gfx.cell_13 = World.Load("Puzzles/glyph13_M")
+    self.gfx.cell_14 = World.Load("Puzzles/glyph14_M")
+    self.gfx.cell_15 = World.Load("Puzzles/glyph15_M")
+    self.gfx.cell_16 = World.Load("Puzzles/glyph16_M")
+    self.gfx.cell_17 = World.Load("Puzzles/glyph17_M")
+    self.gfx.cell_18 = World.Load("Puzzles/glyph18_M")
+    self.gfx.cell_19 = World.Load("Puzzles/glyph19_M")
+    self.gfx.cell_20 = World.Load("Puzzles/glyph20_M")
+    self.gfx.cell_21 = World.Load("Puzzles/glyph21_M")
+    self.gfx.cell_22 = World.Load("Puzzles/glyph22_M")
+    self.gfx.cell_23 = World.Load("Puzzles/glyph23_M")
+    self.gfx.cell_24 = World.Load("Puzzles/glyph24_M")
+    self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
+    self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
+    self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
+
+    self.gfx.mark_start = nil
+    self.typefaces = {}
+    self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+
+    local xScale = UI.screenWidth / 1280
+    local yScale = UI.screenHeight / 720
+
+    -- the border is authored to be a 16:9 image packed in a square image, adjust for this
+
+    local region = (1 - UI.yAspect) / 2
+    local inset  = region * UI.screenWidth
+
+    self.magicBoardRect = {0, -inset, UI.screenWidth, UI.screenHeight+inset*2}
+
+    local wideRegion = (1 - (9/16)) / 2
+    local wideInset = wideRegion * 1280 * xScale
+
+    if (UI.systemScreen.aspect == "4x3") then
+        wideInset = wideInset * 0.91 -- wtf?
+    end
+
+    self.screen = {
+        1280 * 0.05156 * xScale,
+        (720 * 0.07644 * yScale) + (wideInset-inset)*yScale,
+        0,
+        0
+    }
+
+    self.screen[3] = UI.screenWidth - (self.screen[1]*2)
+    self.screen[4] = UI.screenHeight - (self.screen[2]*2)
 end
 
-function MemoryGame.SetPositionByGrid(self,w,x,y)
-	local xo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + x * self.REFLEX_CELL_SIZE
-	local yo = self.REFLEX_BOARD_OFFSET + self.REFLEX_CELL_SIZE/2 + y * self.REFLEX_CELL_SIZE
+function MemoryGame.GetPositionByGrid(self,x,y)
+    local v = { }
+    v.x = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1]/2 + x * self.REFLEX_CELL_SIZE[1]
+    v.y = self.REFLEX_BOARD_OFFSET[2] + self.REFLEX_CELL_SIZE[2]/2 + y * self.REFLEX_CELL_SIZE[2]
+    return v
+end
 
-	UI:MoveWidgetByCenter(w,xo,yo)
-	--COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
+
+function MemoryGame.SetPositionByGrid(self,w,x,y)
+    local v = self:GetPositionByGrid(x,y)
+    UI:MoveWidgetByCenter(w,v.x,v.y)
+    --COutLine(kC_Debug,"position line @ x=%.02f,y=%.02f",xo,yo)
 end
 
 function MemoryGame.Vec2Normal(self,x,y)
@@ -366,36 +603,8 @@ function MemoryGame.GetGridCell(self,widget)
 	return vec2
 end
 
-function MemoryGame.IsGridCellOnBoard(self,x,y)
-	if (x >= 0 and y >= 0 and x < self.INDEX_MAX_X and y < self.INDEX_MAX_Y) then
-		return true
-	end
-		
-	return false
-end
-
 function MemoryGame.ConvertCoordToIndex(self,x,y)
 	return bit.bor(bit.lshift(y, 16), x)
-end
-
-function MemoryGame.ConstrainPointToBoard(self,x,y)
-	if (x < self.COORD_MIN_X) then
-		x = self.COORD_MIN_X
-	end
-	if (x >= self.COORD_MAX_X) then
-		x = self.COORD_MAX_X - 1
-	end
-	if (y < self.COORD_MIN_Y) then
-		y = self.COORD_MIN_Y
-	end		
-	if (y >= self.COORD_MAX_Y) then
-		y = self.COORD_MAX_Y - 1
-	end	
-
-	local vec2 = { }
-	vec2.x = x
-	vec2.y = y
-	return vec2			
 end
 
 function MemoryGame.GetPosition(self,w)
@@ -407,113 +616,102 @@ function MemoryGame.GetPosition(self,w)
 end
 
 
-function MemoryGame.CreateState(self,architype)
-	local state = { }
-	state.architype = architype
-	return state
+function MemoryGame.CreateState(self,architype,ref)
+    local state = { }
+    state.architype = architype
+    state.ref = ref
+    return state
 end
 
-function MemoryGame.SetLineSegmentPosition(self,line,startPos,endPos)
-	--COutLine(kC_Debug,"SetLineSegment start/end @ start=%i,%i, end=%i,%i",startPos.x,startPos.y,endPos.x,endPos.y)		
-
-	local x = startPos.x
-	local y = startPos.y
-	
-	local xx = endPos.x
-	local yy = endPos.y
-	
-	if (x > xx) then
-		x = endPos.x
-		xx = startPos.x
-	end
-	
-	if (y > yy) then
-		y = endPos.y
-		yy = startPos.y
-	end 
-	
-	local width = xx - x
-	if (width == 0) then
-		width = 5
-	end
-	
-	local height = yy - y
-	if (height == 0) then
-		height = 5
-	end
-	
-	local r = { }
-	r[1] = x
-	r[2] = y
-	r[3] = width
-	r[4] = height
-	
-	--COutLine(kC_Debug,"SetLineSegment @ x=%i, y=%i, width=%i, height=%i",x,y,width,height)		
-	line:SetRect(r)
+function MemoryGame.UpdateHud(self)
+    local minutes = math.floor(self.state.timeLeft / 60)
+    local seconds = self.state.timeLeft - (minutes * 60)
+    local text = string.format("%i:%02i",minutes,seconds)
+    self.widgets.timeLeftLabel:SetText(text)
 end
 
-function MemoryGame.CollideWithLine(self,x,y,ignore)
-	local count = #self.widgets.lines
-	if (ignore) then
-		count = count - 2
-	end	
-
-	for i, k in pairs(self.widgets.lines) do
-		local r = k:Rect()
-		if (i < count and x >= r[1] and x < r[1]+r[3] and y >= r[2] and y < r[2] + r[4]) then
-			return true
-		end
-	end
-	
-	return false
+function MemoryGame.DrawBoard(self)
+    local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
+    for i,v in ipairs(self.state.level.board) do
+        local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=self.gfx[v.img]})
+        local index = self:ConvertCoordToIndex(v.x,v.y)
+        b.state = self:CreateState(v.img,v)
+        -- -djr animate cells in eventually
+        --        b:BlendTo({1,1,1,0}, 0)
+        self.widgets.root:AddChild(b)
+        self.widgets.grid[index] = b
+        table.insert(self.widgets.cells,b)
+        self:SetPositionByGrid(b,v.x,v.y)
+        --        if (string.find(b.state.architype,"cell_") ~= nil) then
+        --            table.insert(self.widgets.goals,b)
+        --        end
+    end
 end
 
-function MemoryGame.CollideWithBoard(self,x,y,isPlayer)
-	if (x < self.COORD_MIN_X) then
-		COutLine(kC_Debug,"CollideWihtBoard found min X @ x=%i, y=%i",x,y)		
-		return true
-	end
-	if (x >= self.COORD_MAX_X) then
-		COutLine(kC_Debug,"CollideWihtBoard found max X @ x=%i, y=%i",x,y)			
-		return true
-	end
-	if (y < self.COORD_MIN_Y) then
-		COutLine(kC_Debug,"CollideWihtBoard found min Y @ x=%i, y=%i",x,y)			
-		return true
-	end		
-	if (y >= self.COORD_MAX_Y) then
-		COutLine(kC_Debug,"CollideWihtBoard found max Y @ x=%i, y=%i",x,y)			
-		return true
-	end	
-	
-	local screenCoord = { }
-	screenCoord.x = x
-	screenCoord.y = y
-	local v = self:GetGridCellFromVec2(screenCoord)
-	local index = self:ConvertCoordToIndex(v.x,v.y)
-	
-	local piece = self.widgets.grid[index]		
-	if (piece == nil) then
-		return false
-	end
+function MemoryGame.DoPhase0(self,dt)
+    self.state.phaseTimer = self.state.phaseTimer - dt
+    if (self.state.phaseTimer > 0) then
+        return
+    end
 
---  djr, this isn't relevant
---	if (isPlayer) then
---		if (piece.state.architype == "mark_end" or piece.state.architype == "mark_start") then
---			return false
---		end
---
---		if (piece.state.architype == "cell_a"
---			or piece.state.architype == "cell_b"
---			or piece.state.architype == "cell_c"
---			or piece.state.architype == "cell_d"
---		) then
---			return false
---		end
---	end
-	
-	COutLine(kC_Debug,"CollideWihtBoard found Piece @ x=%i, y=%i, type=%s",x,y,piece.state.architype)			
-	return true
+--    COutLine(kC_Debug,"Phase0 - Legend/Goal Count: %i/%i",#self.state.level.legend,#self.widgets.goals)
+    if (#self.widgets.goals >= #self.state.level.legend) then
+        self:DrawBoard()
+        self.state.phase = kMGPhase_ShuffleSmallTiles
+        self.state.phaseTimer = self.PHASE1_BOARD_SHUFFLE_TIMER
+        return
+    end
+
+    local v = self.state.level.legend[#self.widgets.goals+1]
+    self.state.phaseTimer = self.PHASE0_LEGEND_REVEAL_TIMER
+    local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green})
+    b.state = self:CreateState(v,nil)
+    self.widgets.root:AddChild(b)
+    UI:MoveWidgetByCenter(b,UI.screenWidth/2 - (#self.state.level.legend * self.REFLEX_CELL_SIZE[1])/2 + #self.widgets.goals * self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]/2)
+    -- -djr animate cells in eventually
+    --        b:BlendTo({1,1,1,0}, 0)
+    table.insert(self.widgets.goals,b)
+end
+
+function MemoryGame.DoPhase1(self,dt)
+    self.state.phaseTimer = self.state.phaseTimer - dt
+    if (self.state.phaseTimer > 0) then
+        return
+    end
+
+    self.state.phaseShuffles = self.state.phaseShuffles - 1
+    if (self.state.phaseShuffles <= 0) then
+        self.state.phase = kMGPhase_DiscoverPattern
+        return
+    end
+
+    self.state.phaseTimer = self.PHASE1_BOARD_SHUFFLE_TIMER;
+
+    self:ShuffleBoard(self.state.level)
+end
+
+function MemoryGame.DoPhase2(self,dt)
+    if (self.state.phaseGlyphsCounter >= #self.widgets.goals) then
+        self.state.phase = kMGPhase_AnimateTransition
+        self.state.phaseGlyphsCounter = 0
+        local level = self:CreateBoardLarge(self.state.level.legend)
+        self:ChangeLevel(level)
+        -- djr, animate this once it works (see video)
+        self:DrawBoard()
+    end
+end
+
+function MemoryGame.DoPhase3(self,dt)
+    -- make it a fancy animation
+    self.state.phase = kMGPhase_FindPattern
+end
+
+function MemoryGame.DoPhase4(self,dt)
+    if (self.state.phaseGlyphsCounter >= #self.widgets.goals) then
+        self.state.phase = kMGPhase_GameOver
+        self.state.gameOver = true
+        self.state.victory = true
+    end
 end
 
 function MemoryGame.Think(self,dt)
@@ -536,123 +734,32 @@ function MemoryGame.Think(self,dt)
 			self.widgets.bigTextLabel:SetText("You Lose!")
 		end
 		UI:CenterLabel(self.widgets.bigTextLabel, UI.fullscreenRect)
-				
-		-- game over never advances past here
 		return
-	end
+    end
 
---  djr, this isn't relevant
---	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
---		-- NO HEADING: Game hasn't started
---		return
---	end
---
---	if (self.state.lastHeading.x == 0 and self.state.lastHeading.y == 0) then
---		self.state.lastHeading.x = self.state.heading.x
---		self.state.lastHeading.y = self.state.heading.y
---	end
---
---	if (self.widgets.current.heading == nil) then
---		self.widgets.current.heading = self.state.heading
---	end
---
---	local currentPos = self:LerpVec2(self.widgets.current.state.endPos,self.state.lastHeading,dt,self.PLAYER_SPEED)
---	if (self:CollideWithBoard(currentPos.x,currentPos.y,true)) then
---		COutLine(kC_Debug,"GameOver player collided with board @ : x=%i, y=%i",currentPos.x,currentPos.y)
---		self.state.gameOver = true
---		return
---	end
---
---	--COutLine(kC_Debug,"currentPos: x=%.02f, y=%.02f",currentPos.x,currentPos.y)
---	currentPos = self:ConstrainPointToBoard(currentPos.x,currentPos.y)
---	self.widgets.current.state.endPos = currentPos
---	self:SetLineSegmentPosition(self.widgets.current,self.widgets.current.state.startPos,self.widgets.current.state.endPos)
---
---	-- detect change of direction
---	if (self.state.lastHeading.x ~= self.state.heading.x or self.state.lastHeading.y ~= self.state.heading.y) then
---		local oldR = self.widgets.current:Rect()
---		COutLine(kC_Debug,"oldLineSegment @ x=%i, y=%i, width=%i, height=%i",oldR[1],oldR[2],oldR[3],oldR[4])
---		COutLine(kC_Debug,"newLineSegment @ currentPos: x=%i, y=%i",currentPos.x,currentPos.y)
---		local line = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.mark_line_v})
---		line.state = self:CreateState("mark_line_v")
---		table.insert(self.widgets.lines,line)
---		self.widgets.current = line
---		self.widgets.root:AddChild(line)
---
---		line.state.startPos = currentPos
---		line.state.endPos = line.state.startPos
---		self:SetLineSegmentPosition(line,line.state.startPos,line.state.endPos)
---
---		self.state.lastHeading.x = self.state.heading.x
---		self.state.lastHeading.y = self.state.heading.y
---	end
---
---	local playerGridCell = self:GetGridCellFromVec2(currentPos)
---	local playerIndex = self:ConvertCoordToIndex(playerGridCell.x,playerGridCell.y)
---
---	local pieceAtPlayer = self.widgets.grid[playerIndex]
---	if (pieceAtPlayer) then
---		if (self.state.goalCounter < #self.widgets.goals) then
---			local goalPiece = self.widgets.goals[self.state.goalCounter]
---			if (goalPiece.state.architype == pieceAtPlayer.state.architype) then
---				COutLine(kC_Debug,"Goal accomplished: x=%s",goalPiece.state.architype)
---				self.state.goalCounter = self.state.goalCounter + 1
---				-- TODO: -djr Question: How do they want to indicate that you activated a box, just
---				-- swap out the cell with another cell?
---			end
---		end
---
---		if (pieceAtPlayer.state.architype == "mark_end" and self.state.goalCounter >= #self.widgets.goals) then
---			COutLine(kC_Debug,"Game Over Detected")
---			self.state.gameOver = true
---			self.state.victory = true
---			return
---		end
---	end
---	if (self:CollideWithLine(currentPos.x,currentPos.y,true)) then
---		COutLine(kC_Debug,"Game Over - collided with own line")
---		self.state.gameOver = true
---		return
---	end
---
---	--COutLine(kC_Debug,"antivirusSpawnTimer=%i, dt=%f, rate=%i",self.state.antivirusSpawnTimer,dt,self.state.level.antivirusSpiderSpawnRate)
---	self.state.antivirusSpawnTimer =  self.state.antivirusSpawnTimer - dt
---	if (self.state.antivirusSpawnTimer < 0) then
---		self.state.antivirusSpawnTimer = self.state.level.antivirusSpiderSpawnRate
---		local x = math.random(self.INDEX_MAX_X)-1
---		local y = math.random(self.INDEX_MAX_Y)-1
---		local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE,self.REFLEX_CELL_SIZE}, material=self.gfx.antivirus_spider})
---		self.widgets.root:AddChild(spider)
---		table.insert(self.widgets.spiders,spider)
---		self:SetPositionByGrid(spider,x,y)
---		spider.state = self:CreateState("antivirus_spider")
---		spider.state.heading = self:Vec2Normal(math.random() * 2 - 1,math.random() * 2 - 1)
---		if (spider.state.heading.x == 0 and spider.state.heading.y == 0) then -- failsafe
---			spider.state.heading.x = 1
---		end
---		COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f",x,y,spider.state.heading.x,spider.state.heading.y)
---	end
---
---	--COutLine(kC_Debug,"Spider move")
---	for i,k in pairs(self.widgets.spiders) do
---		local pos = k:Rect()
---		COutLine(kC_Debug,"pos @ : x=%i, y=%i, dt=%.04f, heading = %.04f,%.04f, speed=%i",pos[1]+pos[3]/2,pos[2]+pos[4]/2,dt,k.state.heading.x,k.state.heading.y,self.state.level.antivirusSpiderSpeed)
---		local nextPos = self:LerpWidget(k,k.state.heading,dt,self.state.level.antivirusSpiderSpeed)
---		if (self:CollideWithBoard(nextPos.x,nextPos.y,false)) then
---			table.remove(self.widgets.spiders,i)
---			self.widgets.root:RemoveChild(k)
---			COutLine(kC_Debug,"remove spider @ : x=%i, y=%i",nextPos.x,nextPos.y)
---		else
---			UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
---			--COutLine(kC_Debug,"move spider to: x=%.02f, y=%.02f",nextPos.x,nextPos.y)
---			-- TODO: detect spider crossing a line segment
---			if (self:CollideWithLine(nextPos.x,nextPos.y,false)) then
---				COutLine(kC_Debug,"Game Over - spider crossed player line")
---				self.state.gameOver = true
---				return
---			end
---		end
---	end
+    if (self.state.phase == kMGPhase_AnimateOpening) then
+        self:DoPhase0(dt)
+    elseif (self.state.phase == kMGPhase_ShuffleSmallTiles) then
+        self:DoPhase1(dt)
+    elseif (self.state.phase == kMGPhase_DiscoverPattern) then
+        self:DoPhase2(dt)
+    elseif (self.state.phase == kMGPhase_AnimateTransition) then
+        self:DoPhase3(dt)
+    elseif (self.state.phase == kMGPhase_FindPattern) then
+        self:DoPhase4(dt)
+    end
+
+    self:UpdateHud()
+
+    if (self.state.phase > kMGPhase_AnimateOpening) then
+        self.state.timeLeft = self.state.timeLeft - dt
+        if (self.state.timeLeft <= 0) then
+            self.state.timeLeft = 0
+            self.state.phase = kMGPhase_GameOver
+            self.state.gameOver = true
+            self.state.victory = false
+        end
+    end
 end
 
 memory_game = MemoryGame

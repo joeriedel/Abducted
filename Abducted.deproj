@@ -133,6 +133,9 @@
     <filename>Source\Scripts\MemoryGame.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Metadata.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Mine.lua</filename>
   </file>
   <file>

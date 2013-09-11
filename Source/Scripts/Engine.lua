@@ -147,6 +147,9 @@ kMaterialWidgetDrawMode_Circle = 1
 kParticleEmitterDrawModelPositionMode_Local = 0
 kParticleEmitterDrawModelPositionMode_World = 1
 
+kParticleEmitterDrawModelCullMode_None = 0
+kParticleEmitterDrawModelCullMode_View = 1
+
 -- String table languages
 kLangId_EN = 0
 kLangId_FR = 1

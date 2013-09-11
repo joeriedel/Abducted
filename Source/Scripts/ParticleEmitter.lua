@@ -64,6 +64,32 @@ function ParticleEmitter.Spawn(self)
 	
 end
 
+function ParticleEmitter.PostSpawn(self)
+
+	if (self.keys.attach_entity) then
+	
+		local entity = World.FindEntityTargets(self.keys.attach_entity)
+		if (entity) then
+			entity = entity[1]
+		else
+			error(string.format("particle emitter can't find an entity named '%s' to attach to.", self.keys.attach_entity))
+		end
+	
+		if ((entity.model == nil) or (entity.model.dm == nil) or (entity.model.dm.FindBone == nil)) then
+			error(string.format("particle emitter attachment entity '%s' is not a skelmodel.", self.keys.attach_entity))
+		end
+
+		local boneIdx = entity.model.dm:FindBone(self.keys.attach_bone)
+		if (boneIdx < 0) then
+			error(string.format("particle emitter attachment entity '%s' does not have a bone named '%s'", self.keys.attach_entity, self.keys.attach_bone))
+		end
+		
+		entity:AttachChild(self, entity.model.dm, boneIdx)
+	
+	end
+
+end
+
 function ParticleEmitter.OnEvent(self, cmd, args)
 
 	COutLineEvent("ParticleEmitter", self.keys.targetname, cmd, args)

@@ -788,10 +788,10 @@ end
 function PlayerSkills.Load(self)
 	self.Pulse = 0
 	
-	self.armUnlocked = Persistence.ReadBool(SaveGame, "armUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
-	self.manipulateUnlocked = Persistence.ReadBool(SaveGame, "manipulateUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
-	self.shieldUnlocked = Persistence.ReadBool(SaveGame, "shieldUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
-	self.pulseUnlocked = Persistence.ReadBool(SaveGame, "pulseUnlocked", PlayerSkills.DebugAllAbilitiesEnabled)
+	self.armUnlocked = PlayerSkills.DebugAllAbilitiesEnabled
+	self.manipulateUnlocked = PlayerSkills.DebugAllAbilitiesEnabled
+	self.shieldUnlocked = PlayerSkills.DebugAllAbilitiesEnabled
+	self.pulseUnlocked = PlayerSkills.DebugAllAbilitiesEnabled
 	
 	self.ManipulateSkill = Persistence.ReadNumber(SaveGame, "skills/ManipulateSkill", 0)
 	self.ManipulateRegen = Persistence.ReadNumber(SaveGame, "skills/ManipulateRegen", 0)
@@ -958,7 +958,6 @@ end
 function PlayerSkills.UnlockArm(self)
 	if (not (self.armUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.armUnlocked = true
-		Persistence.WriteBool(SaveGame, "armUnlocked", true)
 		HUD:AnimateUnlock({arm=true})
 	end
 end
@@ -970,7 +969,6 @@ end
 function PlayerSkills.UnlockManipulate(self)
 	if (not (self.manipulateUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.manipulateUnlocked = true
-		Persistence.WriteBool(SaveGame, "manipulateUnlocked", true)
 		HUD:AnimateUnlock({manipulate=true})
 	end
 end
@@ -982,7 +980,6 @@ end
 function PlayerSkills.UnlockShield(self)
 	if (not (self.shieldUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.shieldUnlocked = true
-		Persistence.WriteBool(SaveGame, "shieldUnlocked", true)
 		HUD:AnimateUnlock({shield=true})
 	end
 end
@@ -994,7 +991,6 @@ end
 function PlayerSkills.UnlockPulse(self)
 	if (not (self.pulseUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.pulseUnlocked = true
-		Persistence.WriteBool(SaveGame, "pulseUnlocked", true)
 		HUD:AnimateUnlock({pulse=true})
 	end
 end

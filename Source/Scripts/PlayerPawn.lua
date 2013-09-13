@@ -86,6 +86,8 @@ function PlayerPawn.Spawn(self)
 	self:Precache("Audio/mine_explode")
 	self:Precache("Audio/mine_tripped")
 	
+	self.charDBStatus = StringForString(self.keys.health_status, "good")
+	
 	self.mineDrop = World.LoadSound("Audio/mine_drop")
 	self:AttachSound(self.mineDrop)
 	
@@ -895,6 +897,10 @@ function PlayerPawn.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "play") then
 		self:PlayCinematicAnim(args)
+		return true
+	elseif (cmd == "set_health_status") then
+		assert((args == "good") or (args == "bad") or (args == "stable"))
+		self.charDBStatus = args
 		return true
 	end
 	

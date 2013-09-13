@@ -253,7 +253,7 @@ function Arm.LoadLog(self)
 			local buttonRect = ExpandRect(
 				labelRect, 
 				16*UI.identityScale[1],
-				16*UI.identityScale[2]
+				96*UI.identityScale[2]
 			)
 			
 			buttonRect[3] = buttonRect[1] + buttonRect[3]

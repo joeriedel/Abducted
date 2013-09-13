@@ -277,6 +277,7 @@ function Discovery.AnimateOpenUI(self, awardSkillPoints)
 		local f = function()
 			
 			Discovery.Widgets.Arrow:BlendTo({1,1,1,1}, 0.3)
+			Discovery.Widgets.Close:BlendTo({1,1,1,1}, 0.3)
 			Discovery.Widgets.Title:BlendTo({1,1,1,1}, 0.3)
 			Discovery.Widgets.Text:BlendTo({1,1,1,1}, 0.3)
 			Discovery.Widgets.Scroll:BlendTo({1,1,1,1}, 0.3)
@@ -353,6 +354,7 @@ function Discovery.AnimateCloseUI(self, callback)
 	end
 		
 	Discovery.Widgets.Arrow:BlendTo({1,1,1,0}, 0.3)
+	Discovery.Widgets.Close:BlendTo({1,1,1,0}, 0.3)
 	Discovery.Widgets.Title:BlendTo({1,1,1,0}, 0.3)
 	Discovery.Widgets.Text:BlendTo({1,1,1,0}, 0.3)
 	Discovery.Widgets.Scroll:BlendTo({1,1,1,0}, 0.3)
@@ -481,6 +483,10 @@ function Discovery.OpenDBPressed()
 	self:CloseUI(function () World.playerPawn:EnterArm("db", self.databaseId) end)
 end
 
+function Discovery.ClosePressed()
+	Discovery.Popup:CloseUI()
+end
+
 function Discovery.StaticInit()
 
 	local material = World.Load("UI/discovery_arrow_M")
@@ -494,6 +500,23 @@ function Discovery.StaticInit()
 	Discovery.Widgets.Root:SetVisible(false)
 	Discovery.Widgets.Root:SetHAlign(kHorizontalAlign_Center)
 	Discovery.Widgets.Root:SetVAlign(kVerticalAlign_Center)
+	
+	local closeButtonSize = 64*UI.identityScale[1]
+	Discovery.Widgets.Close = UIPushButton:Create(
+		{Discovery.kUISize[1]*UI.identityScale[1]-(closeButtonSize/2),-(closeButtonSize/2),closeButtonSize,closeButtonSize}, 
+		{
+			pressed = World.Load("UI/discovery_close_x_pressed_M"),
+			enabled = World.Load("UI/discovery_close_x_M")
+		},
+		{
+			pressed = UI.sfx.Command
+		},
+		{
+			pressed = Discovery.ClosePressed
+		},
+		nil,
+		Discovery.Widgets.Root
+	)
 	
 	local titleTF = World.Load("UI/DiscoveryTitle_TF")
 	Discovery.Widgets.Title = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=titleTF})

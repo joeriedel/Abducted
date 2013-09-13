@@ -161,6 +161,7 @@ function Arm.SpawnCharacterDB(self)
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
 	UI:SetLabelText(w, StringTable.Get("ARM_CHARDB_GOOD"), UI.identityScale)
+	self.charDBHealthStatusText = w
 	
 	y = y + advance + (Arm.CharDBTextSpace[2] * UI.identityScale[2])
 	
@@ -209,6 +210,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.HumanHeart})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
+	self.charDBHeartWidget = w
 	
 	rect = {
 		0,
@@ -264,6 +266,22 @@ function Arm.EnterCharDB(self, enter, callback, time)
 	end
 	
 	if (enter) then
+	
+		if ((World.playerPawn.charDBStatus == "good") or (World.playerPawn.charDBStatus == "stable")) then
+			if (World.playerPawn.charDBStatus == "good") then
+				UI:SetLabelText(self.charDBHealthStatusText, StringTable.Get("ARM_CHARDB_GOOD"), UI.identityScale)
+			else
+				UI:SetLabelText(self.charDBHealthStatusText, StringTable.Get("ARM_CHARDB_STABLE"), UI.identityScale)
+			end
+			
+			self.charDBHeartWidget:SetMaterial(self.gfx.HumanHeart)
+			Arm.DBPulseTimes = {0.75, 0.2, 0.4, 0.65}
+	 	else
+			Arm.DBPulseTimes = {0.38, 0.1, 0.2, 0.325}
+			UI:SetLabelText(self.charDBHealthStatusText, StringTable.Get("ARM_CHARDB_BAD"), UI.identityScale)
+			self.charDBHeartWidget:SetMaterial(self.gfx.HumanHeartInjured)
+	 	end
+	 	
 		Arm:DBAnimateCharHeartbeat(true)
 		Arm:DBAnimateTimePlayed(true)
 		self.widgets.db.CharRoot:BlendTo({1,1,1,1}, time)
@@ -291,6 +309,7 @@ end
 function Arm.DBAnimateCharHeartbeat(self, animate)
 	if (not animate) then
 		self.sfx.HeartBeat:FadeOutAndStop(0.5)
+		self.sfx.HeartBeatFast:FadeOutAndStop(0.5)
 		if (self.pulseTimer) then
 			self.pulseTimer:Clean()
 			self.pulseTimer = nil
@@ -299,9 +318,16 @@ function Arm.DBAnimateCharHeartbeat(self, animate)
 	end
 	
 	
-	self.sfx.HeartBeat:FadeVolume(1, 0)
-	self.sfx.HeartBeat:Rewind()
-	self.sfx.HeartBeat:Play(kSoundChannel_UI, 0)
+	if (World.playerPawn.charDBStatus == "good") then
+		self.sfx.HeartBeat:FadeVolume(1, 0)
+		self.sfx.HeartBeat:Rewind()
+		self.sfx.HeartBeat:Play(kSoundChannel_UI, 0)
+	else
+		self.sfx.HeartBeatFast:FadeVolume(1, 0)
+		self.sfx.HeartBeatFast:Rewind()
+		self.sfx.HeartBeatFast:Play(kSoundChannel_UI, 0)
+	end
+	
 	self:DBPulseStart()	
 
 end
@@ -323,8 +349,6 @@ function Arm.DBAnimateTimePlayed(self, animate)
 
 	self.dbTimePlayedTimer = World.globalTimers:Add(f, 0, true)
 end
-
-Arm.DBPulseTimes = {0.75, 0.2, 0.4, 0.65}
 
 function Arm.DBPulseStart(self)
 	local x = self.charDBHeartBeatRect[3] - ((Arm.CharDBPulseInset+64) * UI.identityScale[1])

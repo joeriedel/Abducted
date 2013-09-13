@@ -217,6 +217,7 @@ function Arm.ProcessActionTokens(self, tokens)
 		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
 	elseif (tokens[1] == "award") then
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
 			self.rewardSkillPoints = tonumber(tokens[2])
@@ -955,7 +956,7 @@ function Arm.ChooseChatPrompt(self, root)
 	for k,v in pairs(root) do
 		local n = v.n / sum
 		v.n = ofs + n
-		ofs = ofs + n
+		ofs = v.n
 	end
 	
 	-- choose
@@ -1031,9 +1032,15 @@ function Arm.FillInChoices(self, responses, priority)
 		end
 	end
 	
+	local prioritySort = {}
+	
+	for i = priority,10 do
+		table.insert(prioritySort, i)
+	end
+	
 	for z = 1,2 do
-		for i = priority, 10 do
-			local t = Arm:SortProceduralTopics(i)
+		for i = 1,#prioritySort do
+			local t = Arm:SortProceduralTopics(prioritySort[i])
 			if (t ~= nil) then
 				for k,v in pairs(t) do
 					if (self.topicTree[v.name] == nil) then -- has not been selected by user
@@ -1078,5 +1085,7 @@ function Arm.FillInChoices(self, responses, priority)
 		if (exit) then
 			break
 		end
+		-- next time through we randomize the priority.
+		prioritySort = ShuffleArray(prioritySort)
 	end	
 end

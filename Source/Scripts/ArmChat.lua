@@ -64,6 +64,14 @@ function Arm.StartChat(self, delay)
 		Arm:SwapToChange()
 		self.widgets.chat.Root:BlendTo({1,1,1,1}, 0.2)
 		
+		if (self.currentRewardWidgets) then
+			for k,v in pairs(self.currentRewardWidgets) do
+				if (v.class) then
+					v.class:ResetHighlight(v, true)
+				end
+			end
+		end
+		
 		if (self.topic == nil) then
 			Arm:StartConversation()
 		else

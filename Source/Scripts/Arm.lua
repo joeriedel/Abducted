@@ -69,7 +69,10 @@ function Arm.SpawnShared(self)
 		World.Load("UI/level4_M")
 	}
 	
---self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
+	if (UI.mode == kGameUIMode_Mobile) then
+		self.gfx.DiscoveriesScrollBar = World.Load("UI/alphabet_scrollbar_M")
+		self.gfx.DiscoveriesScrollBarPressed = World.Load("UI/alphabet_scrollbar_pressed_M")
+	end
 	
 	self.typefaces = {}
 	

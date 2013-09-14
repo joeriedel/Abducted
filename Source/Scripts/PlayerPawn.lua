@@ -151,6 +151,7 @@ function PlayerPawn.Spawn(self)
 			rot = 0
 		}
 	)
+	self.shieldSprite.dm:Skin()
 	self.shieldSprite.dm:BlendTo({0,0,0,0}, 0)
 	
 	self.shieldSpriteSpark = World.CreateSpriteBatch(1, 1)
@@ -167,6 +168,7 @@ function PlayerPawn.Spawn(self)
 			rot = 0
 		}
 	)
+	self.shieldSpriteSpark.dm:Skin()
 	self.shieldSpriteSpark.dm:BlendTo({0,0,0,0}, 0)
 	
 	self.shieldSpriteDamaged = World.CreateSpriteBatch(1, 1)

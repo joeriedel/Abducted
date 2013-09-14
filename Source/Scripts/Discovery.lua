@@ -41,6 +41,7 @@ function Discovery.Spawn(self)
 			rot = 0
 		}
 	)
+	self.sprite.dm:Skin()
 	self.sprite.dm:BlendTo({0,0,0,0}, 0)
 	
 	local radius = NumberForString(self.keys.activation_radius, 300)

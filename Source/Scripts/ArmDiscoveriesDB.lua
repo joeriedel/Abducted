@@ -84,17 +84,24 @@ The following items are OPTIONAL:
 
 ]]
 Arm.Discoveries = {
+
+--[[
+
+-- entries are 100's based, so A = 100, 101, etc, B = 200, 201, 202 etc
+
+	A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
+    1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+]]
+
 	Bugs = {
 		picture = "UI/discovery_bugs_M",
 		title = "ARM_DISCOVERY_BUGS_TITLE",
-		text = "ARM_DISCOVERY_BUGS",
-		index = 1
+		text = "ARM_DISCOVERY_BUGS"
 	},
-	Pod = {
+	Pod = { -- Alien Pod
 		picture = "UI/discovery_pod_M",
 		title = "ARM_DISCOVERY_POD_TITLE",
 		text = "ARM_DISCOVERY_POD",
-		index = 2,
 		logText = {
 			all = "ARM_DISCOVERY_POD_LOG"
 		},
@@ -111,14 +118,12 @@ Arm.Discoveries = {
 		logText = {
 			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
 		},
-		index = 3,
 		chat = "ARM_TOPIC_TENTACLES"
 	},
 	Terminals = {
 		picture = "UI/discovery_terminals_M",
 		title = "ARM_DISCOVERY_TERMINALS_TITLE",
-		text = "ARM_DISCOVERY_TERMINALS",
-		index = 4
+		text = "ARM_DISCOVERY_TERMINALS"
 	}
 }
 
@@ -145,25 +150,45 @@ function Arm.SpawnDiscoveriesDB(self)
 	self.widgets.db.Root:AddChild(self.widgets.db.DiscoveriesRoot)
 	self.widgets.db.DiscoveriesRoot:SetBlendWithParent(true)
 	
---[[	local rect = UI:MaterialSize(self.gfx.DiscoveriesScrollBar)
-	local h = self.discoveriesDBWorkspaceSize[4]
-	local scale = h / rect[4]
-	rect[4] = h
-	rect[3] = rect[3] * scale
-	rect[1] = self.discoveriesDBWorkspaceSize[3] - rect[3]
-	rect[2] = 0
-	
-	self.widgets.db.DiscoveriesScrollBar = UI:CreateWidget("MatWidget", {rect=rect, material=self.gfx.DiscoveriesScrollBar})
-	self.widgets.db.DiscoveriesRoot:AddChild(self.widgets.db.DiscoveriesScrollBar)
-	self.widgets.db.DiscoveriesScrollBar:SetBlendWithParent(true)
-]]
-	
 	self.discoveriesDBArea = {
 		0,
 		0,
 		self.discoveriesDBWorkspaceSize[3] - (4 * UI.identityScale[1]),
 		self.discoveriesDBWorkspaceSize[4]
 	}
+	
+	if (UI.mode == kGameUIMode_Mobile) then
+		local rect = UI:MaterialSize(self.gfx.DiscoveriesScrollBar)
+		local h = self.discoveriesDBWorkspaceSize[4]
+		local scale = h / rect[4]
+		rect[4] = h
+		rect[3] = rect[3] * scale
+		rect[1] = self.discoveriesDBWorkspaceSize[3] - rect[3]
+		rect[2] = 0
+		
+		self.widgets.db.DiscoveriesScrollBar = UIPushButton:Create(
+			rect,
+			{
+				pressed = self.gfx.DiscoveriesScrollBarPressed,
+				enabled = self.gfx.DiscoveriesScrollBar
+			},
+			{
+				pressed = UI.sfx.Command
+			},
+			{
+				pressed = function (w, e) Arm:DiscoveryMobileScrollPressed(e) end
+			},
+			{
+				pressedWhenDown = true
+			},
+			self.widgets.db.DiscoveriesRoot
+		)
+		
+		self.widgets.db.DiscoveriesScrollBar:SetBlendWithParent(true)
+		self.widgets.db.DiscoveriesScrollBar.height = rect[4]
+		
+		self.discoveriesDBArea[3] = self.discoveriesDBArea[3] - rect[3]
+	end
 	
 	self.widgets.db.Discoveries = UI:CreateWidget("VListWidget", {rect=self.discoveriesDBArea})
 	self.widgets.db.DiscoveriesRoot:AddChild(self.widgets.db.Discoveries)
@@ -183,15 +208,89 @@ function Arm.SpawnDiscoveriesDB(self)
 	self.widgets.db.Discoveries:SetEndStops({0, self.discoveriesDBArea[4]*0.1})
 	
 	self.discoveryTime = -1
-
+	
+	local index = 100
+	local sorted = {}
+	
+	for i=0,25 do
+	
+		local marker = {
+			string = string.char(65+i),
+			index = index
+		}
+		
+		table.insert(sorted, marker)
+		
+		local marker = {
+			string = string.char(97+i),
+			index = index
+		}
+		
+		table.insert(sorted, marker)
+	
+		index = index + 100
+	end
+	
 	for k,v in pairs(Arm.Discoveries) do
 	
 		v.picture = World.Load(v.picture)
 		v.pictureSize = UI:MaterialSize(v.picture)
 		v.pictureSize[3] = v.pictureSize[3] * UI.identityScale[1]
 		v.pictureSize[4] = v.pictureSize[4] * UI.identityScale[2]
+		
+		local marker = {
+			string = StringTable.Get(v.title),
+			dbItem = v
+		}
+		
+		table.insert(sorted, marker)
+	end
+	
+	local sortfunc = function(a, b)
+		return System.UTF8Compare(a.string, b.string) < 0
+	end
+	
+	table.sort(sorted, sortfunc)
+	
+	local index = 1
+	
+	for k,v in pairs(sorted) do
+	
+		if (v.dbItem) then
+			v.dbItem.index = index
+			index = index + 1
+		else
+			-- marker hit, set sort
+			index = v.index
+		end
 	
 	end
+	
+end
+
+function Arm.DiscoveryMobileScrollPressed(self, e)
+	local frac = e.data[2] / self.widgets.db.DiscoveriesScrollBar.height
+	local index = math.floor(Clamp(frac, 0, 1) * 2600)
+	
+	-- find closest matching item
+	local topic = nil
+	local best = 999999
+	
+	for k,v in pairs(self.discoveryList) do
+	
+		local dd = math.abs(v.index - index)
+		if (dd < best) then
+			best = dd
+			topic = v
+		end
+	
+	end
+	
+	
+	if (topic) then
+		self.widgets.db.Discoveries:ScrollTo({0, topic.y}, 0.4)
+	end
+	
 end
 
 function Arm.EnterDiscoveriesDB(self, enter, callback, time)
@@ -491,10 +590,16 @@ function Arm.LoadDiscoveries(self)
 	
 	for k,v in pairs(Arm.Discoveries) do
 		if (GameDB:CheckDiscovery(k)) then
-			self.discoveryList[v.index] = v
+			table.insert(self.discoveryList, v)
 			unlocked[v.index] = GameDB:CheckDiscoveryUnlocked(k)
 		end
 	end
+	
+	local sorter = function(a, b)
+		return a.index < b.index
+	end
+	
+	table.sort(self.discoveryList, sorter)
 	
 	local state = {
 		y = 0,

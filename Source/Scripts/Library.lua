@@ -4,6 +4,34 @@
 -- See Abducted/LICENSE for licensing terms
 
 --[[---------------------------------------------------------------------------
+	Table Compare
+-----------------------------------------------------------------------------]]
+
+function table.compare(a, b)
+
+	local lenA = #a
+	local lenB = #b
+
+	for i = 1, lenA do
+		if (i > lenB) then
+			return 1
+		end
+		if (a[i] < b[i]) then
+			return -1
+		elseif(a[i] > b[i]) then
+			return 1
+		end
+	end
+	
+	if (lenB > lenA) then
+		return -1
+	end
+	
+	return 0
+
+end
+
+--[[---------------------------------------------------------------------------
 	Bit test
 -----------------------------------------------------------------------------]]
 

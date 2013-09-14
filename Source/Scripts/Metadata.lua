@@ -44,6 +44,7 @@ function Metadata.Spawn(self)
 			rot = 0
 		}
 	)
+	self.sprite.dm:Skin()
 	self.sprite.dm:SetVisible(false)
 	
 	self.explodeSprite = World.CreateSpriteBatch(1, 1)
@@ -60,6 +61,7 @@ function Metadata.Spawn(self)
 			rot = 0
 		}
 	)
+	self.explodeSprite.dm:Skin()
 	self.explodeSprite.dm:BlendTo({1,1,1,0}, 0)
 	
 	self.sparks = World.Load("FX/sparks1")

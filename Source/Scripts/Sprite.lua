@@ -29,6 +29,7 @@ function Sprite.Spawn(self)
 			rot = NumberForString(self.keys.rotation, 0)
 		}
 	)
+	self.sprite.dm:Skin()
 	
 	self.visible = BoolForString(self.keys.visible, true)
 	if (not self.visible) then

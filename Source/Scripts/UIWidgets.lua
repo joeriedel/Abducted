@@ -112,7 +112,18 @@ function UIPushButton.OnInputEvent(widget, e)
 	end
 	
 	if (Input.IsTouchBegin(e)) then
-		return UIPushButton:DoPressed(widget, e)
+		local handled, pressed = UIPushButton:DoPressed(widget, e)
+		if (handled and pressed) then
+			if (widget.options.pressedWhenDown) then
+				if (widget.sfx.pressed) then
+					widget.sfx.pressed:Play(kSoundChannel_UI, 0)
+				end
+				if (widget.events.pressed) then
+					widget.events.pressed(widget, e)
+				end
+			end
+		end
+		return handled
 	elseif ((widget.state.pressed) and Input.IsTouchMove(e)) then
 		return true
 	elseif ((widget.state.pressed) and widget.busy and Input.IsTouchEnd(e, widget.busy)) then
@@ -127,7 +138,7 @@ function UIPushButton.OnInputEvent(widget, e)
 				widget:SetCapture(false)
 				return true
 			end
-			if (UIPushButton:DoUnpressed(widget, true)) then
+			if (UIPushButton:DoUnpressed(widget, true) and (not widget.options.pressedWhenDown)) then
 				if (widget.sfx.pressed) then
 					widget.sfx.pressed:Play(kSoundChannel_UI, 0)
 				end
@@ -145,7 +156,7 @@ end
 
 function UIPushButton.DoPressed(self, widget, e)
 	if (widget.state.pressed) then
-		return true -- eat this press
+		return true, false -- eat this press
 	end
 	
 	if (UI.gestureMode) then
@@ -156,7 +167,7 @@ function UIPushButton.DoPressed(self, widget, e)
 		if (widget.sfx.disabled) then
 			widget.sfx.disabled:Play(kSoundChannel_UI, 0)
 		end
-		return true
+		return true, false
 	end
 	
 	if (widget.state.timer) then
@@ -172,7 +183,7 @@ function UIPushButton.DoPressed(self, widget, e)
 	
 	widget:SetCapture(true)
 	
-	return true
+	return true, true
 	
 end
 

@@ -180,6 +180,17 @@ function Arm.LoadLog(self)
 				Arm:TalkPressed()
 			end
 			buttonLabel = StringTable.Get("EVENT_LOG_TALK_ABOUT"):format(topicName)
+		elseif (v.style == "!SKILLPOINTS") then
+			local num = tonumber(v.text)
+			text = "+"
+			
+			if (num == 1) then
+				text = text..v.text.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
+			else
+				text = text..v.text.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
+			end
+			
+			typeface = self.typefaces.LogSkillPoints
 		else
 			text = StringTable.Get(v.text)
 			typeface = self.typefaces.LogEvent

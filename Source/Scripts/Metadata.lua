@@ -167,6 +167,7 @@ function Metadata.Explode(self)
 	World.globalTimers:Add(f, 0.1)
 	
 	HUD:Print(nil, "METADATA_MESSAGE")
+	EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "EVENT_LOG_OPENED_METADATA_GLYPH")
 	PlayerSkills:AwardSkillPoints(25)
 end
 

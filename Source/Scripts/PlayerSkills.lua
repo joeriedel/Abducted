@@ -5,7 +5,7 @@
 
 PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
-PlayerSkills.UnlimitedSkillPointsCheat = true
+PlayerSkills.UnlimitedSkillPointsCheat = false
 PlayerSkills.RefundFraction = 0.75
 PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120
@@ -848,6 +848,7 @@ function PlayerSkills.AwardSkillPoints(self, num)
 	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
 		self.SkillPoints = self.SkillPoints + num
 	end
+	EventLog:AddEvent(GameDB:ArmDateString(), "!SKILLPOINTS", tostring(num))
 end
 
 function PlayerSkills.ManipulateSkillLevel(self)

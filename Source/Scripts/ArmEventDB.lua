@@ -191,6 +191,26 @@ function Arm.LoadLog(self)
 			end
 			
 			typeface = self.typefaces.LogSkillPoints
+		elseif (v.style == "!KILLEDBUGS") then
+			local num = tonumber(v.text)
+			
+			if (num == 1) then
+				text = StringTable.Get("EVENT_LOG_KILLED_BUG")
+			else
+				text = StringTable.Get("EVENT_LOG_KILLED_BUGS"):format(num)
+			end
+			
+			typeface = self.typefaces.LogEvent
+		elseif (v.style == "!SQUISHEDBUGS") then
+			local num = tonumber(v.text)
+			
+			if (num == 1) then
+				text = StringTable.Get("EVENT_LOG_SQUISHED_BUG")
+			else
+				text = StringTable.Get("EVENT_LOG_SQUISHED_BUGS"):format(num)
+			end
+			
+			typeface = self.typefaces.LogEvent
 		else
 			text = StringTable.Get(v.text)
 			typeface = self.typefaces.LogEvent

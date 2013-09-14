@@ -1037,6 +1037,12 @@ function Bug.Damage(self, damage, instigator)
 		end
 		
 		World.gameTimers:Add(f, 20) -- remove us in 20 seconds
+		
+		if (self.group) then
+			GameDB:SquishedBugs(IntRand(8, 12))
+		else
+			GameDB:SquishedBugs(1)
+		end
 	end
 end
 
@@ -1053,8 +1059,10 @@ function Bug.PulseDamage(self, damage)
 		
 		if (self.group) then
 			self.model:BlendToState("pulsedeath")
+			GameDB:KilledBugs(IntRand(8, 12))
 		else
 			self.model.dm:SetVisible(false)
+			GameDB:KilledBugs(1)
 		end
 		
 		self.guts.dm:SetVisible(true)

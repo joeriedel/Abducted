@@ -453,6 +453,8 @@ function Arm.ResetWidgets(self)
 end
 
 function Arm.Start(self, mode, dbTopic)
+
+	GameDB:CheckBugKillCounter() -- flush to log
 	
 	self.active = true
 	self.intro = true

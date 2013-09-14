@@ -42,17 +42,45 @@ function GameDB.Load(self)
 	end
 	self.numDiscoveries = Persistence.ReadNumber(SaveGame, "numDiscoveries", 0)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
+	self.bugKillCounter = Persistence.ReadNumber(SaveGame, "bugKillCounter", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
 	
 	self.loadingCheckpoint = self.loadingCheckpoint and self:ValidCheckpoint()
+	self.bugSquishCounter = 0
 	
 	self:LoadTime()
 	self:LoadChatLockouts()
 	EventLog:Load()
 	
+	-- check bug kill counter
+	local f = function()
+		self:CheckBugKillCounter()
+	end
+	
+	World.gameTimers:Add(f, 25, true)
+	
+	local f = function()
+		self:CheckBugSquishCounter()
+	end
+	
+	World.gameTimers:Add(f, 0, true)
+end
+
+function GameDB.CheckBugKillCounter(self)
+	if (self.bugKillCounter > 0) then
+		EventLog:AddEvent(GameDB:ArmDateString(), "!KILLEDBUGS", tostring(self.bugKillCounter))
+		self.bugKillCounter = 0
+	end
+end
+
+function GameDB.CheckBugSquishCounter(self)
+	if (self.bugSquishCounter > 0) then
+		EventLog:AddEvent(GameDB:ArmDateString(), "!SQUISHEDBUGS", tostring(self.bugSquishCounter))
+		self.bugSquishCounter = 0
+	end
 end
 
 function GameDB.LoadingSaveGame(self)
@@ -61,6 +89,7 @@ end
 
 function GameDB.SaveCheckpoint(self)
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
+	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
 	Persistence.WriteString(SaveGame, "checkpointmap", World.worldspawn.keys.mappath)
 	GameDB:SaveEvents()
@@ -158,6 +187,14 @@ function GameDB.SavePeristentObjects(self)
 	
 	SaveGame.keys["persistentObjectData"] = db
 
+end
+
+function GameDB.KilledBugs(self, num)
+	self.bugKillCounter = self.bugKillCounter + num
+end
+
+function GameDB.SquishedBugs(self, num)
+	self.bugSquishCounter = self.bugSquishCounter + num
 end
 
 function GameDB.LoadTime(self)

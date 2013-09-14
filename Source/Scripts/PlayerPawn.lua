@@ -1189,6 +1189,14 @@ end
 
 function PlayerPawn.EnterArm(self, mode, dbTopic)
 
+	if (self.bugStun) then
+		return
+	end
+	
+	self.bugStun = true
+	self.oldGodMode = PlayerPawn.GodMode
+	PlayerPawn.GodMode = true
+
 	if (mode == nil) then
 		mode = "chat"
 	end
@@ -1226,6 +1234,8 @@ function PlayerPawn.ExitArm(self)
 		OnComplete = function()
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
+			self.bugStun = false
+			PlayerPawn.GodMode = self.oldGodMode
 		end
 	}
 

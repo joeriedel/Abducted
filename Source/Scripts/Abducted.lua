@@ -11,6 +11,7 @@ function Abducted.Initialize(self)
 	math.randomseed(System.ReadMilliseconds())
 	
 	self.eatInput = false
+	
 	Abducted.KeyBindings = LoadKeyBindings()
 	
 	UI:InitMap()

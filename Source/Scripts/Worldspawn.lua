@@ -25,24 +25,24 @@ function Worldspawn.Spawn(self)
 		if (StringForString(self.keys.arm_state, "unlocked") == "locked") then
 			Arm:ChatLockout()
 		end
-	end
+		
+		local abilities = NumberForString(self.keys.starting_abilities, 15)
 	
-	local abilities = NumberForString(self.keys.starting_abilities, 15)
-	
-	if (BitTest(abilities, 1)) then
-		PlayerSkills:UnlockArm()
-	end
-	
-	if (BitTest(abilities, 2)) then
-		PlayerSkills:UnlockManipulate()
-	end
-	
-	if (BitTest(abilities, 4)) then
-		PlayerSkills:UnlockShield()
-	end
-	
-	if (BitTest(abilities, 8)) then
-		PlayerSkills:UnlockPulse()
+		if (BitTest(abilities, 1)) then
+			PlayerSkills:UnlockArm()
+		end
+		
+		if (BitTest(abilities, 2)) then
+			PlayerSkills:UnlockManipulate()
+		end
+		
+		if (BitTest(abilities, 4)) then
+			PlayerSkills:UnlockShield()
+		end
+		
+		if (BitTest(abilities, 8)) then
+			PlayerSkills:UnlockPulse()
+		end
 	end
 	
 end

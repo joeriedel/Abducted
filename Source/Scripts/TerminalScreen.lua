@@ -14,6 +14,7 @@ TerminalScreen.Widgets = {}
 TerminalScreen.Skip = false
 TerminalScreen.DT = 0
 TerminalScreen.Active = nil
+TerminalScreen.kSpriteSize = 192*4
 
 function TerminalScreen.Spawn(self)
 	Entity.Spawn(self)
@@ -52,9 +53,34 @@ function TerminalScreen.Spawn(self)
 	self.alienSkin1 = World.Load("Shared/alienskin1_M")
 	self.terminalFlash1 = World.Load("Objects/terminalglow1_M")
 	self.terminalFlash2 = World.Load("Objects/terminalglow2_M")
-	
+		
 	self.model.glow1:ReplaceMaterial(self.alienSkin1, self.terminalFlash1)
 	self.model.glow2:ReplaceMaterial(self.alienSkin1, self.terminalFlash2)
+	
+	self.flashSprite = World.CreateSpriteBatch(1, 1)
+	self.flashSprite.material = World.Load("FX/terminalflash1_M")
+	self.flashSprite.dm = self:AttachDrawModel(self.flashSprite, self.flashSprite.material)
+	self.flashSprite.dm:SetBounds(self:Mins(), self:Maxs())
+	self.flashSprite.sprite = self.flashSprite.dm:AllocateSprite()
+	self.flashSprite.dm:SetSpriteData(
+		self.flashSprite.sprite,
+		{
+			pos = {0, 0, 0},
+			size = {TerminalScreen.kSpriteSize*0.7, TerminalScreen.kSpriteSize},
+			rgba = {1, 1, 1, 1},
+			rot = 0
+		}
+	)
+	self.flashSprite.dm:Skin()
+	self.flashSprite.dm:BlendTo({1,1,1,0}, 0)
+	self.flashSprite.dm:ScaleTo({0,0,0}, 0)
+	
+	self.sfx = {}
+	self.sfx.Flash = World.LoadSound("Audio/terminalflash")
+	self.sfx.Skin1 = World.LoadSound("Audio/EFX_AlienSkinGrowsSlow")
+	self.sfx.Skin2 = World.LoadSound("Audio/EFX_AlienSkinSwallow")
+	
+	self.sfx.Skin1:SetLoop(true)
 	
 	self:SetOccupantType(kOccupantType_BBox)
 	self:Link()
@@ -165,17 +191,24 @@ function TerminalScreen.EndActivated(self)
 		TerminalScreen.Signaled = nil
 	end
 	
-	self.model.glow1:BlendTo({1,1,1,0}, 0.1)
-	self.model.glow2:BlendTo({1,1,1,0}, 0.1)
-	
 	if (self.size == "small") then
+		if (self.state == "flash4") then
+			self:UpdateActivated(true)
+			return
+		end
+		
 		self:PlayAnim("idle", self.model)
 		self.state = "none"
+		self.model.glow1:BlendTo({1,1,1,0}, 0.1)
+		self.model.glow2:BlendTo({1,1,1,0}, 0.1)
+		self.flashSprite.dm:BlendTo({1,1,1,0}, 0.1)
+		self.sfx.Skin1:FadeOutAndStop(0.1)
+		self.sfx.Skin2:FadeOutAndStop(0.1)
 	end
 	
 end
 
-function TerminalScreen.UpdateActivated(self)
+function TerminalScreen.UpdateActivated(self, force)
 
 	if (self.size == "big") then
 		return
@@ -186,14 +219,34 @@ function TerminalScreen.UpdateActivated(self)
 	if ((self.state == "none") and (dt > 2)) then
 		self.state = "wiggle"
 		self:PlayAnim("wiggle1", self.model)
+		self.flashSprite.dm:ScaleTo({0.25, 0.25, 0.25}, 0)
+		self.flashSprite.dm:BlendTo({1,1,1,0}, 0)
+		self.flashSprite.dm:BlendTo({1,1,1,1}, 25)
+		self.sfx.Skin1:Rewind()
+		self.sfx.Skin1:Play(kSoundChannel_FX, 0)
 	elseif ((self.state == "wiggle") and (dt > 5)) then
 		self.state = "flash1"
 		self.model.glow1:BlendTo({1,1,1,1}, 0.1)
-	elseif ((self.state == "flash1") and (dt > 7)) then
+	elseif ((self.state == "flash1") and (dt > 6)) then
 		self.state = "flash2"
+		self.sfx.Skin2:Play(kSoundChannel_FX, 0)
+	elseif ((self.state == "flash2") and (dt > 7)) then
+		self.state = "flash3"
 		self.model.glow2:BlendTo({1,1,1,1}, 0.1)
 		self.model.glow1:BlendTo({1,1,1,0}, 0.1)
-	elseif ((self.state == "flash2") and (dt > 8)) then
+	elseif ((self.state == "flash3") and (dt > 8)) then
+		self.state = "flash4"
+		self.flashSprite.dm:BlendTo({1,1,1,1}, 0.1)
+		self.flashSprite.dm:ScaleTo({1,1,1}, 0.1)
+		PostFX.TerminalFlash:FadeIn(0.1)
+		local f = function()
+			self.flashSprite.dm:BlendTo({1,1,1,0}, 0.1)
+			PostFX.TerminalFlash:FadeOut(0.1)
+		end
+		World.globalTimers:Add(f, 0.2)
+		self.sfx.Flash:Play(kSoundChannel_FX, 0)
+	elseif ((self.state == "flash4") and ((dt > 8) or force)) then
+		self.sfx.Skin1:FadeOutAndStop(0.1)
 		self.state = "grow"
 		self.model.glow2:BlendTo({1,1,1,0}, 2)
 		self.size = "big"

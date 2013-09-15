@@ -391,7 +391,10 @@ pak0 {
 	Audio/mine_explode
 	Audio/mine_tripped
 	Audio/mine_drop
+	Audio/terminalflash
 
+	Audio/EFX_AlienSkinGrowsSlow
+	Audio/EFX_AlienSkinSwallow
 	Audio/EFX_SingleBugSquish_rev1
 	Audio/AFX_ShieldActivate
 	Audio/AFX_ShieldHum

@@ -3,6 +3,7 @@ pak0 {
 	UI/mainmenu
 
 	// Ep1 levels
+	Ep1/ep1_combat
 	Ep1/ep1_falling
 	Ep1/ep1_crushed
 	Ep1/ep1_eaten
@@ -21,6 +22,15 @@ pak0 {
 	Ep1/rainvolume1
 
 	// Shared
+	FX/discoverysprite_M
+	FX/darkparticles1
+	FX/darkparticles2
+	FX/ghostparticles
+	FX/pulseimpactsparks
+	FX/pylonimpact1
+	FX/sparks1
+	FX/terminalflash1_M
+	FX/terminalflash2_M
 	Objects/big_tentacle1
 	Objects/big_tentacle2
 	Objects/big_tentacle3
@@ -33,7 +43,8 @@ pak0 {
 	Objects/terminalglow2_M
 	Objects/alien_metadata1
 	Characters/Eve
-	Characters/Tormentor_test
+	Characters/Ghost1
+	Characters/Tormentor1
 	Characters/Buggroup10
 	FX/bug_guts_group01
 	Characters/Bug1
@@ -50,11 +61,16 @@ pak0 {
 	Characters/tentaclewings1_M_manipulate
 	Shared/alienskin1_M_manipulate
 	Shared/pylon1_M_manipulate
+	Objects/mine
+	Objects/mine_armed_M
+	Objects/mine_tripped_M
 	FX/shield1mesh
 	FX/pulsecone1mesh
 	FX/pulsebeam1mesh
 	FX/pulseimpact1mesh
 	FX/shieldsprite1_M
+	FX/shieldspritespark_M
+	FX/shieldspritedamaged_M
 	FX/smokepuff1_M
 	FX/glyph01_M
 	Shared/terminal1
@@ -70,6 +86,8 @@ pak0 {
 	UI/LogEvent_TF
 	UI/LogDiscovery_TF
 	UI/LogArmAsk_TF
+	UI/LogSkillPoints_TF
+	UI/LogUnlockTopic_TF
 	UI/StandardButtonSmall_TF
 	UI/StandardButton_TF
 	UI/StandardButtonDark_TF
@@ -86,6 +104,7 @@ pak0 {
 	UI/heartbeat1_M
 	UI/heartbeat2_M
 	UI/human_heart_M
+	UI/human_heart_injured_M
 	UI/tab-selection-character_M
 	UI/tab-selection-character-pressed_M
 	UI/tab-selection-discoveries_M
@@ -101,6 +120,7 @@ pak0 {
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
 	UI/alphabet_scrollbar_M
+	UI/alphabet_scrollbar_pressed_M
 	UI/TerminalScreenButtons_TF
 	UI/puzzle_level1_M
 	UI/puzzle_level2_M
@@ -117,8 +137,27 @@ pak0 {
 	UI/pulse_button_M
 	UI/pulse_button_charging_M
 	UI/pulse_button_flashing_M
+	UI/rapid_pulse_M
+	UI/rapid_pulse_disabled_M
+	UI/rapid_pulse_flashing_M
 	UI/shield_button_M
 	UI/shield_button_charging_M
+	
+	UI/power_bubble_M
+	UI/power_bubble_disabled_M
+	UI/dropmine_M
+	UI/dropmine_disabled_M
+	UI/tntbox_M
+	UI/tntbox_disabled_M
+
+	UI/HUD_TF
+	
+	UI/discovery_arrow_M
+	UI/discovery_close_x_M
+	UI/discovery_close_x_pressed_M
+	UI/DiscoveryBackground_M
+	UI/DiscoveryText_TF
+	UI/DiscoveryTitle_TF
 
 	UI/alertpanelbackground_M
 	UI/AlertText_TF
@@ -162,6 +201,10 @@ pak0 {
 	UI/curve2_M
 	UI/vertlines2_M
 	UI/backgroundplate1_M
+
+	UI/Title_TF
+	UI/Subtitle_TF
+	UI/CaretBlink_M
 	
 	UI/TerminalPuzzlesFont_TF
 	UI/TerminalPuzzlesScoreFont_TF
@@ -274,6 +317,33 @@ pak0 {
 	Puzzles/glyph25_M
 	Puzzles/glyph26_M
 	Puzzles/glyph27_M
+	FX/glyph01_M
+	FX/glyph02_M
+	FX/glyph03_M
+	FX/glyph04_M
+	FX/glyph05_M
+	FX/glyph06_M
+	FX/glyph07_M
+	FX/glyph08_M
+	FX/glyph09_M
+	FX/glyph10_M
+	FX/glyph11_M
+	FX/glyph12_M
+	FX/glyph13_M
+	FX/glyph14_M
+	FX/glyph15_M
+	FX/glyph16_M
+	FX/glyph17_M
+	FX/glyph18_M
+	FX/glyph19_M
+	FX/glyph20_M
+	FX/glyph21_M
+	FX/glyph22_M
+	FX/glyph23_M
+	FX/glyph24_M
+	FX/glyph25_M
+	FX/glyph26_M
+	FX/glyph27_M
 	Puzzles/reflex-checkerboard1_M
 	Puzzles/goalparticles_M
 	Puzzles/playerparticles_M
@@ -309,8 +379,17 @@ pak0 {
 	Audio/armsignaled
 	Audio/armreward
 	Audio/shiphum1
+	Audio/selectskill
+	Audio/upgradeskill
 	Audio/heartbeat1
+	Audio/heartbeatfast
 	Audio/ability_unlocked
+	Audio/mine_activate
+	Audio/mine_hum
+	Audio/mine_armed
+	Audio/mine_explode
+	Audio/mine_tripped
+	Audio/mine_drop
 
 	Audio/EFX_SingleBugSquish_rev1
 	Audio/AFX_ShieldActivate
@@ -319,6 +398,7 @@ pak0 {
 	Audio/AFX_ShieldImpactLight
 	Audio/AFX_PulseCycleLoop
 	Audio/AFX_ShieldImpactAggressive
+	Audio/AFX_ShieldSpark
 	Audio/AFX_PulseEnergyImpact
 	Audio/EFX_IdleBugSwarm_rev1
 	Audio/EFX_IdleBugSwarm_rev1
@@ -327,6 +407,10 @@ pak0 {
 	Audio/EFX_TenticleActivate_rev1
 	Audio/EFX_TenticleAttack1
 	Audio/EFX_TenticleDeactivate_rev1
+	Audio/EFX_TenticleAttack2
+	Audio/PFX_TentacleStrikeDeath1
+	Audio/PFX_TentacleStrikeDeath2
+	Audio/PFX_TentacleStrikeDeath3
 	Audio/EnviroFX_PylonEnd
 	Audio/EnviroFX_PylonMoving
 

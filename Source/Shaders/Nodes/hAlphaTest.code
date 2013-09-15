@@ -1,0 +1,6 @@
+HALF4 hAlphaTest(HALF4 x) {
+	if (x.a <= (64.0/255.0)) {
+		discard;
+	}
+	return x;
+}

@@ -1,0 +1,13 @@
+
+Node({
+
+	Outputs = 
+	{
+		r = {t=HALF4, r=-1}
+	},
+
+	Inputs = 
+	{
+		x = {t=HALF4, r=0}
+	},
+})

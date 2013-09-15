@@ -970,6 +970,8 @@ function Arm.LoadState(self)
 		HUD:SignalArm(false)
 	end
 
+	Arm:ClearChat()
+	
 end
 
 arm_ui = Arm

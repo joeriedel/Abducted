@@ -168,7 +168,8 @@ pak0 {
 	UI/arm_button_M
 	UI/arm_buttons_solid_M
 	UI/arm_button_pressed_M
-	UI/arm_button_signaled_M
+	UI/arm_signaled_M
+	UI/arm_activity_M
 	UI/arm_screen1_M
 
 	UI/ability_recharge_shimmer_M

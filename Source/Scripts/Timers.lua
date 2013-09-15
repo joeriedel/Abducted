@@ -45,8 +45,8 @@ function TimerList.Tick(self, time, ...)
 	end
 end
 
-function TimerList.TimerSetPeriod(self, period)
-	self.period = period
+function TimerList.TimerSetDelay(self, delay)
+	self.delay = delay
 end
 
 function TimerList.TimerClean(self)
@@ -63,7 +63,7 @@ function TimerList.Add(self, fn, delay, repeats)
 		time = 0,
 		tick = 0,
 		repeats = repeats,
-		SetPeriod = TimerList.TimerSetPeriod,
+		SetDelay = TimerList.TimerSetDelay,
 		Clean = TimerList.TimerClean
 	}
 	return LL_Append(self.timers, x)

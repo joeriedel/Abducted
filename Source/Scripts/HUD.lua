@@ -4,6 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 HUD = Class:New()
+HUD.kArmActivityFlashDuration = 0.5
 
 function HUD.Spawn(self)
 	
@@ -100,7 +101,6 @@ function HUD.Load(self)
 		self.gfx = {
 			Arm = "UI/arm_button_M",
 			ArmPressed = "UI/arm_button_pressed_M",
-			ArmSignaled = "UI/arm_button_signaled_M",
 			ManipulateDisabled = "UI/manipulate_button_charging_M",
 			ManipulateEnabled = "UI/manipulate_button_M",
 			ManipulateFlashing = "UI/manipulate_button_flashing_M",
@@ -124,7 +124,6 @@ function HUD.Load(self)
 		self.gfx = {
 			Arm = "UI/arm_button_pc_M",
 			ArmPressed = "UI/arm_button_pressed_pc_M",
-			ArmSignaled = "UI/arm_button_signaled_pc_M",
 			ManipulateDisabled = "UI/manipulate_button_charging_pc_M",
 			ManipulateEnabled = "UI/manipulate_button_pc_M",
 			ManipulateFlashing = "UI/manipulate_button_flashing_pc_M",
@@ -146,6 +145,10 @@ function HUD.Load(self)
 			TNTBoxDisabled = "UI/tntbox_disabled_pc_M"
 		}
 	end
+	
+	self.gfx.ArmActivity = "UI/arm_activity_M"
+	self.gfx.ArmSignaled = "UI/arm_signaled_M"
+	
 	map(self.gfx, World.Load)
 	
 	self.pulseFlashing = self.gfx.PulseFlashing
@@ -185,6 +188,10 @@ function HUD.Load(self)
 		nil,
 		self.widgets.Root
 	)
+	
+	self.widgets.ArmActivity = UI:CreateWidget("MatWidget", {rect={0,0,8,8,}, material=self.gfx.ArmActivity})
+	self.widgets.ArmActivity:SetVisible(false)
+	self.widgets.Arm:AddChild(self.widgets.ArmActivity)
 	
 	self.widgets.Manipulate = UIPushButton:Create(
 		UI:MaterialSize(self.gfx.ManipulateEnabled, {0, 0}),
@@ -355,8 +362,24 @@ function HUD.Load(self)
 		self.widgets.ShieldLabelBkg:BlendTo({1,1,1,0}, 0)
 		self.widgets.PulseLabel:BlendTo({1,1,1,0}, 0)
 		self.widgets.PulseLabelBkg:BlendTo({1,1,1,0}, 0)
-	end
+		
+		local activityRect = self.widgets.Arm:Rect()
+		activityRect[1] = 0
+		activityRect[2] = 0
+		activityRect[3] = activityRect[3] * 0.4
+		activityRect[4] = activityRect[3]
+		activityRect = CenterChildRectInRect(activityRect, self.widgets.Arm:Rect())
+		self.widgets.ArmActivity:SetRect(activityRect)
 	
+	else
+		local activityRect = self.widgets.Arm:Rect()
+		activityRect[1] = 0
+		activityRect[2] = 0
+		activityRect[3] = activityRect[3] * 0.35
+		activityRect[4] = activityRect[3]
+		activityRect = CenterRectInRect(activityRect, {46,30,185,105})
+		self.widgets.ArmActivity:SetRect(activityRect)
+	end
 	
 	self.widgets.Root:AddChild(self.widgets.ManipulateShimmer)
 	self.widgets.Root:AddChild(self.widgets.ShieldShimmer)
@@ -1321,6 +1344,27 @@ function HUD.Shimmer(self, widget)
 	World.globalTimers:Add(f, 0.2)
 end
 
+function HUD.ArmActivity(self)
+
+	if (self.armSignaled) then
+		return
+	end
+
+	if (self.armActivityTimer) then
+		self.armActivityTimer:Clean()
+	end
+	
+	self.widgets.ArmActivity:SetMaterial(self.gfx.ArmActivity)
+	self.widgets.ArmActivity:SetVisible(true)
+	
+	local f = function()
+		self.widgets.ArmActivity:SetVisible(false)
+	end
+	
+	World.globalTimers:Add(f, HUD.kArmActivityFlashDuration)
+
+end
+
 function HUD.PlayerDied(self)
 	HUD:Disable()
 end
@@ -1412,19 +1456,16 @@ function HUD.EnableArm(self, enable)
 end
 
 function HUD.SignalArm(self, signal)
-	
-	local gfx = {}
+
+	self.armSignaled = signal
 	
 	if (signal) then
-		gfx.pressed = self.gfx.ArmPressed
-		gfx.enabled = self.gfx.ArmSignaled
+		self.widgets.ArmActivity:SetMaterial(self.gfx.ArmSignaled)
+		self.widgets.ArmActivity:SetVisible(true)
 		self.sfx.Signaled:Play(kSoundChannel_UI, 0)
 	else
-		gfx.pressed = self.gfx.ArmPressed
-		gfx.enabled = self.gfx.Arm
+		self.widgets.ArmActivity:SetVisible(false)
 	end
-	
-	self.widgets.Arm.class:ChangeGfx(self.widgets.Arm, gfx)
 
 end
 
@@ -1696,12 +1737,15 @@ function HUD.SaveState(self)
 end
 
 function HUD.LoadState(self)
-	HUD.enabled = true
-	HUD.printer:Clear()
-	HUD.printer.timers = World.globalTimers
+	self.enabled = true
+	self.armActivityTimer = nil
+	self.armSignaled = false
+	self.printer:Clear()
+	self.printer.timers = World.globalTimers
 	self.widgets.PowerBubble:SetVisible(false)
 	self.widgets.DropMine:SetVisible(false)
 	self.widgets.RapidPulse:SetVisible(false)
+	self.widgets.ArmActivity:SetVisible(false)
 	self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, true)
 	self.widgets.DropMine.class:SetEnabled(self.widgets.DropMine, true)
 	self.widgets.RapidPulse.class:SetEnabled(self.widgets.RapidPulse, true)

@@ -1939,6 +1939,7 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 		end
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
 	elseif (tokens[1] == "award") then
 		self.rewardSkillPoints = tonumber(tokens[2])
 		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)

@@ -115,6 +115,9 @@ function Arm.EndChat(self, callback)
 end
 
 function Arm.ClearChat(self)
+
+	self.topic = nil
+	
 	if (self.chatTimer) then
 		self.chatTimer:Clean()
 		self.chatTimer = nil

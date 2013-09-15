@@ -122,7 +122,7 @@ function Abducted.LoadState(self)
 	World.FlushInput(true)
 	self.pulse = false
 
-	PlayerSkills:Load()
+	PlayerSkills:Load(true)
 	HUD:LoadState()
 	Arm:LoadState()
 	Cinematics:LoadState()

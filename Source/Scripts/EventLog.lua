@@ -60,6 +60,8 @@ function EventLog.AddEvent(self, time, style, text)
 		Persistence.DeleteKey(SaveGame, dst.."/text")
 	end
 	
+	HUD:ArmActivity()
+	
 end
 
 function EventLog.LoadList(self)

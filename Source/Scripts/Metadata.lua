@@ -6,7 +6,7 @@
 Metadata = Entity:New()
 Metadata.kSize = 45
 Metadata.List = LL_New()
-Metadata.kSmackDistance = 50
+Metadata.kSmackDistance = 60
 
 function Metadata.Spawn(self)
 

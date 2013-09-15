@@ -257,6 +257,7 @@ function Discovery.AnimateOpenUI(self, awardSkillPoints)
 	self.updateTimer = World.globalTimers:Add(function () self:UpdateUI() end, 0, true)
 
 	Discovery.Widgets.Arrow:BlendTo({1,1,1,0}, 0)
+	Discovery.Widgets.Close:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Title:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Text:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Scroll:BlendTo({1,1,1,0}, 0)

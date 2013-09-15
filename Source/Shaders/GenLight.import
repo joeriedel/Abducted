@@ -901,6 +901,34 @@ function GenDSBumpAlphaShader()
 
 end
 
+function GenDSBumpAlphaTestShader()
+
+	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")
+	diffuseTexture.In.t = MTexture(0)
+	diffuseTexture.In.tc = MTexCoord(0)
+
+	local alphaTest = Node("hAlphaTest", "alphaTest")
+	alphaTest.In.x = diffuseTexture
+
+	local bumpMap = Node("hSampleNormalMap2D", "bumpMap")
+	bumpMap.In.t = MTexture(1)
+	bumpMap.In.tc = MTexCoord(1)
+
+	return GenLightShader(
+		{"Diffuse", "DiffuseSpecular"},
+		kMaxLights,
+		GenBumpLight,
+		bumpMap,
+		diffuseTexture,
+		MSpecularColor(0),
+		MColor(0),
+		nil,
+		nil,
+		alphaTest
+	)
+
+end
+
 function GenDSBumpGlowShader()
 
 	local diffuseTexture = Node("hSampleTexture2D", "diffuseTexture")

@@ -1054,6 +1054,11 @@ void CWaypoint::Connection::InitProps() {
 	flags[kFlag_Interruptible].SetType(CObjProp::integer);
 	flags[kFlag_Interruptible].SetInt(1 << kFlag_Interruptible);
 
+	flags[kFlag_AutoPitch].SetName("autoPitch");
+	flags[kFlag_AutoPitch].SetDisplayName("Auto Pitch");
+	flags[kFlag_AutoPitch].SetType(CObjProp::integer);
+	flags[kFlag_AutoPitch].SetInt(1 << kFlag_AutoPitch);
+
 	props[kProp_Flags].AddChoice(&flags[kFlag_AtoB]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_BtoA]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_BtoAUseAtoBScript]);

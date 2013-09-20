@@ -146,6 +146,7 @@ private:
 			kFlag_BtoAUseAtoBScript,
 			kFlag_AutoFace,
 			kFlag_Interruptible,
+			kFlag_AutoPitch,
 			kFlag_Num
 		};
 

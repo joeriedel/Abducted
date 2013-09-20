@@ -1064,6 +1064,7 @@ void CWaypoint::Connection::InitProps() {
 	props[kProp_Flags].AddChoice(&flags[kFlag_BtoAUseAtoBScript]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_AutoFace]);
 	props[kProp_Flags].AddChoice(&flags[kFlag_Interruptible]);
+	props[kProp_Flags].AddChoice(&flags[kFlag_AutoPitch]);
 
 	props[kProp_Flags].SetInt(
 		(1 << kFlag_AtoB) | (1 << kFlag_BtoA) | (1 << kFlag_AutoFace) | (1 << kFlag_Interruptible)

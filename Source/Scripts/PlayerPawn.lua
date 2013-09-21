@@ -38,7 +38,8 @@ PlayerPawn.AnimationStates = {
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
 		puzzle_default_choice = "puzzle_limp_choice",
-		speedScale = 0.7,
+		smack_metadata = "limpmanup",
+		speedScale = 0.64,
 		tapAdjust = 48, -- CheckTappedOn
 		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
 		canRun = false,
@@ -58,6 +59,7 @@ PlayerPawn.AnimationStates = {
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
 		puzzle_default_choice = "puzzle_limp_choice",
+		smack_metadata = "limpmanup",
 		speedScale = 0.4,
 		tapAdjust = 48, -- CheckTappedOn
 		bbox = {mins = {-32, -32, 0}, maxs = {32, 32, 90}},

@@ -5,7 +5,7 @@
 
 TerminalScreen = Entity:New()
 TerminalScreen.MaxTouchDistancePct = 1/8
-TerminalScreen.TouchPosShift = {70,0,120}
+TerminalScreen.TouchPosShift = {70,0,80}
 TerminalScreen.ButtonPosShift = {1.5/10, 1/10}
 TerminalScreen.ButtonSize = {1.5/15, 1.5/15}
 TerminalScreen.PopupEntity = nil

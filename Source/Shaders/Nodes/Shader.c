@@ -193,15 +193,15 @@ MAIN
 #if defined(LIGHTS)
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_VERTEXPOS) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_POS >= 4) || (SHADER_LIGHT_VERTEXPOS >= 4) || (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)
-	HALF3 v_light3_dir = UNIFORM(light3_pos).xyz - vertex.xyz;
+	FLOAT3 v_light3_dir = UNIFORM(light3_pos).xyz - vertex.xyz;
 #endif
 #if (SHADER_LIGHT_POS >= 3) || (SHADER_LIGHT_VERTEXPOS >= 3) || (SHADER_LIGHT_VEC >= 3) || (SHADER_LIGHT_HALFVEC >= 3) || (SHADER_LIGHT_TANVEC >= 3) || (SHADER_LIGHT_TANHALFVEC >= 3)
-	HALF3 v_light2_dir = UNIFORM(light2_pos).xyz - vertex.xyz;
+	FLOAT3 v_light2_dir = UNIFORM(light2_pos).xyz - vertex.xyz;
 #endif
 #if (SHADER_LIGHT_POS >= 2) || (SHADER_LIGHT_VERTEXPOS >= 2) || (SHADER_LIGHT_VEC >= 2) || (SHADER_LIGHT_HALFVEC >= 2) || (SHADER_LIGHT_TANVEC >= 2) || (SHADER_LIGHT_TANHALFVEC >= 2)
-	HALF3 v_light1_dir = UNIFORM(light1_pos).xyz - vertex.xyz;
+	FLOAT3 v_light1_dir = UNIFORM(light1_pos).xyz - vertex.xyz;
 #endif
-	HALF3 v_light0_dir = UNIFORM(light0_pos).xyz - vertex.xyz;
+	FLOAT3 v_light0_dir = UNIFORM(light0_pos).xyz - vertex.xyz;
 #endif
 #if defined(SHADER_LIGHT_VEC) || defined(SHADER_LIGHT_TANVEC) || defined(SHADER_LIGHT_HALFVEC) || defined(SHADER_LIGHT_TANHALFVEC)
 #if (SHADER_LIGHT_VEC >= 4) || (SHADER_LIGHT_TANVEC >= 4) || (SHADER_LIGHT_HALFVEC >= 4) || (SHADER_LIGHT_TANHALFVEC >= 4)

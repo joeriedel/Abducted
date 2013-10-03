@@ -1,5 +1,4 @@
 pak0 {
-
 	UI/mainmenu
 
 	// Ep1 levels
@@ -13,6 +12,7 @@ pak0 {
 	Ep1/testroom3_dynlight1
 	Ep1/testroom3_dynlight2
 	Ep1/testroom3_fog1
+	Ep1/testroom2_manipulate
 
 	Ep1/Falling
 	Ep1/Ep1Crushed
@@ -28,7 +28,11 @@ pak0 {
 	FX/ghostparticles
 	FX/pulseimpactsparks
 	FX/pylonimpact1
+	FX/rockparticle1
+	FX/rockparticle2
+	FX/greenblood1_particle
 	FX/sparks1
+	FX/dustimpact1
 	FX/terminalflash1_M
 	FX/terminalflash2_M
 	Objects/big_tentacle1
@@ -73,6 +77,7 @@ pak0 {
 	FX/shieldspritedamaged_M
 	FX/smokepuff1_M
 	FX/glyph01_M
+	FX/rain1_screenfx_M
 	Shared/terminal1
 	UI/Solid_M
 	UI/loading_icon_M
@@ -417,6 +422,13 @@ pak0 {
 	Audio/PFX_TentacleStrikeDeath3
 	Audio/EnviroFX_PylonEnd
 	Audio/EnviroFX_PylonMoving
+	Audio/VO_Eve_BigPain02
+	Audio/VO_Eve_Scream01
+	Audio/PFX_Impact7
+	Audio/VO_Eve_Scream05
+	Audio/VO_Eve_Surprise02
+	Audio/rainthunder1
+	Audio/rain1
 
 	Audio/EnviroFX_Creak01
 	Audio/EnviroFX_Creak02
@@ -425,6 +437,8 @@ pak0 {
 	Audio/EnviroFX_Creak05
 	Audio/EnviroFX_Creak06
 	Audio/EnviroFX_Creak07
+	Audio/EnviroFX_TenticalsSnapping2
+	Audio/EnviroFX_Crash
 
 	// System (for DebugUI)
 

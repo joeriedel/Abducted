@@ -2,10 +2,9 @@ pak0 {
 	UI/mainmenu
 
 	// Ep1 levels
-	Ep1/ep1_combat
+	Ep1/ep1_crushed_intro
 	Ep1/ep1_falling
-	Ep1/ep1_crushed
-	Ep1/ep1_eaten
+	Ep1/ep1_dreamscape1
 	
 	// Ep1 test maps
 	Ep1/ep1_crushed_combat

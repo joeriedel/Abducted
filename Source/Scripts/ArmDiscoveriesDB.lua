@@ -98,7 +98,20 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_BUGS_TITLE",
 		text = "ARM_DISCOVERY_BUGS"
 	},
-	Pod = { -- Alien Pod
+	MysteryExample = {
+		picture = "UI/discovery_tentacles_M",
+		title = "ARM_TOPIC_TENTACLES",
+		text = "ARM_DISCOVERY_TENTACLES",
+		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
+		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
+		mysteryChat = "Tentacles",
+		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG",
+		logText = {
+			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
+		},
+		chat = "ARM_TOPIC_TENTACLES"
+	},
+	Pod = {
 		picture = "UI/discovery_pod_M",
 		title = "ARM_DISCOVERY_POD_TITLE",
 		text = "ARM_DISCOVERY_POD",
@@ -111,10 +124,6 @@ Arm.Discoveries = {
 		picture = "UI/discovery_tentacles_M",
 		title = "ARM_TOPIC_TENTACLES",
 		text = "ARM_DISCOVERY_TENTACLES",
-		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
-		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
-		mysteryChat = "Tentacles",
-		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG",
 		logText = {
 			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
 		},

@@ -4,7 +4,7 @@
 -- See Abducted/LICENSE for licensing terms
 
 MainMenu.NewGame = MainMenuPanel:New()
-MainMenu.NewGame.StartingLevel = "Ep1/ep1_combat"
+MainMenu.NewGame.StartingLevel = "Ep1/ep1_crushed_intro"
 
 function MainMenu.InitNewGame(self)
 	self.newGamePanel = MainMenu.NewGame:New()

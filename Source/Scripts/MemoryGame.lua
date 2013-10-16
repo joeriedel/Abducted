@@ -14,14 +14,31 @@ kMGPhase_FindPattern = 4
 kMGPhase_GameOver = 99
 
 function MemoryGame.DebugStart(self)
-    MemoryGame:InitGame("memory-game: debug_start", 1, 1)
-    MemoryGame:ShowBoard(true)
-    MemoryGame:StartGame()
+	Abducted.entity.eatInput = true
+	UI:BlendTo({1,1,1,1}, 0.3)
+	local f = function()
+		local f = function()
+			UI:BlendTo({1,1,1,1}, 0.3)
+			local f = function()
+				UI:BlendTo({0,0,0,0}, 0.3)
+				MemoryGame:ShowBoard(false)
+				MemoryGame:ResetGame()
+				collectgarbage()
+				Abducted.entity.eatInput = false
+			end
+			World.globalTimers:Add(f, 0.3)
+		end
+		MemoryGame:InitGame(1)
+		UI:BlendTo({0,0,0,0}, 0.3)
+		MemoryGame:ShowBoard(true)
+		MemoryGame:StartGame("discover Bugs;award 6;message ARM_REWARD_MSG_POWER_RESTORED;unlock_topic LockedTest ARM_REWARD_LOCKEDTEST", f)
+	end
+	World.globalTimers:Add(f, 0.3)
 end
 
 function MemoryGame.FlattenList(self,list)
     local temp = {}
-    for i,v in ipairs(list) do
+    for i,v in pairs(list) do
         table.insert(temp,v)
     end
     return temp
@@ -29,12 +46,17 @@ end
 
 function MemoryGame.Spawn(self)
 	MemoryGame.entity = self
-		
-	self:LoadMaterials()
-	self:InitUI()
-	
-	-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
 
+end
+
+function MemoryGame.PostSpawn(self)
+
+	if (Game.entity.type == "Map") then
+		self:LoadMaterials()
+		self:InitUI()
+		-- Note: InitUI sets widgets.root to be invisbile (hides the whole board)
+	end
+	
 end
 
 function MemoryGame.ShowBoard(self, show)
@@ -45,38 +67,42 @@ function MemoryGame.ShowBoard(self, show)
 	World.DrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
-function MemoryGame.InitGame(self, gameType, playerSkill, terminalSkill)
+function MemoryGame.InitGame(self, terminalSkill)
 	self = MemoryGame.entity
+	self.exiting = false
 	-- InitGame: prep the board to be shown with ShowBoard
 	-- but we should not start until StartGame is called.
 end
 
-function MemoryGame.StartGame(self, gameCompleteCallback)
+function MemoryGame.StartGame(self, actions, gameCompleteCallback)
 	self = MemoryGame.entity
 	
 	MemoryGame.active = true
 	self.gameCompleteCallback = gameCompleteCallback
+	self.actions = actions
 	
 	self.think = MemoryGame.Think
 	self:SetNextThink(0)
-
-    World.SetEnabledGestures(kIG_Line)
+	
 	World.FlushInput(true)
+	Abducted.entity.eatInput = false
 end
 
 function MemoryGame.EndGame(self, result)
-
+	self = MemoryGame.entity
+	self.think = nil
+	self.exiting = true
 	
-	World.SetEnabledGestures(0)
 	World.FlushInput(true)
 	
-	self.think = nil
-	self.gameCompleteCallback(result);
-
+	if (self.gameCompleteCallback) then
+		self.gameCompleteCallback(result)
+	end
 end
 
 function MemoryGame.ResetGame(self)
 	self = MemoryGame.entity
+	PuzzleScoreScreen:Unlink()
 	-- clean up game-board, get ready for another ShowBoard/StartGame call sometime in the future.
 	-- NOTE: the terminal puzzle UI is hidden right now
 	MemoryGame.active = false
@@ -212,15 +238,6 @@ function MemoryGame.CreateBoards(self)
     }
 end
 
---function MemoryGame.CheckTouch(self, v, x, y)
---    return CheckWorldTouch(
---        v:WorldPos(),
---        x,
---        y,
---        (.75 * UI.systemScreen.diagonal)
---    )
---end
-
 function MemoryGame.OnInputEvent(self,e)
     self = MemoryGame.entity
 
@@ -279,37 +296,11 @@ function MemoryGame.OnInputEvent(self,e)
     return (best ~= nil)
 end
 
---function MemoryGame.OnInputGesture(self,g)
---	self = MemoryGame.entity
-
---  djr, disabling this for now (joe added this i think)
---	if (g.id ~= kIG_Line) then
---		return true
---	end
---
---	-- left?
---	if (g.args[1] > 0.707) then
---		self.state.heading.x = 1
---		self.state.heading.y = 0
---	elseif (g.args[1] < -0.707) then -- right?
---		self.state.heading.x = -1
---		self.state.heading.y = 0
---	elseif (g.args[2] > 0.707) then -- down
---		self.state.heading.x = 0
---		self.state.heading.y = 1
---	else -- up
---		self.state.heading.x = 0
---		self.state.heading.y = -1
---	end
---
---	return true
---end
-
 function MemoryGame.ChangeLevel(self,level)
     self.state.level = level
     COutLine(kC_Debug, "memory.level.name=" .. self.state.level.name)
 
-    self.REFLEX_BOARD_OFFSET = {self.screen[1] -  level.CELL_SCALE - 20, self.screen[2] - level.CELL_SCALE - 20 + 100}
+    self.REFLEX_BOARD_OFFSET = {self.screen[1], 200*UI.identityScale[2]}
     self.REFLEX_CELL_SIZE = {level.CELL_SCALE*UI.identityScale[1], level.CELL_SCALE*UI.identityScale[1] }
     self.INDEX_MAX_X = level.INDEX_MAX_X
     self.INDEX_MAX_Y = level.INDEX_MAX_Y
@@ -321,14 +312,17 @@ function MemoryGame.ChangeLevel(self,level)
     -- reset the board for next draw
     for i,k in ipairs(self.widgets.cells) do
         self.widgets.root:RemoveChild(k)
+        k:Unmap()
     end
     self.widgets.grid = {}
     self.widgets.cells = {}
+    
+    collectgarbage()
 end
 
 function MemoryGame.InitUI(self)
     -- constants
-    self.SMALL_CELL_SCALE = 150
+    self.SMALL_CELL_SCALE = 130
     self.SMALL_INDEX_MAX_X = 8
     self.SMALL_INDEX_MAX_Y = 4
 
@@ -386,8 +380,8 @@ function MemoryGame.InitUI(self)
     self.widgets.grid = {}
     self.widgets.cells = {}
 
-    self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=MemoryGame.OnInputEvent, OnInputGesture=ReflexGame.OnInputGesture})
-    World.SetRootWidget(UI.kLayer_TerminalPuzzles, self.widgets.root)
+    self.widgets.root = UI:CreateWidget("Widget", {rect=UI.fullscreenRect, OnInputEvent=MemoryGame.OnInputEvent})
+    World.SetRootWidget(UI.kLayer_SolveGame, self.widgets.root)
     self.widgets.root:SetOpaqueLayerInput(true) -- no input goes past this
 
     self.widgets.root:SetVisible(false)
@@ -431,7 +425,7 @@ function MemoryGame.LoadMaterials(self)
     self.gfx.blackhole = World.Load("Puzzles/reflex-blackhole1_M");
     self.gfx.antivirus_spider = World.Load("Puzzles/AlienICE_M")
     self.gfx.blue_glow = World.Load("Puzzles/reflex-blueglow1_M")
-    self.gfx.board = World.Load("Puzzles/reflex-checkerboard1_M")
+    self.gfx.board = World.Load("UI/terminal_screen1_M")
     self.gfx.border = World.Load("UI/arm_screen1_M")
 
     self.gfx.mark_current = World.Load("Puzzles/reflex-player1_M")
@@ -471,10 +465,10 @@ function MemoryGame.LoadMaterials(self)
 
     self.gfx.mark_start = nil
     self.typefaces = {}
-    self.typefaces.BigText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesBigFont_TF")
-    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesBigFont_TF")
+    self.typefaces.BigText = World.Load("UI/TerminalPuzzlesFont_TF")
+    self.typefaces.TimerText = World.Load("UI/TerminalPuzzlesTimeFont_TF")
+    self.typefaces.TouchWhenReadyText = World.Load("UI/TerminalPuzzlesFont_TF")
+    self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesFont_TF")
 
     local xScale = UI.screenWidth / 1280
     local yScale = UI.screenHeight / 720

@@ -190,12 +190,12 @@ function Metadata.LoadState(self, state)
 	
 	if (self.opened) then
 		self.model.dm:SetVisible(false)
-		self.sprite.dm:BlendTo({1,1,1,1}, 0)
+		self.sprite.dm:SetVisible(true)
 	else
 		self.think = Metadata.CheckProximity
 		self:SetNextThink(1/4)
 		self.model.dm:SetVisible(true)
-		self.sprite.dm:BlendTo({1,1,1,0}, 0)
+		self.sprite.dm:SetVisible(false)
 		self.listItem = LL_Append(Metadata.List, {x=self})
 	end
 

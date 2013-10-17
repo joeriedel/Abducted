@@ -149,6 +149,10 @@ function Metadata.CheckPulseTargets(mx, my)
 	return nil
 end
 
+function Metadata.ShotWithPulse(self)
+	self:Explode()
+end
+
 function Metadata.Explode(self)
 	self.think = nil
 	LL_Remove(Metadata.List, self.listItem)

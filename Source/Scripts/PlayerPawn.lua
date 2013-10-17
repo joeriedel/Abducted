@@ -847,7 +847,11 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage)
 	self:Kill(instigator, killMessage)
 end
 
-function PlayerPawn.Kill(self, instigator, killMessage)
+function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
+
+	if (self.dead) then
+		return
+	end
 	
 	self.dead = true
 	
@@ -863,7 +867,7 @@ function PlayerPawn.Kill(self, instigator, killMessage)
 		self:EndShield()
 	end
 	
-	Game.entity:PlayerDied(killMessage)
+	Game.entity:PlayerDied(killMessage, specialCommand)
 end
 
 function PlayerPawn.CheckTappedOn(self, e)

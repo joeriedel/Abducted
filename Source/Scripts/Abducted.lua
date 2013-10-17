@@ -548,7 +548,7 @@ function Abducted.PlayerDiedAlertPanelDone(self, result)
 	end
 end
 
-function Abducted.PlayerDied(self, killMessage)
+function Abducted.PlayerDied(self, killMessage, specialCommand)
 	HUD:PlayerDied()
 	if (self.manipulate) then
 		self:EndManipulate()
@@ -557,25 +557,29 @@ function Abducted.PlayerDied(self, killMessage)
 		self:EndPulse()
 	end
 	
-	if (killMessage == nil) then
-		killMessage = Abducted.KillMessages[IntRand(1, #Abducted.KillMessages)]
+	if (specialCommand) then
+		World.PostEvent(specialCommand)
+	else
+		if (killMessage == nil) then
+			killMessage = Abducted.KillMessages[IntRand(1, #Abducted.KillMessages)]
+		end
+		
+		local f = function()
+			AlertPanel:Run(
+				"ALERT_PANEL_DIED",
+				killMessage,
+				{
+					{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
+					{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
+				},
+				function (result)
+					self:PlayerDiedAlertPanelDone(result)
+				end
+			)
+		end
+		
+		World.globalTimers:Add(f, 2.5)
 	end
-	
-	local f = function()
-		AlertPanel:Run(
-			"ALERT_PANEL_DIED",
-			killMessage,
-			{
-				{"ALERT_PANEL_BUTTON_RELOAD_CHECKPOINT", r=1},
-				{"ALERT_PANEL_BUTTON_QUIT_TO_MAIN_MENU", r=2}
-			},
-			function (result)
-				self:PlayerDiedAlertPanelDone(result)
-			end
-		)
-	end
-	
-	World.globalTimers:Add(f, 2.5)
 end
 
 function Abducted.Discover(self, name)

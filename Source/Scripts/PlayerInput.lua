@@ -74,7 +74,7 @@ end
 
 function PlayerInput.TapPulse(self, x, y)
 
-	if (self:TapMetadata(x,y)) then
+	if (self:TapTarget(x,y)) then
 		return true
 	end
 
@@ -104,25 +104,43 @@ function PlayerInput.TapPulse(self, x, y)
 	
 end
 
-function PlayerInput.TapMetadata(self, x, y)
+function PlayerInput.TapTarget(self, x, y)
 
-	local target = Metadata.CheckPulseTargets(x, y)
+	local playerPos = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift())
+	
+	local target1 = Metadata.CheckPulseTargets(x, y)
+	local target2 = Tormentor.CheckPulseTargets(x, y)
+	local target = nil
+	
+	if (target1 and target2) then
+		-- choose closest
+		local dist1 = VecMag(VecSub(playerPos, target1.pos))
+		local dist2 = VecMag(VecSub(playerPos, target2.pos))
+		
+		if (dist1 <= dist2) then
+			target = target1
+		else
+			target = target2
+		end
+	else
+		target = target1 or target2
+	end
 	
 	if (target) then
-	
+		
 		-- did we hit something first?
 		local trace = {
-			start = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift()),
+			start = playerPos,
 			_end = target.pos,
 			contents = bit.bor(kContentsFlag_Solid, kContentsFlag_Clip)
 		}
 	
 		if (World.LineTrace(trace) == nil) then
-			COutLine(kC_Debug, "Pulse - hit metadata entity!")
+			COutLine(kC_Debug, "Pulse - targeting object!")
 			local normal = VecSub(trace.start, trace._end)
 			normal = VecNorm(normal)
 			Game.entity:FirePulse(target.pos, normal, false)
-			target:Explode()
+			target:ShotWithPulse()
 			return true
 		end
 	end

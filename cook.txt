@@ -68,6 +68,7 @@ pak0 {
 	Objects/mine
 	Objects/mine_armed_M
 	Objects/mine_tripped_M
+	Objects/gameintro_fadeimage_mesh
 	FX/shield1mesh
 	FX/pulsecone1mesh
 	FX/pulsebeam1mesh
@@ -425,6 +426,7 @@ pak0 {
 	Audio/EnviroFX_PylonMoving
 	Audio/VO_Eve_BigPain02
 	Audio/VO_Eve_Scream01
+	Audio/VO_Eve_What01
 	Audio/PFX_Impact7
 	Audio/VO_Eve_Scream05
 	Audio/VO_Eve_Surprise02
@@ -444,6 +446,7 @@ pak0 {
 	Audio/EnviroFX_Creak07
 	Audio/EnviroFX_TenticalsSnapping2
 	Audio/EnviroFX_Crash
+	Audio/EnviroFX_HumanShip
 
 	// System (for DebugUI)
 

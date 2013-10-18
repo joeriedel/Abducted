@@ -34,6 +34,7 @@ pak0 {
 	FX/dustimpact1
 	FX/terminalflash1_M
 	FX/terminalflash2_M
+	FX/impactfx1
 	Objects/big_tentacle1
 	Objects/big_tentacle2
 	Objects/big_tentacle3
@@ -146,7 +147,8 @@ pak0 {
 	UI/rapid_pulse_flashing_M
 	UI/shield_button_M
 	UI/shield_button_charging_M
-	
+	UI/terminal_screen1_M
+
 	UI/power_bubble_M
 	UI/power_bubble_disabled_M
 	UI/dropmine_M
@@ -428,6 +430,10 @@ pak0 {
 	Audio/VO_Eve_Surprise02
 	Audio/rainthunder1
 	Audio/rain1
+	Audio/PFX_TentacleStrike1
+	Audio/PFX_TentacleStrike2	
+	Audio/PFX_TentacleStrike3
+	Audio/PFX_TentacleStrike4
 
 	Audio/EnviroFX_Creak01
 	Audio/EnviroFX_Creak02

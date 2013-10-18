@@ -9,6 +9,8 @@ Tormentor.PlayerAttackDistance = 200
 Tormentor.Acceleration = 500
 Tormentor.MoveSpeed = 500
 Tormentor.Friction = 2000
+-- Percent of total screen
+Tormentor.TouchDistance = 0.1
 
 function Tormentor.Spawn(self)
 

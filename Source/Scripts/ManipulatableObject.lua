@@ -5,8 +5,11 @@
 
 ManipulatableObject = Entity:New()
 ManipulatableObject.Objects = LL_New()
+ManipulatableObject.Shootable = LL_New()
 ManipulatableObject.MaxManipulateDistancePct = 1/5 -- max distance to target center
 ManipulatableObject.AmbiguousManipulateDistancePct = ManipulatableObject.MaxManipulateDistancePct * 0.25
+-- Percent of total screen
+ManipulatableObject.ShootDistance = 0.1
 
 function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
@@ -69,7 +72,9 @@ function ManipulatableObject.Spawn(self)
 		self:SetTouchBone(self.model.dm, boneIdx)
 		self:SetTouchBoneBounds(VecNeg(size), size)
 		self:SetTouchClassBits(bit.bor(kEntityClass_Player, kEntityClass_Monster))
+		self.damageBone = boneIdx
 		self.canDamage = true
+		self.canBeShot = BoolForString(self.keys.can_be_shot, true)
 	end
 	
 	self.keepAttacking = BoolForString(self.keys.keep_attacking, false)
@@ -172,6 +177,19 @@ function ManipulatableObject.DoManipulateShimmer(self)
 		self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	end
 	self.manipulateShimmerTimer = World.gameTimers:Add(f, 0.5)
+end
+
+function ManipulatableObject.AddToShootableList(self)
+	if (self.shootItem == nil) then
+		self.shootItem = LL_Append(ManipulatableObject.Shootable, {x=self})
+	end
+end
+
+function ManipulatableObject.RemoveFromShootableList(self)
+	if (self.shootItem) then
+		LL_Remove(ManipulatableObject.Shootable, self.shootItem)
+		self.shootItem = nil
+	end
 end
 
 function ManipulatableObject.AddToManipulateList(self)
@@ -436,6 +454,7 @@ function ManipulatableObject.Sleep(self)
 	self.canAttack = false
 	
 	self:RemoveFromManipulateList()
+	self:RemoveFromShootableList()
 	
 	self:SetAutoFace(nil)
 	World.viewController:RemoveLookTarget(self.manipulateTarget)
@@ -524,6 +543,7 @@ function ManipulatableObject.Idle(self)
 	end
 	
 	self:AddToManipulateList()
+	self:AddToShootableList()
 		
 	if (not self.enabled) then
 		self.enabled = true
@@ -607,6 +627,53 @@ function ManipulatableObject.AttackFinish(self)
 		self:SetNextThink(t)
 		self.nextAttackTime = nil
 	end
+end
+
+function ManipulatableObject.Pain(self)
+
+	self.canAttack = false
+	self:RemoveFromShootableList()
+	self:PlayAnim("pain", self.model).Seq(ManipulatableObject.Idle)
+
+end
+
+function ManipulatableObject.ShotWithPulse(self)
+	self:Pain()
+end
+
+function ManipulatableObject.CheckPulseTargets(mx, my)
+	local x = LL_Head(ManipulatableObject.Shootable)
+	while (x) do
+		if(x.x:CheckPulseTarget(mx, my)) then
+			return x.x
+		end
+		x = LL_Next(x)
+	end
+	
+	return nil
+end
+
+function ManipulatableObject.CheckPulseTarget(self, x, y)
+	if (not self.canBeShot) then -- no damage bone or not enabled for shooting
+		return false
+	end
+	
+	self.pos = self.model.dm:WorldBonePos(self.damageBone)
+	local p, r = World.Project(self.pos)
+	if (not r) then
+		return false
+	end
+	
+	p = UI:MapToUI(p)
+	
+	local dx = p[1]-x
+	local dy = p[2]-y
+	local dd = math.sqrt(dx*dx+dy*dy)
+	if (dd <= UI.screenDiagonal*ManipulatableObject.ShootDistance) then
+		return true
+	end
+	
+	return false
 end
 
 function ManipulatableObject.NotifyManipulate(enabled)
@@ -930,6 +997,7 @@ function ManipulatableObject.CustomAnimation(self, customAnim)
 	-- no longer manipulatable
 	self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	self:RemoveFromManipulateList()
+	self:RemoveFromShootableList()
 	
 	return true
 end
@@ -975,6 +1043,7 @@ function ManipulatableObject.CustomManipulate(self, customAnim)
 	-- no longer manipulatable
 	self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	self:RemoveFromManipulateList()
+	self:RemoveFromShootableList()
 	
 	return true
 end
@@ -1026,6 +1095,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 	-- no longer manipulatable
 	self.model.vision:BlendTo({1,1,1,0}, 0.5)
 	self:RemoveFromManipulateList()
+	self:RemoveFromShootableList()
 	
 	-- how long do we sit here?
 	local alwaysReset = StringForString(self.keys.reset, "auto")=="always"
@@ -1073,6 +1143,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 			
 			-- manipulatable again
 			self:AddToManipulateList()
+			self:AddToShootableList()
 		end
 		World.gameTimers:Add(f, self.manipulateWindow)
 	else
@@ -1215,6 +1286,7 @@ function ManipulatableObject.LoadState(self, state)
 			self.saveManipulateDir = state.manipulate
 			-- no longer manipulatable
 			self:RemoveFromManipulateList()
+			self:RemoveFromShootableList()
 			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
 			if (self.sounds.Idle) then
 				self.sounds.Idle:Stop()
@@ -1234,6 +1306,7 @@ function ManipulatableObject.LoadState(self, state)
 			self.canAttack = true
 			self:PlayAnim("idle", self.model)
 			self:AddToManipulateList()
+			self:AddToShootableList()
 			if (self.cameraFocus) then
 				local fov = NumberForString(self.keys.camera_focus_fov, 10)
 				if (fov <= 0) then
@@ -1259,6 +1332,7 @@ function ManipulatableObject.LoadState(self, state)
 		self.enabled = false
 		self.canAttack = false
 		self:RemoveFromManipulateList()
+		self:RemoveFromShootableList()
 		self.model:BlendImmediate("dormant")
 		
 		if (self.sounds.Idle) then

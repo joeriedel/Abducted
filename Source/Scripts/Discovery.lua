@@ -61,6 +61,17 @@ function Discovery.Spawn(self)
 	else
 		self.enabled = enabled
 	end
+	
+	local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
 function Discovery.Enable(self, enable)
@@ -73,9 +84,15 @@ function Discovery.Enable(self, enable)
 	end
 	
 	self.enabled = enable
-	self.think = Discovery.CheckPlayerProximity
-	self:SetNextThink(1/4)
-
+	
+	if (enable) then
+		self.think = Discovery.CheckPlayerProximity
+		self:SetNextThink(1/4)
+	else
+		self.think = nil
+		self:Activate(false)
+	end
+	
 end
 
 function Discovery.Activate(self, activate)
@@ -92,6 +109,7 @@ function Discovery.Activate(self, activate)
 	else
 		LL_Remove(Discovery.Active, self.activeItem)
 		self.sprite.dm:BlendTo({1,1,1,0}, 0.2)
+		
 		if (Discovery.Popup == self) then
 			Discovery.Popup:CloseUI()
 		end
@@ -370,6 +388,11 @@ end
 
 function Discovery.OpenUI(self)
 	Abducted.entity.eatInput = true
+	
+	if (self.keys.on_activated) then
+		World.PostEvent(self.keys.on_activated)
+	end
+	
 	local f = function()
 		Discovery.Popup = self
 		local awardSkillPoints = GameDB:Discover(self.databaseId, "world", false, true)
@@ -389,7 +412,18 @@ function Discovery.OpenUI(self)
 end
 
 function Discovery.CloseUI(self, callback)
-	self:AnimateCloseUI(callback)
+	local f = function()
+		if (BoolForString(self.keys.disable_on_close, false)) then
+			self:Enable(false)
+		end
+		if (self.keys.on_closed) then
+			World.PostEvent(self.keys.on_closed)
+		end
+		if (callback) then
+			callback()
+		end
+	end
+	self:AnimateCloseUI(f)
 	self:RemoveLookTarget()
 end
 
@@ -577,6 +611,28 @@ function Discovery.ResetUIForCheckpoint()
 		Discovery.Popup = nil
 	end
 	Discovery.Active = LL_New()
+end
+
+function Discovery.SaveState(self)
+	
+	local state = {
+		enabled = tostring(self.enabled)
+	}
+	
+	return state
+end
+
+function Discovery.LoadState(self, state)
+	
+	self.think = nil
+	self.activeItem = nil
+	self.sprite.dm:BlendTo({1,1,1,0}, 0)
+	self.enabled = false
+	
+	if (state.enabled == "true") then
+		self:Enable()
+	end
+	
 end
 
 info_discovery = Discovery

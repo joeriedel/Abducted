@@ -110,6 +110,7 @@ function PlayerInput.TapTarget(self, x, y)
 	
 	local target1 = Metadata.CheckPulseTargets(x, y)
 	local target2 = Tormentor.CheckPulseTargets(x, y)
+	local target3 = ManipulatableObject.CheckPulseTargets(x, y)
 	local target = nil
 	
 	if (target1 and target2) then
@@ -124,6 +125,18 @@ function PlayerInput.TapTarget(self, x, y)
 		end
 	else
 		target = target1 or target2
+	end
+	
+	if (target and target3) then
+		-- choose closest
+		local dist1 = VecMag(VecSub(playerPos, target.pos))
+		local dist2 = VecMag(VecSub(playerPos, target3.pos))
+		
+		if (dist2 < dist1) then
+			target = target3
+		end
+	else
+		target = target or target3
 	end
 	
 	if (target) then

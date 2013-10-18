@@ -5,9 +5,9 @@
 
 Tormentor = Entity:New()
 Tormentor.List = LL_New()
-Tormentor.PlayerAttackDistance = 200
-Tormentor.Acceleration = 500
-Tormentor.MoveSpeed = 500
+Tormentor.PlayerAttackDistance = 140
+Tormentor.Acceleration = 300
+Tormentor.MoveSpeed = 300
 Tormentor.Friction = 2000
 -- Percent of total screen
 Tormentor.TouchDistance = 0.1

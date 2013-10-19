@@ -65,6 +65,7 @@ pak0 {
 	Characters/tentaclewings1_M_manipulate
 	Shared/alienskin1_M_manipulate
 	Shared/pylon1_M_manipulate
+	Ep1/bigtentacleMaster01CompleteMap_M_manipulate
 	Objects/mine
 	Objects/mine_armed_M
 	Objects/mine_tripped_M
@@ -149,6 +150,8 @@ pak0 {
 	UI/shield_button_M
 	UI/shield_button_charging_M
 	UI/terminal_screen1_M
+	UI/distortion_pattern1_M
+	UI/blue_blank1_M
 
 	UI/power_bubble_M
 	UI/power_bubble_disabled_M

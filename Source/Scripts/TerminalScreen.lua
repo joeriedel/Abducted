@@ -462,20 +462,20 @@ function TerminalScreen.DoSolveGame(self)
 		
 	local entity = TerminalScreen.Active
 		
-	if (true) then
+	if (TerminalScreen.Skip) then
 		TerminalScreen.GameComplete(entity, "solve", "w")
 	else
 		local f = function ()
 			UI:BlendTo({0,0,0,0}, 0.3)
-			ReflexGame:InitGame(#self.solveGlpyhs)
-			ReflexGame:ShowBoard(true)
+			MemoryGame:InitGame()
+			MemoryGame:ShowBoard(true)
 			
 			local f = function ()
 				local f = function(result)
 					TerminalScreen.GameComplete(entity, "solve", result)
 				end
 				Abducted.entity.eatInput = false
-				ReflexGame:StartGame(self.solveActions, f)
+				MemoryGame:StartGame(self.solveGlyphs, self.solveActions, f)
 			end
 			
 			World.globalTimers:Add(f, 0.3)

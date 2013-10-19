@@ -482,14 +482,17 @@ end
 function MemoryGame.CleanWidgets(self)
 	self:CleanBoard()
 	
-	for i,k in pairs(self.widgets.goals) do
-		self.widgets.root:RemoveChild(k.base)
-		k.base:Unmap()
-		self.widgets.root:RemoveChild(k.piece)
-		k.piece:Unmap()
+	if (self.widgets.goals) then
+		for i,k in pairs(self.widgets.goals) do
+			self.widgets.root:RemoveChild(k.base)
+			k.base:Unmap()
+			self.widgets.root:RemoveChild(k.piece)
+			k.piece:Unmap()
+		end
+		
+		self.widgets.goals = nil
 	end
 	
-	self.widgets.goals = nil
 	collectgarbage()
 end
 
@@ -574,12 +577,33 @@ function MemoryGame.OnInputEvent(self,e)
 		if (self.state.phaseGlyphsCounter < #self.goals) then
 			COutLine(kC_Debug,"begin glyph code")
 			local idx = self.state.phaseGlyphsCounter + 1
-			local gfx = self.goals[idx]
-			if (best.tile.goal and (best.tile.id == gfx)) then
+			
+			if (best.tile.goal) then
+				local gfx = nil
+				local num = idx
+				
+				if (self.state.phase == kMGPhase_DiscoverPattern) then
+					gfx = best.tile.id -- matches any of them
+					
+					for k,v in pairs(self.goals) do
+						if (v == gfx) then
+							num = k
+							break
+						end
+					end
+				else
+					gfx = self.goals[idx]
+					if (best.tile.id ~= gfx) then
+						self:DoRedEffect({best}, true)
+						return
+					end
+				end
+				
 				if (not best.tile.busy) then
 					best.tile.busy = true
+									
 					if (self.state.phase == kMGPhase_DiscoverPattern) then
-						self.widgets.goals[idx].piece:BlendTo({1,1,1,1}, 0.1)
+						self.widgets.goals[num].piece:BlendTo({1,1,1,1}, 0.1)
 					end
 					best.tile.tile:BlendTo({1,1,1,1}, 0.2)
 					best.tile.sel:BlendTo({1,1,1,1}, 0.2)
@@ -625,8 +649,8 @@ function MemoryGame.InitUI(self)
     self.GOAL_SIZE = 130 * UI.identityScale[1]
 
     self.PHASE0_LEGEND_REVEAL_TIMER = 0.7
-    self.PHASE1_BOARD_SHUFFLE_TIMER = .125
-    self.PHASE1_BOARD_SHUFFLE_MAX = 10
+    self.PHASE1_BOARD_SHUFFLE_TIMER = .075
+    self.PHASE1_BOARD_SHUFFLE_MAX = 50
 
     self.NUM_GLPYHS_TO_FIND = 3
 
@@ -1156,7 +1180,7 @@ function MemoryGame.DoPhase2(self,dt)
 							
 							local f = function()
 								self.state.phase = kMGPhase_FindPattern
-								self.state.phaseTimer = FloatRand(5, 12)
+								self.state.phaseTimer = FloatRand(4, 9)
 								self.widgets.wavy:BlendTo({1,1,1,1}, 1)
 							end
 							self.transitionTimer = nil
@@ -1197,7 +1221,7 @@ function MemoryGame.DoPhase4(self,dt)
         return
     end
     
-    self.state.phaseTimer = FloatRand(5, 12)
+    self.state.phaseTimer = FloatRand(4, 9)
     self:ChallengShuffle()
 end
 
@@ -1247,6 +1271,7 @@ function MemoryGame.Think(self,dt)
         self.state.timeLeft = self.state.timeLeft - dt
         if (self.state.timeLeft <= 0) then
             self.state.timeLeft = 0
+            self:UpdateHud()
             self.state.phase = kMGPhase_GameOver
             self.state.gameOver = true
             self.state.victory = false

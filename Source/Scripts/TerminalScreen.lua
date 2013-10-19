@@ -501,7 +501,7 @@ function TerminalScreen.GameComplete(self, mode, result)
 	if (mode == "hack") then
 		World.playerPawn:LeaveHackGame(self, result == "w")
 	else
-		World.playerPawn:LeaveSolveGame(self, result == "w")
+		World.playerPawn:LeaveSolveGame(self, result)
 	end
 end
 

@@ -1358,7 +1358,7 @@ function PlayerPawn.EnterSolveGame(self, terminal)
 	
 end
 
-function PlayerPawn.LeaveSolveGame(self, terminal)
+function PlayerPawn.LeaveSolveGame(self, terminal, result)
 
 	local callbacks = {
 		OnTag = function(self, tag)
@@ -1369,8 +1369,10 @@ function PlayerPawn.LeaveSolveGame(self, terminal)
 			TerminalScreen.Active = nil
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
-			terminal:PostSolveEvents(terminal)
-			if (result) then
+			if (result ~= "x") then
+				terminal:PostSolveEvents(result == "w")
+			end
+			if (result == "w") then
 				Abducted.entity:VisibleCheckpoint()
 			else
 				terminal:PopupUI()

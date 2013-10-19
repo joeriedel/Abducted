@@ -85,14 +85,6 @@ The following items are OPTIONAL:
 ]]
 Arm.Discoveries = {
 
---[[
-
--- entries are 100's based, so A = 100, 101, etc, B = 200, 201, 202 etc
-
-	A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
-    1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-]]
-
 	Bugs = {
 		picture = "UI/discovery_bugs_M",
 		title = "ARM_DISCOVERY_BUGS_TITLE",

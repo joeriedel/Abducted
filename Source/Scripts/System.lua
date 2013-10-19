@@ -133,13 +133,20 @@ World.CoThink
 function World.CoThink(entity)
 	local f = function ()
 		local time = World.GameTime()
+		local paused = false
 		while true do
 			local dt = World.GameTime() - time;
 			if entity.think then
+				if (paused) then -- woke up from a long think delay.
+					paused = false
+					dt = 0.001
+				end
+				
 				entity.think(entity, dt)
 			end
 			if not entity.think then
 				entity:SetNextThink(1000000) -- don't call back in here
+				paused = true
 			end
 			time = World.GameTime()
 			coroutine.yield()

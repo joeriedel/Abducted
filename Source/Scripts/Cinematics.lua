@@ -10,7 +10,7 @@ Cinematics.Persistent = LL_New()
 
 function Cinematics.Play(self, args, time, originEntity, callback)
 		
-	x = Tokenize(args)
+	local x = Tokenize(args)
 	local animateCamera = not FindArrayElement(x, "camera=no")
 	local looping = FindArrayElement(x, "loop=true")
 	local playForever = FindArrayElement(x, "forever=true")

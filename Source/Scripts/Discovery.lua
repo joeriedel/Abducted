@@ -21,7 +21,7 @@ function Discovery.Spawn(self)
 	self.databaseId = self.keys.database_id
 	self.left = StringForString(self.keys.fold_out, "left") == "left"
 		
-	local spriteSize = {40, 40}--Vec2ForString(self.keys.sprite_size, {64, 64})
+	local spriteSize = {80, 80}--Vec2ForString(self.keys.sprite_size, {64, 64})
 	local absSize = math.max(spriteSize[1], spriteSize[2])
 	
 	self:SetMins({-absSize/2, -absSize/2, -absSize/2})

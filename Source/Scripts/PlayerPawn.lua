@@ -316,13 +316,15 @@ function PlayerPawn.SelectAnimState(self, state)
 		if (set and set.OnSelect) then
 			set.OnSelect(self)
 		end
-		local bbox = set.bbox
-		if (not bbox) then
-			bbox = PlayerPawn.AnimationStates.default.bbox
+		if (set) then
+			local bbox = set.bbox
+			if (not bbox) then
+				bbox = PlayerPawn.AnimationStates.default.bbox
+			end
+			
+			self:SetMins(bbox.mins)
+			self:SetMaxs(bbox.maxs)
 		end
-		
-		self:SetMins(bbox.mins)
-		self:SetMaxs(bbox.maxs)
 		self.model.dm:SetBounds(self:Mins(), self:Maxs())
 		self:SetSpeeds()
 		self.state = nil -- force change

@@ -1241,6 +1241,9 @@ function ReflexGame.Think(self,dt)
 		-- game over never advances past here
 		self.think = nil
 		self.gameReady = false
+		
+		self.widgets.root3:ClearCapture() -- #66 make sure to release any dpad capture buttons!
+		
 		if (self.state.victory) then
 			self.tickTimer = false
 			self:ExplodeSpiders()

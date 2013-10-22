@@ -34,6 +34,8 @@ PlayerPawn.AnimationStates = {
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
+		pulse_idle = "limpmanidle",
+		pulse_fire = "limpmanup",
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
@@ -44,7 +46,7 @@ PlayerPawn.AnimationStates = {
 		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
 		canRun = false,
 		OnSelect = function()
-			HUD:Enable({"arm", "shield", "manipulate"})
+			HUD:EnableAll()
 		end,
 	},
 	limpscrunch = {
@@ -55,6 +57,8 @@ PlayerPawn.AnimationStates = {
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
+		pulse_idle = "limpmanidle",
+		pulse_fire = "limpmanup",
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
@@ -65,7 +69,7 @@ PlayerPawn.AnimationStates = {
 		bbox = {mins = {-32, -32, 0}, maxs = {32, 32, 90}},
 		canRun = false,
 		OnSelect = function()
-			HUD:Enable({"arm", "shield", "manipulate"})
+			HUD:EnableAll()
 		end,
 	},
 	walkfast = {
@@ -74,7 +78,31 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end
-	}
+	},
+	crawl = {
+		idle = "limpidle",
+		walk = "limpcrawl",
+		death = "limpdeath",
+		manipulate_idle = "limpmanidle",
+		maniplate_left = "limpmanleft",
+		manipulate_right = "limpmanright",
+		manipulate_up = "limpmanup",
+		manipulate_down = "limpmandown",
+		pulse_idle = "limpmanidle",
+		pulse_fire = "limpmanup",
+		arm_default_flyin = "arm_limp_flyin",
+		arm_default_flyout = "arm_limp_flyout",
+		arm_pose_standing = "arm_pose_limp",
+		puzzle_default_choice = "puzzle_limp_choice",
+		smack_metadata = "limpmanup",
+		speedScale = 0.64,
+		tapAdjust = 48, -- CheckTappedOn
+		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
+		canRun = false,
+		OnSelect = function()
+			HUD:EnableAll()
+		end,
+	},
 }
 
 function PlayerPawn.Spawn(self)

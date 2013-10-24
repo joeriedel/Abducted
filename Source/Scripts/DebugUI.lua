@@ -55,12 +55,6 @@ function DebugUI.Spawn(self)
 	pos[2] = pos[2] + h + DebugUI.LineSpace
 	
 	self.widgets.rspeeds:SetVisible(false)
-	
-	World.globalTimers:Add(
-		function () DebugUI:Think() end,
-		0,
-		true
-	)
 end
 
 function DebugUI.Think(self)

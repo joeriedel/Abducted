@@ -611,5 +611,4 @@ function Abducted.Think(self, dt)
 	ManipulatableObjectUI:UpdateUI()
 	TerminalScreen.UpdateUI()
 	TerminalScreen.CheckActivate(dt)
-	DebugUI:Think()
 end

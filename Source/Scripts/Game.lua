@@ -41,6 +41,7 @@ function Game.Think(self, dt)
 	World.globalTimers:Tick(Game.sysTime)
 	
 	FlyCam:Think(dt)
+	DebugUI:Think()
 end
 
 function Game.PostSpawn(self)

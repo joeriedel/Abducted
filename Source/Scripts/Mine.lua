@@ -45,6 +45,8 @@ function Mine.Spawn(self)
 	
 	self:SetMins({-48, -48, 0})
 	self:SetMaxs({ 48,  48, 32})
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	self:SetOccupantType(kOccupantType_BBox)

@@ -196,6 +196,9 @@
     <filename>Source\Scripts\TitleCrawl.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Tormentor.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\TouchTrigger.lua</filename>
   </file>
   <file>

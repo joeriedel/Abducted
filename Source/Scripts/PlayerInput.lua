@@ -181,11 +181,17 @@ function PlayerInput.TapMove(self, x, y)
 	end
 
 	if (self:TapFloor(a, b, dist)) then
+		COutLine(kC_Debug, "PlayerInput: Tapped on floor - precise (1).")
 		return true
 	end
 	
+	if (self:TapWaypoint(x, y, 50)) then
+		COutLine(kC_Debug, "PlayerInput: Tapped on waypoint - precise (2).")
+		return true
+	end	
+	
+	-- see if we can cast downward and hit a floor
 	if (trace) then
-		-- see if we can cast downward and hit a floor
 		local d = 16
 		while (d <= 224) do
 			a = VecAdd(trace.traceEnd, VecScale(trace.normal, d))
@@ -193,18 +199,41 @@ function PlayerInput.TapMove(self, x, y)
 			
 			local targetFloorPos = World.ClipToFloor(a, b)
 			if (targetFloorPos) then
-				if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
-					self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
-					return true
+			
+				-- is this point on screen?
+				local p,r = World.Project(targetFloorPos.pos)
+				if (r) then
+				
+					if ((p[1] > 0) and (p[1] < UI.systemScreen.width) and
+						(p[2] > 0) and (p[2] < UI.systemScreen.height)) then
+			
+						-- on screen
+						COutLine(kC_Debug, "PlayerInput: Tapped on clip-mesh, floor found below (3).")
+						
+						if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
+							self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
+							return true
+						end
+						
+						COutLine(kC_Debug, "PlayerInput: Player could not generate path to floor!")
+						break
+					
+					end
 				end
-				break
 			end
 			
 			d = d + 16
 		end
 	end
-
-	return self:TapWaypoint(x, y, dist)
+	
+	if (self:TapWaypoint(x, y, 350)) then
+		COutLine(kC_Debug, "PlayerInput: Tapped on waypoint - unprecise (4).")
+		return true
+	end
+	
+	COutLine(kC_Debug, "PlayerInput: no point.")
+	
+	return false
 end
 
 function PlayerInput.TapFloor(self, a, b, dist)
@@ -222,7 +251,7 @@ function PlayerInput.TapFloor(self, a, b, dist)
 	return false
 end
 
-function PlayerInput.TapWaypoint(self, x, y)
+function PlayerInput.TapWaypoint(self, x, y, radius)
 	-- PickWaypoint(x, y, radiusOnScreen, dropDistance)
 	-- dropDistance: all points that are within radiusOnScreen are
 	-- collected and sorted front to back based on distance from the
@@ -230,7 +259,7 @@ function PlayerInput.TapWaypoint(self, x, y)
 	-- closest candidate waypoint are removed from consideration.
 	--
 	-- ZERO means no points are ever dropped.
-	local waypoint = World.PickWaypoint(x, y,  350, 0) -- NOTE: does per-waypoint waypoint->camera line trace
+	local waypoint = World.PickWaypoint(x, y,  radius, 0) -- NOTE: does per-waypoint waypoint->camera line trace
 	if (waypoint) then
 		local targetFloorPos = World.WaypointFloorPosition(waypoint)
 		if (targetFloorPos) then

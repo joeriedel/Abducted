@@ -14,7 +14,9 @@ function Sprite.Spawn(self)
 	
 	self:SetMins({-size[1]*0.5, -size[1]*0.5, -size[2]*0.5})
 	self:SetMaxs({ size[1]*0.5,  size[1]*0.5,  size[2]*0.5})
-	
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
+		
 	self.sprite = World.CreateSpriteBatch(1, 1)
 	self.sprite.material = World.Load(StringForString(self.keys.material, "FX/shieldsprite1_M"))
 	self.sprite.dm = self:AttachDrawModel(self.sprite, self.sprite.material)

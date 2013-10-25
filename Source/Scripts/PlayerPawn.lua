@@ -23,7 +23,8 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 128}}
+		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 128}},
+		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}}
 	},
 	limp = {
 		idle = "limpidle",
@@ -156,8 +157,15 @@ function PlayerPawn.Spawn(self)
 		bbox = PlayerPawn.AnimationStates.default.bbox
 	end
 	
+	local shadowBox = set.shadowBox
+	if (not shadowBox) then
+		shadowBox = PlayerPawn.AnimationStates.default.shadowBox
+	end
+	
 	self:SetMins(bbox.mins)
 	self:SetMaxs(bbox.maxs)
+	self:SetShadowMins(shadowBox.mins)
+	self:SetShadowMaxs(shadowBox.maxs)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	-- shield mesh
@@ -350,10 +358,18 @@ function PlayerPawn.SelectAnimState(self, state)
 				bbox = PlayerPawn.AnimationStates.default.bbox
 			end
 			
+			local shadowBox = set.shadowBox
+			if (not shadowBox) then
+				shadowBox = PlayerPawn.AnimationStates.default.shadowBox
+			end
+			
 			self:SetMins(bbox.mins)
 			self:SetMaxs(bbox.maxs)
+			self:SetShadowMins(shadowBox.mins)
+			self:SetShadowMaxs(shadowBox.maxs)
+			self.model.dm:SetBounds(self:Mins(), self:Maxs())
 		end
-		self.model.dm:SetBounds(self:Mins(), self:Maxs())
+		
 		self:SetSpeeds()
 		self.state = nil -- force change
 	end

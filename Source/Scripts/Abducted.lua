@@ -48,7 +48,7 @@ function Abducted.OnLevelStart(self)
 		local subtitle = World.worldspawn.keys.subtitle or World.worldspawn.keys.mappath
 		
 		if (title and subtitle) then
-			World.DrawUIOnly(true)
+			World.SetDrawUIOnly(true)
 			World.PauseGame(true)
 			TitleCrawl:Print(title, subtitle, function() self:FinishTitleCrawl() end)
 		else
@@ -65,7 +65,7 @@ function Abducted.FinishTitleCrawl(self)
 	
 	local f = function()
 		UI:BlendTo({1,1,1,0}, 0.3)
-		World.DrawUIOnly(false)
+		World.SetDrawUIOnly(false)
 		TitleCrawl:Clear()
 		self:StartGame()
 	end

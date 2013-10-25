@@ -31,7 +31,9 @@ function ParticleEmitter.Spawn(self)
 	
 	self:SetMins(mins)
 	self:SetMaxs(maxs)
-	
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
+		
 	self.emitter = World.Load(self.keys.particle)
 	self.emitter:SetMaxParticles(maxParticles) -- really important to do this before making the DM
 	

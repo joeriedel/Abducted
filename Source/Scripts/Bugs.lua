@@ -288,6 +288,8 @@ function Bug.Spawn(self)
 	self.model.dm = self:AttachDrawModel(self.model)
 	self:SetMins({-24, -24, 0})
 	self:SetMaxs({ 24,  24, 32})
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 
 	self.guts.dm = self:AttachDrawModel(self.guts)

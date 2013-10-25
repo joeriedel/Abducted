@@ -68,7 +68,7 @@ function MemoryGame.ShowBoard(self, show)
 		self.widgets.button:BlendTo({1,1,1,0}, 0)
 	end
 	
-	World.DrawUIOnly(show) -- < disable/enable 3D rendering
+	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
 end
 
 function MemoryGame.InitGame(self)

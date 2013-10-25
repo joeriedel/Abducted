@@ -14,7 +14,7 @@ Discovery.kArrowSize = {20, 32}
 Discovery.kButtonHeight = 90
 Discovery.kUIBorder = 8
 -- Percent of total screen
-Discovery.TouchDistance = 0.1
+Discovery.TouchDistance = 0.15
 
 function Discovery.Spawn(self)
 
@@ -478,6 +478,11 @@ function Discovery.UpdateUI(self)
 end
 
 function Discovery.CheckTouched(self, e)
+
+	if (not self.enabled) then
+		return false
+	end
+	
 	local p, r = World.Project(self.pos)
 	if (not r) then
 		return false

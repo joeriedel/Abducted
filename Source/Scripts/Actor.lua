@@ -42,6 +42,8 @@ function Actor.Spawn(self)
         
         self:SetMins(Vec3ForString(self.keys.mins), {-32, -32, -32})
 		self:SetMaxs(Vec3ForString(self.keys.maxs), { 32,  32,  32})
+		self:SetShadowMins(self:Mins())
+		self:SetShadowMaxs(self:Maxs())
         self.model.dm:SetBounds(self:Mins(), self:Maxs())
         
         self:AddGhostParticles(self.model, self.keys.model)

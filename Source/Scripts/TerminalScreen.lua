@@ -34,6 +34,8 @@ function TerminalScreen.Spawn(self)
 
 	self:SetMins({-200*scale[1], -200*scale[2], 0*scale[3]})
 	self:SetMaxs({ 200*scale[1],  200*scale[2], 282*scale[3]})
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	
 	self.model.glow1 = self.model.dm:CreateInstance()

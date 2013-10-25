@@ -52,8 +52,10 @@ function ManipulatableObject.Spawn(self)
 		maxs = VecMul(maxs, scale)
 	end
 	
-	self:SetMins( mins)
+	self:SetMins(mins)
 	self:SetMaxs(maxs)
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self.model.vision:SetBounds(self:Mins(), self:Maxs())
 	self.manipulateShift = Vec3ForString(self.keys.manipulate_shift, {0,0,0})

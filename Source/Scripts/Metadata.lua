@@ -22,6 +22,8 @@ function Metadata.Spawn(self)
 	
 	self:SetMins({-Metadata.kSize/2, -Metadata.kSize/2, -Metadata.kSize/2})
 	self:SetMaxs({Metadata.kSize/2, Metadata.kSize/2, Metadata.kSize/2})
+	self:SetShadowMins(self:Mins())
+	self:SetShadowMaxs(self:Maxs())
 	
 	self.model = World.Load("Objects/alien_metadata1")
 	self.model.dm = self:AttachDrawModel(self.model)

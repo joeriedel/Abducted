@@ -64,5 +64,6 @@ function TitleCrawl.Clear(self)
 	
 	self.titlePrinter = nil
 	self.subtitlePrinter = nil
-
+	
+	collectgarbage() -- clean up these big fonts
 end

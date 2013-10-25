@@ -399,6 +399,10 @@ function Discovery.OpenUI(self)
 		self:LayoutUI(awardSkillPoints)
 		self:AnimateOpenUI(awardSkillPoints)
 		self:AddLookTarget()
+		
+		if (awardSkillPoints) then
+			PlayerSkills:AwardSkillPoints(Discovery.kSkillReward)
+		end
 	end
 	if (Discovery.Popup) then
 		if (Discovery.Popup == self) then

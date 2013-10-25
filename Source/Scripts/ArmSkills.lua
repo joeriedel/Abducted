@@ -734,6 +734,7 @@ end
 
 function Arm.StartSkills(self)
 	self.widgets.skills.Root:BlendTo({1,1,1,1}, 0.2)
+	self:UpdateSkillsUI()
 end
 
 function Arm.EndSkills(self, callback)

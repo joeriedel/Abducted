@@ -23,7 +23,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		bbox = {mins = {-28, -28, 0}, maxs = {28, 28, 128}},
+		bbox = {mins = {-18, -18, 0}, maxs = {18, 18, 128}},
 		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}}
 	},
 	limp = {

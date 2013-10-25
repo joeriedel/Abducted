@@ -7,6 +7,8 @@ Metadata = Entity:New()
 Metadata.kSize = 45
 Metadata.List = LL_New()
 Metadata.kSmackDistance = 60
+-- Percent of total screen
+Metadata.TouchDistance = 0.07
 
 function Metadata.Spawn(self)
 
@@ -132,7 +134,7 @@ function Metadata.CheckPulseTarget(self, x, y)
 	local dx = p[1]-x
 	local dy = p[2]-y
 	local dd = math.sqrt(dx*dx+dy*dy)
-	if (dd <= UI.screenDiagonal*Discovery.TouchDistance) then
+	if (dd <= UI.screenDiagonal*Metadata.TouchDistance) then
 		return true
 	end
 	

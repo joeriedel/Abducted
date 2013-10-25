@@ -6,13 +6,6 @@ pak0 {
 	Ep1/ep1_falling
 	Ep1/ep1_dreamscape1
 	
-	// Ep1 test maps
-	Ep1/ep1_crushed_combat
-	Ep1/testroom3_dynlight1
-	Ep1/testroom3_dynlight2
-	Ep1/testroom3_fog1
-	Ep1/testroom2_manipulate
-
 	Ep1/Falling
 	Ep1/Ep1Crushed
 	Ep1/Ep1General
@@ -66,6 +59,8 @@ pak0 {
 	Shared/alienskin1_M_manipulate
 	Shared/pylon1_M_manipulate
 	Ep1/bigtentacleMaster01CompleteMap_M_manipulate
+	Ep1/big_tentacle2CompleteMap_M_manipulate
+	Ep1/big_tentacle3CompleteMap_M_manipulate
 	Objects/mine
 	Objects/mine_armed_M
 	Objects/mine_tripped_M

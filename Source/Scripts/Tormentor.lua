@@ -98,7 +98,7 @@ function Tormentor.OnEvent(self, cmd, args)
 		return true
 	elseif (cmd == "intro") then
 		if (self.visible) then
-			self:PlayAnim("cinematicintro1", self.model).Seq(function() self.didIntro = true end).And(Tormentor.SwitchModes)
+			self:PlayCinematicAnim("cinematicintro1").Seq(function() self.didIntro = true end)
 		end
 		return true
 	elseif (cmd == "teleport") then
@@ -123,9 +123,47 @@ function Tormentor.OnEvent(self, cmd, args)
 			end
 		end
 		return true
+	elseif (cmd == "play") then
+		if (self.visible) then
+			self:PlayCinematicAnim(args)
+		end
 	end
 	
 	return false
+end
+
+function PlayerPawn.PlayCinematicAnim(self, args)
+
+	local f = function()
+		self:SetMoveType(kMoveType_Floor)
+		
+		if (args[2]) then
+			self:Teleport(args[2], tonumber(args[3]))
+		else
+			local fp = self:FindFloor()
+			if (fp) then
+				self:SetFloorPosition(fp)
+			else
+				error("Tormentor.PlayCinematicAnim: walked off the floor.")
+			end
+		end
+		
+		self:SwitchModes()
+	end
+	
+	self:SetMoveType(kMoveType_Ska)
+	self.think = nil
+	self:Move(false)
+	self:SetDesiredMove(nil)
+	
+	local blend = self:PlayAnim(anim, self.model)
+	if (blend) then
+		blend.Seq(f)
+	else
+		f()
+	end
+	
+	return blend
 end
 
 function Tormentor.Teleport(self, userId, facing)

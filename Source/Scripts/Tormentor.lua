@@ -269,7 +269,7 @@ function Tormentor.AttackPlayer(self)
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then
-			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage, self, nil, self.keys.killed_player_command)
+			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, self.keys.killed_player_command)
 		end
 	end
 	

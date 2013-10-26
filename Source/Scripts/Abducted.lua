@@ -560,7 +560,10 @@ function Abducted.PlayerDied(self, killMessage, specialCommand)
 	end
 	
 	if (specialCommand) then
-		World.PostEvent(specialCommand)
+		local f = function()
+			World.PostEvent(specialCommand)
+		end
+		World.globalTimers:Add(f, 2.5)
 	else
 		if (killMessage == nil) then
 			killMessage = Abducted.KillMessages[IntRand(1, #Abducted.KillMessages)]

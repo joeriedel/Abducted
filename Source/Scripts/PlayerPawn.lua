@@ -837,7 +837,7 @@ function PlayerPawn.EndPowerBubble(self)
 end
 
 function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand)
-	if (self.dead or PlayerPawn.GodMode--[[ or self.shieldActive]]) then
+	if (self.dead) then
 		return
 	end
 	
@@ -890,7 +890,9 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 		end
 	end
 	
-	self:Kill(instigator, killMessage, specialCommand)
+	if (not PlayerPawn.GodMode) then
+		self:Kill(instigator, killMessage, specialCommand)
+	end
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
@@ -1452,15 +1454,11 @@ function PlayerPawn.LeaveTerminal(self)
 end
 
 function PlayerPawn.ShowShield(self, show)
-	if (show and self.shieldActive) then
-		self.shield.dm:SetVisbile(show)
-		self.shieldSprite.dm:SetVisible(show)
-		self:PauseShieldSound(false)
-	elseif (not show) then
-		self.shield.dm:SetVisible(false)
-		self.shieldSprite.dm:SetVisible(false)
-		self:PauseShieldSound(true)
-	end
+	self.shield.dm:SetVisible(show)
+	self.shieldSprite.dm:SetVisible(show)
+	self.shieldSpriteSpark.dm:SetVisible(show)
+	self.shieldSpriteDamaged.dm:SetVisible(show)
+	self:PauseShieldSound(not show)
 end
 
 function PlayerPawn.PlayShieldSound(self)
@@ -1650,6 +1648,7 @@ function PlayerPawn.LoadState(self, state)
 		self.shieldFlavorTimer2:Clean()
 		self.shieldFlavorTimer2 = nil
 	end
+	
 		
 	if (state.shieldActive == "true") then
 		self:BeginShield()
@@ -1660,7 +1659,6 @@ function PlayerPawn.LoadState(self, state)
 	end
 	
 	self.shieldAutoActivateTime = tonumber(state.shieldAutoActivateTime)
-	
 	self:Show(state.visible == "true")
 	
 	local pos = Vec3ForString(state.pos)

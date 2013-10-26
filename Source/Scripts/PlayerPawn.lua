@@ -836,7 +836,7 @@ function PlayerPawn.EndPowerBubble(self)
 	self.powerBubble = false
 end
 
-function PlayerPawn.Damage(self, damage, instigator, killMessage)
+function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand)
 	if (self.dead or PlayerPawn.GodMode--[[ or self.shieldActive]]) then
 		return
 	end
@@ -890,7 +890,7 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage)
 		end
 	end
 	
-	self:Kill(instigator, killMessage)
+	self:Kill(instigator, killMessage, specialCommand)
 end
 
 function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
@@ -1306,6 +1306,10 @@ function PlayerPawn.EnterTerminal(self, terminal)
 		return
 	end
 	
+	self.bugStun = true
+	self.oldGodMode = PlayerPawn.GodMode
+	PlayerPawn.GodMode = true
+	
 	-- move us relative to the terminal
 	local terminalPos = terminal:WorldPos()
 	local angle = terminal:Angles().pos[3]
@@ -1371,6 +1375,8 @@ function PlayerPawn.LeaveHackGame(self, terminal, result)
 			TerminalScreen.Active = nil
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
+			self.bugStun = false
+			PlayerPawn.GodMode = self.oldGodMode
 			terminal:PostHackEvents(result)
 			if (result) then
 				Abducted.entity:VisibleCheckpoint()
@@ -1415,6 +1421,8 @@ function PlayerPawn.LeaveSolveGame(self, terminal, result)
 			TerminalScreen.Active = nil
 			Abducted.entity.eatInput = false
 			HUD:SetVisible(true)
+			self.bugStun = false
+			PlayerPawn.GodMode = self.oldGodMode
 			if (result ~= "x") then
 				terminal:PostSolveEvents(result == "w")
 			end
@@ -1438,6 +1446,9 @@ function PlayerPawn.LeaveTerminal(self)
 	TerminalScreen.Active = nil
 	Abducted.entity.eatInput = false
 	HUD:SetVisible(true)
+	
+	self.bugStun = false
+	PlayerPawn.GodMode = self.oldGodMode
 end
 
 function PlayerPawn.ShowShield(self, show)

@@ -165,7 +165,7 @@ function Tormentor.SwitchModes(self)
 	
 	if (((self.didIntro == false) and BoolForString(self.keys.wait_for_intro, false)) or self.mode == "idle") then
 		self:Move(false)
-		self:PlayAnim("idle", self.model)
+		self:PlayAnim("idle", self.model, false)
 	else
 		self:SeekPlayer()
 	end
@@ -184,28 +184,28 @@ function Tormentor.Stun(self)
 	self.think = nil
 	
 	local f = function()
-		self:PlayAnim("idle", self.model)
+		self:PlayAnim("idle", self.model, false)
 		self.think = Tormentor.SwitchModes
 		self:SetNextThink(FloatRand(2, 4))
 	end
 	
-	self:PlayAnim("pain", self.model).Seq(f)
+	self:PlayAnim("pain", self.model, false).Seq(f)
 end
 
 function Tormentor.SeekPlayer(self)
 	local fp = World.playerPawn:FloorPosition()
-	if (fp and (fp.floor.floor == self.floor.floor)) then
+	if (fp and (fp.floor == self.floor.floor)) then
 		self.think = Tormentor.SeekPlayerThink
 		self.thinkTime = Game.time or 0
 		self:SetNextThink(0)
 		if (not self:CheckAttack()) then
-			self:PlayAnim("run", self.model)
+			self:PlayAnim("run", self.model, false)
 			self:SeekPlayerThink(true)
 		end
 	else
 		self.think = Tormentor.SeekPlayer
 		self:SetNextThink(1)
-		self:PlayAnim("idle", self.model)
+		self:PlayAnim("idle", self.model, false)
 	end
 end
 
@@ -226,7 +226,7 @@ function Tormentor.SeekPlayerThink(self, force)
 	
 				if (moveCommand) then
 					self:SetDesiredMove(moveCommand)
-					
+					moved = true
 				end
 			end
 		end
@@ -269,7 +269,7 @@ function Tormentor.AttackPlayer(self)
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then
-			World.playerPawn:Kill(self, nil, self.keys.killed_player_command)
+			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage, self, nil, self.keys.killed_player_command)
 		end
 	end
 	

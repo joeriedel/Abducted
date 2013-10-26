@@ -59,8 +59,13 @@ function Tormentor.Spawn(self)
 	self.listItem = LL_Append(Tormentor.List, {x=self})
 	
 	self.didIntro = false
+	self.visible = BoolForString(self.keys.visible, true)
 	
-	self:SwitchModes()
+	if (self.visible) then
+		self:SwitchModes()
+	else
+		self.model.dm:SetVisible(false)
+	end
 	
 	local io = {
 		Save = function()
@@ -79,18 +84,79 @@ function Tormentor.OnEvent(self, cmd, args)
 	
 	if (cmd == "idle") then
 		self.mode = cmd
-		self:SwitchModes()
+		if (self.visible) then
+			self:SwitchModes()
+		end
 		return true
 	elseif (cmd == "attack") then
 		self.mode = "aggressive"
-		self:SwitchModes()
+		if (self.visible) then
+			self:SwitchModes()
+		end
 		return true
 	elseif (cmd == "intro") then
-		self:PlayAnim("cinematicintro1", self.model).Seq(function() self.didIntro = true end).And(Tormentor.SwitchModes)
+		if (self.visible) then
+			self:PlayAnim("cinematicintro1", self.model).Seq(function() self.didIntro = true end).And(Tormentor.SwitchModes)
+		end
+		return true
+	elseif (cmd == "teleport") then
+		args = Tokenize(args)
+		self:Teleport(args[1], tonumber(args[2]))
+		return true
+	elseif (cmd == "show") then
+		if (not self.visible) then
+			self.visible = true
+			self:SwitchModes()
+			self.model.dm:SetVisible(true)
+		end
+		return true
+	elseif (cmd == "hide") then
+		if (self.visible) then
+			self.visible = false
+			self.think = nil
+			self.model.dm:SetVisible(false)
+			if (self.attackDamageTimer) then
+				self.attackDamageTimer:Clean()
+				self.attackDamageTimer = nil
+			end
+		end
 		return true
 	end
 	
 	return false
+end
+
+function Tormentor.Teleport(self, userId, facing)
+	local waypoints = World.WaypointsForUserId(userId)
+	if (waypoints) then
+		local fp = World.WaypointFloorPosition(waypoints[1])
+		if (fp) then
+			self:SetFloorPosition(fp)
+			self:SetDesiredMove(nil)
+			self.floor = fp
+			
+			if (facing) then
+				self:SetFacing(facing)
+			end
+			
+			if (self.attackDamageTimer) then
+				self.attackDamageTimer:Clean()
+				self.attackDamageTimer = nil
+			end
+			
+			self:Move(false)
+			self.think = nil
+			
+			if (self.visbile) then
+				self:SwitchModes()
+			end
+			
+		else
+			COutLine(kC_Debug, "ERROR: Tormentor, waypoint '%s' doesn't have a valid floor position.", userId)
+		end
+	else
+		COutLine(kC_Debug, "ERROR: Tormentor(teleport) there is no waypoint with a userid of '%s'.", userId)
+	end
 end
 
 function Tormentor.SwitchModes(self)
@@ -127,12 +193,19 @@ function Tormentor.Stun(self)
 end
 
 function Tormentor.SeekPlayer(self)
-	self.think = Tormentor.SeekPlayerThink
-	self.thinkTime = Game.time or 0
-	self:SetNextThink(0)
-	if (not self:CheckAttack()) then
-		self:PlayAnim("run", self.model)
-		self:SeekPlayerThink(true)
+	local fp = World.playerPawn:FloorPosition()
+	if (fp and (fp.floor.floor == self.floor.floor)) then
+		self.think = Tormentor.SeekPlayerThink
+		self.thinkTime = Game.time or 0
+		self:SetNextThink(0)
+		if (not self:CheckAttack()) then
+			self:PlayAnim("run", self.model)
+			self:SeekPlayerThink(true)
+		end
+	else
+		self.think = Tormentor.SeekPlayer
+		self:SetNextThink(1)
+		self:PlayAnim("idle", self.model)
 	end
 end
 
@@ -145,14 +218,27 @@ function Tormentor.SeekPlayerThink(self, force)
 	
 	if (force or (Game.time-self.thinkTime) > 1.5) then
 		local fp = World.playerPawn:FloorPosition()
-		local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
+		local moved = false
+			
+		if (self.floor.floor > -1) then
+			if (fp and (fp.floor == self.floor.floor)) then
+				local moveCommand = World.CreateFloorMove(self:FloorPosition(), fp)
 	
-		if (moveCommand) then
-			self:SetDesiredMove(moveCommand)
-			self:Move(true)
+				if (moveCommand) then
+					self:SetDesiredMove(moveCommand)
+					
+				end
+			end
 		end
 		
 		self.thinkTime = Game.time
+		self:Move(moved)
+		
+		if (not moved) then
+		-- go back to idle
+			self.think = nil
+			self:SwitchModes()
+		end
 	end
 end
 

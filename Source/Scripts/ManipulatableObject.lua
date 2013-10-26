@@ -636,6 +636,7 @@ function ManipulatableObject.Pain(self)
 	self.canAttack = false
 	self:RemoveFromShootableList()
 	self:PlayAnim("pain", self.model).Seq(ManipulatableObject.Idle)
+	self:EnableTouch(false)
 
 end
 

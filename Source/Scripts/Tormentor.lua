@@ -283,7 +283,7 @@ function Tormentor.AttackPlayer(self)
 	
 	self.attackDamageTimer = World.gameTimers:Add(f, 0.5)
 	self.think = Tormentor.SwitchModes
-	self:SetNextThink(2)
+	self:SetNextThink(3.5)
 end
 
 function Tormentor.Move(self, move)

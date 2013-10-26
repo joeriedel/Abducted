@@ -20,20 +20,22 @@ function Tormentor.Spawn(self)
 	MakeAnimatable(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	
 	self.mode = StringForString(self.keys.initial_state, "idle")
 	self.model = LoadModel("Characters/Tormentor1")
 	
 	self.model.dm = self:AttachDrawModel(self.model)
-	
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetClassBits(kEntityClass_Monster)
 	self:SetOccupantType(kOccupantType_BBox)
 	self:SetMoveType(kMoveType_Floor)
 	self:Move(false)
-	self:SetMins({-64, -64, 0})
-	self:SetMaxs({64, 64, 256})
+	self:SetMins({-64, -128, 0})
+	self:SetMaxs({64, 64, 220})
 	self:SetShadowMins(self:Mins())
 	self:SetShadowMaxs(self:Maxs())
+	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetMaxGroundSpeed(Tormentor.MoveSpeed)
 	self:SetAccel({Tormentor.Acceleration, 0, 0})
 	self:SetGroundFriction(Tormentor.Friction)
@@ -265,15 +267,23 @@ function Tormentor.AttackPlayer(self)
 	
 	self.think = nil
 	self:Move(false)
-	self:PlayAnim("swing", self.model).Seq(Tormentor.SwitchModes)
+	self:PlayAnim("swing", self.model).Seq("idle")
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then
 			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, self.keys.killed_player_command)
+			if (World.playerPawn.dead) then
+				local f = function()
+					World.viewController:AddLookTarget(self, {0,0,160})
+				end
+				World.globalTimers:Add(f, 0.5)
+			end
 		end
 	end
 	
 	self.attackDamageTimer = World.gameTimers:Add(f, 0.5)
+	self.think = Tormentor.SwitchModes
+	self:SetNextThink(2)
 end
 
 function Tormentor.Move(self, move)

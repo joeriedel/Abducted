@@ -134,7 +134,8 @@ function Tormentor.OnEvent(self, cmd, args)
 end
 
 function Tormentor.PlayCinematicAnim(self, args)
-
+	args = Tokenize(args)
+	
 	local f = function()
 		self:SetMoveType(kMoveType_Floor)
 		
@@ -157,7 +158,7 @@ function Tormentor.PlayCinematicAnim(self, args)
 	self:Move(false)
 	self:SetDesiredMove(nil)
 	
-	local blend = self:PlayAnim(anim, self.model)
+	local blend = self:PlayAnim(args[1], self.model)
 	if (blend) then
 		blend.Seq(f)
 	else

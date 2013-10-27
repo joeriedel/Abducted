@@ -25,10 +25,13 @@ function Actor.Spawn(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
     
+    self.visible = false
+    
     if (self.keys.model) then
         self.model = LoadModel(self.keys.model)
         self.model.dm = self:AttachDrawModel(self.model)
         if (self.model.SetRootController and self.keys.idle) then
+			self.state = self.keys.idle
             self.model:BlendToState(self.keys.idle)
         end 
         if (self.keys.scale) then
@@ -52,6 +55,17 @@ function Actor.Spawn(self)
         self:SetOccupantType(kOccupantType_BBox)
 		self:Link()
     end
+    
+    local io = {
+		Save = function()
+			return self:SaveState()
+		end,
+		Load = function(s, x)
+			return self:LoadState(x)
+		end
+	}
+	
+	GameDB.PersistentObjects[self.keys.uuid] = io
 
 end
 
@@ -195,6 +209,35 @@ function Actor.AddGhostParticles(self, model, modelname)
 		table.insert(self.ghostParticles, emitter)
 	end
 
+end
+
+function Actor.SaveState(self)
+	
+	local state = {
+		visible = tostring(self.visible)
+	}
+	
+	if (self.state) then
+		state.state = self.state
+	end
+	
+	return state
+end
+
+function Actor.LoadState(self, state)
+	
+	if (state.visible == "true") then
+		self.model.dm:SetVisible(true)
+		self.model.dm:BlendTo({1,1,1,1}, 0)
+		self:EnableGhostParticles(nil, {1,1,1,1}, 0)
+	else
+		self.model.dm:SetVisible(false)
+	end
+	
+	if (state.state) then
+		self.model:BlendToState(state.state)
+	end
+	
 end
 
 info_actor = Actor

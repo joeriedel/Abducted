@@ -133,7 +133,7 @@ function Cinematics.PlayLevelCinematics(self, introCompleteCallback)
 	World.PlayCinematic("environment", kCinematicFlag_CanPlayForever, 0)
 	World.PlayCinematic("environment_loop", kCinematicFlag_Loop, 0)
 	if (not GameDB.loadingCheckpoint) then
-		Cinematics:Play("intro", nil, nil, introCompleteCallback)
+		Cinematics:Play(StringForString(World.worldspawn.keys.intro_cinematic, "intro"), nil, nil, introCompleteCallback)
 	end
 end
 

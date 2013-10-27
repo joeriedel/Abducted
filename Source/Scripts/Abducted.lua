@@ -64,25 +64,33 @@ function Abducted.FinishTitleCrawl(self)
 	UI:BlendTo({1,1,1,1}, 0.3)
 	
 	local f = function()
-		UI:BlendTo({1,1,1,0}, 0.3)
+		if (BoolForString(World.worldspawn.keys.start_black, true)) then
+			UI:BlendTo({0,0,0,1}, 0.3)
+		else
+			UI:BlendTo({1,1,1,0}, 0.3)
+		end
 		World.SetDrawUIOnly(false)
 		TitleCrawl:Clear()
-		self:StartGame()
 	end
 	
 	World.globalTimers:Add(f, 0.3)
+	self:StartGame()
 end
 
-function Abducted.StartGame(self)
-	World.PauseGame(false)
+function Abducted.StartGame(self, delay)
+	
+	if (delay == nil) then
+		delay = 0
+	end
 	
 	local f = function()
 		local f = function()
 			self:VisibleCheckpoint()
 		end
-		World.globalTimers:Add(f, 0.25)
+		World.globalTimers:Add(f, 0.25 + delay)
 	end
 	
+	World.PauseGame(false)
 	Cinematics:PlayLevelCinematics(f)
 end
 

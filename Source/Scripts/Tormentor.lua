@@ -133,7 +133,7 @@ function Tormentor.OnEvent(self, cmd, args)
 	return false
 end
 
-function PlayerPawn.PlayCinematicAnim(self, args)
+function Tormentor.PlayCinematicAnim(self, args)
 
 	local f = function()
 		self:SetMoveType(kMoveType_Floor)

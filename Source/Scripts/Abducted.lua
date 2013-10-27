@@ -64,7 +64,7 @@ function Abducted.FinishTitleCrawl(self)
 	UI:BlendTo({1,1,1,1}, 0.3)
 	
 	local f = function()
-		if (BoolForString(World.worldspawn.keys.start_black, true)) then
+		if (BoolForString(World.worldspawn.keys.start_black, false)) then
 			UI:BlendTo({0,0,0,1}, 0.3)
 		else
 			UI:BlendTo({1,1,1,0}, 0.3)

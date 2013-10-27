@@ -24,6 +24,7 @@ function Tormentor.Spawn(self)
 	
 	self.mode = StringForString(self.keys.initial_state, "idle")
 	self.model = LoadModel("Characters/Tormentor1")
+	self:SetMotionSka(self.model)
 	
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())

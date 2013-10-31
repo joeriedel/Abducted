@@ -5,6 +5,7 @@ pak0 {
 	Ep1/ep1_crushed_intro
 	Ep1/ep1_falling
 	Ep1/ep1_dreamscape1
+	Ep1/ep1_dreamscape1B
 	
 	Ep1/Falling
 	Ep1/Ep1Crushed

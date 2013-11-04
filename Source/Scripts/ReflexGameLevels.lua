@@ -149,11 +149,11 @@ function ReflexGame.CreateLevel2x1(self)
 		, { x=16, y=8, img="blocker_green" }
 		}
 		
-	return self:CreateLevel1x1()
+	return level
 end
 
 function ReflexGame.CreateLevel2x2(self)
-local level = {}
+	local level = {}
 	
 	level.name = "2x2"
 	
@@ -221,11 +221,11 @@ local level = {}
 		, { x=15, y=8, img="blocker_green" }
 		, { x=16, y=8, img="blocker_green" }
 		}
-	return self:CreateLevel1x1()
+	return level
 end
 
 function ReflexGame.CreateLevel2x3(self)
-local level = {}
+	local level = {}
 	
 	level.name = "2x3"
 	
@@ -297,17 +297,17 @@ local level = {}
 		, { x=15, y=8, img="blocker_green" }
 		, { x=16, y=8, img="blocker_green" }
 		}
-	return self:CreateLevel1x1()
+	return level
 end
 
 function ReflexGame.CreateLevel2x4(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel2x1()
 end
 
 ------- level 3's
 
 function ReflexGame.CreateLevel3x1(self)
-local level = {}
+	local level = {}
 	
 	level.name = "3x1"
 	
@@ -375,19 +375,19 @@ local level = {}
 		, { x=15, y=8, img="blocker_green" }
 		, { x=16, y=8, img="blocker_green" }
 		}
-	return self:CreateLevel1x1()
+	return level
 end
 
 function ReflexGame.CreateLevel3x2(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel3x1()
 end
 
 function ReflexGame.CreateLevel3x3(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel3x1()
 end
 
 function ReflexGame.CreateLevel3x4(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel3x1()
 end
 
 ------- level 4's

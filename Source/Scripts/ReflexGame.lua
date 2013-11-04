@@ -313,7 +313,7 @@ function ReflexGame.InitUI(self)
 	self.INDEX_MAX_X = 16
 	self.INDEX_MAX_Y = 8
     self.LINE_SPAWN_TIME = 0.5
-	self.PLAYER_SPEED = 125
+	self.PLAYER_SPEED = 140
 	self.COORD_MIN_X = self.REFLEX_BOARD_OFFSET[1]
 	self.COORD_MIN_Y = self.REFLEX_BOARD_OFFSET[2]
 	self.COORD_MAX_X = self.REFLEX_BOARD_OFFSET[1] + self.REFLEX_CELL_SIZE[1] + self.INDEX_MAX_X * self.REFLEX_CELL_SIZE[1]

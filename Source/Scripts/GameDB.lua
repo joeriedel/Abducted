@@ -99,7 +99,18 @@ function GameDB.SaveCheckpoint(self)
 	SaveGame:Save()
 end
 
+function GameDB.SaveCheckpointTransition(self, level)
+
+	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
+	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
+	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
+	Persistence.WriteString(SaveGame, "currentLevel", level)
+	SaveGame:Save()
+	
+end
+
 function GameDB.LoadCheckpoint(self)
+	SaveGame:Load() -- load savegame data
 	GameDB:Load()
 	World.MarkTempEntsForGC()
 	self.loadingCheckpoint = true
@@ -229,6 +240,7 @@ function GameDB.Discover(self, name, source, unlock, visible)
 	local logEntry = nil
 
 	if (unlock or (dbItem.mysteryTitle == nil)) then
+		unlock = true -- not a mystery item, count the discovery
 		logTitle = dbItem.title or "MISSING TITLE TEXT!"
 		if (dbItem.logText) then
 			logEntry = dbItem.logText[source] or dbItem.logText.all or "MISSING LOG TEXT!"
@@ -254,9 +266,9 @@ function GameDB.Discover(self, name, source, unlock, visible)
 	if (unlock) then
 		self.numDiscoveries = self.numDiscoveries + 1
 		Persistence.WriteNumber(SaveGame, "numDiscoveries", self.numDiscoveries)
-		Persistence.WriteBool(SaveGame, "discovery", "unlocked", name)
+		Persistence.WriteString(SaveGame, "discovery", "unlocked", name)
 	else
-		Persistence.WriteBool(SaveGame, "discovery", "mystery", name)
+		Persistence.WriteString(SaveGame, "discovery", "mystery", name)
 	end
 	
 	self.discoveryTime = self.realTime

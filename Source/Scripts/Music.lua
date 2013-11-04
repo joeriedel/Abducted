@@ -50,8 +50,10 @@ function Music.Play(self, cmd, args)
 	
 	self:Stop() -- fade out active music
 	
-	self.cmd = cmd
-	self.name = args[1]
+	if (not FindArrayElement(args, "stateless=true")) then
+		self.cmd = cmd
+		self.name = args[1]
+	end
 		
 	if (GameDB.loadingCheckpoint) then
 		self.active = World.Load(args[1], 1, false) -- blocking load

@@ -256,7 +256,7 @@ function Arm.SpawnCharacterDB(self)
 	w = UI:CreateWidget("TextLabel", {rect = r, typeface = UI.typefaces.StandardButton})
 	self.widgets.db.CharRoot:AddChild(w)
 	w:SetBlendWithParent(true)
-	UI:SetLabelText(w, tostring(GameDB.numDiscoveries), UI.identityScale)
+	self.discoveriesCountWidget = w
 	
 end
 
@@ -281,6 +281,8 @@ function Arm.EnterCharDB(self, enter, callback, time)
 			UI:SetLabelText(self.charDBHealthStatusText, StringTable.Get("ARM_CHARDB_BAD"), UI.identityScale)
 			self.charDBHeartWidget:SetMaterial(self.gfx.HumanHeartInjured)
 	 	end
+	 	
+	 	UI:SetLabelText(self.discoveriesCountWidget, tostring(GameDB.numDiscoveries), UI.identityScale)
 	 	
 		Arm:DBAnimateCharHeartbeat(true)
 		Arm:DBAnimateTimePlayed(true)

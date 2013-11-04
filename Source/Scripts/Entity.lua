@@ -23,6 +23,38 @@ function Entity.Spawn(self)
 	
 end
 
+function Entity.SaveFloorPos(self, state)
+	local fp = self:FloorPosition()
+	if (fp.floor == -1) then
+		local classname = StringForKey(self.keys.classname, "<null>")
+		local targetname = StringForKey(self.keys.targetname, "<notarget>")
+		error(string.format("Entity.SaveFloorPos: Checkpoint error (%s, %s) is not on a floor!", classname, targetname))
+	end
+	
+	state.floorpos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
+	state.floorname = World.FloorName(fp.floor)
+end
+
+function Entity.LoadFloorPos(self, state)
+
+	local floorNum = World.FindFloor(state.floorname)
+	assert(floorNum ~= -1)
+	
+	local floorState = World.FloorState(floorNum)
+	World.SetFloorState(floorNum, kFloorState_Enabled)
+	
+	local pos = Vec3ForString(state.floorpos)
+	local fp  = World.ClipToFloor(
+		{pos[1], pos[2], pos[3] + 8},
+		{pos[1], pos[2], pos[3] - 8}
+	)
+	
+	assert(fp)
+	self:SetFloorPosition(fp)
+	
+	World.SetFloorState(floorNum, floorState)
+end
+
 function Entity.Precache(self, path, async)
 
 	self.precached = self.precached or {}

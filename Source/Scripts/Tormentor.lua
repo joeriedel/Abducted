@@ -366,8 +366,7 @@ function Tormentor.CheckPulseTarget(self, x, y)
 end
 
 function Tormentor.SaveState(self)
-	local fp = self:FloorPosition()
-	
+		
 	if (self.attackDamageTimer) then
 		self.attackDamageTimer:Clean()
 		self.attackDamageTimer = nil
@@ -378,23 +377,17 @@ function Tormentor.SaveState(self)
 	local state = {
 		mode = tostring(self.mode),
 		didIntro = tostring(self.didIntro),
-		facing = tostring(vertex.pos[3]),
-		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
+		facing = tostring(vertex.pos[3])
 	}
+	
+	self:SaveFloorPos(state)
 	
 	return state
 end
 
 function Tormentor.LoadState(self, state)
 	
-	local pos = Vec3ForString(state.pos)
-	local fp  = World.ClipToFloor(
-		{pos[1], pos[2], pos[3] + 8},
-		{pos[1], pos[2], pos[3] - 8}
-	)
-	
-	assert(fp)
-	self:SetFloorPosition(fp)
+	self:LoadFloorPos(state)
 	self:SetDesiredMove(nil)
 	self:SetFacing(tonumber(state.facing))
 	self:Link()

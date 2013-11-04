@@ -1610,9 +1610,10 @@ function PlayerPawn.SaveState(self)
 		shieldActive = tostring(self.shieldActive),
 		animState = self.animState,
 		facing = tostring(vertex.pos[3]),
-		sheidlAutoActiveTime = tostring(self.shieldAutoActivateTime),
-		pos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
+		sheidlAutoActiveTime = tostring(self.shieldAutoActivateTime)
 	}
+	
+	self:SaveFloorPos(state)
 	
 	return state
 end
@@ -1661,14 +1662,8 @@ function PlayerPawn.LoadState(self, state)
 	self.shieldAutoActivateTime = tonumber(state.shieldAutoActivateTime)
 	self:Show(state.visible == "true")
 	
-	local pos = Vec3ForString(state.pos)
-	local fp  = World.ClipToFloor(
-		{pos[1], pos[2], pos[3] + 8},
-		{pos[1], pos[2], pos[3] - 8}
-	)
+	self:LoadFloorPos(state)
 	
-	assert(fp)
-	self:SetFloorPosition(fp)
 	self:SetDesiredMove(nil)
 	self:SetMoveType(kMoveType_Floor)
 	self:SetFacing(tonumber(state.facing))

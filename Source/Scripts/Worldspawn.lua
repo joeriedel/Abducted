@@ -19,7 +19,7 @@ function Worldspawn.Spawn(self)
 	
 	Game.entity:Initialize(StringForString(self.keys.type, "Map"))
 	
-	if (Game.entity.type == "Map") then
+	if ((Game.entity.type == "Map") or (Game.entity.type == "Cinematic")) then
 		Arm:LoadChats(self.keys.arm_chats)
 		
 		if (StringForString(self.keys.arm_state, "unlocked") == "locked") then

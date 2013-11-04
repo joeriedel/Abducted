@@ -21,7 +21,7 @@ function Game.Initialize(self, type)
 	
 	World.SetEnabledGestures(0)
 	
-	if (type == "Map") then
+	if (type == "Map" or type == "Cinematic") then
 		Abducted:New(Game.entity)
 		Game.entity:Initialize()
 	elseif (type == "MainMenu") then
@@ -55,6 +55,8 @@ function Game.LoadLevel(self, level)
 	World.SoundFadeMasterVolume(0, 1)
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
+	
+	GameDB:SaveCheckpointTransition(level)
 	
 	local f = function()
 		World.RequestLoad(level, kUnloadDisposition_Slot)

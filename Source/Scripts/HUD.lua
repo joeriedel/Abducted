@@ -939,7 +939,9 @@ end
 
 function HUD.AnimateUnlock(self, items)
 
-	self.sfx.AbilityUnlocked:Play(kSoundChannel_UI, 0)
+	if (Game.entity.levelStarted and not GameDB:LoadingSaveGame()) then
+		self.sfx.AbilityUnlocked:Play(kSoundChannel_UI, 0)
+	end
 	
 	if (UI.mode == kGameUIMode_Mobile) then
 		HUD:AnimateUnlockMobile(items)
@@ -1462,7 +1464,9 @@ function HUD.SignalArm(self, signal)
 	if (signal) then
 		self.widgets.ArmActivity:SetMaterial(self.gfx.ArmSignaled)
 		self.widgets.ArmActivity:SetVisible(true)
-		self.sfx.Signaled:Play(kSoundChannel_UI, 0)
+		if (Game.entity.levelStarted and not GameDB:LoadingSaveGame()) then
+			self.sfx.Signaled:Play(kSoundChannel_UI, 0)
+		end
 	else
 		self.widgets.ArmActivity:SetVisible(false)
 	end

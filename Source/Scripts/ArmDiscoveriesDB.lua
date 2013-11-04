@@ -370,7 +370,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_TENTACLES_TITLE",
 		text = "ARM_DISCOVERY_TENTACLES",
 		logText = {
-			arm = "ARM_DISCOVERY_TENTACLES_LOG"
+			all = "ARM_DISCOVERY_TENTACLES_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP",
 		chat = "ARM_TOPIC_TENTACLES"
@@ -381,7 +381,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_TERMINALS_TITLE",
 		text = "ARM_DISCOVERY_TERMINALS",
 		logText = {
-			arm = "ARM_DISCOVERY_TERMINALS_LOG"
+			all = "ARM_DISCOVERY_TERMINALS_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_TERMINALS_POPUP"
 	},
@@ -391,7 +391,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_THE_MAW_TITLE",
 		text = "ARM_DISCOVERY_THE_MAW",
 		logText = {
-			arm = "ARM_DISCOVERY_THE_MAW_LOG"
+			all = "ARM_DISCOVERY_THE_MAW_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_THE_MAW_POPUP"
 	},
@@ -401,7 +401,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_THE_ROOM_TITLE",
 		text = "ARM_DISCOVERY_THE_ROOM",
 		logText = {
-			arm = "ARM_DISCOVERY_THE_ROOM_LOG"
+			all = "ARM_DISCOVERY_THE_ROOM_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_THE_ROOM_POPUP"
 	},
@@ -411,7 +411,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_WILD_GROWTH_TITLE",
 		text = "ARM_DISCOVERY_WILD_GROWTH",
 		logText = {
-			arm = "ARM_DISCOVERY_WILD_GROWTH_LOG"
+			all = "ARM_DISCOVERY_WILD_GROWTH_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_WILD_GROWTH_POPUP"
 	},
@@ -421,7 +421,7 @@ Arm.Discoveries = {
 		title = "ARM_DISCOVERY_WINDOW_LIGHT_TITLE",
 		text = "ARM_DISCOVERY_WINDOW_LIGHT",
 		logText = {
-			arm = "ARM_DISCOVERY_WINDOW_LIGHT_LOG"
+			all = "ARM_DISCOVERY_WINDOW_LIGHT_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_WINDOW_LIGHT_POPUP"
 	}

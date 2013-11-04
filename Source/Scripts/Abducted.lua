@@ -38,7 +38,9 @@ end
 
 function Abducted.OnLevelStart(self)
 	
-	if (GameDB:LoadingSaveGame()) then
+	self.levelStarted = true
+	
+	if (GameDB:LoadingSaveGame() and (Game.type == "Map")) then
 		COutLine(kC_Debug, "Loading checkpoint!")
 		self:LoadCheckpoint()
 		UI:FadeIn(1)
@@ -91,6 +93,11 @@ function Abducted.StartGame(self, delay)
 	end
 	
 	World.PauseGame(false)
+	
+	if (Game.type ~= "Map") then
+		f = nil -- do not save checkpoints for a cinematic map
+	end
+	
 	Cinematics:PlayLevelCinematics(f)
 end
 

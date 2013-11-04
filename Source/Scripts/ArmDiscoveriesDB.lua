@@ -85,12 +85,7 @@ The following items are OPTIONAL:
 ]]
 Arm.Discoveries = {
 
-	Bugs = {
-		picture = "UI/discovery_bugs_M",
-		title = "ARM_DISCOVERY_BUGS_TITLE",
-		text = "ARM_DISCOVERY_BUGS"
-	},
-	MysteryExample = {
+	--[[MysteryExample = {
 		picture = "UI/discovery_tentacles_M",
 		title = "ARM_TOPIC_TENTACLES",
 		text = "ARM_DISCOVERY_TENTACLES",
@@ -102,7 +97,214 @@ Arm.Discoveries = {
 			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
 		},
 		chat = "ARM_TOPIC_TENTACLES"
+	},]]
+	
+	BlockCreature = {
+		picture = "UI/discovery_block_creature_M",
+		title = "ARM_DISCOVERY_BLOCK_CREATURE_TITLE",
+		text = "ARM_DISCOVERY_BLOCK_CREATURE",
+		logText = {
+			all = "ARM_DISCOVERY_BLOCK_CREATURE_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_BLOCK_CREATURE_POPUP"
 	},
+	
+	BugHoles = {
+		picture = "UI/discovery_bug_holes_M",
+		title = "ARM_DISCOVERY_BUG_HOLES_TITLE",
+		text = "ARM_DISCOVERY_BUG_HOLES",
+		logText = {
+			all = "ARM_DISCOVERY_BUG_HOLES_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_BUG_HOLES_POPUP"
+	},
+	
+	Bugs = {
+		picture = "UI/discovery_bugs_M",
+		title = "ARM_DISCOVERY_BUGS_TITLE",
+		text = "ARM_DISCOVERY_BUGS"
+	},
+	
+	ComputerLog = {
+		picture = "UI/discovery_computer_log_M",
+		title = "ARM_DISCOVERY_COMPUTER_LOG_TITLE",
+		text = "ARM_DISCOVERY_COMPUTER_LOG",
+		logText = {
+			all = "ARM_DISCOVERY_COMPUTER_LOG_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_COMPUTER_LOG_POPUP"
+	},
+	
+	CrystalineStructure = {
+		picture = "UI/discovery_crystaline_structure_M",
+		title = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_TITLE",
+		text = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE",
+		logText = {
+			all = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_POPUP"
+	},
+	
+	DarkCorner = {
+		picture = "UI/discovery_dark_corner_M",
+		title = "ARM_DISCOVERY_DARK_CORNER_TITLE",
+		text = "ARM_DISCOVERY_DARK_CORNER",
+		logText = {
+			all = "ARM_DISCOVERY_DARK_CORNER_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_DARK_CORNER_POPUP"
+	},
+	
+	Dreamscape = {
+		picture = "UI/discovery_dreamscape_M",
+		title = "ARM_DISCOVERY_DREAMSCAPE_TITLE",
+		text = "ARM_DISCOVERY_DREAMSCAPE",
+		logText = {
+			all = "ARM_DISCOVERY_DREAMSCAPE_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_POPUP"
+	},
+	
+	DreamscapePortal = {
+		picture = "UI/discovery_dreamscape_portal_M",
+		title = "ARM_DISCOVERY_DREAMSCAPE_PORTAL_TITLE",
+		text = "ARM_DISCOVERY_DREAMSCAPE_PORTAL",
+		logText = {
+			all = "ARM_DISCOVERY_DREAMSCAPE_PORTAL_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_PORTAL_POPUP"
+	},
+	
+	FlowingSkin = {
+		picture = "UI/discovery_flowing_skin_M",
+		title = "ARM_DISCOVERY_FLOWING_SKIN_TITLE",
+		text = "ARM_DISCOVERY_FLOWING_SKIN",
+		logText = {
+			all = "ARM_DISCOVERY_FLOWING_SKIN_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_FLOWING_SKIN_POPUP"
+	},
+	
+	GlowingPolyps = {
+		picture = "UI/discovery_glowing_polyps_M",
+		title = "ARM_DISCOVERY_GLOWING_POLYPS_TITLE",
+		text = "ARM_DISCOVERY_GLOWING_POLYPS",
+		logText = {
+			all = "ARM_DISCOVERY_GLOWING_POLYPS_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_GLOWING_POLYPS_POPUP"
+	},
+	
+	Glyphs = {
+		picture = "UI/discovery_glyphs_M",
+		title = "ARM_DISCOVERY_GLYPHS_TITLE",
+		text = "ARM_DISCOVERY_GLYPHS",
+		logText = {
+			all = "ARM_DISCOVERY_GLYPHS_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_GLYPHS_POPUP"
+	},
+	
+	HumanShipDoor = {
+		picture = "UI/discovery_human_ship_door_M",
+		title = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_TITLE",
+		text = "ARM_DISCOVERY_HUMAN_SHIP_DOOR",
+		logText = {
+			all = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_POPUP"
+	},
+	
+	HumanShipTop1 = {
+		picture = "UI/discovery_human_ship_top1_M",
+		title = "ARM_DISCOVERY_HUMAN_SHIP_TOP1_TITLE",
+		text = "ARM_DISCOVERY_HUMAN_SHIP_TOP1",
+		logText = {
+			all = "ARM_DISCOVERY_HUMAN_SHIP_TOP1_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_TOP1_POPUP"
+	},
+	
+	HumanShipTop2 = {
+		picture = "UI/discovery_human_ship_top2_M",
+		title = "ARM_DISCOVERY_HUMAN_SHIP_TOP2_TITLE",
+		text = "ARM_DISCOVERY_HUMAN_SHIP_TOP2",
+		logText = {
+			all = "ARM_DISCOVERY_HUMAN_SHIP_TOP2_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_TOP2_POPUP"
+	},
+	
+	HumanShipTop3 = {
+		picture = "UI/discovery_human_ship_top3_M",
+		title = "ARM_DISCOVERY_HUMAN_SHIP_TOP3_TITLE",
+		text = "ARM_DISCOVERY_HUMAN_SHIP_TOP3",
+		logText = {
+			all = "ARM_DISCOVERY_HUMAN_SHIP_TOP3_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_TOP3_POPUP"
+	},
+	
+	HumanShipTop4 = {
+		picture = "UI/discovery_human_ship_top4_M",
+		title = "ARM_DISCOVERY_HUMAN_SHIP_TOP4_TITLE",
+		text = "ARM_DISCOVERY_HUMAN_SHIP_TOP4",
+		logText = {
+			all = "ARM_DISCOVERY_HUMAN_SHIP_TOP4_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_TOP4_POPUP"
+	},
+	
+	JumpDown = {
+		picture = "UI/discovery_jump_down_M",
+		title = "ARM_DISCOVERY_JUMP_DOWN_TITLE",
+		text = "ARM_DISCOVERY_JUMP_DOWN",
+		logText = {
+			all = "ARM_DISCOVERY_JUMP_DOWN_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_JUMP_DOWN_POPUP"
+	},
+	
+	ManipulateTentacle = {
+		picture = "UI/discovery_manipulate_tentacle_M",
+		title = "ARM_DISCOVERY_MANIPULATE_TENTACLE_TITLE",
+		text = "ARM_DISCOVERY_MANIPULATE_TENTACLE",
+		logText = {
+			all = "ARM_DISCOVERY_MANIPULATE_TENTACLE_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_TENTACLE_POPUP"
+	},
+	
+	MedicalDiscovery = {
+		picture = "UI/discovery_medical_discovery_M",
+		title = "ARM_DISCOVERY_MEDICAL_DISCOVERY_TITLE",
+		text = "ARM_DISCOVERY_MEDICAL_DISCOVERY",
+		logText = {
+			all = "ARM_DISCOVERY_MEDICAL_DISCOVERY_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_MEDICAL_DISCOVERY_POPUP"
+	},
+	
+	Overgrowth = {
+		picture = "UI/discovery_overgrowth_M",
+		title = "ARM_DISCOVERY_OVERGROWTH_TITLE",
+		text = "ARM_DISCOVERY_OVERGROWTH",
+		logText = {
+			all = "ARM_DISCOVERY_OVERGROWTH_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_OVERGROWTH_POPUP"
+	},
+	
+	PlacesToClimb = {
+		picture = "UI/discovery_places_to_climb_M",
+		title = "ARM_DISCOVERY_PLACES_TO_CLIMB_TITLE",
+		text = "ARM_DISCOVERY_PLACES_TO_CLIMB",
+		logText = {
+			all = "ARM_DISCOVERY_PLACES_TO_CLIMB_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_PLACES_TO_CLIMB_POPUP"
+	},
+	
 	Pod = {
 		picture = "UI/discovery_pod_M",
 		title = "ARM_DISCOVERY_POD_TITLE",
@@ -112,19 +314,116 @@ Arm.Discoveries = {
 		},
 		discoveryPopupText = "ARM_DISCOVERY_POD_POPUP"
 	},
+	
+	Polyps = {
+		picture = "UI/discovery_polyps_M",
+		title = "ARM_DISCOVERY_POLYPS_TITLE",
+		text = "ARM_DISCOVERY_POLYPS",
+		logText = {
+			all = "ARM_DISCOVERY_POLYPS_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_POLYPS_POPUP"
+	},
+	
+	PylonElevator = {
+		picture = "UI/discovery_pylon_elevator_M",
+		title = "ARM_DISCOVERY_PYLON_ELEVATOR_TITLE",
+		text = "ARM_DISCOVERY_PYLON_ELEVATOR",
+		logText = {
+			all = "ARM_DISCOVERY_PYLON_ELEVATOR_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_PYLON_ELEVATOR_POPUP"
+	},
+	
+	Rain = {
+		picture = "UI/discovery_rain_M",
+		title = "ARM_DISCOVERY_RAIN_TITLE",
+		text = "ARM_DISCOVERY_RAIN",
+		logText = {
+			all = "ARM_DISCOVERY_RAIN"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_RAIN_POPUP"
+	},
+	
+	Skin = {
+		picture = "UI/discovery_skin_M",
+		title = "ARM_DISCOVERY_SKIN_TITLE",
+		text = "ARM_DISCOVERY_SKIN",
+		logText = {
+			all = "ARM_DISCOVERY_SKIN"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_SKIN_POPUP"
+	},
+	
+	SleepingTentacle = {
+		picture = "UI/discovery_sleeping_tentacle_M",
+		title = "ARM_DISCOVERY_SLEEPING_TENTACLE_TITLE",
+		text = "ARM_DISCOVERY_SLEEPING_TENTACLE",
+		logText = {
+			all = "ARM_DISCOVERY_SLEEPING_TENTACLE"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_SLEEPING_TENTACLE_POPUP"
+	},
+	
 	Tentacles = {
 		picture = "UI/discovery_tentacles_M",
-		title = "ARM_TOPIC_TENTACLES",
+		title = "ARM_DISCOVERY_TENTACLES_TITLE",
 		text = "ARM_DISCOVERY_TENTACLES",
 		logText = {
-			arm = "ARM_DISCOVERY_TENTACLES_LOG_ARM"
+			arm = "ARM_DISCOVERY_TENTACLES_LOG"
 		},
+		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP",
 		chat = "ARM_TOPIC_TENTACLES"
 	},
+	
 	Terminals = {
 		picture = "UI/discovery_terminals_M",
 		title = "ARM_DISCOVERY_TERMINALS_TITLE",
-		text = "ARM_DISCOVERY_TERMINALS"
+		text = "ARM_DISCOVERY_TERMINALS",
+		logText = {
+			arm = "ARM_DISCOVERY_TERMINALS_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_TERMINALS_POPUP"
+	},
+	
+	TheMaw = {
+		picture = "UI/discovery_the_maw_M",
+		title = "ARM_DISCOVERY_THE_MAW_TITLE",
+		text = "ARM_DISCOVERY_THE_MAW",
+		logText = {
+			arm = "ARM_DISCOVERY_THE_MAW_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_THE_MAW_POPUP"
+	},
+	
+	TheRoom = {
+		picture = "UI/discovery_the_room_M",
+		title = "ARM_DISCOVERY_THE_ROOM_TITLE",
+		text = "ARM_DISCOVERY_THE_ROOM",
+		logText = {
+			arm = "ARM_DISCOVERY_THE_ROOM_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_THE_ROOM_POPUP"
+	},
+	
+	WildGrowth = {
+		picture = "UI/discovery_wild_growth_M",
+		title = "ARM_DISCOVERY_WILD_GROWTH_TITLE",
+		text = "ARM_DISCOVERY_WILD_GROWTH",
+		logText = {
+			arm = "ARM_DISCOVERY_WILD_GROWTH_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_WILD_GROWTH_POPUP"
+	},
+	
+	WindowLight = {
+		picture = "UI/discovery_window_light_M",
+		title = "ARM_DISCOVERY_WINDOW_LIGHT_TITLE",
+		text = "ARM_DISCOVERY_WINDOW_LIGHT",
+		logText = {
+			arm = "ARM_DISCOVERY_WINDOW_LIGHT_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_WINDOW_LIGHT_POPUP"
 	}
 }
 

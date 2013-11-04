@@ -10,6 +10,7 @@ GameDB.MinutesPerHour = 60
 GameDB.HoursPerDay = 24
 GameDB.SecondsPerHour = 60*60
 GameDB.SecondsPerDay = 60*60*24
+GameDB.AllDiscoveriesCheat = false
 GameDB.PersistentObjects = {}
 GameDB.Portraits = {
 	"UI/portrait1_M",
@@ -265,6 +266,9 @@ function GameDB.Discover(self, name, source, unlock, visible)
 end
 
 function GameDB.CheckDiscovery(self, name)
+	if (GameDB.AllDiscoveriesCheat) then
+		return "unlocked"
+	end
 	return Persistence.ReadString(SaveGame, "discovery", nil, name)
 end
 

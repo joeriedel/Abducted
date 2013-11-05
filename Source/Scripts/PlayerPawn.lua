@@ -849,7 +849,7 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 		end
 		
 		-- This damage amount overloaded our shield
-		-- Play an flickering shield effect to show that it blocked the damage
+		-- Play a flickering shield effect to show that it blocked the damage
 		-- but it shorted out
 		HUD:ExpireShield(PlayerSkills:MaxShieldTime())
 		self.shieldSounds.ImpactHard:Play(kSoundChannel_FX, 0)

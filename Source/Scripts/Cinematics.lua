@@ -66,6 +66,8 @@ function Cinematics.Play(self, args, time, originEntity, callback)
 			end
 		end
 	else
+		PlayerInput:Flush()
+		
 		local callbacks = {
 			OnTag = function(self, tag)
 				World.PostEvent(tag)

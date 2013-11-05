@@ -72,6 +72,13 @@ function PlayerInput.OnInputGesture(self, g)
 	return false
 end
 
+function PlayerInput.Flush(self)
+	
+	UI:ShowFinger(false, 0.5)
+	self.touch = nil
+
+end
+
 function PlayerInput.TapPulse(self, x, y)
 
 	if (self:TapTarget(x,y)) then

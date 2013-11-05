@@ -637,6 +637,7 @@ function Discovery.LoadState(self, state)
 	self.activeItem = nil
 	self.sprite.dm:BlendTo({1,1,1,0}, 0)
 	self.enabled = false
+	self.active = false
 	
 	if (state.enabled == "true") then
 		self:Enable()

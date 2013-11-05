@@ -74,7 +74,7 @@ function Floors.SaveState(self)
 		else
 			local s = World.FloorName(i-1)
 			local z = World.FloorState(i-1)
-			Persistence.WriteNumber(SaveGame, "Floors/floorName"..i, s)
+			Persistence.WriteString(SaveGame, "Floors/floorName"..i, s)
 			Persistence.WriteNumber(SaveGame, "Floors/floorState"..i, z)
 		end
 	end
@@ -114,7 +114,9 @@ function Floors.LoadState(self)
 	x = World.NumWaypoints()
 	
 	for i = 1,x do
-		local z = Persistence.ReadNumber(SaveGame, "Floors/waypoint"..i, 0)
-		World.SetWaypointState(i-1, z)
+		local z = Persistence.ReadNumber(SaveGame, "Floors/waypoint"..i)
+		if (z) then
+			World.SetWaypointState(i-1, z)
+		end
 	end
 end

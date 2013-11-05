@@ -858,11 +858,8 @@ function Arm.ScrollToRequestedItem(self)
 	if (requestedTopic) then
 		local topic = Arm.Discoveries[requestedTopic]
 		if (topic) then
-			topic = self.discoveryList[topic.index]
-			if (topic) then
-				-- it's in our list scroll to it
-				self.widgets.db.Discoveries:ScrollTo({0, topic.y}, 0.4)
-			end
+			-- it's in our list scroll to it
+			self.widgets.db.Discoveries:ScrollTo({0, topic.y}, 0.4)
 		end
 	end
 

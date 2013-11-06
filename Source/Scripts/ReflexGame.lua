@@ -545,6 +545,14 @@ function ReflexGame.CreateBoard(self)
 	self.widgets.current = nil
 	self.widgets.trash = {}
 	
+	local goalimages = {}
+	for i=1,27 do
+		goalimages[i] = i
+	end
+	
+	goalimages = ShuffleArray(goalimages)
+	local goalnum = 1
+	
 	COutLine(kC_Debug, "reflex.level.name=" .. self.state.level.name)
 
 	COutLine(kC_Debug, "Creating Board")	
@@ -600,6 +608,9 @@ function ReflexGame.CreateBoard(self)
 			self.widgets.portal = b
         end
         if (string.find(b.state.archetype,"cell_") ~= nil) then
+			local img = self.gfx[string.format("cell_%02i", goalimages[goalnum])]
+			goalnum = goalnum + 1
+			b:SetMaterial(img)
             table.insert(self.widgets.goals,b)
 		end
     end

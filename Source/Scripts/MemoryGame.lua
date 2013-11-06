@@ -182,6 +182,10 @@ function MemoryGame.EndGame(self, result)
 	
 	World.FlushInput(true)
 	
+	if (result == "f") then
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "SOLVE_TERMINAL_FAIL")
+	end
+	
 	if (self.gameCompleteCallback) then
 		self.gameCompleteCallback(result)
 	end
@@ -1230,6 +1234,7 @@ function MemoryGame.Think(self,dt)
 		self.think = nil
 		if (self.state.victory) then
 			local f = function()
+				EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "SOLVE_TERMINAL_SUCCESS")
 				PuzzleScoreScreen:DoSuccessScreen(
 					self.widgets.root2,
 					self.actions,

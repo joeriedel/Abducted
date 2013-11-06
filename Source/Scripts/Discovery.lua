@@ -7,7 +7,6 @@ Discovery = Entity:New()
 Discovery.Active = LL_New()
 Discovery.Popup = nil
 Discovery.Widgets = {}
-Discovery.kSkillReward = 25
 -- 720p sizes
 Discovery.kUISize = {300, 500}
 Discovery.kArrowSize = {20, 32}
@@ -183,8 +182,8 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 		Discovery.Widgets.SkillReward:SetRect(rect)
 		r[2] = r[2] + 8*UI.identityScale[1]
 		
-		local text = "+"..tostring(Discovery.kSkillReward)
-		if (Discovery.kSkillReward > 1) then
+		local text = "+"..tostring(PlayerSkills.kDiscoveryReward)
+		if (PlayerSkills.kDiscoveryReward > 1) then
 			text = text.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
 		else
 			text = text.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
@@ -401,7 +400,7 @@ function Discovery.OpenUI(self)
 		self:AddLookTarget()
 		
 		if (awardSkillPoints) then
-			PlayerSkills:AwardSkillPoints(Discovery.kSkillReward)
+			PlayerSkills:AwardSkillPoints(PlayerSkills.kDiscoveryReward)
 		end
 	end
 	if (Discovery.Popup) then

@@ -104,6 +104,10 @@ function ReflexGame.EndGame(self, result)
 	
 	World.FlushInput(true)
 	
+	if (result == "f") then
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "HACK_TERMINAL_FAIL")
+	end
+	
 	if (self.gameCompleteCallback) then
 		self.gameCompleteCallback(result)
 	end
@@ -1264,6 +1268,9 @@ function ReflexGame.Think(self,dt)
 						v:BlendTo({1,1,1,0}, 0.2)
 					end
 				end
+				
+				EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "HACK_TERMINAL_SUCCESS")
+	
 				PuzzleScoreScreen:DoSuccessScreen(
 					self.widgets.root3,
 					self.actions,
@@ -1818,7 +1825,7 @@ function PuzzleScoreScreen.RevealNextItem(self, callback)
 	end
 end
 
-function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback)
+function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logevent)
 
 	self.successHook = callback
 	
@@ -1954,7 +1961,7 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 		self.rewardMessage = tokens[2]
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
 	elseif (tokens[1] == "award") then
-		self.rewardSkillPoints = tonumber(tokens[2])
+		self.rewardSkillPoints = Arm:GetSkillAwardAmount(tokens[2], "terminal")
 		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	elseif (tokens[1] == "unlock_skill") then
 		self.rewardSkill = tokens[2]

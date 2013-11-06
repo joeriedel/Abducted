@@ -218,6 +218,24 @@ function Arm.ProcessActions(self, actions)
 	end
 end
 
+function Arm.GetSkillAwardAmount(self, token, context)
+	
+	local num
+	
+	if (token:sub(1,1) == "x") then
+		num = tonumber(token:sub(2))
+		if (context == "arm") then
+			num = num * PlayerSkills.kArmChatReward
+		else
+			num = num * PlayerSkills.kTerminalReward
+		end
+	else
+		num = tonumber(token)
+	end
+	
+	return num
+end
+
 function Arm.ProcessActionTokens(self, tokens)
 
 	if (tokens[1] == "trigger") then
@@ -231,7 +249,7 @@ function Arm.ProcessActionTokens(self, tokens)
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
 	elseif (tokens[1] == "award") then
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
-			self.rewardSkillPoints = tonumber(tokens[2])
+			self.rewardSkillPoints = Arm:GetSkillAwardAmount(tokens[2], "arm")
 			Arm:SaveTopicReward(self.topic, "skillpoints")
 			PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 		end

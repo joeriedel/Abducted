@@ -364,6 +364,7 @@ end
 function TerminalScreen.Downgrade()
 	local self = TerminalScreen.Signaled
 	if (self.hackDifficulty > 1) then
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "TERMINAL_DOWNGRADED_LOG")
 		self.hackDifficulty = self.hackDifficulty - 1
 		self.downgraded = true
 	end

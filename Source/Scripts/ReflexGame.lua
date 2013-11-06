@@ -1386,7 +1386,6 @@ function ReflexGame.Think(self,dt)
             b.state = self:CreateState("blocker_green")
             self.widgets.root:AddChild(b)
             assert(self.widgets.grid[index] == nil)
-            self.widgets.grid[index] = nil
             self.widgets.grid[index] = b
             self:SetPositionByGrid(b,v.x,v.y)
             b:ScaleTo({0,0}, {0,0})
@@ -1451,7 +1450,7 @@ function ReflexGame.Think(self,dt)
             k.state.heading = {}
             k.state.heading.x = k.state.ref.heading[1]
             k.state.heading.y = k.state.ref.heading[2]
-            k.state.headingTime = FloatRand(1.7, 10)
+            k.state.headingTime = FloatRand(self.state.level.blackholeMoveTime[1], self.state.level.blackholeMoveTime[2])
             k.state.speed = FloatRand(self.state.level.blackholeSpeed[1], self.state.level.blackholeSpeed[2])
             COutLine(kC_Debug,"blackhole heading @ : x=%i, y=%i",k.state.heading.x,k.state.heading.y)
 		else
@@ -1463,7 +1462,7 @@ function ReflexGame.Think(self,dt)
         if ((k.state.headingTime < 0) or (self:ClipToBoard(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2]))) then
             k.state.heading.x = -k.state.heading.x
             k.state.heading.y = -k.state.heading.y
-            k.state.headingTime = FloatRand(1.7, 10)
+            k.state.headingTime = FloatRand(self.state.level.blackholeMoveTime[1], self.state.level.blackholeMoveTime[2])
             nextPos = self:LerpWidget(k,k.state.heading,2*dt,k.state.speed,false)
             COutLine(kC_Debug,"blackhole bounce @ : x=%i, y=%i",nextPos.x,nextPos.y)
         end

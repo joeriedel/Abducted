@@ -6,6 +6,7 @@
 Arm = Class:New()
 Arm.active = false
 Arm.Chats = {}
+Arm.IntroAnimationSpeedScale = 1
 
 function Arm.Spawn(self)
 
@@ -765,7 +766,7 @@ function Arm.Intro(self)
 		Arm:DoShimmer()
 	end
 	
-	World.globalTimers:Add(f, 0.5)
+	World.globalTimers:Add(f, 0.5 * Arm.IntroAnimationSpeedScale)
 end
 
 function Arm.DoShimmer(self)
@@ -801,24 +802,24 @@ function Arm.DoInitialize(self)
 		}
 	)
 	
-	self.widgets.Symbol:MoveTo({x, r[2]}, {3.5, 0})
-	self.widgets.Symbol:BlendTo({1,1,1,1}, 0.5)
+	self.widgets.Symbol:MoveTo({x, r[2]}, {3.5*Arm.IntroAnimationSpeedScale, 0})
+	self.widgets.Symbol:BlendTo({1,1,1,1}, 0.5*Arm.IntroAnimationSpeedScale)
 	
 	self.widgets.LineBorder1:BlendTo({1,1,1,1}, 0)
 	self.widgets.LineBorder1:ScaleTo({0, 0}, {0, 0})
-	self.widgets.LineBorder1:ScaleTo({1, 1}, {1, 1})
+	self.widgets.LineBorder1:ScaleTo({1, 1}, {1*Arm.IntroAnimationSpeedScale, 1*Arm.IntroAnimationSpeedScale})
 	
 	local f = function()
 		Arm:TransitionChat()
 	end
 	
-	World.globalTimers:Add(f, 2.8)
+	World.globalTimers:Add(f, 2.8*Arm.IntroAnimationSpeedScale)
 	
 	f = function()
 		Arm:ButtonsIntro()
 	end
 	
-	World.globalTimers:Add(f, 1.0)
+	World.globalTimers:Add(f, 1.0*Arm.IntroAnimationSpeedScale)
 	
 end
 
@@ -889,16 +890,16 @@ end
 
 function Arm.ButtonsIntro(self)
 	if (GameDB.chatLockout) then
-		self.widgets.LineBorder3:BlendTo({1,1,1,1}, 1.5)
+		self.widgets.LineBorder3:BlendTo({1,1,1,1}, 1.5*Arm.IntroAnimationSpeedScale)
 	else
-		self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5)
+		self.widgets.LineBorder2:BlendTo({1,1,1,1}, 1.5*Arm.IntroAnimationSpeedScale)
 	end
 	
 	local f = function()
 		Arm:ListButtons(1)
 	end
 	
-	World.globalTimers:Add(f, 1.5)
+	World.globalTimers:Add(f, 1.5*Arm.IntroAnimationSpeedScale)
 end
 
 function Arm.ListButtons(self, num)
@@ -906,7 +907,7 @@ function Arm.ListButtons(self, num)
 	local widget = self.widgets.MenuButtons[num]
 	if (widget) then
 		if (not widget.skipIntro) then
-			widget:BlendTo({1,1,1,1}, 0.3)
+			widget:BlendTo({1,1,1,1}, 0.3*Arm.IntroAnimationSpeedScale)
 			didFade = true
 		end
 	end
@@ -924,7 +925,7 @@ function Arm.ListButtons(self, num)
 	end
 	
 	if (didFade) then
-		World.globalTimers:Add(f, 0.3)
+		World.globalTimers:Add(f, 0.3*Arm.IntroAnimationSpeedScale)
 	else
 		f()
 	end

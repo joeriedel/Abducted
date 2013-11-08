@@ -426,8 +426,7 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_TENTACLES_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP",
-		chat = "ARM_TOPIC_TENTACLES"
+		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP"
 	},
 	
 	Terminals = {
@@ -438,7 +437,7 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_TERMINALS_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_TERMINALS_POPUP",
-		
+		chat = "Terminals",
 		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
 		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
 		mysteryChat = "TerminalsMystery",
@@ -710,12 +709,18 @@ function Arm.ClearDiscoveries(self)
 end
 
 function Arm.DiscoveryPressed(self, discovery)
-	self.requestedTopic = discovery.chat
+
+	if (discovery.unlocked or (discovery.mysteryTitle == nil)) then
+		self.requestedTopic = discovery.chat
+	else
+		self.requestedTopic = discovery.mysteryChat
+	end
+	
 	self.topic = nil
 	Arm:TalkPressed()
 end
 
-function Arm.LayoutDiscovery(self, discovery, unlocked, section, state)
+function Arm.LayoutDiscovery(self, discovery, section, state)
 
 	-- discoveries have a title, a picture, and a description
 	local y = 0
@@ -730,6 +735,8 @@ function Arm.LayoutDiscovery(self, discovery, unlocked, section, state)
 		self.discoveriesDBArea[3],
 		state.titleAdvance
 	}
+	
+	local unlocked = discovery.unlocked
 	
 	if (discovery.mysteryTitle == nil) then
 		unlocked = true
@@ -965,7 +972,7 @@ function Arm.LoadDiscoveries(self)
 	for k,v in pairs(Arm.Discoveries) do
 		if (GameDB:CheckDiscovery(k)) then
 			table.insert(self.discoveryList, v)
-			unlocked[v.index] = GameDB:CheckDiscoveryUnlocked(k)
+			v.unlocked = GameDB:CheckDiscoveryUnlocked(k)
 		end
 	end
 	
@@ -986,7 +993,7 @@ function Arm.LoadDiscoveries(self)
 	}
 	
 	for k,v in pairs(self.discoveryList) do
-		self:LayoutDiscovery(v, unlocked[k], v, state)
+		self:LayoutDiscovery(v, v, state)
 	end
 	
 	self.widgets.db.Discoveries:RecalcLayout()

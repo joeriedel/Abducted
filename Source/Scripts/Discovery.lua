@@ -73,6 +73,20 @@ function Discovery.Spawn(self)
 	GameDB.PersistentObjects[self.keys.uuid] = io
 end
 
+function Discovery.OnEvent(self, cmd, args)
+	COutLineEvent(self.keys.targetname, "Discovery", cmd, args)
+	
+	if (cmd == "enable") then
+		self:Enable()
+		return true
+	elseif (cmd == "disable") then
+		self:Enable(false)
+		return true
+	end
+	
+	return false
+end
+
 function Discovery.Enable(self, enable)
 	if (enable == nil) then
 		enable = true

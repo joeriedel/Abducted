@@ -235,6 +235,8 @@ function GameDB.Discover(self, name, source, unlock, visible)
 		end
 	end
 	
+	GameDB.discoveryTime = GameDB.time
+	
 	-- add log text
 	local logTitle = nil
 	local logEntry = nil

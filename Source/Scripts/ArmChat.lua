@@ -1071,6 +1071,11 @@ function Arm.FillInChoices(self, responses, priority)
 	
 	local groups = self.topic.group
 	local defaultGroup = {"Default"}
+	local noDefault = false
+	
+	if (groups) then
+		noDefault = FindArrayElement(groups, "NoDefault")
+	end
 		
 	local prioritySort = {}
 	
@@ -1086,10 +1091,10 @@ function Arm.FillInChoices(self, responses, priority)
 			end
 		end
 		for i = 1,#prioritySort do
-			local t
+			local t = nil
 			if ((z == 1) or (z == 2)) then
 				t = Arm:SortProceduralTopics(prioritySort[i], groups or defaultGroup)
-			else
+			elseif (not noDefault) then
 				t = Arm:SortProceduralTopics(prioritySort[i], defaultGroup)
 			end
 			

@@ -614,7 +614,7 @@ function Arm.AnimatePrompt(self)
 		Arm:TickPrompt()
 	end
 	
-	local charactersPerSecond = 30
+	local charactersPerSecond = 33
 	self.chatTimer = World.globalTimers:Add(f, 1/charactersPerSecond, true)
 end
 

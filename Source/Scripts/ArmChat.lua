@@ -216,6 +216,10 @@ function Arm.ProcessActions(self, actions)
 			self:ProcessActionTokens(tokens)
 		end
 	end
+	
+	if (self.rewardSkillPoints) then
+		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
+	end
 end
 
 function Arm.GetSkillAwardAmount(self, token, context)
@@ -276,10 +280,6 @@ function Arm.ProcessActionTokens(self, tokens)
 			self.contextTopic = nil
 			self:ClearSignal()
 		end
-	end
-	
-	if (self.rewardSkillPoints) then
-		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	end
 end
 

@@ -29,12 +29,26 @@ function Arm.LinkDialogDB(self, db)
 			end
 			Arm.Chats.Loaded[k] = v
 			v.stringTable = strings
+			
+			if (v.group) then
+				v.group = string.split(v.group, ";")
+				if (#v.group == 0) then
+					v.group = nil
+				end
+			end
+			
 			Arm:SetTopicFlags(k, v)
 			Arm:LinkProceduralChat(k, v)
 		end
 		
 		for k,v in pairs(data.dialogs) do
 			v.stringTable = strings
+			if (v.group) then
+				v.group = string.split(v.group, ";")
+				if (#v.group == 0) then
+					v.group = nil
+				end
+			end
 		end
 	end
 
@@ -79,16 +93,48 @@ function Arm.LinkProceduralChat(self, name, topic)
 		error(string.format("Arm topic '%s' is a procedural topic and must contain 1 dialog.", name))
 	end
 	
-	table.insert(t, topic.choices[1])
+	local choice = topic.choices[1]
+	choice.topicGroup = topic.group
+	
+	table.insert(t, choice)
 end
 
-function Arm.SortProceduralTopics(self, priority)
+function Arm.SortProceduralTopics(self, priority, groups)
 
-	local t = Arm.Chats.Procedural[priority]
-	if (t ~= nil) then
-		t = ShuffleArray(t)
+	if (groups == nil) then
+		return nil
 	end
-	return t
+	
+	local topics = Arm.Chats.Procedural[priority]
+	if (topics ~= nil) then
+		local final = {}
+		
+		for k,root in pairs(topics) do
+			root.used = false
+		end
+		
+		for k,group in pairs(groups) do
+		-- add in group order
+			local filtered = {}
+			for k,root in pairs(topics) do
+				if (root.topicGroup) then
+					if (not root.used) then
+						if (FindArrayElement(root.topicGroup, group)) then
+							root.used = true
+							table.insert(filtered, root)
+						end
+					end
+				end
+			end	
+			filtered = ShuffleArray(filtered)
+			for k,v in pairs(filtered) do
+				table.insert(final, v)
+			end			
+		end
+		
+		topics = final
+	end
+	return topics
 end
 
 function Arm.UnlockTopic(self, name, topic)
@@ -145,7 +191,7 @@ function Arm.SaveTopicReward(self, topic, type)
 	Persistence.WriteBool(SaveGame, "armTopicRewards", true, name, type)
 end
 
-function Arm.AddAvailableChats(self, db, group, flags)
+function Arm.AddAvailableChats(self, db, flags)
 
 	if (flags == nil) then
 		flags = 0
@@ -153,25 +199,22 @@ function Arm.AddAvailableChats(self, db, group, flags)
 	
 	for k,v in pairs(db.roots) do
 		if (v.priority > 0) then
-			if (v.group == group) then
-			
-				local skip = false
+			local skip = false
 				
-				if (bit.band(v.flags, kArmChatFlag_Locked) ~= 0) then
-					if (bit.band(flags, kArmChatFlag_Locked) ~= 0) then
-						Arm:UnlockTopic(k, v)
-					else
-						skip = true
-					end
-				end
-				
-				if (bit.band(v.flags, kArmChatFlag_Procedural) ~= 0) then
+			if (bit.band(v.flags, kArmChatFlag_Locked) ~= 0) then
+				if (bit.band(flags, kArmChatFlag_Locked) ~= 0) then
+					Arm:UnlockTopic(k, v)
+				else
 					skip = true
 				end
-				
-				if (not skip) then
-					Arm.Chats.Available[k] = v
-				end
+			end
+			
+			if (bit.band(v.flags, kArmChatFlag_Procedural) ~= 0) then
+				skip = true
+			end
+			
+			if (not skip) then
+				Arm.Chats.Available[k] = v
 			end
 		end
 	end
@@ -183,7 +226,7 @@ function Arm.LoadCommonChat(self)
     Arm.Chats.CommonDB = Arm:LinkDialogDB(Arm.Chats.CommonDB)
     
     if (Arm.Chats.CommonDB) then
-		Arm:AddAvailableChats(Arm.Chats.CommonDB, "Default")
+		Arm:AddAvailableChats(Arm.Chats.CommonDB)
 	end
 end
 
@@ -194,7 +237,7 @@ function Arm.LoadChatList(self, chats)
 		local db = World.Load(v)
 		db = Arm:LinkDialogDB(db)
 		if (db) then
-			Arm:AddAvailableChats(db, "Default")
+			Arm:AddAvailableChats(db)
 			Arm.Chats[v] = db
 		end
 	end

@@ -249,9 +249,9 @@ function Arm.ProcessActionTokens(self, tokens)
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
 	elseif (tokens[1] == "award") then
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
-			self.rewardSkillPoints = Arm:GetSkillAwardAmount(tokens[2], "arm")
+			self.rewardSkillPoints = self.rewardSkillPoints or 0
+			self.rewardSkillPoints = self.rewardSkillPoints + Arm:GetSkillAwardAmount(tokens[2], "arm")
 			Arm:SaveTopicReward(self.topic, "skillpoints")
-			PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 		end
 	elseif (tokens[1] == "unlock_skill") then
 		if (not Arm:CheckTopicReward(self.topic, "unlock_skill")) then
@@ -261,6 +261,8 @@ function Arm.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "discover") then
 		if (GameDB:Discover(tokens[2], "arm", true)) then
 			self.rewardDiscover = tokens[2]
+			self.rewardSkillPoints = self.rewardSkillPoints or 0
+			self.rewardSkillPoints = self.rewardSkillPoints + Arm:GetSkillAwardAmount("x1", "arm")
 		end
 	elseif (tokens[1] == "clear_topic") then
 		self.requiredTopic = nil
@@ -274,6 +276,10 @@ function Arm.ProcessActionTokens(self, tokens)
 			self.contextTopic = nil
 			self:ClearSignal()
 		end
+	end
+	
+	if (self.rewardSkillPoints) then
+		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	end
 end
 
@@ -471,11 +477,7 @@ function Arm.ChatPrompt(self)
 	
 	assert(self.topicPriority)
 	
-	if (self.topic.choices) then
-		self.choices = Arm:ChatChoices(self.topic, self.topicPriority)
-	else
-		self.choices = nil
-	end
+	self.choices = Arm:ChatChoices(self.topic, self.topicPriority)
 	
 	if (next(self.topic.reply) == nil) then
 		return
@@ -1006,17 +1008,19 @@ function Arm.ChatChoices(self, root, priority)
 
 	local responses = {}
 	
-	for k,v in pairs(root.choices) do
-		if (v == nil) then
-			error(string.format("Error in arm chat table for choice %s", k))
-		end
-		if (v.prob) then
-			local p = math.random()
-			if (p <= v.prob) then
+	if (root.choices) then
+		for k,v in pairs(root.choices) do
+			if (v == nil) then
+				error(string.format("Error in arm chat table for choice %s", k))
+			end
+			if (v.prob) then
+				local p = math.random()
+				if (p <= v.prob) then
+					table.insert(responses, v)
+				end
+			else
 				table.insert(responses, v)
 			end
-		else
-			table.insert(responses, v)
 		end
 	end
 	
@@ -1026,6 +1030,10 @@ function Arm.ChatChoices(self, root, priority)
 	
 	if (bit.band(root.flags, kArmChatFlag_ShuffleChoices) ~= 0) then
 		Arm:ShuffleResponses(responses)
+	end
+	
+	if (#responses == 0) then
+		responses = nil
 	end
 	
 	return responses
@@ -1061,26 +1069,41 @@ function Arm.FillInChoices(self, responses, priority)
 		end
 	end
 	
+	local groups = self.topic.group
+	local defaultGroup = {"Default"}
+		
 	local prioritySort = {}
 	
 	for i = priority,10 do
 		table.insert(prioritySort, i)
 	end
 	
-	for z = 1,2 do
+	for z = 1,4 do
+		if (z == 3) then
+			prioritySort = {}
+			for i = 1,10 do
+				table.insert(prioritySort, i)
+			end
+		end
 		for i = 1,#prioritySort do
-			local t = Arm:SortProceduralTopics(prioritySort[i])
+			local t
+			if ((z == 1) or (z == 2)) then
+				t = Arm:SortProceduralTopics(prioritySort[i], groups or defaultGroup)
+			else
+				t = Arm:SortProceduralTopics(prioritySort[i], defaultGroup)
+			end
+			
 			if (t ~= nil) then
 				for k,v in pairs(t) do
 					if (self.topicTree[v.name] == nil) then -- has not been selected by user
 						local chosen = false
-						if (z < 2) then
+						if ((z == 1) or (z == 3)) then
 							-- knock out this choices if the user has selected it before
 							chosen = Persistence.ReadBool(SaveGame, "armGeneratedTopicChosen", false, v.name)
 						end
 						
 						if (chosen) then
-							-- 15 % chance an item that was seen will show up
+							-- 15 % chance an item that was chosen before will show up
 							-- after they have swapped conversations 4 times
 							if ((self.changeConversationCount >= 4) and (math.random() <= 0.15)) then
 								chosen = false

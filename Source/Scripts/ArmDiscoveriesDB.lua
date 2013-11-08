@@ -99,6 +99,60 @@ Arm.Discoveries = {
 		chat = "ARM_TOPIC_TENTACLES"
 	},]]
 	
+	Pulse = {
+		picture = "UI/discovery_pulse_M",
+		title = "ARM_DISCOVERY_PULSE_TITLE",
+		text = "ARM_DISCOVERY_PULSE",
+		logText = {
+			all = "ARM_DISCOVERY_PULSE_LOG"
+		}
+	},
+	
+	Manipulate = {
+		picture = "UI/discovery_manipulate_M",
+		title = "ARM_DISCOVERY_MANIPULATE_TITLE",
+		text = "ARM_DISCOVERY_MANIPULATE",
+		logText = {
+			all = "ARM_DISCOVERY_MANIPULATE_LOG"
+		}
+	},
+	
+	Shield = {
+		picture = "UI/discovery_shield_M",
+		title = "ARM_DISCOVERY_SHIELD_TITLE",
+		text = "ARM_DISCOVERY_SHIELD",
+		logText = {
+			all = "ARM_DISCOVERY_SHIELD_LOG"
+		}
+	},
+	
+	Acheron = {
+		picture = "UI/discovery_acheron_M",
+		title = "ARM_DISCOVERY_ACHERON_TITLE",
+		text = "ARM_DISCOVERY_ACHERON",
+		logText = {
+			all = "ARM_DISCOVERY_ACHERON_LOG"
+		}
+	},
+	
+	Exodus = {
+		picture = "UI/discovery_exodus_M",
+		title = "ARM_DISCOVERY_EXODUS_TITLE",
+		text = "ARM_DISCOVERY_EXODUS",
+		logText = {
+			all = "ARM_DISCOVERY_EXODUS_LOG"
+		}
+	},
+	
+	Morta = {
+		picture = "UI/discovery_morta_M",
+		title = "ARM_DISCOVERY_MORTA_TITLE",
+		text = "ARM_DISCOVERY_MORTA",
+		logText = {
+			all = "ARM_DISCOVERY_MORTA_LOG"
+		}
+	},
+		
 	BlockCreature = {
 		picture = "UI/discovery_block_creature_M",
 		title = "ARM_DISCOVERY_BLOCK_CREATURE_TITLE",
@@ -383,7 +437,21 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_TERMINALS_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_TERMINALS_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_TERMINALS_POPUP",
+		
+		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
+		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
+		mysteryChat = "TerminalsMystery",
+		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG"
+	},
+	
+	TheCreators = {
+		picture = "UI/discovery_the_creators_M",
+		title = "ARM_DISCOVERY_THE_CREATORS_TITLE",
+		text = "ARM_DISCOVERY_THE_CREATORS",
+		logText = {
+			all = "ARM_DISCOVERY_THE_CREATORS_LOG"
+		}
 	},
 	
 	TheMaw = {
@@ -404,6 +472,15 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_THE_ROOM_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_THE_ROOM_POPUP"
+	},
+	
+	TheShip = {
+		picture = "UI/discovery_the_ship_M",
+		title = "ARM_DISCOVERY_THE_SHIP_TITLE",
+		text = "ARM_DISCOVERY_THE_SHIP",
+		logText = {
+			all = "ARM_DISCOVERY_THE_SHIP_LOG"
+		}
 	},
 	
 	WildGrowth = {

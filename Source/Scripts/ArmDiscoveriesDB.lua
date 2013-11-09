@@ -152,6 +152,15 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_MORTA_LOG"
 		}
 	},
+	
+	TheGhost = {
+		picture = "UI/discovery_ghost_M",
+		title = "ARM_DISCOVERY_GHOST_TITLE",
+		text = "ARM_DISCOVERY_GHOST",
+		logText = {
+			all = "ARM_DISCOVERY_GHOST_LOG"
+		}
+	},
 		
 	BlockCreature = {
 		picture = "UI/discovery_block_creature_M",

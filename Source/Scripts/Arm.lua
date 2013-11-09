@@ -972,6 +972,7 @@ function Arm.LoadState(self)
 	end
 
 	Arm:ClearChat()
+	Arm:LoadChatState()
 	
 end
 

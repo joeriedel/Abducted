@@ -15,20 +15,29 @@ Arm.Chats.Available = {}
 Arm.Chats.Loaded = {}
 Arm.Chats.Procedural = {}
 
-function Arm.LinkDialogDB(self, db)
+-- All chat string tables must be loaded
+Arm.Chats.StringTables = {
+	"UI/ArmChatStrings",
+	"Ep1/Ep1GeneralStrings",
+	"Ep1/Ep1DatabaseStrings",
+	"Ep1/Ep1Dreamscape1BStrings"
+}
 
-	local strings = db:StringTable()
-	local data = db:Data()
+function Arm.LinkDialogDB(self, db, data)
+
+	if (data == nil) then
+		data = db:Data()
+		data.stringTable = db:StringTable()
+	end
 	
 	if (data) then
-		data.stringTable = strings
 		
 		for k,v in pairs(data.roots) do
 			if (Arm.Chats.Loaded[k] ~= nil) then
 				error(string.format("Arm topic '%s' is defined multiple times.", k))
 			end
 			Arm.Chats.Loaded[k] = v
-			v.stringTable = strings
+			v.stringTable = data.stringTable
 			
 			if (v.group) then
 				v.group = string.split(v.group, ";")
@@ -42,7 +51,7 @@ function Arm.LinkDialogDB(self, db)
 		end
 		
 		for k,v in pairs(data.dialogs) do
-			v.stringTable = strings
+			v.stringTable = data.stringTable
 			if (v.group) then
 				v.group = string.split(v.group, ";")
 				if (#v.group == 0) then
@@ -56,8 +65,8 @@ function Arm.LinkDialogDB(self, db)
 end
 
 function Arm.FindChatString(self, text)
-	for k,v in pairs(Arm.Chats.Loaded) do
-		local z = StringTable.Get(text, v.stringTable, true)
+	for k,v in pairs(Arm.Chats.StringTables) do
+		local z = StringTable.Get(text, v, true)
 		if (z) then
 			return z
 		end
@@ -202,7 +211,8 @@ function Arm.AddAvailableChats(self, db, flags)
 			local skip = false
 				
 			if (bit.band(v.flags, kArmChatFlag_Locked) ~= 0) then
-				if (bit.band(flags, kArmChatFlag_Locked) ~= 0) then
+				local unlocked = Persistence.ReadBool(SaveGame, "armTopicUnlocked", false, v.name)
+				if (unlocked or (bit.band(flags, kArmChatFlag_Locked) ~= 0)) then
 					Arm:UnlockTopic(k, v)
 				else
 					skip = true
@@ -231,6 +241,11 @@ function Arm.LoadCommonChat(self)
 end
 
 function Arm.LoadChatList(self, chats)
+
+	for k,v in pairs(Arm.Chats.StringTables) do
+		Arm.Chats.StringTables[k] = World.Load(v)
+	end
+	
 	chats = string.split(chats, ";")
 	
 	for k,v in pairs(chats) do
@@ -244,3 +259,16 @@ function Arm.LoadChatList(self, chats)
     
 end
 
+function Arm.LoadChatState(self)
+	Arm.Chats.Available = {}
+	Arm.Chats.Loaded = {}
+	
+	if (Arm.Chats.CommonDB) then
+		Arm:AddAvailableChats(Arm.Chats.CommonDB)
+	end
+	
+	for k,db in pairs(Arm.Chats) do
+		Arm:LinkDialogDB(nil, db)
+		Arm:AddAvailableChats(db)
+	end
+end

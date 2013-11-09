@@ -20,7 +20,9 @@ Arm.Chats.StringTables = {
 	"UI/ArmChatStrings",
 	"Ep1/Ep1GeneralStrings",
 	"Ep1/Ep1DatabaseStrings",
-	"Ep1/Ep1Dreamscape1BStrings"
+	"Ep1/Ep1Dreamscape1BStrings",
+	"Ep1/Ep1CrushedStrings",
+	"Ep1/Ep1FallingStrings"
 }
 
 function Arm.LinkDialogDB(self, db, data)

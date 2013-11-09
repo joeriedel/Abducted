@@ -104,6 +104,7 @@ function Arm.LinkProceduralChat(self, name, topic)
 	
 	local choice = topic.choices[1]
 	choice.topicGroup = topic.group
+	choice.topicId = topic.name
 	
 	table.insert(t, choice)
 end
@@ -146,7 +147,45 @@ function Arm.SortProceduralTopics(self, priority, groups)
 	return topics
 end
 
-function Arm.UnlockTopic(self, name, topic)
+function Arm.LockTopic(self, name, topic)
+	if (topic == nil) then
+		topic = Arm.Chats.Loaded[name]
+		if (topic == nil) then
+			COutLine(kC_Error, "ERROR: Arm topic '%s' does not exist or is not loaded.", name)
+			return false
+		end
+	end
+	
+	local locked = bit.band(topic.flags, kArmChatFlag_Locked) ~= 0
+	if (not locked) then
+	
+		topic.flags = bit.bor(topic.flags, kArmChatFlag_Locked)
+		Persistence.WriteBool(SaveGame, "armTopicUnlocked", false, topic.name)
+		
+		if (bit.band(topic.flags, kArmChatFlag_Procedural) == 0) then
+			Arm.Chats.Available[name] = nil
+			Arm.Chats.Available = table.compact(Arm.Chats.Available)
+		else
+			local t = Arm.Chats.Procedural[topic.priority]
+			if (t ~= nil) then
+				for k,v in pairs(t) do
+					if (v.topicId == topic.name) then
+						t[k] = nil
+						t = table.compact(t)
+						Arm.Chats.Procedural[topic.priority] = t
+						break
+					end
+				end
+			end
+		end
+		
+		return true
+	end
+	
+	return false
+end
+
+function Arm.UnlockTopic(self, name, topic, silent)
 	if (topic == nil) then
 		topic = Arm.Chats.Loaded[name]
 		if (topic == nil) then
@@ -171,11 +210,13 @@ function Arm.UnlockTopic(self, name, topic)
 			Arm:LinkProceduralChat(topic.name, topic)
 		end
 		
-		EventLog:AddEvent(
-			GameDB:ArmDateString(),
-			"!TOPIC",
-			topic.name
-		)
+		if (not silent) then
+			EventLog:AddEvent(
+				GameDB:ArmDateString(),
+				"!TOPIC",
+				topic.name
+			)
+		end
 		
 		return true
 	end

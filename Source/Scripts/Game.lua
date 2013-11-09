@@ -139,6 +139,12 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "unlock_topic") then
 		self:UnlockTopic(args)
 		return true
+	elseif (cmd == "silent_unlock_topic") then
+		self:UnlockTopic(args, true)
+		return true
+	elseif (cmd == "lock_topic") then
+		self:LockTopic(args)
+		return true
 	elseif (cmd == "horror_topic") then
 		Arm:HorrorTopic(args)
 		return true

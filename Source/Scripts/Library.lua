@@ -31,6 +31,19 @@ function table.compare(a, b)
 
 end
 
+function table.compact(a)
+
+	local new = {}
+	
+	for k,v in pairs(a) do
+		if (v ~= nil) then
+			new[k] = v
+		end
+	end
+
+	return new
+end
+
 --[[---------------------------------------------------------------------------
 	Bit test
 -----------------------------------------------------------------------------]]

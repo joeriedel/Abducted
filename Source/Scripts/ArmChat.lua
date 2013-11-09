@@ -248,6 +248,8 @@ function Arm.ProcessActionTokens(self, tokens)
 		if (Arm:UnlockTopic(tokens[2])) then
 			self.rewardTopic = tokens[2]
 		end
+	elseif (tokens[1] == "lock_topic") then
+		Arm:LockTopic(tokens[2])
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = tokens[2]
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)

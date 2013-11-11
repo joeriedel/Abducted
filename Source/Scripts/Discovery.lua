@@ -13,7 +13,7 @@ Discovery.kArrowSize = {20, 32}
 Discovery.kButtonHeight = 90
 Discovery.kUIBorder = 8
 -- Percent of total screen
-Discovery.TouchDistance = 0.15
+Discovery.TouchDistance = 0.07
 
 function Discovery.Spawn(self)
 

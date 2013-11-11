@@ -201,6 +201,7 @@ function Arm.StartConversation(self)
 	end
 	
 	self.topicTree = {}
+	self.chatStart = true
 	
 	if (self.topic) then
 		self:ChatPrompt()
@@ -266,7 +267,8 @@ function Arm.ProcessActionTokens(self, tokens)
 		end
 	elseif (tokens[1] == "discover") then
 		if (GameDB:Discover(tokens[2], "arm", true)) then
-			self.rewardDiscover = tokens[2]
+			self.rewardDiscover = self.rewardDiscover or {}
+			table.insert(self.rewardDiscover, tokens[2])
 			self.rewardSkillPoints = self.rewardSkillPoints or 0
 			self.rewardSkillPoints = self.rewardSkillPoints + Arm:GetSkillAwardAmount("x1", "arm")
 		end
@@ -431,24 +433,25 @@ function Arm.CreateRewardText(self)
 	end
 	
 	if (self.rewardDiscover) then
-		local rewardDiscover = self.rewardDiscover -- this may change as the conversation does so record it
-		local dbItem = Arm.Discoveries[rewardDiscover]
-		if (dbItem) then
-			local w, r = self:CreateRewardActionButton(
-				"> "..StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title), 
-				inset,
-				maxWidth,
-				function ()
-					Arm:OpenDatabaseItem(rewardDiscover)
-				end
-			)
-			
-			table.insert(self.currentRewardWidgets, w)
-			self.widgets.chat.ChatList:AddItem(w)
-			w:SetBlendWithParent(true)
-			w:BlendTo({1,1,1,0}, 0)
-		else
-			COutLine(kC_Error, "There is no item called '%s' in the game database.", rewardDiscover)
+		for k,v in pairs(self.rewardDiscover) do
+			local dbItem = Arm.Discoveries[v]
+			if (dbItem) then
+				local w, r = self:CreateRewardActionButton(
+					"> "..StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title), 
+					inset,
+					maxWidth,
+					function ()
+						Arm:OpenDatabaseItem(v)
+					end
+				)
+				
+				table.insert(self.currentRewardWidgets, w)
+				self.widgets.chat.ChatList:AddItem(w)
+				w:SetBlendWithParent(true)
+				w:BlendTo({1,1,1,0}, 0)
+			else
+				COutLine(kC_Error, "There is no item called '%s' in the game database.", v)
+			end
 		end
 	end
 	
@@ -520,7 +523,9 @@ function Arm.ChatPrompt(self)
 		end
 	end
 	
-	if (self.prompt[1] ~= "What would you like to talk about?") then
+	if (self.chatStart) then
+		self.chatStart = false
+	else
 		if (lock) then
 			EventLog:AddEvent(GameDB:ArmDateString(), "!ARM_LOCKED_REPLY", self.prompt[1])
 		else
@@ -538,15 +543,7 @@ function Arm.ChatPrompt(self)
 		Arm:ChatLockout() -- until a trigger.
 	end
 	
-	-- how many lines?
 	self.promptState = {}
-	self.promptState.line = 1
-	self.promptState.char = 0 -- utf32
-	self.promptState.lines = UI:WordWrap(
-		self.typefaces.Chat, 
-		self.promptText, 
-		self.chatRect[3] - self.chatPos[1]
-	)
 	
 	-- Create text controls
 	self.promptState.labels = {}
@@ -558,20 +555,39 @@ function Arm.ChatPrompt(self)
 		typeface = self.typefaces.ChatLocked
 	end
 	
-	for k,v in pairs(self.promptState.lines) do
-		
-		local r = {self.chatPos[1], self.chatPos[2], self.chatRect[3]-self.chatPos[1], promptLineSize}
-		local w = UI:CreateWidget("TextLabel", {rect=r, typeface=typeface})
-		self.widgets.chat.ChatList:AddItem(w)
-		w:SetBlendWithParent(true)
-		w:AllocateText(v)
-		table.insert(self.promptState.labels, w)
-		self.chatPos[2] = self.chatPos[2] + promptLineSize
-		
-		-- convert prompt text to UTF32 so we can reveal character by character in extended character sets
-		self.promptState.lines[k] = System.UTF8To32(v)
-	end
+	-- how many lines?
+	self.promptState.line = 1
+	self.promptState.char = 0 -- utf32
 	
+	self.promptState.lines = {}
+	
+	local lines = string.split(self.promptText, "\n")
+	for k,v in pairs(lines) do
+	
+		if (v:len() > 0) then
+			local wraped = UI:WordWrap(
+				self.typefaces.Chat, 
+				v, 
+				self.chatRect[3] - self.chatPos[1]
+			)
+			
+			for k,v in pairs(wraped) do
+				local r = {self.chatPos[1], self.chatPos[2], self.chatRect[3]-self.chatPos[1], promptLineSize}
+				local w = UI:CreateWidget("TextLabel", {rect=r, typeface=typeface})
+				self.widgets.chat.ChatList:AddItem(w)
+				w:SetBlendWithParent(true)
+				w:AllocateText(v)
+				table.insert(self.promptState.labels, w)
+				self.chatPos[2] = self.chatPos[2] + promptLineSize
+				
+				-- convert prompt text to UTF32 so we can reveal character by character in extended character sets
+				table.insert(self.promptState.lines, System.UTF8To32(v))
+			end
+		else
+			self.chatPos[2] = self.chatPos[2] + promptLineSize
+		end
+	end
+		
 	self:CreateRewardText()
 	
 	self.widgets.chat.ChatList:RecalcLayout()

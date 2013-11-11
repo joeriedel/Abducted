@@ -185,7 +185,11 @@ Arm.Discoveries = {
 	Bugs = {
 		picture = "UI/discovery_bugs_M",
 		title = "ARM_DISCOVERY_BUGS_TITLE",
-		text = "ARM_DISCOVERY_BUGS"
+		text = "ARM_DISCOVERY_BUGS",
+		logText = {
+			all = "ARM_DISCOVERY_BUGS_LOG"
+		},
+		chat = "Bugs"
 	},
 	
 	ComputerLog = {
@@ -398,6 +402,16 @@ Arm.Discoveries = {
 		discoveryPopupText = "ARM_DISCOVERY_PYLON_ELEVATOR_POPUP"
 	},
 	
+	Pylons = {
+		picture = "UI/discovery_pylons_M",
+		title = "ARM_DISCOVERY_PYLONS_TITLE",
+		text = "ARM_DISCOVERY_PYLONS",
+		logText = {
+			all = "ARM_DISCOVERY_PYLONS_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_PYLONS"
+	},
+	
 	Rain = {
 		picture = "UI/discovery_rain_M",
 		title = "ARM_DISCOVERY_RAIN_TITLE",
@@ -415,7 +429,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_SKIN"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_SKIN_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_SKIN_POPUP",
+		chat = "Skin"
 	},
 	
 	SleepingTentacle = {
@@ -435,7 +450,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_TENTACLES_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP",
+		chat = "Tentacles"
 	},
 	
 	Terminals = {
@@ -453,13 +469,14 @@ Arm.Discoveries = {
 		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG"
 	},
 	
-	TheCreators = {
-		picture = "UI/discovery_the_creators_M",
-		title = "ARM_DISCOVERY_THE_CREATORS_TITLE",
-		text = "ARM_DISCOVERY_THE_CREATORS",
+	TheMasters = {
+		picture = "UI/discovery_the_masters_M",
+		title = "ARM_DISCOVERY_THE_MASTERS_TITLE",
+		text = "ARM_DISCOVERY_THE_MASTERS",
 		logText = {
-			all = "ARM_DISCOVERY_THE_CREATORS_LOG"
-		}
+			all = "ARM_DISCOVERY_THE_MASTERS_LOG"
+		},
+		chat = "Masters"
 	},
 	
 	TheMaw = {

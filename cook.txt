@@ -11,6 +11,8 @@ pak0 {
 	Ep1/Ep1Crushed
 	Ep1/Ep1General
 	Ep1/Ep1Database
+	Ep1/Ep1Dreamscape1B
+
 	Ep1/dustmotevolume1
 	Ep1/rainvolume1
 
@@ -122,6 +124,45 @@ pak0 {
 	UI/discovery_pod_M
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
+	UI/discovery_acheron_M
+	UI/discovery_block_creature_M
+	UI/discovery_bug_holes_M
+	UI/discovery_computer_log_M
+	UI/discovery_crystaline_structure_M
+	UI/discovery_dark_corner_M
+	UI/discovery_dreamscape_M
+	UI/discovery_dreamscape_portal_M
+	UI/discovery_exodus_M
+	UI/discovery_flowing_skin_M
+	UI/discovery_ghost_M
+	UI/discovery_glowing_polyps_M
+	UI/discovery_glyphs_M
+	UI/discovery_human_ship_door_M
+	UI/discovery_human_ship_top1_M
+	UI/discovery_human_ship_top2_M
+	UI/discovery_human_ship_top3_M
+	UI/discovery_human_ship_top4_M
+	UI/discovery_jump_down_M
+	UI/discovery_manipulate_M
+	UI/discovery_manipulate_tentacle_M
+	UI/discovery_medical_discovery_M
+	UI/discovery_morta_M
+	UI/discovery_overgrowth_M
+	UI/discovery_places_to_climb_M
+	UI/discovery_polyps_M
+	UI/discovery_pulse_M
+	UI/discovery_pylon_elevator_M
+	UI/discovery_pylons_M
+	UI/discovery_rain_M
+	UI/discovery_shield_M
+	UI/discovery_skin_M
+	UI/discovery_sleeping_tentacle_M
+	UI/discovery_the_masters_M
+	UI/discovery_the_maw_M
+	UI/discovery_the_room_M
+	UI/discovery_the_ship_M
+	UI/discovery_wild_growth_M
+	UI/discovery_window_light_M
 	UI/alphabet_scrollbar_M
 	UI/alphabet_scrollbar_pressed_M
 	UI/TerminalScreenButtons_TF

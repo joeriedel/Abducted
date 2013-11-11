@@ -466,6 +466,14 @@ function Arm.Start(self, mode, dbTopic)
 	self.introMode = mode
 	self.changeConversationCount = 0
 	
+	if (self.contextTopic) then
+		if (not self.inContextTopic) then
+			self.topic = nil
+		end
+	elseif (self.requiredTopic and (not self.inReqTopic)) then
+		self.topic = nil
+	end
+	
 	if (mode == "db") then
 		self.introDBTopic = dbTopic
 	else
@@ -502,6 +510,7 @@ function Arm.Signal(self, topic)
 	if (topic) then
 		self.requiredTopic = topic
 		self.requestedTopic = nil
+		self.inReqTopic = false
 		self.topic = nil
 		HUD:SignalArm(true)
 	end
@@ -515,6 +524,7 @@ function Arm.SignalContext(self, topic, clearedCallback)
 	if (topic) then
 		self.contextTopic = topic
 		self.clearContext = clearedCallback
+		self.inContextTopic = false
 		self.requestedTopic = nil
 		self.topic = nil
 	end
@@ -962,6 +972,9 @@ function Arm.LoadState(self)
 	self.requestedTopic = nil
 	self.requiredTopic = nil
 	self.contextTopic = nil
+	self.inReqTopic = false
+	self.inContextTopic = false
+	self.topic = nil
 	self.logTime = -1
 	
 	local x = Persistence.ReadString(SaveGame, "armReqTopic")

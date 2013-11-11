@@ -181,6 +181,8 @@ function Arm.StartConversation(self)
 	Arm:EnableChangeTopic(false)
 	
 	self.chatPos = {Arm.ChatInset[1]*UI.identityScale[1], Arm.ChatInset[2]*UI.identityScale[2]}
+	self.inReqTopic = false
+	self.inContextTopic = false
 	
 	if (self.horrorTopic) then
 		self.changeConversationCount = 0
@@ -188,6 +190,7 @@ function Arm.StartConversation(self)
 	elseif (self.contextTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.contextTopic]
+		self.inContextTopic = true
 	elseif (self.requestedTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.requestedTopic]
@@ -195,6 +198,7 @@ function Arm.StartConversation(self)
 	elseif (self.requiredTopic) then
 		self.changeConversationCount = 0
 		self.topic = Arm.Chats.Loaded[self.requiredTopic]
+		self.inReqTopic = true
 	else
 		self.changeConversationCount = self.changeConversationCount + 1
 		self.topic = self:SelectChatRoot()

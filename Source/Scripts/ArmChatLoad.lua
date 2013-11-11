@@ -14,6 +14,7 @@ kArmChatFlag_ShuffleChoices = 8
 Arm.Chats.Available = {}
 Arm.Chats.Loaded = {}
 Arm.Chats.Procedural = {}
+Arm.Chats.Data = {}
 
 -- All chat string tables must be loaded
 Arm.Chats.StringTables = {
@@ -41,7 +42,7 @@ function Arm.LinkDialogDB(self, db, data)
 			Arm.Chats.Loaded[k] = v
 			v.stringTable = data.stringTable
 			
-			if (v.group) then
+			if (type(v.group) == "string") then
 				v.group = string.split(v.group, ";")
 				if (#v.group == 0) then
 					v.group = nil
@@ -54,7 +55,7 @@ function Arm.LinkDialogDB(self, db, data)
 		
 		for k,v in pairs(data.dialogs) do
 			v.stringTable = data.stringTable
-			if (v.group) then
+			if (type(v.group) == "string") then
 				v.group = string.split(v.group, ";")
 				if (#v.group == 0) then
 					v.group = nil
@@ -296,7 +297,7 @@ function Arm.LoadChatList(self, chats)
 		db = Arm:LinkDialogDB(db)
 		if (db) then
 			Arm:AddAvailableChats(db)
-			Arm.Chats[v] = db
+			Arm.Chats.Data[v] = db
 		end
 	end
     
@@ -307,10 +308,11 @@ function Arm.LoadChatState(self)
 	Arm.Chats.Loaded = {}
 	
 	if (Arm.Chats.CommonDB) then
+		Arm:LinkDialogDB(nil, Arm.Chats.CommonDB)
 		Arm:AddAvailableChats(Arm.Chats.CommonDB)
 	end
 	
-	for k,db in pairs(Arm.Chats) do
+	for k,db in pairs(Arm.Chats.Data) do
 		Arm:LinkDialogDB(nil, db)
 		Arm:AddAvailableChats(db)
 	end

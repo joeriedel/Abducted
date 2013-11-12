@@ -26,8 +26,8 @@ end
 function Entity.SaveFloorPos(self, state)
 	local fp = self:FloorPosition()
 	if (fp.floor == -1) then
-		local classname = StringForKey(self.keys.classname, "<null>")
-		local targetname = StringForKey(self.keys.targetname, "<notarget>")
+		local classname = StringForString(self.keys.classname, "<null>")
+		local targetname = StringForString(self.keys.targetname, "<notarget>")
 		error(string.format("Entity.SaveFloorPos: Checkpoint error (%s, %s) is not on a floor!", classname, targetname))
 	end
 	
@@ -35,6 +35,9 @@ function Entity.SaveFloorPos(self, state)
 	state.floorname = World.FloorName(fp.floor)
 	
 	-- check if we are really over the floor:
+	local floorNum = fp.floor
+	local floorState = World.FloorState(floorNum)
+	World.SetFloorState(floorNum, kFloorState_Enabled)
 	
 	local pos = Vec3ForString(state.floorpos)
 	fp  = World.ClipToFloor(
@@ -42,7 +45,11 @@ function Entity.SaveFloorPos(self, state)
 		{pos[1], pos[2], pos[3] - 16}
 	)
 	
+	World.SetFloorState(floorNum, floorState)
+	
 	if (fp == nil) then
+		local classname = StringForString(self.keys.classname, "<null>")
+		local targetname = StringForString(self.keys.targetname, "<notarget>")
 		error(string.format("Entity.SaveFloorPos: Checkpoint error (%s, %s) is not on a floor!", classname, targetname))
 	end
 end

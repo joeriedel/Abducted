@@ -301,11 +301,11 @@ end
 function ManipulatableObject.OnEvent(self, cmd, args)
 	COutLineEvent("ManipulatableObject", self.keys.targetname, cmd, args)
 	
-	if (cmd == "activate") then
+	if ((cmd == "activate") or (cmd == "enable")) then
 		self:ManipulateShimmer()
 		self:Awaken()
 		return true
-	elseif(cmd == "deactivate") then
+	elseif((cmd == "deactivate") or (cmd == "disable")) then
 		self:Sleep()
 		return true
 	elseif (cmd == "attack") then
@@ -482,6 +482,11 @@ function ManipulatableObject.Awaken(self)
 		return -- we have been permanently manipulated, ignore changes in state
 	end
 	
+	if (self.awake) then
+		COutLine(kC_Debug, "ManipulatableObject.Awaken (ignored, already awake)")
+		return
+	end
+	
 	COutLine(kC_Debug, "ManipulatableObject.Awaken")
 	
 	self.think = nil
@@ -546,6 +551,14 @@ function ManipulatableObject.Idle(self)
 	
 	self:AddToManipulateList()
 	self:AddToShootableList()
+	
+	if (self.cameraFocus) then
+		local fov = NumberForString(self.keys.camera_focus_fov, 10)
+		if (fov <= 0) then
+			fov = nil
+		end
+		World.viewController:AddLookTarget(self.manipulateTarget, self.manipulateShift, fov)
+	end
 		
 	if (not self.enabled) then
 		self.enabled = true
@@ -1334,16 +1347,25 @@ function ManipulatableObject.LoadState(self, state)
 		self.awake = false
 		self.enabled = false
 		self.canAttack = false
+		self.saveManipulateDir = nil
 		self:RemoveFromManipulateList()
 		self:RemoveFromShootableList()
-		self.model:BlendImmediate("dormant")
 		
-		if (self.sounds.Idle) then
-			self.sounds.Idle:Stop()
+		if (BoolForString(self.keys.idle_while_dormant, false)) then
+			self:PlayAnim("idle", self.model)
+			if (self.sounds.Idle) then
+				self.sounds.Idle:Play(kSoundChannel_FX, 0)
+			end
+		else
+			self:PlayAnim("dormant", self.model)
+			if (self.sounds.Dormant) then
+				self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+			end
+			if (self.sounds.Idle) then
+				self.sounds.Idle:FadeOutAndStop(1)
+			end
 		end
-		if (self.sounds.Dormant) then
-			self.sounds.Dormant:Play()
-		end
+		
 		if (self.sounds.Sleep) then
 			self.sounds.Sleep:Stop()
 		end

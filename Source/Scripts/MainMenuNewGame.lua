@@ -204,6 +204,7 @@ function MainMenu.NewGame.StartGame(self)
 	Persistence.WriteNumber(SaveGame, "portrait", self.portrait)
 	Persistence.WriteString(SaveGame, "currentLevel", MainMenu.NewGame.StartingLevel)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
+	Persistence.WriteNumber(SaveGame, "version", GameDB.SaveGameVersion)
 	SaveGame:Save()
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)

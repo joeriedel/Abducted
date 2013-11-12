@@ -1294,13 +1294,13 @@ function ReflexGame.Think(self,dt)
 		return
     end
 
-    if (self.state.swipeToMoveTimer > 0) then
+    --[[if (self.state.swipeToMoveTimer > 0) then
         self.state.swipeToMoveTimer = self.state.swipeToMoveTimer - dt
         if (self.state.swipeToMoveTimer <= 0) then
             self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .5)
             self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .5)
         end
-    end
+    end]]
 
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		

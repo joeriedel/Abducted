@@ -4,6 +4,8 @@
 -- See Abducted/LICENSE for licensing terms
 
 GameDB = Class:New()
+GameDB.SaveGameVersion = 1
+GameDB.SaveGameMinVersion = 1
 GameDB.GameSecondsPerSecond = 8 -- means 4 hours of gameplay = 1 day
 GameDB.SecondsPerMinute = 60
 GameDB.MinutesPerHour = 60
@@ -93,6 +95,7 @@ function GameDB.SaveCheckpoint(self)
 	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
 	Persistence.WriteString(SaveGame, "checkpointmap", World.worldspawn.keys.mappath)
+	Persistence.WriteNumber(SaveGame, "version", GameDB.SaveGameVersion)
 	GameDB:SaveEvents()
 	GameDB:SavePeristentObjects()
 	Game.entity:SaveState()

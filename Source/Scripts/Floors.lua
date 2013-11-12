@@ -79,20 +79,11 @@ function Floors.SaveState(self)
 		end
 	end
 	
-	x = World.NumWaypoints()
-	y = Persistence.ReadNumber(SaveGame, "Floors/numWaypoints", 0)
+	x = World.WaypointIds()
 	
-	Persistence.WriteNumber(SaveGame, "Floors/numWaypoints", x)
-	
-	y = Max(x, y)
-	
-	for i = 1,y do
-		if (i > x) then
-			Persistence.DeleteKey(SaveGame, "Floors/waypoint"..i)
-		else
-			local z = World.WaypointState(i-1)
-			Persistence.WriteNumber(SaveGame, "Floors/waypoint"..i, z)
-		end
+	for k,v in pairs(x) do
+		local z = World.WaypointState(v)
+		Persistence.WriteNumber(SaveGame, "Floors/waypoint_"..v, z)	
 	end
 end
 
@@ -111,12 +102,14 @@ function Floors.LoadState(self)
 		end
 	end
 
-	x = World.NumWaypoints()
+	x = World.WaypointIds()
 	
-	for i = 1,x do
-		local z = Persistence.ReadNumber(SaveGame, "Floors/waypoint"..i)
+	for k,v in pairs(x) do
+	
+		local z = Persistence.ReadNumber(SaveGame, "Floors/waypoint_"..v)
 		if (z) then
-			World.SetWaypointState(i-1, z)
+			World.SetWaypointState(v, z)
 		end
+	
 	end
 end

@@ -227,10 +227,12 @@ end
 function Actor.LoadState(self, state)
 	
 	if (state.visible == "true") then
+		self.visible = true
 		self.model.dm:SetVisible(true)
 		self.model.dm:BlendTo({1,1,1,1}, 0)
 		self:EnableGhostParticles(nil, {1,1,1,1}, 0)
 	else
+		self.visible = false
 		self.model.dm:SetVisible(false)
 	end
 	

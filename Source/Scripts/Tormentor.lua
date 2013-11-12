@@ -64,6 +64,8 @@ function Tormentor.Spawn(self)
 	self.didIntro = false
 	self.visible = BoolForString(self.keys.visible, true)
 	
+	self:Link()
+	
 	if (self.visible) then
 		self:SwitchModes()
 	else
@@ -175,6 +177,7 @@ function Tormentor.Teleport(self, userId, facing)
 		if (fp) then
 			self:SetFloorPosition(fp)
 			self:SetDesiredMove(nil)
+			self:Link()
 			self.floor = fp
 			
 			if (facing) then
@@ -377,7 +380,8 @@ function Tormentor.SaveState(self)
 	local state = {
 		mode = tostring(self.mode),
 		didIntro = tostring(self.didIntro),
-		facing = tostring(vertex.pos[3])
+		facing = tostring(vertex.pos[3]),
+		visible = tostring(self.visible)
 	}
 	
 	self:SaveFloorPos(state)
@@ -395,6 +399,9 @@ function Tormentor.LoadState(self, state)
 	self.mode = state.mode
 	self.didIntro = state.didIntro == "true"
 	self:SwitchModes()
+	
+	self.visible = state.visible == "true"
+	self.model.dm:SetVisible(self.visible)
 	
 end
 

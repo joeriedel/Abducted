@@ -36,7 +36,7 @@ function Cinematics.Play(self, args, time, originEntity, callback)
 	
 	local item = LL_Append(Cinematics.Active, {cmd=args, name=x[1]})
 	
-	if (forever) then
+	if (playForever) then
 		item.persistent = LL_Append(Cinematics.Persistent, {cmd=args, name=x[1]})
 	end
 	

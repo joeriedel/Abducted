@@ -31,7 +31,7 @@ PlayerPawn.AnimationStates = {
 		walk = "limpcrawl",
 		death = "limpdeath",
 		manipulate_idle = "limpmanidle",
-		maniplate_left = "limpmanleft",
+		manipulate_left = "limpmanleft",
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
@@ -54,7 +54,7 @@ PlayerPawn.AnimationStates = {
 		idle = "limp_scrunched_idle",
 		walk = "limp_scrunched_forward",
 		manipulate_idle = "limpmanidle",
-		maniplate_left = "limpmanleft",
+		manipulate_left = "limpmanleft",
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
@@ -85,7 +85,7 @@ PlayerPawn.AnimationStates = {
 		walk = "limpcrawl",
 		death = "limpdeath",
 		manipulate_idle = "limpmanidle",
-		maniplate_left = "limpmanleft",
+		manipulate_left = "limpmanleft",
 		manipulate_right = "limpmanright",
 		manipulate_up = "limpmanup",
 		manipulate_down = "limpmandown",
@@ -310,6 +310,8 @@ function PlayerPawn.Spawn(self)
 	
 	World.playerPawn = self
 	World.SetPlayerPawn(self)
+	
+	self:Link()
 	
 	self:AddTickable(kTF_PostPhysics, function () PlayerPawn.TickPhysics(self) end)
 	
@@ -970,6 +972,7 @@ function PlayerPawn.Teleport(self, userId, facing)
 		local fp = World.WaypointFloorPosition(waypoints[1])
 		if (fp) then
 			self:SetFloorPosition(fp)
+			self:Link()
 			self:SetDesiredMove(nil)
 			
 			if (facing) then
@@ -1026,6 +1029,7 @@ function PlayerPawn.PlayCinematicAnim(self, args)
 				if (fp) then
 					self.validFloorPosition = true
 					self:SetFloorPosition(fp)
+					self:Link()
 				else
 					self.validFloorPosition = false
 					error("PlayerPawn.PlayCinematicAnim: walked off the floor.")

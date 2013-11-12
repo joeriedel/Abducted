@@ -33,6 +33,18 @@ function Entity.SaveFloorPos(self, state)
 	
 	state.floorpos = string.format("%d %d %d", fp.pos[1], fp.pos[2], fp.pos[3])
 	state.floorname = World.FloorName(fp.floor)
+	
+	-- check if we are really over the floor:
+	
+	local pos = Vec3ForString(state.floorpos)
+	fp  = World.ClipToFloor(
+		{pos[1], pos[2], pos[3] + 16},
+		{pos[1], pos[2], pos[3] - 16}
+	)
+	
+	if (fp == nil) then
+		error(string.format("Entity.SaveFloorPos: Checkpoint error (%s, %s) is not on a floor!", classname, targetname))
+	end
 end
 
 function Entity.LoadFloorPos(self, state)
@@ -45,12 +57,13 @@ function Entity.LoadFloorPos(self, state)
 	
 	local pos = Vec3ForString(state.floorpos)
 	local fp  = World.ClipToFloor(
-		{pos[1], pos[2], pos[3] + 8},
-		{pos[1], pos[2], pos[3] - 8}
+		{pos[1], pos[2], pos[3] + 16},
+		{pos[1], pos[2], pos[3] - 16}
 	)
 	
 	assert(fp)
 	self:SetFloorPosition(fp)
+	self:Link()
 	
 	World.SetFloorState(floorNum, floorState)
 end

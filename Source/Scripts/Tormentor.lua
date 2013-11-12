@@ -64,6 +64,8 @@ function Tormentor.Spawn(self)
 	self.didIntro = false
 	self.visible = BoolForString(self.keys.visible, true)
 	
+	self:Link()
+	
 	if (self.visible) then
 		self:SwitchModes()
 	else
@@ -175,6 +177,7 @@ function Tormentor.Teleport(self, userId, facing)
 		if (fp) then
 			self:SetFloorPosition(fp)
 			self:SetDesiredMove(nil)
+			self:Link()
 			self.floor = fp
 			
 			if (facing) then

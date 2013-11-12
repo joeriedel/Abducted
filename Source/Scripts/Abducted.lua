@@ -6,6 +6,7 @@
 Abducted = Game:New()
 Abducted.PulseTargets = LL_New()
 Abducted.KillMessages = { "DEFAULT_KILLED_MESSAGE1" }
+Abducted.CheckpointError = false
 
 function Abducted.Initialize(self)
 	math.randomseed(System.ReadMilliseconds())
@@ -107,6 +108,7 @@ function Abducted.VisibleCheckpoint(self)
 end
 
 function Abducted.LoadCheckpoint(self)
+	Abducted.CheckpointError = true
 	World.gameTimers = TimerList:Create()
 	World.globalTimers = TimerList:Create()
 	World.gameTimers.time = Game.time or 0
@@ -118,6 +120,7 @@ function Abducted.LoadCheckpoint(self)
 		TitleCrawl.subtitlePrinter.timers = World.globalTimers
 	end
 	GameDB:LoadCheckpoint()
+	Abducted.CheckpointError = false
 end
 
 function Abducted.SaveCheckpoint(self)
@@ -125,7 +128,9 @@ function Abducted.SaveCheckpoint(self)
 		if (self.showCheckpointNotification) then
 			HUD:Print(nil, "CHECKPOINT_SAVED")
 		end
+		Abducted.CheckpointError = true
 		GameDB:SaveCheckpoint()
+		Abducted.CheckpointError = false
 	end
 end
 
@@ -616,6 +621,11 @@ end
 
 function Abducted.Think(self, dt)
 	Game.Think(self, dt)
+	
+	if (Abducted.CheckpointError) then
+		Abducted.CheckpointError = false
+		AlertPanel:OK("Checkpoint Failed", "There was a checkpoint failure, please check the output log. This indicates a critical bug.", nil, nil, false)
+	end
 	
 	if (self.lastSysTime == nil) then
 		self.lastSysTime = self.sysTime

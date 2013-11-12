@@ -175,6 +175,7 @@ function MainMenu.LoadSaveGameInfo(self, path)
 		portrait = Persistence.ReadNumber(SaveGame, "portrait", 1),
 		level = Persistence.ReadString(SaveGame, "currentLevel"),
 		lastPlayed = Persistence.ReadString(SaveGame, "lastPlayed"),
+		version = Persistence.ReadNumber(SaveGame, "version", 0),
 		armDate = GameDB:ArmDateString(),
 		path = path
 	}

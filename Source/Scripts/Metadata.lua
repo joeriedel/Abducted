@@ -8,7 +8,7 @@ Metadata.kSize = 45
 Metadata.List = LL_New()
 Metadata.kSmackDistance = 60
 -- Percent of total screen
-Metadata.TouchDistance = 0.07
+Metadata.TouchDistance = 0.1
 
 function Metadata.Spawn(self)
 

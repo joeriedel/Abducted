@@ -42,6 +42,7 @@ pak0 {
 	Objects/terminalglow1_M
 	Objects/terminalglow2_M
 	Objects/alien_metadata1
+	Objects/crushed_down_pylon2
 	Characters/Eve
 	Characters/Ghost1
 	Characters/Tormentor1

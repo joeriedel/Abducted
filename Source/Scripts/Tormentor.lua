@@ -377,7 +377,8 @@ function Tormentor.SaveState(self)
 	local state = {
 		mode = tostring(self.mode),
 		didIntro = tostring(self.didIntro),
-		facing = tostring(vertex.pos[3])
+		facing = tostring(vertex.pos[3]),
+		visible = tostring(self.visible)
 	}
 	
 	self:SaveFloorPos(state)
@@ -395,6 +396,9 @@ function Tormentor.LoadState(self, state)
 	self.mode = state.mode
 	self.didIntro = state.didIntro == "true"
 	self:SwitchModes()
+	
+	self.visible = state.visible == "true"
+	self.model.dm:SetVisible(self.visible)
 	
 end
 

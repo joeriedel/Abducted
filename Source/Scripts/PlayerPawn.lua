@@ -1247,7 +1247,7 @@ end
 
 function PlayerPawn.EnterArm(self, mode, dbTopic)
 
-	if (self.bugStun) then
+	if (self.bugStun or self.customMove) then
 		return
 	end
 	

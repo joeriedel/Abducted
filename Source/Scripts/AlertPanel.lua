@@ -44,14 +44,14 @@ function AlertPanel.Create(self)
 	
 	local panelRect = self.widgets.panel:Rect()
 	local titleSize = UI:FontAdvanceSize(self.typefaces.Title)+(48*UI.identityScale[2])
-	local textRect = {
+	self.textRect = {
 		48*UI.identityScale[1],
 		titleSize,
 		panelRect[3] - (48*2*UI.identityScale[1]),
 		panelRect[4] - titleSize - (48*UI.identityScale[2]) - buttonSize[2]
 	}
 	
-	self.widgets.text:SetRect(textRect)
+	self.widgets.text:SetRect(self.textRect)
 	
 	self.widgets.buttonAbk = UI:CreateWidget("MatWidget", {rect={0,0,buttonSize[1], buttonSize[2]}, material=UI.gfx.Solid})
 	self.widgets.buttonAbk:BlendTo({0,0,0,1}, 0)
@@ -137,6 +137,8 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect, useStri
 	if (useStringTable) then
 		text = StringTable.Get(msg)
 	end
+	
+	self.widgets.text:SetRect(self.textRect) -- restore, WrapJustify will set the text rect
 	
 	local r = UI:LineWrapCenterLJustifyText(
 		self.widgets.text,

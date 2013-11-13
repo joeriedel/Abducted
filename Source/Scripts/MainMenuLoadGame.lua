@@ -193,7 +193,12 @@ function MainMenu.LoadGame.OnSaveGameInputEvent(self, panel, saveInfo, e)
 		panel:SetMaterial(MainMenu.gfx.MMItemBackground)
 		if (e.type ~= kI_TouchCancelled) then
 			UI.sfx.Command:Play(kSoundChannel_UI, 0)
-			self:LoadGame(saveInfo)
+			local f = function(r)
+				if (r == AlertPanel.YesButton) then
+					self:LoadGame(saveInfo)
+				end
+			end
+			AlertPanel:YesNo("MM_LOAD_GAME", "MM_CONFIRM_LOAD_GAME", f, MainMenu.contentRect)
 		end
 	end
 

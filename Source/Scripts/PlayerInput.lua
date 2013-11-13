@@ -33,7 +33,7 @@ function PlayerInput.OnInputEvent(self, e)
 		UI:ShowFinger(true, 0.25)
 		if (not World.playerPawn.customMove) then
 			if (Game.entity.pulse) then
-				action = self:TapPulse(e.original.data[1], e.original.data[2])
+				action = self:TapPulse(e)
 			else
 				if ((UI.mode == kGameUIMode_Mobile) and World.playerPawn:CheckTappedOn(e.original)) then
 					World.playerPawn:Stop()
@@ -79,14 +79,14 @@ function PlayerInput.Flush(self)
 
 end
 
-function PlayerInput.TapPulse(self, x, y)
+function PlayerInput.TapPulse(self, e)
 
-	if (self:TapTarget(x,y)) then
+	if (self:TapTarget(e)) then
 		return true
 	end
 
-	local a = World.Unproject({x, y, 0})
-	local b = World.Unproject({x, y, 1})
+	local a = World.Unproject({e.original.data[1], e.original.data[2], 0})
+	local b = World.Unproject({e.original.data[1], e.original.data[2], 1})
 	
 	local trace = {
 		start = a,
@@ -113,13 +113,13 @@ function PlayerInput.TapPulse(self, x, y)
 	
 end
 
-function PlayerInput.TapTarget(self, x, y)
+function PlayerInput.TapTarget(self, e)
 
 	local playerPos = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift())
 	
-	local target1 = Metadata.CheckPulseTargets(x, y)
-	local target2 = Tormentor.CheckPulseTargets(x, y)
-	local target3 = ManipulatableObject.CheckPulseTargets(x, y)
+	local target1 = Metadata.CheckPulseTargets(e)
+	local target2 = Tormentor.CheckPulseTargets(e)
+	local target3 = ManipulatableObject.CheckPulseTargets(e)
 	local target = nil
 	
 	if (target1 and target2) then

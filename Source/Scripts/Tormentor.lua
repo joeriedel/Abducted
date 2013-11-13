@@ -337,10 +337,10 @@ function Tormentor.ShotWithPulse(self)
 	self:Stun()
 end
 
-function Tormentor.CheckPulseTargets(mx, my)
+function Tormentor.CheckPulseTargets(e)
 	local x = LL_Head(Tormentor.List)
 	while (x) do
-		if(x.x:CheckPulseTarget(mx, my)) then
+		if(x.x:CheckPulseTarget(e)) then
 			return x.x
 		end
 		x = LL_Next(x)
@@ -349,7 +349,7 @@ function Tormentor.CheckPulseTargets(mx, my)
 	return nil
 end
 
-function Tormentor.CheckPulseTarget(self, x, y)
+function Tormentor.CheckPulseTarget(self, e)
 	self.pos = VecAdd(self:WorldPos(), {0, 0, 128})
 	local p, r = World.Project(self.pos)
 	if (not r) then
@@ -358,8 +358,8 @@ function Tormentor.CheckPulseTarget(self, x, y)
 	
 	p = UI:MapToUI(p)
 	
-	local dx = p[1]-x
-	local dy = p[2]-y
+	local dx = p[1]-e.data[1]
+	local dy = p[2]-e.data[2]
 	local dd = math.sqrt(dx*dx+dy*dy)
 	if (dd <= UI.screenDiagonal*Discovery.TouchDistance) then
 		return true

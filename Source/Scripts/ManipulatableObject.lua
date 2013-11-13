@@ -657,10 +657,10 @@ function ManipulatableObject.ShotWithPulse(self)
 	self:Pain()
 end
 
-function ManipulatableObject.CheckPulseTargets(mx, my)
+function ManipulatableObject.CheckPulseTargets(e)
 	local x = LL_Head(ManipulatableObject.Shootable)
 	while (x) do
-		if(x.x:CheckPulseTarget(mx, my)) then
+		if(x.x:CheckPulseTarget(e)) then
 			return x.x
 		end
 		x = LL_Next(x)
@@ -669,7 +669,7 @@ function ManipulatableObject.CheckPulseTargets(mx, my)
 	return nil
 end
 
-function ManipulatableObject.CheckPulseTarget(self, x, y)
+function ManipulatableObject.CheckPulseTarget(self, e)
 	if (not self.canBeShot) then -- no damage bone or not enabled for shooting
 		return false
 	end
@@ -682,8 +682,8 @@ function ManipulatableObject.CheckPulseTarget(self, x, y)
 	
 	p = UI:MapToUI(p)
 	
-	local dx = p[1]-x
-	local dy = p[2]-y
+	local dx = p[1]-e.data[1]
+	local dy = p[2]-e.data[2]
 	local dd = math.sqrt(dx*dx+dy*dy)
 	if (dd <= UI.screenDiagonal*ManipulatableObject.ShootDistance) then
 		return true

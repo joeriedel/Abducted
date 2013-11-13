@@ -123,7 +123,7 @@ function Metadata.CheckProximity(self)
 	end
 end
 
-function Metadata.CheckPulseTarget(self, x, y)
+function Metadata.CheckPulseTarget(self, e)
 	local p, r = World.Project(self.pos)
 	if (not r) then
 		return false
@@ -131,10 +131,10 @@ function Metadata.CheckPulseTarget(self, x, y)
 	
 	p = UI:MapToUI(p)
 	
-	local dx = p[1]-x
-	local dy = p[2]-y
+	local dx = p[1]-e.data[1]
+	local dy = p[2]-e.data[2]
 	local dd = math.sqrt(dx*dx+dy*dy)
-	COutLine(kC_Debug, "Metadata.CheckPulseTarget: pos(%d, %d), event(%d, %d), dist: %f, max: %f", p[1], p[2], x, y, dd, UI.screenDiagonal*Metadata.TouchDistance)
+	COutLine(kC_Debug, "Metadata.CheckPulseTarget: pos(%d, %d), event(%d, %d), dist: %f, max: %f", p[1], p[2], e.data[1], e.data[2], dd, UI.screenDiagonal*Metadata.TouchDistance)
 	
 	if (dd <= UI.screenDiagonal*Metadata.TouchDistance) then
 		return true
@@ -143,10 +143,10 @@ function Metadata.CheckPulseTarget(self, x, y)
 	return false
 end
 
-function Metadata.CheckPulseTargets(mx, my)
+function Metadata.CheckPulseTargets(e)
 	local x = LL_Head(Metadata.List)
 	while (x) do
-		if(x.x:CheckPulseTarget(mx, my)) then
+		if(x.x:CheckPulseTarget(e)) then
 			return x.x
 		end
 		x = LL_Next(x)

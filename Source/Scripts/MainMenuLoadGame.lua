@@ -316,8 +316,12 @@ function MainMenu.LoadGame.CreateGameInfoWidget(self, saveInfo, yOfs, inset, pic
 	local buttonPadd = {32 * UI.identityScale[1], 8 * UI.identityScale[2]}
 	
 	if (UI.fontScale[1] > 1) then
-		buttonPadd[1] = buttonPadd[1] * 3
-		buttonPadd[2] = buttonPadd[2] * 3
+		local scale = 3
+		if (UI.systemScreen.aspect == "3x2") then
+			scale = 1.8
+		end
+		buttonPadd[1] = buttonPadd[1] * scale
+		buttonPadd[2] = buttonPadd[2] * scale
 	end
 	
 	local buttonRect = {

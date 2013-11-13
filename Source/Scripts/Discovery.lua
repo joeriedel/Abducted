@@ -352,6 +352,7 @@ end
 function Discovery.AnimateCloseUI(self, callback)
 
 	self.busy = true
+	Abducted.entity.eatInput = false
 	
 	if (self.animateTimer) then	
 		self.animateTimer:Clean()
@@ -360,6 +361,9 @@ function Discovery.AnimateCloseUI(self, callback)
 	
 	local f = function()
 	
+		Discovery.Widgets.Close:SetCapture(false)
+		Discovery.Widgets.Root:ClearCapture()
+		
 		local f = function()
 			Discovery.Widgets.Root:ScaleTo({0.1, 0}, {0, 0.15})
 			
@@ -400,13 +404,12 @@ function Discovery.AnimateCloseUI(self, callback)
 end
 
 function Discovery.OpenUI(self)
-	Abducted.entity.eatInput = true
-	
 	if (self.keys.on_activated) then
 		World.PostEvent(self.keys.on_activated)
 	end
 	
 	local f = function()
+		Abducted.entity.eatInput = true
 		Discovery.Popup = self
 		local awardSkillPoints = GameDB:Discover(self.databaseId, "world", false, true)
 		self:LayoutUI(awardSkillPoints)
@@ -419,7 +422,6 @@ function Discovery.OpenUI(self)
 	end
 	if (Discovery.Popup) then
 		if (Discovery.Popup == self) then
-			Abducted.entity.eatInput = false
 			return
 		end
 		Discovery.Popup:CloseUI(f)

@@ -96,6 +96,8 @@ function PlayerInput.TapPulse(self, x, y)
 	
 	trace = World.LineTrace(trace)
 	if (trace and not (trace.startSolid)) then
+		COutLine(kC_Debug, "Pulse - shooting world!")
+		
 		local playerTrace = {
 			start = VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift()),
 			_end = trace.traceEnd,
@@ -162,6 +164,8 @@ function PlayerInput.TapTarget(self, x, y)
 			Game.entity:FirePulse(target.pos, normal, false)
 			target:ShotWithPulse()
 			return true
+		else
+			COutLine(kC_Debug, "Pulse - was going to shoot object but hit collision mesh first!")
 		end
 	end
 	

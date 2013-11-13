@@ -134,6 +134,8 @@ function Metadata.CheckPulseTarget(self, x, y)
 	local dx = p[1]-x
 	local dy = p[2]-y
 	local dd = math.sqrt(dx*dx+dy*dy)
+	COutLine(kC_Debug, "Metadata.CheckPulseTarget: pos(%d, %d), event(%d, %d), dist: %f, max: %f", p[1], p[2], x, y, dd, UI.screenDiagonal*Metadata.TouchDistance)
+	
 	if (dd <= UI.screenDiagonal*Metadata.TouchDistance) then
 		return true
 	end

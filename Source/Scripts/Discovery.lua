@@ -512,6 +512,9 @@ function Discovery.CheckTouched(self, e)
 	local dx = p[1]-e.data[1]
 	local dy = p[2]-e.data[2]
 	local dd = math.sqrt(dx*dx+dy*dy)
+	
+	COutLine(kC_Debug, "Discovery.CheckTouched: pos(%d, %d), event(%d, %d), dist: %f, max: %f", p[1], p[2], e.data[1], e.data[2], dd, UI.screenDiagonal*Discovery.TouchDistance)
+	
 	if (dd <= UI.screenDiagonal*Discovery.TouchDistance) then
 		self:OpenUI()
 		return true

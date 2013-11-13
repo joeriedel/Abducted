@@ -107,6 +107,12 @@ function PlayerInput.TapPulse(self, e)
 		playerTrace = World.LineTrace(playerTrace) or trace
 		Game.entity:FirePulse(playerTrace.traceEnd, playerTrace.normal)
 		return true
+	else
+		if (trace) then
+			COutLine(kC_Debug, "Pulse - trace was startSolid, error.")
+		else
+			COutLine(kC_Debug, "Pulse - nothing hit.")
+		end
 	end
 	
 	return false

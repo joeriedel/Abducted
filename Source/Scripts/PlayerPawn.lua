@@ -24,7 +24,8 @@ PlayerPawn.AnimationStates = {
 			HUD:EnableAll()
 		end,
 		bbox = {mins = {-18, -18, 0}, maxs = {18, 18, 128}},
-		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}}
+		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}},
+		cameraShift = {0, 0, 64}
 	},
 	limp = {
 		idle = "limpidle",
@@ -49,6 +50,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
+		cameraShift = {0, 0, 32}
 	},
 	limpscrunch = {
 		idle = "limp_scrunched_idle",
@@ -72,6 +74,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
+		cameraShift = {0, 0, 32}
 	},
 	walkfast = {
 		walk = "walkfast",
@@ -103,6 +106,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
+		cameraShift = {0, 0, 32}
 	},
 }
 
@@ -132,8 +136,7 @@ function PlayerPawn.Spawn(self)
 	
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	self:SetLightInteractionFlags(kLightInteractionFlag_Player)
-	self:SetCameraShift({0,0,64})
-	
+		
 	MakeAnimatable(self)
 	
 	self.animState = StringForString(self.keys.initial_state, "default")
@@ -153,13 +156,18 @@ function PlayerPawn.Spawn(self)
 	
 	local set = PlayerPawn.AnimationStates[self.animState]
 	local bbox = set.bbox
-	if (not bbox) then
+	if (bbox == nil) then
 		bbox = PlayerPawn.AnimationStates.default.bbox
 	end
 	
 	local shadowBox = set.shadowBox
-	if (not shadowBox) then
+	if (shadowBox == nil) then
 		shadowBox = PlayerPawn.AnimationStates.default.shadowBox
+	end
+	
+	local cameraShift = set.cameraShift
+	if (cameraShift == nil) then
+		cameraShift = PlayerPawn.AnimationStates.default.cameraShift
 	end
 	
 	self:SetMins(bbox.mins)
@@ -167,6 +175,7 @@ function PlayerPawn.Spawn(self)
 	self:SetShadowMins(shadowBox.mins)
 	self:SetShadowMaxs(shadowBox.maxs)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
+	self:SetCameraShift(cameraShift)
 	
 	-- shield mesh
 	self.shield = World.Load("FX/shield1mesh")
@@ -354,6 +363,7 @@ function PlayerPawn.SelectAnimState(self, state)
 		if (set and set.OnSelect) then
 			set.OnSelect(self)
 		end
+		
 		if (set) then
 			local bbox = set.bbox
 			if (not bbox) then
@@ -365,11 +375,18 @@ function PlayerPawn.SelectAnimState(self, state)
 				shadowBox = PlayerPawn.AnimationStates.default.shadowBox
 			end
 			
+			local cameraShift = set.cameraShift
+			if (cameraShift == nil) then
+				cameraShift = PlayerPawn.AnimationStates.default.cameraShift
+			end
+			
 			self:SetMins(bbox.mins)
 			self:SetMaxs(bbox.maxs)
 			self:SetShadowMins(shadowBox.mins)
 			self:SetShadowMaxs(shadowBox.maxs)
 			self.model.dm:SetBounds(self:Mins(), self:Maxs())
+			self:SetCameraShift(cameraShift)
+			
 		end
 		
 		self:SetSpeeds()

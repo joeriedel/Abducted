@@ -158,6 +158,132 @@ function ReflexGame.OnInputEvent(self,e)
 	return false
 end
 
+function ReflexGame.DPadInput(widget, e)
+	local self = ReflexGame.entity
+
+	if (Input.IsTouchBegin(e)) then
+		if (self.dpadTouch == nil) then
+			self.widgets.dpadRoot:SetCapture(true)
+			self.dpadTouch = e.touch
+			self.dpadInput = {0, 0}
+			self.dpadDir = {0, 0}
+			self.dpadOrder = 0
+		else
+			return true
+		end
+	elseif (self.dpadTouch and Input.IsTouchEnd(e, self.dpadTouch)) then
+		self.dpadTouch = nil
+		self.widgets.dpadRoot:SetCapture(false)
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		return true
+	end
+
+	local size = self.widgets.dpadRoot.size / 2
+	local dx = e.data[1] - size
+	local dy = e.data[2] - size
+	
+	-- deadband
+	if (math.abs(dx) < (size/4)) then
+		dx = 0
+	end
+	
+	if (math.abs(dy) < (size/4)) then
+		dy = 0
+	end
+	
+	if (dx < 0) then
+		dx = -1
+	elseif (dx > 0) then
+		dx = 1
+	else
+		dx = 0
+	end
+	
+	if (dy < 0) then
+		dy = -1
+	elseif (dy > 0) then
+		dy = 1
+	else
+		dy = 0
+	end
+	
+	-- impulse changes?
+	if ((dx == 0) and (self.dpadInput[1] ~= 0)) then -- xinput centered, apply Y
+		self.dpadInput[2] = 0 -- clear y input to force impulse
+	end
+	
+	if ((dy == 0) and (self.dpadInput[2] ~= 0)) then -- yinput cleared, apply X
+		self.dpadInput[1] = 0 -- clear x input to force impulse
+	end
+	
+	local ddx = 0
+	local ddy = 0
+	
+	if (dx ~= self.dpadInput[1]) then
+		ddx = dx
+		self.dpadInput[1] = dx
+	end
+	
+	if (dy ~= self.dpadInput[2]) then
+		ddy = dy
+		self.dpadInput[2] = dy
+	end
+	
+	if (ddx == self.dpadDir[1]) then
+		ddx = 0
+	end
+	
+	if (ddy == self.dpadDir[2]) then
+		ddy = 0
+	end
+		
+	if (ddx ~= 0) then -- x input changed
+		self.dpadDir[1] = ddx
+		self.dpadDir[2] = 0
+	
+		self.state.heading.x = ddx
+		self.state.heading.y = 0
+		
+		self.sfx.dpad:Play(kSoundChannel_UI, 0)
+		
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		
+		if (ddx < 0) then
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrowPressed)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		else
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrowPressed)
+		end
+	elseif (ddy ~= 0) then
+		self.dpadDir[1] = 0
+		self.dpadDir[2] = ddy
+		
+		self.state.heading.x = 0
+		self.state.heading.y = ddy
+		
+		self.sfx.dpad:Play(kSoundChannel_UI, 0)
+		
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		
+		if (ddy < 0) then
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrowPressed)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		else
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrowPressed)
+		end
+	end
+	
+	return true
+
+end
+
 function ReflexGame.HandleDPadEvents(self, widget, e)
 	local press = false
 	
@@ -361,10 +487,16 @@ function ReflexGame.InitUI(self)
 		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])
 		local dpadTop = UI.screenHeight-dpadSize-(72*UI.identityScale[1])
 		
+		self.widgets.dpadRoot = UI:CreateWidget("Widget",
+			{rect={dpadLeft, dpadTop, dpadSize, dpadSize}, OnInputEvent=ReflexGame.DPadInput}
+		)
+		self.widgets.dpadRoot.size = dpadSize
+		self.widgets.root3:AddChild(self.widgets.dpadRoot)
+		
 		self.widgets.dpad.left = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft-dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadLeft}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.left:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 180}, {0,0,0})
@@ -373,7 +505,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.right = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadSize-dpadButtonSize+dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadRight}
+			 material=self.gfx.RightArrow}
 		)
 				
 		self.widgets.root3:AddChild(self.widgets.dpad.right)
@@ -381,7 +513,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.up = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadButtonSize, dpadTop-dpadPad, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadUp}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.up:RotateTo({dpadButtonSize/2, dpadButtonSize/2, -90}, {0,0,0})
@@ -390,7 +522,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.down = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadButtonSize, dpadTop+dpadSize-dpadButtonSize+dpadPad, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadDown}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.down:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 90}, {0,0,0})
@@ -1086,7 +1218,10 @@ function ReflexGame.ReadyGameStart(self)
 	self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .2)
 	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .2)
 	if (self.widgets.dpad) then
+		self.dpadTouch = nil
+		self.widgets.dpadRoot:SetCapture(false)
 		for k,v in pairs(self.widgets.dpad) do
+			v:SetMaterial(self.gfx.RightArrow)
 			v:BlendTo({1,1,1,1}, 0.2)
 		end
 	end
@@ -1257,7 +1392,13 @@ function ReflexGame.Think(self,dt)
 		self.think = nil
 		self.gameReady = false
 		
-		self.widgets.root3:ClearCapture() -- #66 make sure to release any dpad capture buttons!
+		if (self.widgets.dpad) then
+			self.widgets.dpadRoot:SetCapture(false)
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		end
 		
 		if (self.state.victory) then
 			self.tickTimer = false
@@ -1293,14 +1434,6 @@ function ReflexGame.Think(self,dt)
 		end
 		return
     end
-
-    --[[if (self.state.swipeToMoveTimer > 0) then
-        self.state.swipeToMoveTimer = self.state.swipeToMoveTimer - dt
-        if (self.state.swipeToMoveTimer <= 0) then
-            self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .5)
-            self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .5)
-        end
-    end]]
 
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		

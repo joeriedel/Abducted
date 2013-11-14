@@ -25,7 +25,7 @@ PlayerPawn.AnimationStates = {
 		end,
 		bbox = {mins = {-18, -18, 0}, maxs = {18, 18, 128}},
 		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}},
-		cameraShift = {0, 0, 64}
+		cameraShift = {0, 0, 32}
 	},
 	limp = {
 		idle = "limpidle",
@@ -45,12 +45,12 @@ PlayerPawn.AnimationStates = {
 		smack_metadata = "limpmanup",
 		speedScale = 0.64,
 		tapAdjust = 48, -- CheckTappedOn
-		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
+		bbox = {mins = {-40, -40, 0}, maxs = {40, 40, 90}},
 		canRun = false,
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		cameraShift = {0, 0, 32}
+		cameraShift = {0, 0, -32}
 	},
 	limpscrunch = {
 		idle = "limp_scrunched_idle",
@@ -74,7 +74,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		cameraShift = {0, 0, 32}
+		cameraShift = {0, 0, -64}
 	},
 	walkfast = {
 		walk = "walkfast",

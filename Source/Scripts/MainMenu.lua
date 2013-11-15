@@ -50,6 +50,7 @@ function MainMenu.Load(self)
 	self.typefaces.Large = World.Load("UI/MMLarge_TF")
 	self.typefaces.Normal = World.Load("UI/MMNormal_TF")
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
+	self.typefaces.Copyright = World.Load("UI/Copyright_TF")
 	
 end
 
@@ -101,6 +102,21 @@ function MainMenu.InitUI(self)
 	self.widgets.logo = UI:CreateWidget("MatWidget", {rect=logoRect, material=self.gfx.MMLogo})
 	self.widgets.root:AddChild(self.widgets.logo)
 	
+	self.widgets.copyright = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Copyright})
+	self.widgets.root:AddChild(self.widgets.copyright)
+	
+	UI:LineWrapCenterText(
+		self.widgets.copyright,
+		self.contentRect[3] - 32*UI.identityScale[1],
+		true,
+		0,
+		StringTable.Get("COPYRIGHT")
+	)
+	
+	UI:VAlignLabelBottom(self.widgets.copyright, 0, UI.screenHeight)
+	UI:HCenterLabel(self.widgets.copyright, self.contentRect)
+	self.widgets.copyright:BlendTo({1,1,1,0}, 0)
+	
 	-- intro
 	self.widgets.logo:BlendTo({0,0,0,0}, 0)
 	self.mainPanel:Show(false)
@@ -109,7 +125,13 @@ function MainMenu.InitUI(self)
 	local f = function()
 		self.widgets.logo:BlendTo({1,1,1,1}, 3)
 		local f = function()
-			self.mainPanel:TransitionIn({1,0}, 0.4)
+			local f = function()	
+				local f = function()
+					self.widgets.copyright:BlendTo({1,1,1,1}, 0.3)
+				end
+				World.globalTimers:Add(f, 0.5)
+			end
+			self.mainPanel:TransitionIn({1,0}, 0.4, f)
 		end
 		World.globalTimers:Add(f, 4)
 	end
@@ -608,6 +630,8 @@ function MainMenu.MainPanel.Exit(self)
 		
 		local f = function()
 			self.widgets.panel:SetVisible(false)
+			MainMenu.widgets.copyright:SetVisible(false)
+			
 --			local r = self.widgets.panel:Rect()
 --			self.widgets.panel:MoveTo({-r[1]-r[3], 0}, {0.3, 0})
 		

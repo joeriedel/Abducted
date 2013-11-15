@@ -66,6 +66,7 @@ function MemoryGame.ShowBoard(self, show)
 		self.widgets.timeLeftLabel:BlendTo({1,1,1,0}, 0)
 		self.widgets.highlight:SetVisible(false)
 		self.widgets.button:BlendTo({1,1,1,0}, 0)
+		ReflexGame.entity.sfx.Enter:Play(kSoundChannel_UI, 0)
 	end
 	
 	World.SetDrawUIOnly(show) -- < disable/enable 3D rendering
@@ -96,6 +97,7 @@ function MemoryGame.RestartGameState(self)
 	PuzzleScoreScreen:Unlink()
 	
 	self.shuffleGlyphs = nil
+	self.numWrongChoices = 0
 	
 	self:CleanWidgets()
 	self.widgets.goals = {}
@@ -175,6 +177,9 @@ function MemoryGame.EndGame(self, result)
 	self.think = nil
 	self.exiting = true
 	
+	self.sfx.Calculating:FadeOutAndStop(1)
+	self.sfx.Stage2:FadeOutAndStop(1)
+	
 	if (self.transitionTimer) then
 		self.transitionTimer:Clean()
 		self.transitionTimer = nil
@@ -185,6 +190,8 @@ function MemoryGame.EndGame(self, result)
 	if (result == "f") then
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "SOLVE_TERMINAL_FAIL")
 	end
+	
+	ReflexGame.entity.sfx.Enter:Play(kSoundChannel_UI, 0)
 	
 	if (self.gameCompleteCallback) then
 		self.gameCompleteCallback(result)
@@ -219,6 +226,7 @@ function MemoryGame.DoRetry(self)
 		Abducted.entity.eatInput = false
 		self:RestartGameState()
 		self.widgets.black:BlendTo({0,0,0,0}, 0.3)
+		ReflexGame.entity.sfx.Enter:Play(kSoundChannel_UI, 0)
 		
 		local f = function()
 			self:Run()
@@ -598,7 +606,16 @@ function MemoryGame.OnInputEvent(self,e)
 				else
 					gfx = self.goals[idx]
 					if (best.tile.id ~= gfx) then
-						self:DoRedEffect({best}, true)
+						self.sfx.Zap2:Play(kSoundChannel_UI, 0)
+						self.numWrongChoices = self.numWrongChoices + 1
+						if (self.numWrongChoices == 3) then
+							-- end game!
+							self:MakeAllRed(self.widgets.board)
+							self.state.gameOver = true
+							self.state.victory = false
+						else
+							self:DoRedEffect({best}, true)
+						end
 						return
 					end
 				end
@@ -612,9 +629,19 @@ function MemoryGame.OnInputEvent(self,e)
 					best.tile.tile:BlendTo({1,1,1,1}, 0.2)
 					best.tile.sel:BlendTo({1,1,1,1}, 0.2)
 					self.state.phaseGlyphsCounter = idx
+					self.sfx.Selected:Play(kSoundChannel_UI, 0)
 				end
 			else
-				self:DoRedEffect({best}, true)
+				self.sfx.Zap2:Play(kSoundChannel_UI, 0)
+				self.numWrongChoices = self.numWrongChoices + 1
+				if (self.numWrongChoices == 3) then
+					-- end game!
+					self:MakeAllRed(self.widgets.board)
+					self.state.gameOver = true
+					self.state.victory = false
+				else
+					self:DoRedEffect({best}, true)
+				end
 			end
 		end
     end
@@ -789,7 +816,21 @@ function MemoryGame.LoadMaterials(self)
     self.gfx.cell_25 = World.Load("Puzzles/glyph25_M")
     self.gfx.cell_26 = World.Load("Puzzles/glyph26_M")
     self.gfx.cell_27 = World.Load("Puzzles/glyph27_M")
-
+    
+    self.sfx = {}
+	self.sfx.Zap1 = World.LoadSound("Puzzles/zap1")
+	self.sfx.Zap2 = World.LoadSound("Puzzles/zap2")
+	self.sfx.Interference = World.LoadSound("Puzzles/Interference")
+	self.sfx.Calculating = World.LoadSound("Puzzles/Calculating")
+	self.sfx.Selected = World.LoadSound("Puzzles/GlyphSelected", 4)
+	self.sfx.Stage1Complete = World.LoadSound("Puzzles/Stage1Complete")
+	self.sfx.Stage1Complete2 = World.LoadSound("Puzzles/Stage1Complete2")
+	self.sfx.Stage2 = World.LoadSound("Puzzles/Stage2Timer")
+	self.sfx.KeyShow = World.LoadSound("Puzzles/KeyShow", 4)
+		
+	self.sfx.Calculating:SetLoop(true)
+	self.sfx.Stage2:SetLoop(true)
+	
     self.gfx.mark_start = nil
     self.typefaces = {}
     self.typefaces.BigText = World.Load("UI/TerminalPuzzlesFont_TF")
@@ -1021,6 +1062,8 @@ end
 
 function MemoryGame.DoInterferenceEffect(self, tiles)
 
+	self.sfx.Interference:Play(kSoundChannel_UI, 0)
+
 	for k,v in pairs(tiles) do
 		
 		v.tile.busy = true
@@ -1103,6 +1146,19 @@ function MemoryGame.DoRedEffect(self, tiles, forError)
 
 end
 
+function MemoryGame.MakeAllRed(self, tiles)
+
+	for k,v in pairs(tiles) do
+	
+		local rect = v.tile.tile:Rect()
+		v.tile.red:SetRect(rect)
+		v.tile.red:BlendTo({1,0,0,1}, 0.1)
+		v.tile.tile:BlendTo({1,1,1,0.1}, 0.05)
+			
+	end
+
+end
+
 function MemoryGame.DoPhase0(self,dt)
     self.state.phaseTimer = self.state.phaseTimer - dt
     if (self.state.phaseTimer > 0) then
@@ -1115,6 +1171,9 @@ function MemoryGame.DoPhase0(self,dt)
         self.state.phaseTimer = self.PHASE1_BOARD_SHUFFLE_TIMER
         self:BlendBoard({1,1,1,0.4}, 0)
         self.widgets.button:BlendTo({1,1,1,1}, 0.3)
+        self.sfx.Calculating:Rewind()
+        self.sfx.Calculating:FadeVolume(1, 0)
+        self.sfx.Calculating:Play(kSoundChannel_UI, 0)
         return
     end
 
@@ -1128,6 +1187,7 @@ function MemoryGame.DoPhase0(self,dt)
 	
     b.base:BlendTo({1,1,1,0}, 0)
     b.base:BlendTo({1,1,1,1}, 0.2)
+    self.sfx.KeyShow:Play(kSoundChannel_UI, 0)
     table.insert(self.widgets.goals,b)
 end
 
@@ -1144,6 +1204,7 @@ function MemoryGame.DoPhase1(self,dt)
         self.state.phase = kMGPhase_DiscoverPattern
         self:PlaceGoal(true)
         self:DoInterferenceEffect(self.widgets.board)
+        self.sfx.Calculating:Stop()
         return
     end
 
@@ -1156,6 +1217,7 @@ function MemoryGame.DoPhase2(self,dt)
         self.state.phase = kMGPhase_AnimateTransition
         self.state.phaseTimer = 1
         self.state.phaseGlyphsCounter = 0
+        self.numWrongChoices = 0
         
         local f = function()
 			self:DoInterferenceEffect(self.widgets.board)
@@ -1168,9 +1230,12 @@ function MemoryGame.DoPhase2(self,dt)
 					self.widgets.highlight:SetVisible(true)
 					self.widgets.highlight:ScaleTo({0,1},{0,0})
 					self.widgets.highlight:ScaleTo({1,1},{0.8,0})
+					self.sfx.Stage1Complete:Play(kSoundChannel_UI, 0)
 				
 					local f = function()
 					
+						self.sfx.Stage1Complete2:Play(kSoundChannel_UI, 0)
+						
 						for k,v in pairs(self.widgets.goals) do
 							v.base:BlendTo({1,1,1,0}, 0.8)
 						end
@@ -1186,6 +1251,10 @@ function MemoryGame.DoPhase2(self,dt)
 								self.state.phase = kMGPhase_FindPattern
 								self.state.phaseTimer = FloatRand(4, 9)
 								self.widgets.wavy:BlendTo({1,1,1,1}, 1)
+								self.sfx.Stage2:Rewind()
+								self.sfx.Stage2:FadeVolume(0, 0)
+								self.sfx.Stage2:Play(kSoundChannel_UI, 0)
+								self.sfx.Stage2:FadeVolume(1, 1)
 							end
 							self.transitionTimer = nil
 							World.globalTimers:Add(f, 1)
@@ -1227,12 +1296,16 @@ function MemoryGame.DoPhase4(self,dt)
     
     self.state.phaseTimer = FloatRand(4, 9)
     self:ChallengShuffle()
+    self.sfx.Zap1:Play(kSoundChannel_UI, 0)
 end
 
 function MemoryGame.Think(self,dt)
 	if (self.state.gameOver) then
 		self.think = nil
+		self.sfx.Stage2:Stop()
+		
 		if (self.state.victory) then
+			ReflexGame.entity.sfx.Complete:Play(kSoundChannel_UI, 0)
 			local f = function()
 				EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "SOLVE_TERMINAL_SUCCESS")
 				PuzzleScoreScreen:DoSuccessScreen(
@@ -1245,15 +1318,19 @@ function MemoryGame.Think(self,dt)
 			end
 			World.globalTimers:Add(f, 1)
 		else
-			PuzzleScoreScreen:DoRetryQuitScreen(
-				self.widgets.root2,
-				function ()
-					self:DoRetry()
-				end,
-				function ()
-					self:DoQuit()
-				end
-			)
+			ReflexGame.entity.sfx.Fail:Play(kSoundChannel_UI, 0)
+			local f = function()
+				PuzzleScoreScreen:DoRetryQuitScreen(
+					self.widgets.root2,
+					function ()
+						self:DoRetry()
+					end,
+					function ()
+						self:DoQuit()
+					end
+				)
+			end
+			World.globalTimers:Add(f, 1)
 		end
 		return
     end

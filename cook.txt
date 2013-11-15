@@ -371,6 +371,24 @@ pak0 {
 	Puzzles/glyph25_M
 	Puzzles/glyph26_M
 	Puzzles/glyph27_M
+	Puzzles/Calculating
+	Puzzles/Complete
+	Puzzles/Enter
+	Puzzles/Explod
+	Puzzles/Fail
+	Puzzles/GlyphAcquired
+	Puzzles/GlyphSelected
+	Puzzles/Interference
+	Puzzles/KeyShow
+	Puzzles/Reveal
+	Puzzles/SpikeBombEnter
+	Puzzles/Stage1Complete
+	Puzzles/Stage1Complete2
+	Puzzles/Stage2Timer
+	Puzzles/Success
+	Puzzles/Suck
+	Puzzles/zap1
+	Puzzles/zap2
 	FX/glyph01_M
 	FX/glyph02_M
 	FX/glyph03_M

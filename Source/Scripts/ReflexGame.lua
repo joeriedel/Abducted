@@ -21,7 +21,7 @@ function ReflexGame.DebugStart(self)
 			end
 			World.globalTimers:Add(f, 0.3)
 		end
-		ReflexGame:InitGame(1)
+		ReflexGame:InitGame(3)
 		UI:BlendTo({0,0,0,0}, 0.3)
 		ReflexGame:ShowBoard(true)
 		ReflexGame:StartGame("discover Bugs;award 6;message ARM_REWARD_MSG_POWER_RESTORED;unlock_topic LockedTest ARM_REWARD_LOCKEDTEST", f)
@@ -108,6 +108,8 @@ function ReflexGame.EndGame(self, result)
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "HACK_TERMINAL_FAIL")
 	end
 	
+	self.sfx.Enter:Play(kSoundChannel_UI, 0)
+	
 	if (self.gameCompleteCallback) then
 		self.gameCompleteCallback(result)
 	end
@@ -158,60 +160,130 @@ function ReflexGame.OnInputEvent(self,e)
 	return false
 end
 
-function ReflexGame.HandleDPadEvents(self, widget, e)
-	local press = false
-	
+function ReflexGame.DPadInput(widget, e)
+	local self = ReflexGame.entity
+
 	if (Input.IsTouchBegin(e)) then
-		if (widget.touch == nil) then
-			press = true
-			widget:SetMaterial(self.gfx.RightArrowPressed)
-			widget:SetCapture(true)
-			widget.touch = e.touch
-			self.sfx.dpad:Play(kSoundChannel_UI, 0)
+		if (self.dpadTouch == nil) then
+			self.widgets.dpadRoot:SetCapture(true)
+			self.dpadTouch = e.touch
+			self.dpadInput = {0, 0}
+			self.dpadDir = {0, 0}
+			self.dpadOrder = 0
+		else
+			return true
 		end
-	elseif (widget.touch and Input.IsTouchEnd(e, widget.touch)) then
-		widget.touch = nil
-		widget:SetMaterial(self.gfx.RightArrow)
-		widget:SetCapture(false)
+	elseif (self.dpadTouch and Input.IsTouchEnd(e, self.dpadTouch)) then
+		self.dpadTouch = nil
+		self.widgets.dpadRoot:SetCapture(false)
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		return true
+	end
+
+	local size = self.widgets.dpadRoot.size / 2
+	local dx = e.data[1] - size
+	local dy = e.data[2] - size
+	
+	-- deadband
+	if (math.abs(dx) < (size/4)) then
+		dx = 0
 	end
 	
-	return press
-end
-
-function ReflexGame.DPadUp(widget, e)
-	local self = ReflexGame.entity
-	if (self:HandleDPadEvents(widget, e)) then
-		self.state.heading.x = 0
-		self.state.heading.y = -1
+	if (math.abs(dy) < (size/4)) then
+		dy = 0
 	end
-	return Input.IsTouchEvent(e)
-end
-
-function ReflexGame.DPadDown(widget, e)
-	local self = ReflexGame.entity
-	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
-		self.state.heading.x = 0
-		self.state.heading.y = 1
+	
+	if (dx < 0) then
+		dx = -1
+	elseif (dx > 0) then
+		dx = 1
+	else
+		dx = 0
 	end
-	return Input.IsTouchEvent(e)
-end
-
-function ReflexGame.DPadLeft(widget, e)
-	local self = ReflexGame.entity
-	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
-		self.state.heading.x = -1
+	
+	if (dy < 0) then
+		dy = -1
+	elseif (dy > 0) then
+		dy = 1
+	else
+		dy = 0
+	end
+	
+	-- impulse changes?
+	if ((dx == 0) and (self.dpadInput[1] ~= 0)) then -- xinput centered, apply Y
+		self.dpadInput[2] = 0 -- clear y input to force impulse
+	end
+	
+	if ((dy == 0) and (self.dpadInput[2] ~= 0)) then -- yinput cleared, apply X
+		self.dpadInput[1] = 0 -- clear x input to force impulse
+	end
+	
+	local ddx = 0
+	local ddy = 0
+	
+	if (dx ~= self.dpadInput[1]) then
+		ddx = dx
+		self.dpadInput[1] = dx
+	end
+	
+	if (dy ~= self.dpadInput[2]) then
+		ddy = dy
+		self.dpadInput[2] = dy
+	end
+	
+	if (ddx == self.dpadDir[1]) then
+		ddx = 0
+	end
+	
+	if (ddy == self.dpadDir[2]) then
+		ddy = 0
+	end
+		
+	if (ddx ~= 0) then -- x input changed
+		self.dpadDir[1] = ddx
+		self.dpadDir[2] = 0
+	
+		self.state.heading.x = ddx
 		self.state.heading.y = 0
+		
+		self.sfx.DPad:Play(kSoundChannel_UI, 0)
+		
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		
+		if (ddx < 0) then
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrowPressed)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		else
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrowPressed)
+		end
+	elseif (ddy ~= 0) then
+		self.dpadDir[1] = 0
+		self.dpadDir[2] = ddy
+		
+		self.state.heading.x = 0
+		self.state.heading.y = ddy
+		
+		self.sfx.DPad:Play(kSoundChannel_UI, 0)
+		
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		
+		if (ddy < 0) then
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrowPressed)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		else
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrowPressed)
+		end
 	end
-	return Input.IsTouchEvent(e)
-end
+	
+	return true
 
-function ReflexGame.DPadRight(widget, e)
-	local self = ReflexGame.entity
-	if (self.gameReady and self:HandleDPadEvents(widget, e)) then
-		self.state.heading.x = 1
-		self.state.heading.y = 0
-	end
-	return Input.IsTouchEvent(e)
 end
 
 function ReflexGame.LoadMaterials(self)
@@ -273,10 +345,19 @@ function ReflexGame.LoadMaterials(self)
     self.typefaces.TimerTextFlash = World.Load("UI/TerminalPuzzlesTimeFontFlash_TF")
     self.typefaces.TimerTextRed = World.Load("UI/TerminalPuzzlesTimeFontRed_TF")
     self.typefaces.SwipeToMoveText = World.Load("UI/TerminalPuzzlesFont_TF")
-    
-    self.sfx = {}
-    self.sfx.dpad = World.Load("Audio/dpad")
 
+	self.sfx = {}
+	self.sfx.Enter = World.LoadSound("Puzzles/Enter")
+	self.sfx.Success = World.LoadSound("Puzzles/Success")
+	self.sfx.Fail = World.LoadSound("Puzzles/Fail")
+	self.sfx.Complete = World.LoadSound("Puzzles/Complete")
+    self.sfx.DPad = World.LoadSound("Audio/dpad")
+    self.sfx.SpikeBombEnter = World.LoadSound("Puzzles/SpikeBombEnter", 4)
+	self.sfx.Reveal = World.LoadSound("Puzzles/Reveal")
+	self.sfx.Acquired = World.LoadSound("Puzzles/GlyphAcquired", 4)
+	self.sfx.Explode = World.LoadSound("Puzzles/Explode", 4)
+	self.sfx.Suck = World.LoadSound("Puzzles/Suck", 4)
+	
 	local xScale = UI.screenWidth / 1280
 	local yScale = UI.screenHeight / 720
 	
@@ -361,10 +442,16 @@ function ReflexGame.InitUI(self)
 		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])
 		local dpadTop = UI.screenHeight-dpadSize-(72*UI.identityScale[1])
 		
+		self.widgets.dpadRoot = UI:CreateWidget("Widget",
+			{rect={dpadLeft, dpadTop, dpadSize, dpadSize}, OnInputEvent=ReflexGame.DPadInput}
+		)
+		self.widgets.dpadRoot.size = dpadSize
+		self.widgets.root3:AddChild(self.widgets.dpadRoot)
+		
 		self.widgets.dpad.left = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft-dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadLeft}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.left:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 180}, {0,0,0})
@@ -373,7 +460,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.right = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadSize-dpadButtonSize+dpadPad, dpadTop+dpadButtonSize, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadRight}
+			 material=self.gfx.RightArrow}
 		)
 				
 		self.widgets.root3:AddChild(self.widgets.dpad.right)
@@ -381,7 +468,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.up = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadButtonSize, dpadTop-dpadPad, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadUp}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.up:RotateTo({dpadButtonSize/2, dpadButtonSize/2, -90}, {0,0,0})
@@ -390,7 +477,7 @@ function ReflexGame.InitUI(self)
 		self.widgets.dpad.down = UI:CreateWidget(
 			"MatWidget", 
 			{rect={dpadLeft+dpadButtonSize, dpadTop+dpadSize-dpadButtonSize+dpadPad, dpadButtonSize, dpadButtonSize}, 
-			 material=self.gfx.RightArrow, OnInputEvent=ReflexGame.DPadDown}
+			 material=self.gfx.RightArrow}
 		)
 		
 		self.widgets.dpad.down:RotateTo({dpadButtonSize/2, dpadButtonSize/2, 90}, {0,0,0})
@@ -854,8 +941,10 @@ function ReflexGame.CollideWithSymbol(self,x,y)
             self.widgets.grid[index] = nil
             self.widgets.root:RemoveChild(piece)
             self.state.goalCounter = self.state.goalCounter + 1
+            self.sfx.Acquired:Play(kSoundChannel_UI, 0)
             if (self.state.goalCounter == #self.widgets.goals) then
 				self.widgets.portal:SetMaterial(self.gfx.GoalOpen)
+				self.sfx.Complete:Play(kSoundChannel_UI, 0)
             end
             return true
         end
@@ -959,6 +1048,8 @@ function ReflexGame.SuckupPieces(self,x,y,w,h)
 	
 	local kdd = w*w
 	
+	local didSuck = false
+	
 	for gx=min.x,max.x do
 		for gy=min.y,max.y do
 			local vec = self:GetPositionByGrid(gx,gy)
@@ -973,6 +1064,7 @@ function ReflexGame.SuckupPieces(self,x,y,w,h)
 					self:SuckupWidget(piece,x,y)
 					self.widgets.grid[index] = nil
 					table.insert(self.widgets.trash, piece)
+					didSuck = true
 				end
 			end
 		end
@@ -987,9 +1079,12 @@ function ReflexGame.SuckupPieces(self,x,y,w,h)
 		local dd = dx*dx+dy*dy
 		if (dd < kdd*1.5) then
 			self:SuckupSpider(k,v,x,y)
+			didSuck = true
 		end
 	
 	end
+	
+	return didSuck
 end
 
 function ReflexGame.SuckupPlayer(self,x,y)
@@ -1001,6 +1096,9 @@ function ReflexGame.SuckupSpider(self,index,spider,x,y)
 	table.insert(self.widgets.trash, spider)
 	spider.particles:Unmap()
 	self:SuckupWidget(spider,x,y)
+	if (next(self.widgets.spiders) == nil) then
+		MemoryGame.entity.sfx.Stage2:Stop()
+	end
 end
 
 function ReflexGame.SuckupWidget(self,w,x,y)
@@ -1086,7 +1184,10 @@ function ReflexGame.ReadyGameStart(self)
 	self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .2)
 	self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .2)
 	if (self.widgets.dpad) then
+		self.dpadTouch = nil
+		self.widgets.dpadRoot:SetCapture(false)
 		for k,v in pairs(self.widgets.dpad) do
+			v:SetMaterial(self.gfx.RightArrow)
 			v:BlendTo({1,1,1,1}, 0.2)
 		end
 	end
@@ -1098,7 +1199,8 @@ end
 function ReflexGame.RevealBoard(self)
 	self.widgets.swipeBar:SetVisible(true)
 	self.widgets.swipeBar:MoveTo({self.screen[1]+self.screen[3], self.screen[2]}, {1.5,0})
-		
+	self.sfx.Reveal:Play(kSoundChannel_UI, 0)
+	
 	local f = function()
 	
 		if (self.state.timeLeft <= 0) then
@@ -1160,6 +1262,7 @@ function ReflexGame.AnimateIntro(self)
 	self.tickTimer = false
 	self:PrepBoardIntro()
 	
+	self.sfx.Enter:Play(kSoundChannel_UI, 0)
 	self.widgets.board:BlendTo({1,1,1,0}, 0)
 	self.widgets.black:BlendTo({0,0,0,0}, 0)
 		
@@ -1205,6 +1308,8 @@ function ReflexGame.DoRetry(self)
 	
 	self.animatingRetry = true
 	self.widgets.black:BlendTo({0,0,0,1}, 0.3)
+	MemoryGame.entity.sfx.Stage2:FadeOutAndStop(1)
+	
 	local f = function()
 		PuzzleScoreScreen:Unlink()
 	
@@ -1257,11 +1362,20 @@ function ReflexGame.Think(self,dt)
 		self.think = nil
 		self.gameReady = false
 		
-		self.widgets.root3:ClearCapture() -- #66 make sure to release any dpad capture buttons!
+		if (self.widgets.dpad) then
+			self.widgets.dpadRoot:SetCapture(false)
+			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		end
 		
 		if (self.state.victory) then
+			
 			self.tickTimer = false
 			self:ExplodeSpiders()
+			MemoryGame.entity.sfx.Stage2:FadeOutAndStop(1)
+			
 			local f = function()
 				if (self.widgets.dpad) then
 					for k,v in pairs(self.widgets.dpad) do
@@ -1281,6 +1395,7 @@ function ReflexGame.Think(self,dt)
 			end
 			World.globalTimers:Add(f, 1.5)
 		else
+			self.sfx.Fail:Play(kSoundChannel_UI, 0)
 			PuzzleScoreScreen:DoRetryQuitScreen(
 				self.widgets.root3,
 				function ()
@@ -1293,14 +1408,6 @@ function ReflexGame.Think(self,dt)
 		end
 		return
     end
-
-    --[[if (self.state.swipeToMoveTimer > 0) then
-        self.state.swipeToMoveTimer = self.state.swipeToMoveTimer - dt
-        if (self.state.swipeToMoveTimer <= 0) then
-            self.widgets.swipeToMoveLabel:BlendTo({1,1,1,1}, .5)
-            self.widgets.swipeToMoveLabelBkg:BlendTo({1,1,1,1}, .5)
-        end
-    end]]
 
 	if (self.state.heading.x == 0 and self.state.heading.y == 0) then
 		-- NO HEADING: Game hasn't started		
@@ -1380,6 +1487,7 @@ function ReflexGame.Think(self,dt)
 
 		self.state.lastHeading.x = self.state.heading.x
 		self.state.lastHeading.y = self.state.heading.y
+		
 	elseif (firstMove) then
 		local angle = 0
 		if (self.state.heading.x < 0) then
@@ -1447,6 +1555,7 @@ function ReflexGame.Think(self,dt)
 				local spider = UI:CreateWidget("MatWidget", {rect={200,200,self.SPIDER_WIDGET_SIZE[1],self.SPIDER_WIDGET_SIZE[2]}, material=self.gfx.antivirus_spider})
 				spider.particles = UI:CreateWidget("MatWidget", {rect={0,0,310*UI.identityScale[1],310*UI.identityScale[1]},material=self.gfx.SpiderParticles})
 				self.widgets.root2:AddChild(spider)	
+				local firstSpider = next(self.widgets.spiders) == nil
 				table.insert(self.widgets.spiders,spider)
 				self:SetPositionByGrid(spider,x,y)		
 				spider.state = self:CreateState("antivirus_spider")
@@ -1454,6 +1563,13 @@ function ReflexGame.Think(self,dt)
 				self:SpiderPickHeading(spider)
 				COutLine(kC_Debug,"spawnedSpider @ grid: x=%i, y=%i, heading = %.04f,%.04f, distFromPlayer = %f",x,y,spider.state.heading.x,spider.state.heading.y, dd)
 				spawned = true
+				self.sfx.SpikeBombEnter:Play(kSoundChannel_UI, 0)
+				if (firstSpider) then
+					MemoryGame.entity.sfx.Stage2:Rewind()
+					MemoryGame.entity.sfx.Stage2:FadeVolume(0, 0)
+					MemoryGame.entity.sfx.Stage2:Play(kSoundChannel_UI, 0)
+					MemoryGame.entity.sfx.Stage2:FadeVolume(1, 1)
+				end
 				break
 			end
 		end
@@ -1463,6 +1579,8 @@ function ReflexGame.Think(self,dt)
 		end
     end
 
+	local didSuck = false
+	
     for i,k in pairs(self.widgets.blackholes) do
         if (k.state.heading == null) then
             k.state.heading = {}
@@ -1485,14 +1603,19 @@ function ReflexGame.Think(self,dt)
             COutLine(kC_Debug,"blackhole bounce @ : x=%i, y=%i",nextPos.x,nextPos.y)
         end
         UI:MoveWidgetByCenter(k,nextPos.x,nextPos.y)
-        self:SuckupPieces(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2])
+        didSuck = self:SuckupPieces(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2]) or didSuck
         if (not self.state.gameOver) then
 			if (self:CheckTouchPlayer(nextPos.x,nextPos.y,self.BLACKHOLE_SIZE[1],self.BLACKHOLE_SIZE[2])) then
+				didSuck = true
 				self:SuckupPlayer(nextPos.x, nextPos.y)
 				self.state.gameOver = true
 				COutLine(kC_Debug, "Player eaten by blackhole.")
 			end
 		end
+    end
+    
+    if (didSuck) then
+		self.sfx.Suck:Play(kSoundChannel_UI, 0)
     end
 end
 
@@ -1502,6 +1625,9 @@ function ReflexGame.SpiderThink(self, index, spider, dt)
 		spider.particles:Unmap()
 		self.widgets.root2:RemoveChild(spider)
 		spider:Unmap()
+		if (next(self.widgets.spiders) == nil) then
+			MemoryGame.entity.sfx.Stage2:Stop()
+		end
 		return
 	else
 		spider.state.lifetime = spider.state.lifetime - dt
@@ -1616,6 +1742,8 @@ function ReflexGame.ExplodeSpider(self, spider)
 	end
 	
 	World.globalTimers:Add(f, 0.4)
+	
+	self.sfx.Explode:Play(kSoundChannel_UI, 0)
 end
 
 function ReflexGame.ExplodeSpiders(self)
@@ -1827,6 +1955,8 @@ end
 
 function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logevent)
 
+	ReflexGame.entity.sfx.Success:Play(kSoundChannel_UI, 0)
+	
 	self.successHook = callback
 	
 	layer:AddChild(self.widgets.root)

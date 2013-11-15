@@ -648,7 +648,15 @@ function ManipulatableObject.Pain(self)
 
 	self.canAttack = false
 	self:RemoveFromShootableList()
-	self:PlayAnim("pain", self.model).Seq(ManipulatableObject.Idle)
+	
+	local f = function()
+		self:Idle()
+		if (self.keys.on_shot) then
+			World.PostEvent(self.keys.on_shot)
+		end
+	end
+	
+	self:PlayAnim("pain", self.model).Seq(f)
 	self:EnableTouch(false)
 
 end

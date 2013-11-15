@@ -280,7 +280,8 @@ pak0 {
 	UI/facebook_icon_M
 	UI/twitter_icon_M
 	UI/abducted_logo1_M
-	
+	UI/Copyright_TF
+
 	Audio/Amb01-Cine
 	Audio/Amb02-Cine1
 	Audio/Amb03-Cine2
@@ -374,7 +375,7 @@ pak0 {
 	Puzzles/Calculating
 	Puzzles/Complete
 	Puzzles/Enter
-	Puzzles/Explod
+	Puzzles/Explode
 	Puzzles/Fail
 	Puzzles/GlyphAcquired
 	Puzzles/GlyphSelected

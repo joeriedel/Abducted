@@ -79,6 +79,10 @@ pak0 {
 	FX/smokepuff1_M
 	FX/glyph01_M
 	FX/rain1_screenfx_M
+	FX/noise1_screenfx_M
+	FX/screenflash1_M
+	FX/screenflash2_M
+	FX/screenflash3_M
 	Shared/terminal1
 	UI/Solid_M
 	UI/loading_icon_M

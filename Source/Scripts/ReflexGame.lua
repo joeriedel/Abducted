@@ -188,11 +188,11 @@ function ReflexGame.DPadInput(widget, e)
 	local dy = e.data[2] - size
 	
 	-- deadband
-	if (math.abs(dx) < (size/8)) then
+	if (math.abs(dx) < (size/3)) then
 		dx = 0
 	end
 	
-	if (math.abs(dy) < (size/8)) then
+	if (math.abs(dy) < (size/3)) then
 		dy = 0
 	end
 	

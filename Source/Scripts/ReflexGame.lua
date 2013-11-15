@@ -188,11 +188,11 @@ function ReflexGame.DPadInput(widget, e)
 	local dy = e.data[2] - size
 	
 	-- deadband
-	if (math.abs(dx) < (size/4)) then
+	if (math.abs(dx) < (size/8)) then
 		dx = 0
 	end
 	
-	if (math.abs(dy) < (size/4)) then
+	if (math.abs(dy) < (size/8)) then
 		dy = 0
 	end
 	
@@ -436,7 +436,7 @@ function ReflexGame.InitUI(self)
 	if (UI.mode == kGameUIMode_Mobile) then
 		self.widgets.dpad = {}
 		
-		local dpadButtonSize = 72*UI.identityScale[1]*UI.fontScale[1]
+		local dpadButtonSize = 64*UI.identityScale[1]*UI.fontScale[1]
 		local dpadSize = dpadButtonSize*3
 		local dpadPad = 16*UI.identityScale[1]
 		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])

@@ -79,6 +79,10 @@ pak0 {
 	FX/smokepuff1_M
 	FX/glyph01_M
 	FX/rain1_screenfx_M
+	FX/noise1_screenfx_M
+	FX/screenflash1_M
+	FX/screenflash2_M
+	FX/screenflash3_M
 	Shared/terminal1
 	UI/Solid_M
 	UI/loading_icon_M
@@ -276,7 +280,8 @@ pak0 {
 	UI/facebook_icon_M
 	UI/twitter_icon_M
 	UI/abducted_logo1_M
-	
+	UI/Copyright_TF
+
 	Audio/Amb01-Cine
 	Audio/Amb02-Cine1
 	Audio/Amb03-Cine2
@@ -370,7 +375,7 @@ pak0 {
 	Puzzles/Calculating
 	Puzzles/Complete
 	Puzzles/Enter
-	Puzzles/Explod
+	Puzzles/Explode
 	Puzzles/Fail
 	Puzzles/GlyphAcquired
 	Puzzles/GlyphSelected

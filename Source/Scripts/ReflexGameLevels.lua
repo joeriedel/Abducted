@@ -15,7 +15,7 @@ function ReflexGame.CreateLevel1x1(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 5 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 100
@@ -77,7 +77,7 @@ function ReflexGame.CreateLevel2x1(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 80
@@ -138,7 +138,7 @@ function ReflexGame.CreateLevel2x2(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 80
@@ -200,7 +200,7 @@ function ReflexGame.CreateLevel2x3(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 80
@@ -272,7 +272,7 @@ function ReflexGame.CreateLevel3x1(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 60
@@ -334,7 +334,7 @@ function ReflexGame.CreateLevel3x2(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 60
@@ -411,7 +411,7 @@ function ReflexGame.CreateLevel3x3(self)
 	level.antivirusSpiderHeadingTime = {3, 5}
 	level.antivirusSpiderSeekPlayerRange = 6 -- grid squares
     level.blackholeSpeed = {50, 50}
-    level.blackholeMoveTime = {1.7, 10}
+    level.blackholeMoveTime = {20, 20}
     level.blockChaseTime = 1.1 -- delay before blocks start eating player line
     level.blockGrowTime = 1.05
     level.time = 60

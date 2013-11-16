@@ -22,6 +22,12 @@ function Tormentor.Spawn(self)
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	
+	self.sfx = {}
+	self.sfx.Swing = World.LoadSound("Audio/EFX_TenticleAttack2")
+	self:AttachSound(self.sfx.Swing)
+	self.sfx.Contact = World.LoadSound("Audio/EFX_TenticleHit1-BodyHit")
+	self:AttachSound(self.sfx.Contact)
+	
 	self.mode = StringForString(self.keys.initial_state, "idle")
 	self.model = LoadModel("Characters/Tormentor1")
 	self:SetMotionSka(self.model)
@@ -316,6 +322,7 @@ function Tormentor.AttackPlayer(self)
 	self.think = nil
 	self:Move(false)
 	self:PlayAnim("swing", self.model).Seq("idle")
+	self.sfx.Swing:Play(kSoundChannel_FX, 0)
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then
@@ -323,17 +330,18 @@ function Tormentor.AttackPlayer(self)
 			if (self.enableKillCmd) then
 				cmd = self.keys.killed_player_command
 			end
+			self.sfx.Contact:Play(kSoundChannel_FX, 0)
 			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, cmd)
 			if (World.playerPawn.dead) then
 				local f = function()
 					World.viewController:AddLookTarget(self, {0,0,160})
 				end
-				World.globalTimers:Add(f, 0.5)
+				World.globalTimers:Add(f, 0.2)
 			end
 		end
 	end
 	
-	self.attackDamageTimer = World.gameTimers:Add(f, 0.5)
+	self.attackDamageTimer = World.gameTimers:Add(f, 0.35)
 	self.think = Tormentor.SwitchModes
 	self:SetNextThink(3.5)
 end

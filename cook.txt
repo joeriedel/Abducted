@@ -490,14 +490,39 @@ pak0 {
 	Audio/PFX_TentacleStrikeDeath1
 	Audio/PFX_TentacleStrikeDeath2
 	Audio/PFX_TentacleStrikeDeath3
+	Audio/EFX_TenticleHit1-BodyHit
 	Audio/EnviroFX_PylonEnd
 	Audio/EnviroFX_PylonMoving
-	Audio/VO_Eve_BigPain02
-	Audio/VO_Eve_Scream01
+
+	Audio/VO_Eve_BigPain01,
+	Audio/VO_Eve_BigPain02,
+	Audio/VO_Eve_Scream01,
+	Audio/VO_Eve_Scream02,
+	Audio/VO_Eve_Scream03,
+	Audio/VO_Eve_Scream04
+	Audio/VO_Eve_Scream05
+	Audio/VO_Eve_Pain01,
+	Audio/VO_Eve_Pain02,
+	Audio/VO_Eve_Pain03,
+	Audio/VO_Eve_Pain04,
+	Audio/VO_Eve_Pain05,
+	Audio/VO_Eve_Pain06,
+	Audio/VO_Eve_Pain07
+	Audio/VO_Eve_Surprise01,
+	Audio/VO_Eve_Surprise02,
+	Audio/VO_Eve_Surprise03,
+	Audio/VO_Eve_Surprise04,
+	Audio/VO_Eve_Surprise05,
+	Audio/VO_Eve_Surprise06,
+	Audio/VO_Eve_Surprise07,
+	Audio/VO_Eve_What02,
+	Audio/VO_Eve_What05
+	Audio/VO_Eve_Grunt01,
+	Audio/VO_Eve_Grunt03,
+	Audio/VO_Eve_Grunt04
+
 	Audio/VO_Eve_What01
 	Audio/PFX_Impact7
-	Audio/VO_Eve_Scream05
-	Audio/VO_Eve_Surprise02
 	Audio/rainthunder1
 	Audio/rain1
 	Audio/PFX_TentacleStrike1

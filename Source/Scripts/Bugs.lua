@@ -439,8 +439,9 @@ function Bug.UpdateRandomMove(self, moveCompleteCallback)
 		end
 	end
 	
-	COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - can't find anywhere to go.")
+	COutLine(kC_Error, "ERROR: Bug.UpdateRandomMove - can't find anywhere to go (deleting self).")
 	self:Stop()
+	self:Remove()
 	
 end
 

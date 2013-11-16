@@ -527,6 +527,7 @@ function Arm.SignalContext(self, topic, clearedCallback)
 		self.inContextTopic = false
 		self.requestedTopic = nil
 		self.topic = nil
+		HUD:SignalArm(true)
 	end
 	
 	Arm:ClearLockout()

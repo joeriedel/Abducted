@@ -1311,6 +1311,7 @@ function MemoryGame.Think(self,dt)
 				PuzzleScoreScreen:DoSuccessScreen(
 					self.widgets.root2,
 					self.actions,
+					#self.goals,
 					function()
 						self:EndGame("w")
 					end

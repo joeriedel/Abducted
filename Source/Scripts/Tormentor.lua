@@ -63,6 +63,7 @@ function Tormentor.Spawn(self)
 	
 	self.didIntro = false
 	self.visible = BoolForString(self.keys.visible, true)
+	self.enableKillCmd = BoolForString(self.keys.enable_kill_cmd, true)
 	
 	self:Link()
 	
@@ -130,6 +131,10 @@ function Tormentor.OnEvent(self, cmd, args)
 		if (self.visible) then
 			self:PlayCinematicAnim(args)
 		end
+		return true
+	elseif (cmd == "enablekillcmd") then
+		self.enableKillCmd = true
+		return true
 	end
 	
 	return false
@@ -314,7 +319,11 @@ function Tormentor.AttackPlayer(self)
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then
-			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, self.keys.killed_player_command)
+			local cmd = nil
+			if (self.enableKillCmd) then
+				cmd = self.keys.killed_player_command
+			end
+			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, cmd)
 			if (World.playerPawn.dead) then
 				local f = function()
 					World.viewController:AddLookTarget(self, {0,0,160})

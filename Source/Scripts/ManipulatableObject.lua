@@ -93,6 +93,7 @@ function ManipulatableObject.Spawn(self)
 	self.canAttack = false
 	self.enableManipulateShimmer = false
 	self.didManipulateShimmer = false
+	self.disabledFromReset = false
 	self.activationRange = NumberForString(self.keys.range, 450)
 	self.swipePos = {0, 0, 0}
 	self.wasBlocked = false
@@ -195,10 +196,10 @@ function ManipulatableObject.RemoveFromShootableList(self)
 end
 
 function ManipulatableObject.AddToManipulateList(self)
+	if (self.listItem == nil) then
+		self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
+	end
 	if (PlayerSkills:ManipulateUnlocked()) then
-		if (self.listItem == nil) then
-			self.listItem = LL_Append(ManipulatableObject.Objects, {entity=self})
-		end
 		self:DoManipulateShimmer()
 	end
 end
@@ -726,6 +727,7 @@ function ManipulatableObject.NotifyManipulate(enabled)
 			local dd = VecMag(VecSub(world, playerPos))
 			if (dd > x.entity.activationRange) then
 				x.entity.inRange = false
+				COutLine(kC_Debug, "Manipulatable(%s) is out of range (%d > %d)", x.entity.keys.targetname or "noname", dd, x.entity.activationRange)
 				return
 			end
 		end
@@ -1132,6 +1134,13 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 			if (self.keys.on_reset) then
 				World.PostEvent(self.keys.on_reset)
 			end
+			if (BoolForString(self.keys.disable_after_reset, false)) then	
+				self.disabledFromReset = true
+			end
+			
+			if (self.disabledFromReset) then
+				World.viewController:RemoveLookTarget(self.manipulateTarget)
+			end
 			
 			local blend = self:PlayAnim(ret, self.model)
 			if (blend) then
@@ -1139,7 +1148,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 					self.sounds.Reset:FadeVolume(1, 0)
 					self.sounds.Reset:Play(kSoundChannel_FX, 0)
 				end
-				
+								
 				local f = function()
 					COutLine(kC_Debug, "Manipulatable.PostReset")
 					if (self.keys.post_reset) then
@@ -1155,8 +1164,11 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 							self.sounds.Reset:FadeOutAndStop(0.1)
 						end
 					end
+					if (not self.disabledFromReset) then
+						self:Idle()
+					end
 				end
-				blend.Seq(f).Seq(ManipulatableObject.Idle)
+				blend.Seq(f)
 			else
 				COutLine(kC_Debug, "Manipulatable.PostReset")
 				if (self.keys.post_reset) then
@@ -1278,7 +1290,8 @@ function ManipulatableObject.SaveState(self)
 		awake = tostring(self.awake),
 		visible = tostring(self.visible),
 		enableManipulateShimmer = tostring(self.enableManipulateShimmer),
-		didManipulateShimmer = tostring(self.didManipulateShimmer)
+		didManipulateShimmer = tostring(self.didManipulateShimmer),
+		disabledFromReset = tostring(self.disabledFromReset)
 	}
 	
 	if (self.saveManipulateDir) then
@@ -1304,30 +1317,42 @@ function ManipulatableObject.LoadState(self, state)
 	
 	if (state.awake == "true") then
 		self.awake = true
-		if (state.manipulate) then
+		if (state.manipulate or state.disabledFromReset == "true") then
 			self.canAttack = false
 			self.enabled = false
 			self.saveManipulateDir = state.manipulate
+			self.disabledFromReset = state.disabledFromReset == "true"
 			-- no longer manipulatable
 			self:RemoveFromManipulateList()
 			self:RemoveFromShootableList()
-			self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
-			if (self.sounds.Idle) then
-				self.sounds.Idle:Stop()
-			end
-			if (self.sounds.Dormant) then
-				self.sounds.Dormant:Stop()
+			if (state.manipulate) then
+				self.model:BlendImmediate("manipulate_"..state.manipulate.."_idle")
+			else
+				if (BoolForString(self.keys.idle_while_dormant, false)) then
+					self:PlayAnim("idle", self.model)
+					if (self.sounds.Idle) then
+						self.sounds.Idle:Play(kSoundChannel_FX, 0)
+					end
+				else
+					self:PlayAnim("dormant", self.model)
+					if (self.sounds.Dormant) then
+						self.sounds.Dormant:Play(kSoundChannel_FX, 0)
+					end
+					if (self.sounds.Idle) then
+						self.sounds.Idle:FadeOutAndStop(1)
+					end
+				end
 			end
 			if (self.sounds.Sleep) then
 				self.sounds.Sleep:Stop()
 			end
 			if (self.sounds.Manipulate) then
-				self.sounds.Manipulate:FadeVolume(1, 0)
-				self.sounds.Manipulate:Play(kSoundChannel_FX, 0)
+				self.sounds.Manipulate:Stop()
 			end
 		else
 			self.enabled = true
 			self.canAttack = true
+			self.disabledFromReset = false
 			self:PlayAnim("idle", self.model)
 			self:AddToManipulateList()
 			self:AddToShootableList()
@@ -1356,6 +1381,7 @@ function ManipulatableObject.LoadState(self, state)
 		self.enabled = false
 		self.canAttack = false
 		self.saveManipulateDir = nil
+		self.disabledFromReset = false
 		self:RemoveFromManipulateList()
 		self:RemoveFromShootableList()
 		

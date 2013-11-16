@@ -10,9 +10,9 @@ PlayerSkills.RefundFraction = 0.75
 PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120
 PlayerSkills.kPulseExplodeTime = {8, 10}
-PlayerSkills.kArmChatReward = 25
+PlayerSkills.kArmChatReward = 15
 PlayerSkills.kDiscoveryReward = 25
-PlayerSkills.kTerminalReward = 100
+PlayerSkills.kTerminalReward = 150
 
 PlayerSkills.Skills = {}
 

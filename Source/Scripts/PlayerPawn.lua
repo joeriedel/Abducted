@@ -16,6 +16,47 @@ PlayerPawn.PulseBeamScale = 1/120
 PlayerPawn.GodMode = false
 PlayerPawn.kMaxShieldDamage = 100
 
+PlayerPawn.DeathSounds = {
+	"Audio/VO_Eve_BigPain01",
+	"Audio/VO_Eve_BigPain02",
+	"Audio/VO_Eve_Scream01",
+	"Audio/VO_Eve_Scream02",
+	"Audio/VO_Eve_Scream03",
+	"Audio/VO_Eve_Scream04",
+}
+
+PlayerPawn.FallDeathSounds = {
+	"Audio/VO_Eve_Scream05"
+}
+
+PlayerPawn.PainSounds = {
+	"Audio/VO_Eve_Pain01",
+	"Audio/VO_Eve_Pain02",
+	"Audio/VO_Eve_Pain03",
+	"Audio/VO_Eve_Pain04",
+	"Audio/VO_Eve_Pain05",
+	"Audio/VO_Eve_Pain06",
+	"Audio/VO_Eve_Pain07"
+}
+
+PlayerPawn.SurpriseSounds = {
+	"Audio/VO_Eve_Surprise01",
+	"Audio/VO_Eve_Surprise02",
+	"Audio/VO_Eve_Surprise03",
+	"Audio/VO_Eve_Surprise04",
+	"Audio/VO_Eve_Surprise05",
+	"Audio/VO_Eve_Surprise06",
+	"Audio/VO_Eve_Surprise07",
+	"Audio/VO_Eve_What02",
+	"Audio/VO_Eve_What05"
+}
+
+PlayerPawn.GruntSounds = {
+	"Audio/VO_Eve_Grunt01",
+	"Audio/VO_Eve_Grunt03",
+	"Audio/VO_Eve_Grunt04"
+}
+
 PlayerPawn.AnimationStates = {
 	default = {
 	-- any animations *not* listed here will pass-through unaltered
@@ -120,6 +161,19 @@ function PlayerPawn.Spawn(self)
 	self:Precache("Audio/mine_armed")
 	self:Precache("Audio/mine_explode")
 	self:Precache("Audio/mine_tripped")
+	
+	local loadSound = function (sound)
+		sound = World.LoadSound(sound)
+		self:AttachSound(sound)
+		sound:FadeVolume(0.7, 0)
+		return sound
+	end
+	
+	map(PlayerPawn.DeathSounds, loadSound)
+	map(PlayerPawn.FallDeathSounds, loadSound)
+	map(PlayerPawn.PainSounds, loadSound)
+	map(PlayerPawn.SurpriseSounds, loadSound)
+	map(PlayerPawn.GruntSounds, loadSound)
 	
 	self.charDBStatus = StringForString(self.keys.health_status, "good")
 	
@@ -346,6 +400,22 @@ function PlayerPawn.PostSpawn(self)
 	local state = self.animState
 	self.animState = nil
 	self:SelectAnimState(state)	
+
+end
+
+function PlayerPawn.PlaySoundGroup(self, group, probability, delay)
+
+	if (math.random() <= probability) then
+		local idx = IntRand(1, #group)
+		if (delay) then
+			local f = function()
+				group[idx]:Play(kSoundChannel_FX, 0)
+			end
+			World.gameTimers:Add(f, delay)
+		else
+			group[idx]:Play(kSoundChannel_FX, 0)
+		end
+	end
 
 end
 
@@ -878,6 +948,7 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 		if (damage < (PlayerPawn.kMaxShieldDamage*2)) then
 		-- doesn't kill us
 			self:PlayUninterruptable("damage_stun")
+			self:PlaySoundGroup(PlayerPawn.PainSounds, 1)
 			return
 		end
 	elseif (PlayerSkills.Defender > 0) then
@@ -904,6 +975,7 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 			if (damage < (PlayerPawn.kMaxShieldDamage*2)) then
 			-- doesn't kill us
 				self:PlayUninterruptable("damage_stun")
+				self:PlaySoundGroup(PlayerPawn.PainSounds, 1)
 				return
 			end
 		end
@@ -927,6 +999,7 @@ function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
 	
 	self:SetMoveType(kMoveType_None)
 	self:PlayAnim(self:LookupAnimation("death"), self.model)
+	self:PlaySoundGroup(PlayerPawn.DeathSounds, 1)
 	
 	self:AbortBugAction()
 	
@@ -1030,10 +1103,28 @@ function PlayerPawn.PlayUninterruptable(self, anim, callback)
 	return nil
 end
 
+function PlayerPawn.PlayAnimSounds(self, anim)
+	if ((anim == "climb_up_64") or (anim == "climb_up_96") or (anim == "climb_down_64") or (anim == "climb_down_96")) then
+		self:PlaySoundGroup(PlayerPawn.GruntSounds, 0.75, 0.6)
+	elseif ((anim == "jump128") or (anim == "jump196")) then
+		self:PlaySoundGroup(PlayerPawn.GruntSounds, 1, 0.5)
+	elseif (anim == "limp_dropdown_death") then
+		self:PlaySoundGroup(PlayerPawn.FallDeathSounds, 1, 1)
+	elseif (anim == "limp_dropdown_high") then
+		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	elseif (anim == "limp_dropdown_med") then
+		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	elseif (anim == "limp_dropdown_low") then
+		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	end
+end
+
 function PlayerPawn.PlayCinematicAnim(self, args)
 	args = Tokenize(args)
 	local anim = self:LookupAnimation(args[1])
 	if (anim) then
+		self:PlayAnimSounds(anim)
+		
 		local f = function()
 			self:SetMoveType(kMoveType_Floor)
 			self.disableAnimTick = false
@@ -1158,6 +1249,8 @@ function PlayerPawn.BugStun(self, callback)
 		Abducted.entity:EndPulse()
 	end
 	
+	self:PlaySoundGroup(PlayerPawn.PainSounds, 1)
+	
 	local f = function()
 		if (not self.dead) then
 			self.bugStun = false
@@ -1197,6 +1290,8 @@ function PlayerPawn.BugStomp(self, callback)
 		Abducted.entity:EndPulse()
 		self:SetDesiredMove(nil)
 	end
+	
+	self:PlaySoundGroup(PlayerPawn.SurpriseSounds, 1)
 
 	local anim = self:LookupAnimation("bug_squish")
 
@@ -1601,6 +1696,7 @@ function PlayerPawn.CustomAnimMove(self, name)
 	
 	local anim = self:LookupAnimation(name)
 	if (anim) then
+		self:PlayAnimSounds(anim)
 		self.disableAnimTick = true
 		self.customMove = true
 		self.state = nil

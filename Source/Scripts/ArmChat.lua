@@ -251,13 +251,15 @@ function Arm.ProcessActionTokens(self, tokens)
 		self:ProcessTriggerTokens(tokens)
 	elseif (tokens[1] == "unlock_topic") then
 		if (Arm:UnlockTopic(tokens[2])) then
-			self.rewardTopic = tokens[2]
+			self.rewardTopic = self.rewardTopic or {}
+			table.insert(self.rewardTopic, tokens[2])
 		end
 	elseif (tokens[1] == "lock_topic") then
 		Arm:LockTopic(tokens[2])
 	elseif (tokens[1] == "message") then
-		self.rewardMessage = tokens[2]
-		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
+		self.rewardMessage = self.rewardMessage or {}
+		table.insert(self.rewardMessage, tokens[2])
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", tokens[2])
 	elseif (tokens[1] == "award") then
 		if (not Arm:CheckTopicReward(self.topic, "skillpoints")) then
 			self.rewardSkillPoints = self.rewardSkillPoints or 0
@@ -419,21 +421,23 @@ function Arm.CreateRewardText(self)
 	end
 	
 	if (self.rewardTopic) then
-		local rewardTopic = self.rewardTopic -- this may change as the conversation does so record it
-		local w, r = self:CreateRewardActionButton(
-			"> "..StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(self.rewardTopic), 
-			inset,
-			maxWidth,
-			function ()
-				self.requestedTopic = rewardTopic
-				Arm:StartConversation()
-			end
-		)
-		
-		table.insert(self.currentRewardWidgets, w)
-		self.widgets.chat.ChatList:AddItem(w)
-		w:SetBlendWithParent(true)
-		w:BlendTo({1,1,1,0}, 0)
+		for k,v in pairs(self.rewardTopic) do
+			local rewardTopic = v -- this may change as the conversation does so record it
+			local w, r = self:CreateRewardActionButton(
+				"> "..StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(rewardTopic), 
+				inset,
+				maxWidth,
+				function ()
+					self.requestedTopic = rewardTopic
+					Arm:StartConversation()
+				end
+			)
+			
+			table.insert(self.currentRewardWidgets, w)
+			self.widgets.chat.ChatList:AddItem(w)
+			w:SetBlendWithParent(true)
+			w:BlendTo({1,1,1,0}, 0)
+		end
 	end
 	
 	if (self.rewardDiscover) then
@@ -460,16 +464,18 @@ function Arm.CreateRewardText(self)
 	end
 	
 	if (self.rewardMessage) then
-		local w = self:CreateRewardActionText(
-			StringTable.Get(self.rewardMessage),
-			inset,
-			maxWidth
-		)
-		
-		table.insert(self.currentRewardWidgets, w)
-		self.widgets.chat.ChatList:AddItem(w)
-		w:SetBlendWithParent(true)
-		w:BlendTo({1,1,1,0}, 0)
+		for k,v in pairs(self.rewardMessage) do
+			local w = self:CreateRewardActionText(
+				StringTable.Get(v),
+				inset,
+				maxWidth
+			)
+			
+			table.insert(self.currentRewardWidgets, w)
+			self.widgets.chat.ChatList:AddItem(w)
+			w:SetBlendWithParent(true)
+			w:BlendTo({1,1,1,0}, 0)
+		end
 	end
 	
 	self.currentRewardWidgetsHeight = self.chatPos[2] - startY

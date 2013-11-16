@@ -6,7 +6,7 @@
 Metadata = Entity:New()
 Metadata.kSize = 45
 Metadata.List = LL_New()
-Metadata.kSmackDistance = 60
+Metadata.kSmackDistance = 80
 -- Percent of total screen
 Metadata.TouchDistance = 0.1
 
@@ -161,6 +161,7 @@ end
 
 function Metadata.Explode(self)
 	self.think = nil
+	self.opened = true
 	LL_Remove(Metadata.List, self.listItem)
 	self.listItem = nil
 	self.explodeSound:Play(kSoundChannel_FX, 0)

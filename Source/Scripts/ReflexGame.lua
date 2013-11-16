@@ -64,9 +64,9 @@ function ReflexGame.InitGame(self, terminalSkill)
 	self.animatingRetry = false
 	self.exiting = false
 	
-	terminalSkill = Clamp(terminalSkill, 1, #self.db.levels)
+	self.skill = Clamp(terminalSkill, 1, #self.db.levels)
 	
-	local levelBank = self.db.levels[terminalSkill]
+	local levelBank = self.db.levels[self.skill]
 	self.level = levelBank[IntRand(1, #levelBank)]
 	
 	-- InitGame: prep the board to be shown with ShowBoard
@@ -180,6 +180,8 @@ function ReflexGame.DPadInput(widget, e)
 		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
 		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
 		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		return true
+	elseif (self.dpadTouch == nil) then
 		return true
 	end
 
@@ -1388,6 +1390,7 @@ function ReflexGame.Think(self,dt)
 				PuzzleScoreScreen:DoSuccessScreen(
 					self.widgets.root3,
 					self.actions,
+					self.skill,
 					function ()
 						self:EndGame("w")
 					end
@@ -1839,26 +1842,6 @@ function PuzzleScoreScreen.CreateSuccess(self)
 	self.successLabelRect = UI:HCenterLabel(self.widgets.SuccessLabel, screen)
 	self.widgets.SuccessLabel:SetBlendWithParent(true)
 	self.widgets.SuccessRoot:AddChild(self.widgets.SuccessLabel)
-	
-	self.widgets.TopicLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
-	self.widgets.SuccessRoot:AddChild(self.widgets.TopicLabel)
-	self.widgets.TopicLabel:SetBlendWithParent(true)
-	
-	self.widgets.MessageLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
-	self.widgets.SuccessRoot:AddChild(self.widgets.MessageLabel)
-	self.widgets.MessageLabel:SetBlendWithParent(true)
-	
-	self.widgets.SkillLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
-	self.widgets.SuccessRoot:AddChild(self.widgets.SkillLabel)
-	self.widgets.SkillLabel:SetBlendWithParent(true)
-	
-	self.widgets.SkillPointsLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
-	self.widgets.SuccessRoot:AddChild(self.widgets.SkillPointsLabel)
-	self.widgets.SkillPointsLabel:SetBlendWithParent(true)
-	
-	self.widgets.DiscoverLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
-	self.widgets.SuccessRoot:AddChild(self.widgets.DiscoverLabel)
-	self.widgets.DiscoverLabel:SetBlendWithParent(true)
 
 	self.successScreenRect = screen
 end
@@ -1953,7 +1936,15 @@ function PuzzleScoreScreen.RevealNextItem(self, callback)
 	end
 end
 
-function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logevent)
+function PuzzleScoreScreen.CreateRewardWidget(self)
+	local w = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Score2})
+	self.widgets.SuccessRoot:AddChild(w)
+	w:SetBlendWithParent(true)
+	w:BlendTo({1,1,1,0}, 0)
+	return w
+end
+	
+function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, skillLevel, callback, logevent)
 
 	ReflexGame.entity.sfx.Success:Play(kSoundChannel_UI, 0)
 	
@@ -1972,20 +1963,16 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logev
 	self.rewardSkillPoints = nil
 	self.rewardDiscover = nil
 	
-	self:ProcessActions(actions)
+	self:ProcessActions(actions, skillLevel)
 	
 	local kSpace = 24*UI.identityScale[2]
 	local totalHeight = 0--self.successLabelRect[2] + self.successLabelRect[4] + kSpace
 	
 	self.widgets.items = {}
 	
-	self.widgets.TopicLabel:BlendTo({1,1,1,0}, 0)
-	self.widgets.MessageLabel:BlendTo({1,1,1,0}, 0)
-	self.widgets.SkillLabel:BlendTo({1,1,1,0}, 0)
-	self.widgets.SkillPointsLabel:BlendTo({1,1,1,0}, 0)
-	self.widgets.DiscoverLabel:BlendTo({1,1,1,0}, 0)
-	
 	if (self.rewardSkillPoints) then
+		local w = self:CreateRewardWidget()
+		
 		local msg = "+"..tostring(self.rewardSkillPoints)
 		if (self.rewardSkillPoints > 1) then
 			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINTS")
@@ -1993,39 +1980,47 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logev
 			msg = msg.." "..StringTable.Get("ARM_REWARD_SKILLPOINT")
 		end
 		
-		self.widgets.SkillPointsLabel:SetText(msg) -- no zoom on fonts here, gets too crowded
-		--UI:SetLabelText(self.widgets.SkillPointsLabel, msg)
-		UI:SizeLabelToContents(self.widgets.SkillPointsLabel)
-		local r = UI:HCenterLabel(self.widgets.SkillPointsLabel, self.successScreenRect)
-		table.insert(self.widgets.items, self.widgets.SkillPointsLabel)
+		w:SetText(msg) -- no zoom on fonts here, gets too crowded
+		UI:SizeLabelToContents(w)
+		local r = UI:HCenterLabel(w, self.successScreenRect)
+		table.insert(self.widgets.items, w)
 		totalHeight = totalHeight + r[4]
 	end
 	
 	if (self.rewardTopic) then
-		self.widgets.TopicLabel:SetText(StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(self.rewardTopic))
-		UI:SizeLabelToContents(self.widgets.TopicLabel)
-		local r = UI:HCenterLabel(self.widgets.TopicLabel, self.successScreenRect)
-		table.insert(self.widgets.items, self.widgets.TopicLabel)
-		totalHeight = totalHeight + r[4]
-	end
-	
-	if (self.rewardDiscover) then
-		local dbItem = Arm.Discoveries[self.rewardDiscover]
-		if (dbItem) then
-			self.widgets.DiscoverLabel:SetText(StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title))
-			UI:SizeLabelToContents(self.widgets.DiscoverLabel)
-			local r = UI:HCenterLabel(self.widgets.DiscoverLabel, self.successScreenRect)
-			table.insert(self.widgets.items, self.widgets.DiscoverLabel)
+		for k,v in pairs(self.rewardTopic) do
+			local w = self:CreateRewardWidget()
+			w:SetText(StringTable.Get("ARM_REWARD_TOPIC").." "..Arm:FindChatString(v))
+			UI:SizeLabelToContents(w)
+			local r = UI:HCenterLabel(w, self.successScreenRect)
+			table.insert(self.widgets.items, w)
 			totalHeight = totalHeight + r[4]
 		end
 	end
 	
+	if (self.rewardDiscover) then
+		for k,v in pairs(self.rewardDiscover) do
+			local dbItem = Arm.Discoveries[v]
+			if (dbItem) then
+				local w = self:CreateRewardWidget()
+				w:SetText(StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(dbItem.title))
+				UI:SizeLabelToContents(w)
+				local r = UI:HCenterLabel(w, self.successScreenRect)
+				table.insert(self.widgets.items, w)
+				totalHeight = totalHeight + r[4]
+			end
+		end
+	end
+	
 	if (self.rewardMessage) then
-		self.widgets.MessageLabel:SetText(StringTable.Get(self.rewardMessage))
-		UI:SizeLabelToContents(self.widgets.MessageLabel)
-		local r = UI:HCenterLabel(self.widgets.MessageLabel, self.successScreenRect)
-		table.insert(self.widgets.items, self.widgets.MessageLabel)
-		totalHeight = totalHeight + r[4]
+		for k,v in pairs(self.rewardMessage) do
+			local w = self:CreateRewardWidget()
+			w:SetText(StringTable.Get(v))
+			UI:SizeLabelToContents(w)
+			local r = UI:HCenterLabel(w, self.successScreenRect)
+			table.insert(self.widgets.items, w)
+			totalHeight = totalHeight + r[4]
+		end
 	end
 	
 	-- center widgets for better presentation
@@ -2060,13 +2055,19 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, callback, logev
 			self.revealTimer:Clean()
 			self.revealTimer = nil
 		end
-		self.widgets.items = nil
+		if (self.widgets.items) then
+			for k,v in pairs(self.widgets.items) do
+				self.widgets.SuccessRoot:RemoveChild(v)
+				v:Unmap()
+			end
+			self.widgets.items = nil
+		end
 		layer:RemoveChild(self.widgets.root)
 	end
 
 end
 
-function PuzzleScoreScreen.ProcessActions(self, actions)
+function PuzzleScoreScreen.ProcessActions(self, actions, skillLevel)
 	if (actions == nil) then
 		return
 	end
@@ -2079,20 +2080,24 @@ function PuzzleScoreScreen.ProcessActions(self, actions)
 			self:ProcessActionTokens(tokens)
 		end
 	end
+	
+	self.rewardSkillPoints = skillLevel * PlayerSkills.kTerminalReward
+	PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 end
 
 function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 
-	if (tokens[1] == "unlock_topic") then
+	if (tokens[1] == "trigger") then
+		Arm:ProcessTriggerTokens(tokens)
+	elseif (tokens[1] == "unlock_topic") then
 		if (Arm:UnlockTopic(tokens[2])) then
-			self.rewardTopic = tokens[2]
+			self.rewardTopic = self.rewardTopic or {}
+			table.insert(self.rewardTopic, tokens[2])
 		end
 	elseif (tokens[1] == "message") then
-		self.rewardMessage = tokens[2]
+		self.rewardMessage = self.rewardMessage or {}
+		table.insert(self.rewardMessage, tokens[2])
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
-	elseif (tokens[1] == "award") then
-		self.rewardSkillPoints = Arm:GetSkillAwardAmount(tokens[2], "terminal")
-		PlayerSkills:AwardSkillPoints(self.rewardSkillPoints)
 	elseif (tokens[1] == "unlock_skill") then
 		self.rewardSkill = tokens[2]
 	elseif (tokens[1] == "discover") then

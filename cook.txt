@@ -18,6 +18,7 @@ pak0 {
 
 	// Shared
 	FX/discoverysprite_M
+	FX/discoverysprite_dark_M
 	FX/darkparticles1
 	FX/darkparticles2
 	FX/ghostparticles
@@ -31,6 +32,8 @@ pak0 {
 	FX/terminalflash1_M
 	FX/terminalflash2_M
 	FX/impactfx1
+	UI/TerminalHotspot_M
+	UI/TerminalHotspotPressed_M
 	Objects/big_tentacle1
 	Objects/big_tentacle2
 	Objects/big_tentacle3

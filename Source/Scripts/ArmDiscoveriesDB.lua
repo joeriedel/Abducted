@@ -222,6 +222,16 @@ Arm.Discoveries = {
 		discoveryPopupText = "ARM_DISCOVERY_DARK_CORNER_POPUP"
 	},
 	
+	DeepSpace = {
+		picture = "UI/discovery_deep_space_M",
+		title = "ARM_DISCOVERY_DEEPSPACE_TITLE",
+		text = "ARM_DISCOVERY_DEEPSPACE",
+		logText = {
+			all = "ARM_DISCOVERY_DEEPSPACE_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_DEEPSPACE_POPUP"
+	},
+	
 	Dreamscape = {
 		picture = "UI/discovery_dreamscape_M",
 		title = "ARM_DISCOVERY_DREAMSCAPE_TITLE",
@@ -230,6 +240,16 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_DREAMSCAPE_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_POPUP"
+	},
+	
+	DreamscapeMatrix = {
+		picture = "UI/discovery_dreamscape_matrix_M",
+		title = "ARM_DISCOVERY_DREAMSCAPE_MATRIX_TITLE",
+		text = "ARM_DISCOVERY_DREAMSCAPE_MATRIX",
+		logText = {
+			all = "ARM_DISCOVERY_DDREAMSCAPE_MATRIX_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_MATRIX_POPUP"
 	},
 	
 	DreamscapePortal = {
@@ -340,6 +360,16 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_MANIPULATE_TENTACLE_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_TENTACLE_POPUP"
+	},
+	
+	ManipulatePylon = {
+		picture = "UI/discovery_manipulate_pylon_M",
+		title = "ARM_DISCOVERY_MANIPULATE_PYLON_TITLE",
+		text = "ARM_DISCOVERY_MANIPULATE_PYLON",
+		logText = {
+			all = "ARM_DISCOVERY_MANIPULATE_PYLON_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_PYLON_POPUP"
 	},
 	
 	MedicalDiscovery = {

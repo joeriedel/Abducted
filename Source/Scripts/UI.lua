@@ -194,8 +194,8 @@ function UI.InitMap(self)
 		self.gfx.Glyphs[i] = World.Load(s)
 	end
 	
-	self.gfx.AnimatedGlpyh = World.Load("Puzzles/+0glyph_M")
-	self.gfx.AnimatedGlpyhPressed = World.Load("Puzzles/+0glyphPressed_M")
+	self.gfx.AnimatedGlpyh = World.Load("UI/TerminalHotspot_M")
+	self.gfx.AnimatedGlpyhPressed = World.Load("UI/TerminalHotspotPressed_M")
 	
 	if (UI.mode == kGameUIMode_PC) then
 		self.typefaces.ActionBar = World.Load("UI/ActionBarLabel_TF")

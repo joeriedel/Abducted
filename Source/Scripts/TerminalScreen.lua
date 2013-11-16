@@ -5,7 +5,7 @@
 
 TerminalScreen = Entity:New()
 TerminalScreen.MaxTouchDistancePct = 1/8
-TerminalScreen.TouchPosShift = {70,0,80}
+TerminalScreen.TouchPosShift = {80,0,80}
 TerminalScreen.ButtonPosShift = {1.5/10, 1/10}
 TerminalScreen.ButtonSize = {1.5/15, 1.5/15}
 TerminalScreen.PopupEntity = nil
@@ -191,6 +191,7 @@ function TerminalScreen.EndActivated(self)
 		TerminalScreen.CancelUI()
 		Arm:ClearContext()
 		TerminalScreen.Signaled = nil
+		self.popup = false
 	end
 	
 	if (self.size == "small") then
@@ -500,6 +501,15 @@ function TerminalScreen.GameComplete(self, mode, result)
 		collectgarbage()
 	end
 	World.globalTimers:Add(f, 0.3)
+	
+	if (result == "w") then
+		self.failCount = 0
+		Arm:ClearContext()
+		TerminalScreen.Signaled = nil
+		self.enabled = false
+		self.popup = false
+		self:Activate(false)
+	end
 	
 	if (mode == "hack") then
 		World.playerPawn:LeaveHackGame(self, result == "w")

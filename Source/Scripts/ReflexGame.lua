@@ -2097,12 +2097,13 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "message") then
 		self.rewardMessage = self.rewardMessage or {}
 		table.insert(self.rewardMessage, tokens[2])
-		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", self.rewardMessage)
+		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", tokens[2])
 	elseif (tokens[1] == "unlock_skill") then
 		self.rewardSkill = tokens[2]
 	elseif (tokens[1] == "discover") then
 		if (GameDB:Discover(tokens[2], "terminal", true)) then
-			self.rewardDiscover = tokens[2]
+			self.rewardDiscover = self.rewardDiscover or {}
+			table.insert(self.rewardDiscover, tokens[2])
 		end
 	end
 end

@@ -165,7 +165,7 @@ function PlayerPawn.Spawn(self)
 	local loadSound = function (sound)
 		sound = World.LoadSound(sound)
 		self:AttachSound(sound)
-		sound:FadeVolume(0.7, 0)
+		--sound:FadeVolume(0.7, 0)
 		return sound
 	end
 	

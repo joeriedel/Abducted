@@ -28,6 +28,19 @@ function Tormentor.Spawn(self)
 	self.sfx.Contact = World.LoadSound("Audio/EFX_TenticleHit1-BodyHit")
 	self:AttachSound(self.sfx.Contact)
 	
+	self.sfx.Growls = {
+		World.LoadSound("Audio/tormentorgrowl1"),
+		World.LoadSound("Audio/tormentorgrowl2"),
+		World.LoadSound("Audio/tormentorgrowl3"),
+		World.LoadSound("Audio/tormentorgrowl4"),
+	}
+	
+	for k,v in pairs(self.sfx.Growls) do
+		v:SetRefDistance(500)
+		v:SetMaxDistance(1000)
+		self:AttachSound(v)
+	end
+	
 	self.mode = StringForString(self.keys.initial_state, "idle")
 	self.model = LoadModel("Characters/Tormentor1")
 	self:SetMotionSka(self.model)
@@ -89,6 +102,13 @@ function Tormentor.Spawn(self)
 	}
 	
 	GameDB.PersistentObjects[self.keys.uuid] = io
+end
+
+function Tormentor.Growl(self)
+
+	local idx = IntRand(1, #self.sfx.Growls)
+	self.sfx.Growls[idx]:Play(kSoundChannel_FX, 0)
+	
 end
 
 function Tormentor.OnEvent(self, cmd, args)
@@ -170,6 +190,7 @@ function Tormentor.PlayCinematicAnim(self, args)
 	self.think = nil
 	self:Move(false)
 	self:SetDesiredMove(nil)
+	self:Growl()
 	
 	local blend = self:PlayAnim(args[1], self.model)
 	if (blend) then
@@ -236,6 +257,7 @@ function Tormentor.Stun(self)
 	end
 	
 	self:Move(false)
+	self:Growl()
 	
 	self.think = nil
 	
@@ -323,6 +345,7 @@ function Tormentor.AttackPlayer(self)
 	self:Move(false)
 	self:PlayAnim("swing", self.model).Seq("idle")
 	self.sfx.Swing:Play(kSoundChannel_FX, 0)
+	self:Growl()
 	
 	local f = function()
 		if (self:PlayerInAttackRange()) then

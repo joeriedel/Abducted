@@ -72,6 +72,9 @@ pak0 {
 	Objects/mine_armed_M
 	Objects/mine_tripped_M
 	Objects/gameintro_fadeimage_mesh
+	Objects/puncturehole1
+	Characters/TentacleFallingFinal1
+	Characters/TentacleFallingFinal2
 	FX/shield1mesh
 	FX/pulsecone1mesh
 	FX/pulsebeam1mesh
@@ -138,7 +141,9 @@ pak0 {
 	UI/discovery_computer_log_M
 	UI/discovery_crystaline_structure_M
 	UI/discovery_dark_corner_M
+	UI/discovery_deep_space_M
 	UI/discovery_dreamscape_M
+	UI/discovery_dreamscape_matrix_M
 	UI/discovery_dreamscape_portal_M
 	UI/discovery_exodus_M
 	UI/discovery_flowing_skin_M
@@ -153,6 +158,7 @@ pak0 {
 	UI/discovery_jump_down_M
 	UI/discovery_manipulate_M
 	UI/discovery_manipulate_tentacle_M
+	UI/discovery_manipulate_pylon_M
 	UI/discovery_medical_discovery_M
 	UI/discovery_morta_M
 	UI/discovery_overgrowth_M
@@ -498,31 +504,31 @@ pak0 {
 	Audio/EnviroFX_PylonEnd
 	Audio/EnviroFX_PylonMoving
 
-	Audio/VO_Eve_BigPain01,
-	Audio/VO_Eve_BigPain02,
-	Audio/VO_Eve_Scream01,
-	Audio/VO_Eve_Scream02,
-	Audio/VO_Eve_Scream03,
+	Audio/VO_Eve_BigPain01
+	Audio/VO_Eve_BigPain02
+	Audio/VO_Eve_Scream01
+	Audio/VO_Eve_Scream02
+	Audio/VO_Eve_Scream03
 	Audio/VO_Eve_Scream04
 	Audio/VO_Eve_Scream05
-	Audio/VO_Eve_Pain01,
-	Audio/VO_Eve_Pain02,
-	Audio/VO_Eve_Pain03,
-	Audio/VO_Eve_Pain04,
-	Audio/VO_Eve_Pain05,
-	Audio/VO_Eve_Pain06,
+	Audio/VO_Eve_Pain01
+	Audio/VO_Eve_Pain02
+	Audio/VO_Eve_Pain03
+	Audio/VO_Eve_Pain04
+	Audio/VO_Eve_Pain05
+	Audio/VO_Eve_Pain06
 	Audio/VO_Eve_Pain07
-	Audio/VO_Eve_Surprise01,
-	Audio/VO_Eve_Surprise02,
-	Audio/VO_Eve_Surprise03,
-	Audio/VO_Eve_Surprise04,
-	Audio/VO_Eve_Surprise05,
-	Audio/VO_Eve_Surprise06,
-	Audio/VO_Eve_Surprise07,
-	Audio/VO_Eve_What02,
+	Audio/VO_Eve_Surprise01
+	Audio/VO_Eve_Surprise02
+	Audio/VO_Eve_Surprise03
+	Audio/VO_Eve_Surprise04
+	Audio/VO_Eve_Surprise05
+	Audio/VO_Eve_Surprise06
+	Audio/VO_Eve_Surprise07
+	Audio/VO_Eve_What02
 	Audio/VO_Eve_What05
-	Audio/VO_Eve_Grunt01,
-	Audio/VO_Eve_Grunt03,
+	Audio/VO_Eve_Grunt01
+	Audio/VO_Eve_Grunt03
 	Audio/VO_Eve_Grunt04
 
 	Audio/VO_Eve_What01

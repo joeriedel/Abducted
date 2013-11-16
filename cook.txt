@@ -467,6 +467,10 @@ pak0 {
 	Audio/mine_tripped
 	Audio/mine_drop
 	Audio/terminalflash
+	Audio/tormentorgrowl1
+	Audio/tormentorgrowl2
+	Audio/tormentorgrowl3
+	Audio/tormentorgrowl4
 
 	Audio/EFX_AlienSkinGrowsSlow
 	Audio/EFX_AlienSkinSwallow

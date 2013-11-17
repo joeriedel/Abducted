@@ -264,7 +264,7 @@ function Bug.Spawn(self)
 	else
 		self.model = LoadModel("Characters/Bug1")
 		self.guts = LoadModel("FX/bug_guts_lone01")
-		self.moveSpeed = 90
+		self.moveSpeed = 75
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
@@ -279,7 +279,7 @@ function Bug.Spawn(self)
 	end
 	
 	self.health = Bug.Health
-	self.stompDistance = 35
+	self.stompDistance = 42
 	
 	self.sounds = {}
 	self.sounds.Squish = World.LoadSound("Audio/EFX_SingleBugSquish_rev1")
@@ -310,7 +310,7 @@ function Bug.Spawn(self)
 	self.angle = angle
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 120 -- <-- larger numbers means she turns faster
+	spring.elasticity = 300 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	
 	self:SetClassBits(kEntityClass_Monster)

@@ -96,6 +96,8 @@
 		3397729216E9D61F0046535B /* pak0.pak in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3397729016E9D61F0046535B /* pak0.pak */; };
 		33982E8C16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
 		33982E8E16B2554F00C2ED49 /* G_TouchTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */; };
+		33986C7218395CCD00142AA5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33986C7118395CCD00142AA5 /* StoreKit.framework */; };
+		33986C7318395CEF00142AA5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33986C7118395CCD00142AA5 /* StoreKit.framework */; };
 		339BA573163656B40017FD79 /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		339BA574163656C40017FD79 /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
 		339BA577163656CC0017FD79 /* G_SkModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC062A1626689800F8C9FF /* G_SkModel.cpp */; };
@@ -454,6 +456,7 @@
 		3397729016E9D61F0046535B /* pak0.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = pak0.pak; path = ../../Cooked/iOS/Base/pak0.pak; sourceTree = "<group>"; };
 		33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_TouchTrigger.cpp; sourceTree = "<group>"; };
 		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
+		33986C7118395CCD00142AA5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
 		33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_ManipulatableObject.cpp; sourceTree = "<group>"; };
 		33B55A531710CB2300F8C70B /* G_ManipulatableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_ManipulatableObject.h; sourceTree = "<group>"; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -590,6 +593,7 @@
 				33956A8D16FBD677008314CD /* OpenAL.framework in Frameworks */,
 				33956A8E16FBD677008314CD /* OpenGLES.framework in Frameworks */,
 				33956A8F16FBD677008314CD /* QuartzCore.framework in Frameworks */,
+				33986C7218395CCD00142AA5 /* StoreKit.framework in Frameworks */,
 				33956A9016FBD677008314CD /* UIKit.framework in Frameworks */,
 				33956A9116FBD677008314CD /* AudioToolbox.framework in Frameworks */,
 			);
@@ -613,6 +617,7 @@
 				33FA816C1634817D002603A5 /* OpenAL.framework in Frameworks */,
 				33FA816D1634817D002603A5 /* OpenGLES.framework in Frameworks */,
 				33FA816E1634817D002603A5 /* QuartzCore.framework in Frameworks */,
+				33986C7318395CEF00142AA5 /* StoreKit.framework in Frameworks */,
 				33FA816F1634817D002603A5 /* UIKit.framework in Frameworks */,
 				339BA5811636F3180017FD79 /* AudioToolbox.framework in Frameworks */,
 			);
@@ -746,6 +751,7 @@
 		33EC04EF162663FC00F8C9FF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				33986C7118395CCD00142AA5 /* StoreKit.framework */,
 				3397726F16E9AC9B0046535B /* libnvtt.dylib */,
 				33F8F50616D6FF88009646B1 /* libluajitiOS.a */,
 				33F8F50416D6FF4B009646B1 /* libluajitOSX.a */,
@@ -1089,6 +1095,24 @@
 			attributes = {
 				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = "Sunside Inc.";
+				TargetAttributes = {
+					33956A7816FBD677008314CD = {
+						DevelopmentTeam = 9E9KB724EP;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
+					};
+					33BF3EE91633263C006DEAAE = {
+						DevelopmentTeam = 9E9KB724EP;
+						SystemCapabilities = {
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+						};
+					};
+				};
 			};
 			buildConfigurationList = 33EC04E6162663FC00F8C9FF /* Build configuration list for PBXProject "Abducted" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1661,7 +1685,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05881626678A00F8C9FF /* AppShipDebugiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -1682,7 +1707,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC058A1626678A00F8C9FF /* AppShipReleaseiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -1703,6 +1729,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05821626678A00F8C9FF /* AppGoldenDebugiOS.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1715,6 +1742,7 @@
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1723,6 +1751,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05841626678A00F8C9FF /* AppGoldenReleaseiOS.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1735,6 +1764,7 @@
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -1470,6 +1470,8 @@ function HUD.SignalArm(self, signal)
 	else
 		self.widgets.ArmActivity:SetVisible(false)
 	end
+	
+	World.playerPawn:SignalArm(signal)
 
 end
 

@@ -51,6 +51,7 @@ pak0 {
 	Characters/Ghost1
 	Characters/Tormentor1
 	Characters/Buggroup10
+	Characters/armscreen2_M
 	FX/bug_guts_group01
 	Characters/Bug1
 	FX/bug_guts_lone01
@@ -347,6 +348,9 @@ pak0 {
 	// Puzzles
 	Puzzles/reflex-greenparticle1_M
 	Puzzles/reflex-block1_M
+	Puzzles/reflex-block2_M
+	Puzzles/reflex-block3_M
+	Puzzles/reflex-block4_M
 	Puzzles/reflex-player1_M
 	Puzzles/AlienICE_M
 	Puzzles/reflex-blackhole0_M

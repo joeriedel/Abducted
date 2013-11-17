@@ -186,6 +186,9 @@ function PlayerPawn.Spawn(self)
 		Tripped = World.Load("Objects/mine_tripped_M")
 	}
 	
+	self.arm_M = World.Load("Characters/armscreen1_M")
+	self.armSignaled_M = World.Load("Characters/armscreen2_M")
+	
 	self.numActiveMines = 0
 	
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
@@ -1710,6 +1713,16 @@ function PlayerPawn.CustomAnimMove(self, name)
 
 end
 
+function PlayerPawn.SignalArm(self, signal)
+
+	if (signal) then
+		self.model.dm:ReplaceMaterial(self.arm_M, self.armSignaled_M)
+	else
+		self.model.dm:ReplaceMaterial(self.armSignaled_M, self.arm_M)
+	end
+
+end
+
 function PlayerPawn.SaveState(self)
 	local fp = self:FloorPosition()
 	if (fp.floor == -1) then
@@ -1778,6 +1791,7 @@ function PlayerPawn.LoadState(self, state)
 	
 	self.shieldAutoActivateTime = tonumber(state.shieldAutoActivateTime)
 	self:Show(state.visible == "true")
+--	self:SignalArm(HUD.armSignaled) -- done by HUD
 	
 	self:LoadFloorPos(state)
 	

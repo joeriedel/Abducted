@@ -43,6 +43,8 @@ function Discovery.Spawn(self)
 	self.sprite.dm:Skin()
 	self.sprite.dm:BlendTo({0,0,0,0}, 0)
 	
+	self.disableOnClose = BoolForString(self.keys.disable_on_close, false)
+	
 	local radius = NumberForString(self.keys.activation_radius, 300)
 	self.pos = self:WorldPos()
 	self.mins = VecSub(self.pos, {radius, radius, radius})
@@ -82,6 +84,8 @@ function Discovery.OnEvent(self, cmd, args)
 	elseif (cmd == "disable") then
 		self:Enable(false)
 		return true
+	elseif (cmd == "disableonclose") then
+		self.disableOnClose = true
 	end
 	
 	return false
@@ -432,7 +436,7 @@ end
 
 function Discovery.CloseUI(self, callback)
 	local f = function()
-		if (BoolForString(self.keys.disable_on_close, false)) then
+		if (self.disableOnClose) then
 			self:Enable(false)
 		end
 		if (self.keys.on_closed) then
@@ -643,7 +647,8 @@ end
 function Discovery.SaveState(self)
 	
 	local state = {
-		enabled = tostring(self.enabled)
+		enabled = tostring(self.enabled),
+		disableOnClose = tostring(self.disableOnClose)
 	}
 	
 	return state
@@ -656,6 +661,7 @@ function Discovery.LoadState(self, state)
 	self.sprite.dm:BlendTo({1,1,1,0}, 0)
 	self.enabled = false
 	self.active = false
+	self.disableOnClose = state.disableOnClose == "true"
 	
 	if (state.enabled == "true") then
 		self:Enable()

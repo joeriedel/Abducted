@@ -22,6 +22,7 @@ pak0 {
 	FX/darkparticles1
 	FX/darkparticles2
 	FX/ghostparticles
+	FX/darkportal1_M
 	FX/pulseimpactsparks
 	FX/pylonimpact1
 	FX/rockparticle1

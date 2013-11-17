@@ -496,7 +496,10 @@ Arm.Discoveries = {
 		mysteryTitle = "ARM_DISCOVERY_MYSTERY_TITLE",
 		mysteryText = "ARM_DISCOVERY_MYSTERY_TEXT",
 		mysteryChat = "TerminalsMystery",
-		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG"
+		mysteryLogText = "ARM_DISCOVERY_MYSTERY_LOG",
+		events = {
+			"crushed_terminal1discovery2_controller trigger"
+		}
 	},
 	
 	TheMasters = {

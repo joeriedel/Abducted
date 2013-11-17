@@ -110,6 +110,10 @@ end
 
 function Metadata.CheckProximity(self)
 
+	if (World.playerPawn.customMove) then
+		return -- player is busy right now.
+	end
+
 	local v = VecSub(self.pos, VecAdd(World.playerPawn:WorldPos(), World.playerPawn:CameraShift()))
 	local d = VecMag(v)
 

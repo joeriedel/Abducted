@@ -243,7 +243,7 @@ function PlayerInput.TapMove(self, x, y)
 		end
 	end
 	
-	if (self:TapWaypoint(x, y, 350)) then
+	if (self:TapWaypoint(x, y, 100*UI.identityScale[1])) then
 		COutLine(kC_Debug, "PlayerInput: Tapped on waypoint - unprecise (4).")
 		return true
 	end

@@ -252,6 +252,12 @@ function GameDB.Discover(self, name, source, unlock, visible)
 		else
 			logEntry = "MISSING LOG TEXT!"
 		end
+		
+		if (dbItem.events) then
+			for k,v in pairs(dbItem.events) do
+				World.PostEvent(v)
+			end
+		end
 	else
 		logTitle = dbItem.mysteryTitle
 		logEntry = dbItem.mysteryLogText or "MISSING MYSTERY LOG TEXT!"

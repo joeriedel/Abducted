@@ -1551,6 +1551,7 @@ function PlayerPawn.LeaveSolveGame(self, terminal, result)
 				Abducted.entity:VisibleCheckpoint()
 			else
 				terminal:PopupUI()
+				terminal:CheckSignalDowngrade()
 			end
 		end
 	}

@@ -476,6 +476,10 @@ function TerminalScreen.DoSolveGame(self)
 			
 			local f = function ()
 				local f = function(result)
+					if (result ~= "w") then
+						-- failed
+						entity.failcount = entity.failcount + 1
+					end
 					TerminalScreen.GameComplete(entity, "solve", result)
 				end
 				Abducted.entity.eatInput = false

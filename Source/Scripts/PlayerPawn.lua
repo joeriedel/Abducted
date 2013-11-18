@@ -1762,7 +1762,8 @@ function PlayerPawn.SaveState(self)
 		shieldActive = tostring(self.shieldActive),
 		animState = self.animState,
 		facing = tostring(vertex.pos[3]),
-		sheidlAutoActiveTime = tostring(self.shieldAutoActivateTime)
+		sheidlAutoActiveTime = tostring(self.shieldAutoActivateTime),
+		charDBStatus = tostring(self.charDBStatus)
 	}
 	
 	self:SaveFloorPos(state)
@@ -1776,6 +1777,7 @@ function PlayerPawn.LoadState(self, state)
 	self.disableAnimTick = false
 	self.bugStun = false
 	self.state = "idle"
+	self.charDBStatus = state.charDBStatus
 	self.mines = nil
 		
 	self.pulseSounds.Hum:Stop()

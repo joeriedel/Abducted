@@ -186,6 +186,9 @@ function PlayerPawn.Spawn(self)
 		Tripped = World.Load("Objects/mine_tripped_M")
 	}
 	
+	self.arm_M = World.Load("Characters/armscreen1_M")
+	self.armSignaled_M = World.Load("Characters/armscreen2_M")
+	
 	self.numActiveMines = 0
 	
 	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
@@ -230,6 +233,9 @@ function PlayerPawn.Spawn(self)
 	self:SetShadowMaxs(shadowBox.maxs)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetCameraShift(cameraShift)
+	
+	-- player styles / portraits
+	PlayerPawn.SwapModelTextures(self.model)
 	
 	-- shield mesh
 	self.shield = World.Load("FX/shield1mesh")
@@ -393,6 +399,29 @@ function PlayerPawn.Spawn(self)
 	}
 	
 	GameDB.PersistentObjects[self.keys.uuid] = io
+end
+
+function PlayerPawn.SwapModelTextures(model)
+
+	if (GameDB.playerStyle ~= 1) then
+	
+		local swaps = {
+			{ "Characters/hair1_M", string.format("Characters/hair%d_M", GameDB.playerStyle) },
+			{ "Characters/femalehands1_M", string.format("Characters/femalehands%d_M", GameDB.playerStyle) },
+			{ "Characters/femalehead1_M", string.format("Characters/femalehead%d_M", GameDB.playerStyle) },
+			{ "Characters/liquidmetal_M", string.format("Characters/liquidmetal%d_M", GameDB.playerStyle) }
+		}
+
+		for k,v in pairs(swaps) do
+		
+			v[1] = World.Load(v[1])
+			v[2] = World.Load(v[2])
+			model.dm:ReplaceMaterial(v[1], v[2])
+		
+		end
+	
+	end
+
 end
 
 function PlayerPawn.PostSpawn(self)
@@ -1548,6 +1577,7 @@ function PlayerPawn.LeaveSolveGame(self, terminal, result)
 				Abducted.entity:VisibleCheckpoint()
 			else
 				terminal:PopupUI()
+				terminal:CheckSignalDowngrade()
 			end
 		end
 	}
@@ -1710,6 +1740,16 @@ function PlayerPawn.CustomAnimMove(self, name)
 
 end
 
+function PlayerPawn.SignalArm(self, signal)
+
+	if (signal) then
+		self.model.dm:ReplaceMaterial(self.arm_M, self.armSignaled_M)
+	else
+		self.model.dm:ReplaceMaterial(self.armSignaled_M, self.arm_M)
+	end
+
+end
+
 function PlayerPawn.SaveState(self)
 	local fp = self:FloorPosition()
 	if (fp.floor == -1) then
@@ -1778,6 +1818,7 @@ function PlayerPawn.LoadState(self, state)
 	
 	self.shieldAutoActivateTime = tonumber(state.shieldAutoActivateTime)
 	self:Show(state.visible == "true")
+--	self:SignalArm(HUD.armSignaled) -- done by HUD
 	
 	self:LoadFloorPos(state)
 	

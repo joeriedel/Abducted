@@ -76,7 +76,9 @@ function PlayerInput.Flush(self)
 	
 	UI:ShowFinger(false, 0.5)
 	self.touch = nil
-
+	
+	HUD:FlushInput()
+	
 end
 
 function PlayerInput.TapPulse(self, e)

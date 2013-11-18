@@ -386,6 +386,19 @@ function HUD.Load(self)
 	self.widgets.Root:AddChild(self.widgets.PulseShimmer)
 end
 
+function HUD.FlushInput(self)
+
+	self.widgets.Root:ClearCapture()
+	self.widgets.Manipulate.class:Reset(self.widgets.Manipulate)
+	self.widgets.Pulse.class:Reset(self.widgets.Pulse)
+	self.widgets.Shield.class:Reset(self.widgets.Shield)
+	self.widgets.Arm.class:Reset(self.widgets.Arm)
+	self.widgets.PowerBubble.class:Reset(self.widgets.PowerBubble)
+	self.widgets.DropMine.class:Reset(self.widgets.DropMine)
+	self.widgets.RapidPulse.class:Reset(self.widgets.RapidPulse)
+	
+end
+
 function HUD.ArmPressed(self)
 	COutLine(kC_Debug, "Arm Pressed!")
 	if (Game.entity.manipulate or Game.entity.pulse) then
@@ -1470,6 +1483,8 @@ function HUD.SignalArm(self, signal)
 	else
 		self.widgets.ArmActivity:SetVisible(false)
 	end
+	
+	World.playerPawn:SignalArm(signal)
 
 end
 

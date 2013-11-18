@@ -302,7 +302,12 @@ function ReflexGame.LoadMaterials(self)
     self.gfx.mark_line_h = self.gfx.mark_line_v
     self.gfx.mark_end = World.Load("Puzzles/reflex-goal1_M")
 
-    self.gfx.blocker_green = World.Load("Puzzles/reflex-block1_M")
+    self.gfx.blocker_green = {
+		World.Load("Puzzles/reflex-block1_M"),
+		World.Load("Puzzles/reflex-block2_M"),
+		World.Load("Puzzles/reflex-block3_M"),
+		World.Load("Puzzles/reflex-block4_M")
+	}
 
     self.gfx.cell_01 = World.Load("Puzzles/glyph01_M")
     self.gfx.cell_02 = World.Load("Puzzles/glyph02_M")
@@ -445,7 +450,7 @@ function ReflexGame.InitUI(self)
 		local dpadTop = UI.screenHeight-dpadSize-(72*UI.identityScale[1])
 		
 		self.widgets.dpadRoot = UI:CreateWidget("Widget",
-			{rect={dpadLeft, dpadTop, dpadSize, dpadSize}, OnInputEvent=ReflexGame.DPadInput}
+			{rect={dpadLeft-dpadPad, dpadTop-dpadPad, dpadSize+dpadPad*2, dpadSize+dpadPad*2}, OnInputEvent=ReflexGame.DPadInput}
 		)
 		self.widgets.dpadRoot.size = dpadSize
 		self.widgets.root3:AddChild(self.widgets.dpadRoot)
@@ -655,20 +660,25 @@ function ReflexGame.CreateBoard(self)
         local objectTable = self.widgets.cells
         local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
 		local layer = self.widgets.root
-		local img = v.img
 		local archetype = v.img
+		local gfx = nil
 		
-        if (self.gfx[v.img] == self.gfx.blackhole) then
-            objectTable = self.widgets.blackholes
-            objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
-			layer = self.widgets.root2
-		elseif (v.img == "mark_start") then
-			layer = nil
-			img = "mark_current"
-			archetype = "player"
-        end
-
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=self.gfx[v.img]})
+		if (v.img == "blocker_green") then
+			gfx = self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]
+		else
+			if (self.gfx[v.img] == self.gfx.blackhole) then
+				objectTable = self.widgets.blackholes
+				objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
+				layer = self.widgets.root2
+			elseif (v.img == "mark_start") then
+				layer = nil
+				archetype = "player"
+			end
+			
+			gfx = self.gfx[v.img]
+		end
+		
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=gfx})
 		local index = self:ConvertCoordToIndex(v.x,v.y)
 		b.state = self:CreateState(archetype,v)
         if (layer) then
@@ -1511,7 +1521,7 @@ function ReflexGame.Think(self,dt)
 
             local v = self.state.path[self.state.lineIndex]
             local index = self:ConvertCoordToIndex(v.x,v.y)
-            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green})
+            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]})
             b.state = self:CreateState("blocker_green")
             self.widgets.root:AddChild(b)
             assert(self.widgets.grid[index] == nil)

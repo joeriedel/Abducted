@@ -235,24 +235,7 @@ function PlayerPawn.Spawn(self)
 	self:SetCameraShift(cameraShift)
 	
 	-- player styles / portraits
-	if (GameDB.playerStyle ~= 1) then
-	
-		local swaps = {
-			{ "Characters/hair1_M", string.format("Characters/hair%d_M", GameDB.playerStyle) },
-			{ "Characters/femalehands1_M", string.format("Characters/femalehands%d_M", GameDB.playerStyle) },
-			{ "Characters/femalehead1_M", string.format("Characters/femalehead%d_M", GameDB.playerStyle) },
-			{ "Characters/liquidmetal_M", string.format("Characters/liquidmetal%d_M", GameDB.playerStyle) }
-		}
-
-		for k,v in pairs(swaps) do
-		
-			v[1] = World.Load(v[1])
-			v[2] = World.Load(v[2])
-			self.model.dm:ReplaceMaterial(v[1], v[2])
-		
-		end
-	
-	end
+	PlayerPawn.SwapModelTextures(self.model)
 	
 	-- shield mesh
 	self.shield = World.Load("FX/shield1mesh")
@@ -416,6 +399,29 @@ function PlayerPawn.Spawn(self)
 	}
 	
 	GameDB.PersistentObjects[self.keys.uuid] = io
+end
+
+function PlayerPawn.SwapModelTextures(model)
+
+	if (GameDB.playerStyle ~= 1) then
+	
+		local swaps = {
+			{ "Characters/hair1_M", string.format("Characters/hair%d_M", GameDB.playerStyle) },
+			{ "Characters/femalehands1_M", string.format("Characters/femalehands%d_M", GameDB.playerStyle) },
+			{ "Characters/femalehead1_M", string.format("Characters/femalehead%d_M", GameDB.playerStyle) },
+			{ "Characters/liquidmetal_M", string.format("Characters/liquidmetal%d_M", GameDB.playerStyle) }
+		}
+
+		for k,v in pairs(swaps) do
+		
+			v[1] = World.Load(v[1])
+			v[2] = World.Load(v[2])
+			model.dm:ReplaceMaterial(v[1], v[2])
+		
+		end
+	
+	end
+
 end
 
 function PlayerPawn.PostSpawn(self)

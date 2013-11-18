@@ -54,6 +54,10 @@ function Actor.Spawn(self)
         
         self:SetOccupantType(kOccupantType_BBox)
 		self:Link()
+		
+		if (self.keys.model == "Characters/Eve") then
+			PlayerPawn.SwapModelTextures(self.model)
+		end
     end
     
     local io = {

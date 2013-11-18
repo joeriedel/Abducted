@@ -1159,6 +1159,14 @@ end
 
 function ReflexGame.HandleTimeUp(self)
 	Abducted.entity.eatInput = true
+	if (self.widgets.dpad) then
+		self.widgets.dpadRoot:SetCapture(false)
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+	end
+	
 	local f = function()
 		self:EndGame("f")
 	end

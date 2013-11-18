@@ -1446,13 +1446,6 @@ end
 
 function PlayerPawn.EnterTerminal(self, terminal)
 
-	local fp = self:FloorPosition()
-	
-	if (fp.floor == -1) then
-		COutLine(kC_Debug, "ERROR: PlayerPawn.EngageTerminal: player must be on a floor!")
-		return
-	end
-	
 	self.bugStun = true
 	self.oldGodMode = PlayerPawn.GodMode
 	PlayerPawn.GodMode = true
@@ -1463,9 +1456,11 @@ function PlayerPawn.EnterTerminal(self, terminal)
 	local targetPos = RotateVecZ({140,0,0}, angle - 90)
 	
 	targetPos = VecAdd(targetPos, terminalPos)
-	fp = self:FindFloor(targetPos)
+	local fp = self:FindFloor(targetPos)
 	if (fp == nil) then
 		COutLine(kC_Debug, "ERROR: PlayerPawn.EngageTerminal: terminal->player position is not on a floor!")
+		self.bugStun = false
+		PlayerPawn.GodMode = self.oldGodMode
 		return
 	end
 	

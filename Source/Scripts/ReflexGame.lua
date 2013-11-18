@@ -198,6 +198,12 @@ function ReflexGame.DPadInput(widget, e)
 		dy = 0
 	end
 	
+	if (math.abs(dx) > math.abs(dy)) then
+		dy = 0
+	else
+		dx = 0
+	end
+	
 	if (dx < 0) then
 		dx = -1
 	elseif (dx > 0) then

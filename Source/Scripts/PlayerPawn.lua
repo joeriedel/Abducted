@@ -234,9 +234,6 @@ function PlayerPawn.Spawn(self)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 	self:SetCameraShift(cameraShift)
 	
-	-- player styles / portraits
-	PlayerPawn.SwapModelTextures(self.model)
-	
 	-- shield mesh
 	self.shield = World.Load("FX/shield1mesh")
 	self.shield.dm = self:AttachDrawModel(self.shield)
@@ -430,6 +427,8 @@ function PlayerPawn.PostSpawn(self)
 	self.animState = nil
 	self:SelectAnimState(state)	
 
+	-- player styles / portraits
+	PlayerPawn.SwapModelTextures(self.model)
 end
 
 function PlayerPawn.PlaySoundGroup(self, group, probability, delay)

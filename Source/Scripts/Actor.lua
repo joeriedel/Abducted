@@ -54,10 +54,7 @@ function Actor.Spawn(self)
         
         self:SetOccupantType(kOccupantType_BBox)
 		self:Link()
-		
-		if (self.keys.model == "Characters/Eve") then
-			PlayerPawn.SwapModelTextures(self.model)
-		end
+
     end
     
     local io = {
@@ -84,6 +81,14 @@ function Actor.EnableGhostParticles(self, enable, fade, time)
 			end
 		end
 	end
+end
+
+function Actor.PostSpawn(self)
+
+	if (self.model and (self.keys.model == "Characters/Eve")) then
+		PlayerPawn.SwapModelTextures(self.model)
+	end
+
 end
 
 function Actor.OnEvent(self, cmd, args)

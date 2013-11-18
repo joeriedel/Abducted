@@ -199,25 +199,21 @@ function ReflexGame.DPadInput(widget, e)
 	end
 	
 	if (math.abs(dx) > math.abs(dy)) then
-		dy = 0
-	else
 		dx = 0
+	else
+		dy = 0
 	end
 	
 	if (dx < 0) then
 		dx = -1
 	elseif (dx > 0) then
 		dx = 1
-	else
-		dx = 0
 	end
 	
 	if (dy < 0) then
 		dy = -1
 	elseif (dy > 0) then
 		dy = 1
-	else
-		dy = 0
 	end
 	
 	-- impulse changes?

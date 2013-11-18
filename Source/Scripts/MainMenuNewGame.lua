@@ -50,9 +50,7 @@ function MainMenu.NewGame.Create(self, options, parent)
 	
 	self.widgets.portrait:SetBlendWithParent(true)
 	
-	local widget
-	
-	widget = UI:CreateWidget("MatWidget", {rect={x+self.xInset+w, y, 64*UI.identityScale[1], h}, material=MainMenu.gfx.PortraitSelectArrow})
+	local widget = UI:CreateWidget("MatWidget", {rect={x+self.xInset+w, y, 64*UI.identityScale[1], h}, material=MainMenu.gfx.PortraitSelectArrow})
 	widget:SetBlendWithParent(true)
 	self.widgets.group:AddChild(widget)
 		

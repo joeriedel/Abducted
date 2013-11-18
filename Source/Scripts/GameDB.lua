@@ -38,8 +38,8 @@ end
 function GameDB.Load(self)
 
 	self.playerName = Persistence.ReadString(SaveGame, "playerName", "Eve")
-	self.portrait = Persistence.ReadNumber(SaveGame, "portrait", 1)
-	self.portrait = GameDB.Portraits[self.portrait]
+	self.playerStyle = Persistence.ReadNumber(SaveGame, "portrait", 1)
+	self.portrait = GameDB.Portraits[self.playerStyle]
 	if (self.portrait == nil) then
 		self.portrait = GameDB.Portraits[1]
 	end

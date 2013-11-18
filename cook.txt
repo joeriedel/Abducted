@@ -52,6 +52,18 @@ pak0 {
 	Characters/Tormentor1
 	Characters/Buggroup10
 	Characters/armscreen2_M
+	Characters/hair2_M
+	Characters/femalehands2_M
+	Characters/femalehead2_M
+	Characters/liquidmetal2_M
+	Characters/hair3_M
+	Characters/femalehands3_M
+	Characters/femalehead3_M
+	Characters/liquidmetal3_M
+	Characters/hair4_M
+	Characters/femalehands4_M
+	Characters/femalehead4_M
+	Characters/liquidmetal4_M
 	FX/bug_guts_group01
 	Characters/Bug1
 	FX/bug_guts_lone01

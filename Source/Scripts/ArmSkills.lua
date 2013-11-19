@@ -372,6 +372,7 @@ function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
 	
 	self.widgets.skills.SkillsTree:RecalcLayout()
 	
+	self:SelectSkill(PlayerSkills.Skills.ManipulateRegen)
 end
 
 function Arm.UpdateSkillsUI(self)

@@ -7,6 +7,8 @@ MainMenu = Game:New()
 
 function MainMenu.Initialize(self)
 
+	GameNetwork.Initialize()
+	
 	MainMenu:PopulateSaveGames()
 	MainMenu:Load()
 	MainMenu:InitUI()
@@ -117,7 +119,29 @@ function MainMenu.InitUI(self)
 	UI:HCenterLabel(self.widgets.copyright, self.contentRect)
 	self.widgets.copyright:BlendTo({1,1,1,0}, 0)
 	
+	self.widgets.signInBkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=self.gfx.MMItemBackground2})
+	self.widgets.root:AddChild(self.widgets.signInBkg)
+	self.widgets.signInBkg:BlendTo({1,1,1,0}, 0)
+	
+	self.widgets.signInText = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Normal})
+	self.widgets.signInText:BlendTo({1,1,1,0}, 0)
+	self.widgets.root:AddChild(self.widgets.signInText)
+	
+	UI:LineWrapCenterText(
+		self.widgets.signInText,
+		self.contentRect[3] - 32*UI.identityScale[1],
+		true,
+		0,
+		StringTable.Get("SIGNIN")
+	)
+	
+	local signInRect = UI:CenterLabel(self.widgets.signInText, self.contentRect)
+	signInRect = ExpandRect(signInRect, 16*UI.identityScale[1], 16*UI.identityScale[2])
+	self.widgets.signInBkg:SetRect(signInRect)
+	
 	-- intro
+	self:SignIn()
+	
 	self.widgets.logo:BlendTo({0,0,0,0}, 0)
 	self.mainPanel:Show(false)
 	self.mainPanel.widgets.panel:SetVAlign(kVerticalAlign_Bottom)
@@ -126,6 +150,9 @@ function MainMenu.InitUI(self)
 		self.widgets.logo:BlendTo({1,1,1,1}, 3)
 		local f = function()
 			local f = function()	
+				if (self.signInPending) then
+					self:ShowSignInMessage(true)
+				end
 				local f = function()
 					self.widgets.copyright:BlendTo({1,1,1,1}, 0.3)
 				end
@@ -142,6 +169,56 @@ function MainMenu.InitUI(self)
 	self:InitNewGame()
 	self:InitLoadGame()
 	
+end
+
+function MainMenu.SignIn(self)
+
+	local didSignIn = Persistence.ReadBool(Session, "didSignIn", false)
+	if (not didSignIn) then
+	
+		if (GameNetwork.Available()) then
+			self.signInPending = true
+			GameNetwork.AuthenticateLocalPlayer()
+		else
+			self.signInPending = false
+		end
+	
+	end
+
+end
+
+function MainMenu.OnLocalPlayerAuthenticated(self, authenticated, changed)
+	if (MainMenu.signInPending) then
+		MainMenu.signInPending = false
+		MainMenu:ShowSignInMessage(false)
+	end
+end
+
+function MainMenu.ShowSignInMessage(self, show)
+
+	if (self.signInTimer) then
+		self.signInTimer:Clean()
+		self.signInTimer = nil
+	end
+
+	if (show) then
+		MainMenu.eatInput = true
+		self.widgets.signInBkg:BlendTo({1,1,1,1}, 0.5)
+		self.widgets.signInText:BlendTo({1,1,1,1}, 0.5)
+		
+		local f = function() -- don't keep blocking after 5 seconds
+			MainMenu.eatInput = false
+			self.widgets.signInBkg:BlendTo({1,1,1,0}, 0.5)
+			self.widgets.signInText:BlendTo({1,1,1,0}, 0.5)
+		end
+		
+		self.signInTimer = World.gameTimers:Add(f, 5)
+	else
+		MainMenu.eatInput = false
+		self.widgets.signInBkg:BlendTo({1,1,1,0}, 0.5)
+		self.widgets.signInText:BlendTo({1,1,1,0}, 0.5)
+	end
+
 end
 
 function MainMenu.OnLevelStart(self)
@@ -451,14 +528,18 @@ function MainMenu.MainPanel.SaveGamesExist(self)
 	return MainMenu:SaveGamesExist()
 end
 
+function MainMenu.MainPanel.GameNetworkAvailable(self)
+	return GameNetwork.Available()
+end
+
 MainMenu.Items = {
 	{data={string="MM_NEWS", Action=MainMenu.MainPanel.News}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_CONTINUE", Action=MainMenu.MainPanel.Continue}, Condition=MainMenu.MainPanel.ValidCheckpoint, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_NEW_GAME", Action=MainMenu.MainPanel.NewGame}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_LOAD_GAME", Action=MainMenu.MainPanel.LoadGame}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Create=MainMenu.MainPanel.CreateMMText},
+--	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
+	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Condition=GameNetwork.Available, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_CREDITS", Action=MainMenu.MainPanel.Credits}, Create=MainMenu.MainPanel.CreateMMText},
 	{Create=MainMenu.MainPanel.CreateMMIcons}
 }

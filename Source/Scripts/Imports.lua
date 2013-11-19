@@ -31,6 +31,7 @@ Import("FlyCam")
 Import("PostFX")
 Import("TextPrinter")
 Import("TitleCrawl")
+Import("Achievements")
 
 -- // Entities // --
 Import("Entity")

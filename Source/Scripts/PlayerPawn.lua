@@ -1036,6 +1036,7 @@ function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
 	end
 	
 	Game.entity:PlayerDied(killMessage, specialCommand)
+	PlayerInput:Flush()
 end
 
 function PlayerPawn.CheckTappedOn(self, e)

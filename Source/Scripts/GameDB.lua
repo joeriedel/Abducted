@@ -165,7 +165,10 @@ function GameDB.LoadPersistentObjects(self)
 		assert(type(k) == "string")
 		if (x ~= "vc") then
 			local x = db[k]
-			v:Load(x)
+			if (x) then
+			-- new objects won't have state.
+				v:Load(x)
+			end
 		end
 	end
 	

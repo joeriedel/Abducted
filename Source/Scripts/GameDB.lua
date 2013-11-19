@@ -270,7 +270,7 @@ function GameDB.Discover(self, name, source, unlock, visible)
 	)
 	
 	if (visible) then
-		local text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(logTitle).."."
+		local text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(logTitle)
 		HUD:Print(nil, text, nil, false)
 	end
 

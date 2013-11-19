@@ -10,10 +10,10 @@ function TitleCrawl.Spawn(self)
 
 	local typeface = World.Load("UI/Title_TF")
 	
-	self.titlePrinter = TextPrinter:New(typeface, {0,0,8,8}, 1, 40, nil, UI.widgets.titlecrawl.Root, {UI.identityScale[1], UI.identityScale[1]})
+	self.titlePrinter = TextPrinter:New(typeface, nil, {0,0,8,8}, 1, 40, nil, UI.widgets.titlecrawl.Root, {UI.identityScale[1], UI.identityScale[1]})
 	
 	local typeface = World.Load("UI/Subtitle_TF")
-	self.subtitlePrinter = TextPrinter:New(typeface, {0,0,8,8}, 1, 40, nil, UI.widgets.titlecrawl.Root, {UI.identityScale[1], UI.identityScale[1]})
+	self.subtitlePrinter = TextPrinter:New(typeface, nil, {0,0,8,8}, 1, 40, nil, UI.widgets.titlecrawl.Root, {UI.identityScale[1], UI.identityScale[1]})
 
 	local totalSize = self.titlePrinter.lineAdvance*1.5 + self.subtitlePrinter.lineAdvance
 	local centerY = (UI.screenHeight - totalSize) / 2

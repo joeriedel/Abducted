@@ -450,9 +450,10 @@ function ReflexGame.InitUI(self)
 		local dpadPad = 16*UI.identityScale[1]
 		local dpadLeft = UI.screenWidth-dpadSize-(48*UI.identityScale[1])
 		local dpadTop = UI.screenHeight-dpadSize-(72*UI.identityScale[1])
+		local dpadExpand = dpadPad*2
 		
 		self.widgets.dpadRoot = UI:CreateWidget("Widget",
-			{rect={dpadLeft-dpadPad, dpadTop-dpadPad, dpadSize+dpadPad*2, dpadSize+dpadPad*2}, OnInputEvent=ReflexGame.DPadInput}
+			{rect={dpadLeft-dpadExpand, dpadTop-dpadExpand, dpadSize+dpadExpand*2, dpadSize+dpadExpand*2}, OnInputEvent=ReflexGame.DPadInput}
 		)
 		self.widgets.dpadRoot.size = dpadSize
 		self.widgets.root3:AddChild(self.widgets.dpadRoot)

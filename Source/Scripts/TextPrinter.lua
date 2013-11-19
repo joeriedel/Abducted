@@ -5,7 +5,7 @@
 
 TextPrinter = Class:New()
 
-function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lineSpace, root, fontScale, timeBase)
+function TextPrinter.New(outer, typeface, background, rect, maxMessages, charsPerSecond, lineSpace, root, fontScale, timeBase)
 
 	local self = Class.New(TextPrinter)
 	self.typeface = typeface
@@ -24,6 +24,7 @@ function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lin
 	
 	self.timers = timeBase
 	self.cps = charsPerSecond
+	self.background = background
 	
 	self.panel = UI:CreateWidget("Widget", {rect=rect})
 	self.panelRect = {0, 0, rect[3], rect[4]}
@@ -58,6 +59,12 @@ function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lin
 		w:SetVisible(false)
 		self.panel:AddChild(w)
 		
+		if (background) then
+			local bkg = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=background})
+			w:AddChild(bkg)
+			w.bkg = bkg
+		end
+		
 		LL_Append(self.freeBlocks, w)
 	end
 	
@@ -65,7 +72,7 @@ function TextPrinter.New(outer, typeface, rect, maxMessages, charsPerSecond, lin
 	
 	self.usedIcons = LL_New()
 	self.freeIcons = LL_New()
-
+	
 	return self
 end
 
@@ -157,7 +164,7 @@ function TextPrinter.GetIcon(self, parms)
 		icon:SetMaterial(parms.material)
 		icon:SetRect({0,0,parms.size[1],parms.size[2]})
 	else
-		icon = UI:CreateWidget("TextLabel", {rect={0,0,parms.size[1],parms.size[2]}, material=parms.material})
+		icon = UI:CreateWidget("MatWidget", {rect={0,0,parms.size[1],parms.size[2]}, material=parms.material})
 		icon:SetBlendWithParent(true)
 	end
 	return icon
@@ -284,6 +291,8 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 	block.widgets = {}
 	block.lines = {}
 	
+	local numLines = 0
+	
 	for k,line in pairs(lines) do
 		if (line:len() > 0) then
 			local strings = UI:WordWrap(self.typeface, line, textArea, self.invFontScale)
@@ -299,21 +308,16 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 				local lineWidth = UI:StringDimensions(self.typeface, v, self.fontScale)
 				maxWidth = math.max(lineWidth, maxWidth)
 				
-				if (k == #block.lines) then
-					lineWidth = lineWidth + self.caretSize[1] + 8*UI.identityScale[1]
-				end
-				
 				-- convert text to UTF32 so we can reveal character by character in extended character sets
 				table.insert(block.lines, System.UTF8To32(v))
 				block.widgets[#block.lines] = w
 				
-				if (k ~= #strings) then
-					height = height + self.lineAdvance
-				end
+				height = height + self.lineAdvance
+				numLines = numLines + 1
 			end
-		end
-		if (k ~= #lines) then
+		else
 			height = height + self.lineAdvance
+			numLines = numLines + 1
 		end
 	end
 	
@@ -325,7 +329,7 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 	
 	end
 	
-	self:ScrollItems(height+self.lineAdvance)
+	self:ScrollItems(height)
 	
 	block:SetVisible(true)
 	block:BlendTo({1,1,1,1}, 0)
@@ -333,8 +337,12 @@ function TextPrinter.InternalPrint(self, icon, text, caretStartDelay, caretEndDe
 	block.y = 0
 		
 	LL_Insert(self.usedBlocks, block)
+	
+	--[[if (numLines == 1) then
+		maxWidth = maxWidth + self.caretSize[1] + self.caretSpace + 16*UI.identityScale[1]
+	end]]
 		
-	local blockRect = {iconRect[3], 0, maxWidth+iconRect[3], height}
+	local blockRect = {iconRect[3], 0, maxWidth+iconRect[3]+4*UI.identityScale[1], height}
 	return block, blockRect
 end
 
@@ -343,6 +351,11 @@ function TextPrinter.FinishPrint(self, block, blockRect)
 	block:SetRect(blockRect)
 	block.x = blockRect[1]
 	block.y = blockRect[2]
+	
+	if (block.bkg) then
+		block.bkg:SetRect({0,0,blockRect[3],blockRect[4]})
+	end
+	
 	self:AnimateBlock(block)
 
 end
@@ -399,6 +412,11 @@ function TextPrinter.AnimateBlock(self, block)
 	block.charTime = 0
 	block.busy = 1
 	block.char = 4
+	
+	if (block.bkg) then
+		block.bkg:BlendTo({1,1,1,0}, 0)
+		block.bkg:BlendTo({1,1,1,1}, 0.2)
+	end
 	
 	self.caret:SetVisible(true)
 	self.caret:MoveTo({block.x, block.y}, {0,0})
@@ -469,6 +487,10 @@ end
 function TextPrinter.FadeBlock(self, block)
 
 	block:BlendTo({1,1,1,0}, block.fadeOutTime)
+	
+	if (block.bkg) then
+		block.bkg:BlendTo({1,1,1,0}, block.fadeOutTime)
+	end
 	
 	local f = function()
 		self:FreeTextBlock(block)

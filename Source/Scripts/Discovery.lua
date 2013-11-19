@@ -173,9 +173,9 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 		text = "bad arm-db item"
 	end
 	
-	local kBorderSize = Discovery.kUIBorder * UI.identityScale[1]
-	local kDialogWidth = (Discovery.kUISize[1]*UI.identityScale[1]) - (kBorderSize * 2)
-	local kButtonHeight = Discovery.kButtonHeight * UI.identityScale[2]
+	local kBorderSize = Discovery.kUIBorder
+	local kDialogWidth = Discovery.kUISize[1] - (kBorderSize * 2)
+	local kButtonHeight = Discovery.kButtonHeight
 	
 	title = StringTable.Get(title)
 	
@@ -187,8 +187,8 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 		title
 	)
 	
-	r[1] = r[1] + Discovery.kUIBorder * UI.identityScale[1]
-	r[2] = Discovery.kUIBorder * UI.identityScale[1]
+	r[1] = r[1] + Discovery.kUIBorder
+	r[2] = Discovery.kUIBorder
 	Discovery.Widgets.Title:SetRect(r)
 	
 	r[2] = r[2] + r[4]
@@ -229,11 +229,11 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
-	Discovery.Widgets.Line1:SetRect({0,r[2],Discovery.kUISize[1]*UI.identityScale[1],10*UI.identityScale[1]})
+	Discovery.Widgets.Line1:SetRect({0,r[2],Discovery.kUISize[1],10*UI.fontScale[1]})
 	
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
-	local textArea = (Discovery.kUISize[2]*UI.identityScale[2]) - r[2] - kButtonHeight - 10*UI.identityScale[1]
+	local textArea = Discovery.kUISize[2] - r[2] - kButtonHeight - 10*UI.identityScale[1]
 	local textRect = {kBorderSize, r[2], kDialogWidth, textArea}
 	
 	Discovery.Widgets.Scroll:SetRect(textRect)
@@ -262,7 +262,7 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 	Discovery.Widgets.Scroll:RecalcLayout()
 	
 	r[2] = textRect[2] + textRect[4]
-	Discovery.Widgets.Line2:SetRect({0,r[2],Discovery.kUISize[1]*UI.identityScale[1],10*UI.identityScale[1]})
+	Discovery.Widgets.Line2:SetRect({0,r[2],Discovery.kUISize[1],10*UI.identityScale[1]})
 	
 	r[2] = r[2] + 10*UI.identityScale[1]
 	
@@ -556,13 +556,23 @@ end
 
 function Discovery.StaticInit()
 
+	Discovery.kArrowSize[1] = Discovery.kArrowSize[1] * UI.identityScale[1]
+	Discovery.kArrowSize[2] = Discovery.kArrowSize[2] * UI.identityScale[1]
+	
+	Discovery.kUISize[1] = Discovery.kUISize[1] * UI.fontScale[1]
+	Discovery.kUISize[2] = Discovery.kUISize[2] * UI.fontScale[1]
+	
+	Discovery.kUIBorder = Discovery.kUIBorder * UI.identityScale[1]
+	
+	Discovery.kButtonHeight = Discovery.kButtonHeight * UI.identityScale[2]
+
 	local material = World.Load("UI/discovery_arrow_M")
-	Discovery.Widgets.Arrow = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kArrowSize[1]*UI.identityScale[1],Discovery.kArrowSize[2]*UI.identityScale[2]}, material=material})
+	Discovery.Widgets.Arrow = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kArrowSize[1],Discovery.kArrowSize[2]}, material=material})
 	UI.widgets.discoveries.Root:AddChild(Discovery.Widgets.Arrow)
 	Discovery.Widgets.Arrow:BlendTo({1,1,1,0}, 0)
 	
 	material = World.Load("UI/DiscoveryBackground_M")
-	Discovery.Widgets.Root = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kUISize[1]*UI.identityScale[1], Discovery.kUISize[2]*UI.identityScale[2]}, material=material, OnInputEvent=UI.EatInput})
+	Discovery.Widgets.Root = UI:CreateWidget("MatWidget", {rect={0,0,Discovery.kUISize[1], Discovery.kUISize[2]}, material=material, OnInputEvent=UI.EatInput})
 	UI.widgets.discoveries.Root:AddChild(Discovery.Widgets.Root)
 	Discovery.Widgets.Root:SetVisible(false)
 	Discovery.Widgets.Root:SetHAlign(kHorizontalAlign_Center)
@@ -570,7 +580,7 @@ function Discovery.StaticInit()
 	
 	local closeButtonSize = 64*UI.identityScale[1]
 	Discovery.Widgets.Close = UIPushButton:Create(
-		{Discovery.kUISize[1]*UI.identityScale[1]-(closeButtonSize/2),-(closeButtonSize/2),closeButtonSize,closeButtonSize}, 
+		{Discovery.kUISize[1]-(closeButtonSize/2),-(closeButtonSize/2),closeButtonSize,closeButtonSize}, 
 		{
 			pressed = World.Load("UI/discovery_close_x_pressed_M"),
 			enabled = World.Load("UI/discovery_close_x_M")

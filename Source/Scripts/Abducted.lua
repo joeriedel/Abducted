@@ -418,13 +418,15 @@ function Abducted.BeginPulse(self)
 	self.pulseCount = 0
 	HUD:ShowPulseModes(true)
 	HUD:RefreshAvailableActions()
-	World.playerPawn:BeginPulse(self)
+	
+	local dischargeTime = FloatRand(PlayerSkills.kPulseExplodeTime[1], PlayerSkills.kPulseExplodeTime[2])
+	World.playerPawn:BeginPulse(dischargeTime)
 	
 	local f = function()
 		self:DischargePulse()
 	end
 	
-	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.kPulseExplodeTime[1], PlayerSkills.kPulseExplodeTime[2]))
+	self.pulseTimer = World.gameTimers:Add(f, dischargeTime)
 	
 end
 

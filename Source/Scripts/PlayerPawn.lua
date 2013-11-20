@@ -15,6 +15,7 @@ PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
 PlayerPawn.GodMode = false
 PlayerPawn.kMaxShieldDamage = 100
+PlayerPawn.PulseSmokePPS = 10
 
 PlayerPawn.DeathSounds = {
 	"Audio/VO_Eve_BigPain01",
@@ -140,6 +141,9 @@ PlayerPawn.AnimationStates = {
 		arm_pose_standing = "arm_pose_limp",
 		puzzle_default_choice = "puzzle_limp_choice",
 		smack_metadata = "limpmanup",
+		pulse_overload1 = "limpmanidle",
+		pulse_overload2 = "limpmanidle",
+		pulse_overload3 = "limpmanidle",
 		speedScale = 0.64,
 		tapAdjust = 48, -- CheckTappedOn
 		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
@@ -324,11 +328,25 @@ function PlayerPawn.Spawn(self)
 	self.pulseSounds = {
 		Hum = World.LoadSound("Audio/AFX_PulseCycleLoop"),
 		Explode = World.LoadSound("Audio/AFX_ShieldImpactAggressive"),
-		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact", 3)
+		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact", 3),
+		Overload1 = World.LoadSound("Audio/pulse_overload1"),
+		Overload2 = World.LoadSound("Audio/pulse_overload2"),
+		Overload3 = World.LoadSound("Audio/pulse_overload3"),
 	}
 	
 	self.pulseSounds.Hum:SetLoop(true)
+	self.pulseSounds.Overload1:SetLoop(true)
+	self.pulseSounds.Overload2:SetLoop(true)
+	self.pulseSounds.Overload3:SetLoop(true)
 	
+	self.pulseSmoke = World.Load("FX/pulsesmoke")
+	self.pulseSmoke:SetMaxParticles(100)
+	self.pulseSmoke.dm = self:AttachDrawModel(self.pulseSmoke)
+	self.pulseSmoke.dm:SetBounds(self:Mins(), self:Maxs())
+	self.pulseSmoke.dm:SetPositionMode(kParticleEmitterDrawModelPositionMode_World)
+	self.pulseSmoke.dm:SetLocalDir({0,0,1})
+	self.model.dm:AttachChildToBone(self.pulseSmoke.dm, self.model.handBone)
+		
 	self.pulseSparks = World.Load("FX/pulseimpactsparks")
 	self.pulseSparks:SetMaxParticles(250)
 	self.pulseSparks.dm = self:AttachDrawModel(self.pulseSparks)
@@ -692,7 +710,7 @@ function PlayerPawn.LookAt(self, pos)
 
 end
 
-function PlayerPawn.BeginPulse(self)
+function PlayerPawn.BeginPulse(self, dischargeTime)
 	self.pulseActive = true
 	self.disableAnimTick = true
 	self.state = nil
@@ -702,6 +720,7 @@ function PlayerPawn.BeginPulse(self)
 	self.pulseSounds.Hum:FadeVolume(0, 0)
 	self.pulseSounds.Hum:FadeVolume(1, 0.1)
 	self.pulseSounds.Hum:Play(kSoundChannel_FX, 0)
+	self:StartPulseOverload(dischargeTime)
 end
 
 function PlayerPawn.EndPulse(self)
@@ -783,11 +802,73 @@ function PlayerPawn.PulseDamage(self, pos)
 	end
 end
 
+function PlayerPawn.StartPulseOverload(self, dischargeTime)
+
+	local updateTime = dischargeTime / 4
+	
+	local f = function()
+		self:UpdatePulseOverload()
+	end
+	
+	self.pulseOverloadTimer = World.gameTimers:Add(f, updateTime, true)
+	self:UpdatePulseOverload()
+
+end
+
+function PlayerPawn.UpdatePulseOverload(self)
+	if (self.pulseOverloadStage == nil) then
+		self.pulseOverloadStage = 1
+		return
+	end
+	
+	self.pulseOverloadStage = self.pulseOverloadStage + 1
+
+	if (self.pulseOverloadStage == 2) then
+	
+		local anim = self:LookupAnimation("pulse_overload1")
+		self:PlayAnim(anim, self.model)
+		self.pulseSounds.Overload1:Play(kSoundChannel_FX, 0)
+		
+	elseif (self.pulseOverloadStage == 3) then
+	
+		local anim = self:LookupAnimation("pulse_overload2")
+		self:PlayAnim(anim, self.model)
+		self.pulseSounds.Overload1:Stop()
+		self.pulseSounds.Overload2:Play(kSoundChannel_FX, 0)
+		self.pulseSmoke:SetPPS(10)
+		
+	elseif (self.pulseOverloadStage == 4) then
+	
+		local anim = self:LookupAnimation("pulse_overload3")
+		self:PlayAnim(anim, self.model)
+		self.pulseSounds.Overload2:Stop()
+		self.pulseSounds.Overload3:Play(kSoundChannel_FX, 0)
+		self.pulseSmoke:SetPPS(25)
+		
+	end
+end
+
+function PlayerPawn.EndPulseOverload(self)
+
+	self.pulseSounds.Overload1:Stop()
+	self.pulseSounds.Overload2:Stop()
+	self.pulseSounds.Overload3:Stop()
+	self.pulseSmoke:SetPPS(0)
+
+	self.pulseOverloadStage = nil
+	
+	if (self.pulseOverloadTimer) then
+		self.pulseOverloadTimer:Clean()
+		self.pulseOverloadTimer = nil
+	end
+end
+
 function PlayerPawn.FirePulse(self, target, normal, sparks)
 	local f = function()
 		self:EndPulse()
 	end
 	
+	self:EndPulseOverload()
 	self.pulseSounds.Hum:Stop()
 	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
 	self:InternalFirePulse(target, normal, sparks).Seq(f)
@@ -797,6 +878,7 @@ function PlayerPawn.FirePulse(self, target, normal, sparks)
 end
 
 function PlayerPawn.RapidFirePulse(self, target, normal, sparks)
+	self:EndPulseOverload()
 	self.pulseSounds.Hum:Stop()
 	self.pulseSounds.Fire:Play(kSoundChannel_FX, 0)
 	self:InternalFirePulse(target, normal, sparks)
@@ -864,6 +946,8 @@ function PlayerPawn.InternalFirePulse(self, target, normal, sparks)
 end
 
 function PlayerPawn.DischargePulse(self)
+
+	self:EndPulseOverload()
 
 	if (math.random() < 0.5) then
 		self:PulseExplode()

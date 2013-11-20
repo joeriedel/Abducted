@@ -149,15 +149,17 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 
 	local title = nil
 	local text = nil
+	local mysteryItem = false
 	
 	local dbItem = Arm.Discoveries[self.databaseId]
 	if (dbItem) then
-		local discovered = GameDB:CheckDiscovery(self.databaseId)
 		if (dbItem.mysteryTitle) then
+			local discovered = GameDB:CheckDiscovery(self.databaseId)
 			if (discovered ~= "unlocked") then
 				-- use mystery title
 				title = dbItem.mysteryTitle
 				text = dbItem.mysteryText
+				mysteryItem = true
 			end
 		end
 		
@@ -270,14 +272,36 @@ function Discovery.LayoutUI(self, awardSkillPoints)
 	Discovery.Widgets.Button.label:SetRect({0,0,kDialogWidth,kButtonHeight})
 	Discovery.Widgets.Button.highlight:SetRect({0,0,kDialogWidth,kButtonHeight})
 	
-	UI:LineWrapCenterText(
-		Discovery.Widgets.Button.label,
-		kDialogWidth*0.9,
-		nil,
-		0,
-		StringTable.Get("DISCOVERY_OPEN_DB")
-	)
+	if (mysteryItem) then
+		UI:LineWrapCenterText(
+			Discovery.Widgets.Button.label,
+			kDialogWidth*0.9,
+			nil,
+			0,
+			StringTable.Get("ARM_TALK_BTN2")
+		)
 		
+		local gfx = {
+			enabled = UI.gfx.SolidButtonPulse
+		}
+		
+		Discovery.Widgets.Button.class:ChangeGfx(Discovery.Widgets.Button, gfx)
+	else
+		UI:LineWrapCenterText(
+			Discovery.Widgets.Button.label,
+			kDialogWidth*0.9,
+			nil,
+			0,
+			StringTable.Get("DISCOVERY_OPEN_DB")
+		)
+		
+		local gfx = {
+			enabled = UI.gfx.SolidButton
+		}
+		
+		Discovery.Widgets.Button.class:ChangeGfx(Discovery.Widgets.Button, gfx)
+	end
+	
 end
 
 function Discovery.AnimateOpenUI(self, awardSkillPoints)
@@ -547,6 +571,17 @@ function Discovery.OpenDBPressed()
 	end
 	Abducted.entity.eatInput = true
 	local self = Discovery.Popup
+	
+	local dbItem = Arm.Discoveries[self.databaseId]
+	if (dbItem.mysteryTitle) then
+		local discovered = GameDB:CheckDiscovery(self.databaseId)
+		if (discovered ~= "unlocked") then
+			Arm.requestedTopic = dbItem.mysteryChat
+			self:CloseUI(function () World.playerPawn:EnterArm() end)
+			return
+		end
+	end
+		
 	self:CloseUI(function () World.playerPawn:EnterArm("db", self.databaseId) end)
 end
 

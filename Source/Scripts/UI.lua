@@ -155,8 +155,10 @@ function UI.LoadShared(self)
 	self.gfx.Solid = World.Load("UI/Solid_M")
 	self.gfx.CaretBlink = World.Load("UI/CaretBlink_M")
 	self.gfx.Button = World.Load("UI/arm_buttons_M")
+	self.gfx.ButtonPulse = World.Load("UI/arm_buttons_pulse_M")
 	self.gfx.ButtonOverbright = World.Load("UI/arm_buttons_overbright_M")
 	self.gfx.SolidButton = World.Load("UI/arm_buttons_solid_M")
+	self.gfx.SolidButtonPulse = World.Load("UI/arm_buttons_solid_pulse_M")
 	
 	if (UI.mode == kGameUIMode_PC) then
 		self.gfx.VScrollBar = {
@@ -370,9 +372,17 @@ function UI.CreateStylePushButton(self, rect, OnPressed, options, parent)
 	if ((options.background == nil) or (options.background)) then
 		options.background = true
 		if (options.solidBackground) then
-			enabled = self.gfx.SolidButton
+			if (options.pulsingButton) then
+				enabled = self.gfx.SolidButtonPulse
+			else
+				enabled = self.gfx.SolidButton
+			end
 		else
-			enabled = self.gfx.Button
+			if (options.pulsingButton) then
+				enabled = self.gfx.ButtonPulse
+			else
+				enabled = self.gfx.Button
+			end
 		end
 	end
 	

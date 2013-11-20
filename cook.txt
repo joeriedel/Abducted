@@ -242,6 +242,8 @@ pak0 {
 	UI/arm_buttons_overbright_M
 	UI/arm_button_M
 	UI/arm_buttons_solid_M
+	UI/arm_button_pulse_M
+	UI/arm_buttons_pulse_solid_M
 	UI/arm_button_pressed_M
 	UI/arm_signaled_M
 	UI/arm_activity_M
@@ -494,6 +496,9 @@ pak0 {
 	Audio/tormentorgrowl2
 	Audio/tormentorgrowl3
 	Audio/tormentorgrowl4
+	Audio/pulse_overload1
+	Audio/pulse_overload2
+	Audio/pulse_overload3
 
 	Audio/EFX_AlienSkinGrowsSlow
 	Audio/EFX_AlienSkinSwallow

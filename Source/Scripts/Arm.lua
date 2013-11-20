@@ -466,7 +466,9 @@ function Arm.Start(self, mode, dbTopic)
 	self.introMode = mode
 	self.changeConversationCount = 0
 	
-	if (self.contextTopic) then
+	if (self.requestedTopic) then
+		self.topic = nil
+	elseif (self.contextTopic) then
 		if (not self.inContextTopic) then
 			self.topic = nil
 		end

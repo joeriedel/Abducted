@@ -204,12 +204,12 @@ function Achievements.Award(self, name, silent)
 		material = acv.Icon
 	}
 	
+	EventLog:AddEvent(GameDB:ArmDateString(), "!ACHIEVEMENT", acv.String)
+	
 	if (not silent) then
 		HUD:Print(icon, StringTable.Get("ACV_UNLOCKED_HUD"):format(StringTable.Get(acv.String), PlayerSkills.kAchievementReward), nil, false)
 		PlayerSkills:AwardSkillPoints(PlayerSkills.kAchievementReward)
 	end
-	
-	EventLog:AddEvent(GameDB:ArmDateString(), "!ACHIEVEMENT", acv.String)
 	
 	GameNetwork.SendAchievement(acv.Id)
 	GameNetwork.LogEvent("Achievement: "..acv.Id)

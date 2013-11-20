@@ -351,7 +351,7 @@ function TerminalScreen.CheckActivate(dt)
 end
 
 function TerminalScreen.CheckSignalDowngrade(self)
-	if ((self.failcount >= 2) and (not self.downgraded) and (self.hackDifficulty > 1)) then
+	if ((TerminalScreen.Signaled ~= self) and (self.failcount > 0) and (not self.downgraded) and (self.hackDifficulty > 1)) then
 		TerminalScreen.Signaled = self
 		Arm:SignalContext(
 			"TerminalDowngrade",
@@ -373,6 +373,7 @@ end
 
 function TerminalScreen.ClearContextChat(self)
 	self.failcount = 0
+	self.downgraded = true -- don't prompt them again if they refuse the first time.
 end
 
 function TerminalScreen.GlyphPressed()

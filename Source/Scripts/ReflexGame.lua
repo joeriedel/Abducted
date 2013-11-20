@@ -175,19 +175,15 @@ function ReflexGame.DPadInput(widget, e)
 		end
 	elseif (self.dpadTouch and Input.IsTouchEnd(e, self.dpadTouch)) then
 		self.dpadTouch = nil
-		self.widgets.dpadRoot:SetCapture(false)
-		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+		self:FlushInput()
 		return true
 	elseif (self.dpadTouch == nil) then
 		return true
 	end
 
 	local size = self.widgets.dpadRoot.size / 2
-	local dx = e.data[1] - size
-	local dy = e.data[2] - size
+	local dx = e.data[1] - self.widgets.dpadRoot.center
+	local dy = e.data[2] - self.widgets.dpadRoot.center
 	
 	-- deadband
 	if (math.abs(dx) < (size/3)) then
@@ -456,6 +452,7 @@ function ReflexGame.InitUI(self)
 			{rect={dpadLeft-dpadExpand, dpadTop-dpadExpand, dpadSize+dpadExpand*2, dpadSize+dpadExpand*2}, OnInputEvent=ReflexGame.DPadInput}
 		)
 		self.widgets.dpadRoot.size = dpadSize
+		self.widgets.dpadRoot.center = (dpadSize+dpadExpand*2)/2
 		self.widgets.root3:AddChild(self.widgets.dpadRoot)
 		
 		self.widgets.dpad.left = UI:CreateWidget(
@@ -1162,13 +1159,8 @@ end
 
 function ReflexGame.HandleTimeUp(self)
 	Abducted.entity.eatInput = true
-	if (self.widgets.dpad) then
-		self.widgets.dpadRoot:SetCapture(false)
-		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
-		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
-	end
+	self:FlushInput()
+	PuzzleScoreScreen:FlushInput()
 	
 	local f = function()
 		self:EndGame("f")
@@ -1379,19 +1371,23 @@ function ReflexGame.DoQuit(self)
 	end
 end
 
+function ReflexGame.FlushInput(self)
+	if (self.widgets.dpad) then
+		self.widgets.dpadRoot:SetCapture(false)
+		self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
+		self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
+	end
+end
+
 function ReflexGame.Think(self,dt)
 	if (self.state.gameOver) then
 		-- game over never advances past here
 		self.think = nil
 		self.gameReady = false
 		
-		if (self.widgets.dpad) then
-			self.widgets.dpadRoot:SetCapture(false)
-			self.widgets.dpad.left:SetMaterial(self.gfx.RightArrow)
-			self.widgets.dpad.right:SetMaterial(self.gfx.RightArrow)
-			self.widgets.dpad.up:SetMaterial(self.gfx.RightArrow)
-			self.widgets.dpad.down:SetMaterial(self.gfx.RightArrow)
-		end
+		self:FlushInput()
 		
 		if (self.state.victory) then
 			
@@ -1945,6 +1941,13 @@ function PuzzleScoreScreen.CreateRetryQuit(self)
 	self.widgets.RetryQuitRoot:AddChild(self.widgets.Quit)
 end
 
+
+function PuzzleScoreScreen.FlushInput(self)
+	self.widgets.RetryQuitRoot:ClearCapture()
+	self.widgets.Retry.class:ResetHighlight(self.widgets.Retry, true)
+	self.widgets.Quit.class:ResetHighlight(self.widgets.Quit, true)
+end
+
 function PuzzleScoreScreen.RevealNextItem(self, callback)
 	local w = self.widgets.items[self.nextItem]
 	if (w) then
@@ -2130,6 +2133,8 @@ function PuzzleScoreScreen.ProcessActionTokens(self, tokens)
 end
 
 function PuzzleScoreScreen.DoRetryQuitScreen(self, layer, retry, quit)
+	self:FlushInput()
+	
 	self.retryHook = retry
 	self.quitHook = quit
 	self.successHook = nil

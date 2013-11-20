@@ -17,6 +17,8 @@ function Abducted.Initialize(self)
 	
 	UI:InitMap()
 	GameDB:Load()
+	Achievements:Init()
+	Achievements:Load()
 	PlayerSkills:Load()
 	Abducted:Load()
 	PlayerInput:Spawn()
@@ -35,6 +37,30 @@ end
 
 function Abducted.PostSpawn(self)
 	Game.PostSpawn(self)
+	
+	if (GameDB.hackDetected) then
+	-- punish people who steal
+		self.killTime = FloatRand(3,7)*60
+		local f = function()
+			local player = World.playerPawn
+						
+			if (Game.time >= self.killTime) then
+				if (player.bugStun or player.customMove or Cinematics.busy) then	
+					self.killTime = Game.time + 10
+					return
+				end
+				if (player.dead) then
+					self.killTime = Game.time + FloatRand(0.5, 1.2)*60
+					return
+				end
+			
+				self.killTime = Game.time + FloatRand(0.5, 1.2)*60
+				World.playerPawn:Kill()
+			end
+		end
+		
+		World.gameTimers:Add(f, 1, true)
+	end
 end
 
 function Abducted.OnLevelStart(self)
@@ -144,11 +170,14 @@ function Abducted.LoadState(self)
 	World.FlushInput(true)
 	self.pulse = false
 
+	Achievements:Load()
 	PlayerSkills:Load(true)
 	HUD:LoadState()
 	Arm:LoadState()
 	Cinematics:LoadState()
 	Floors:LoadState()
+	Achievements:Load()
+	
 end
 
 function Abducted.SaveState(self)
@@ -418,13 +447,15 @@ function Abducted.BeginPulse(self)
 	self.pulseCount = 0
 	HUD:ShowPulseModes(true)
 	HUD:RefreshAvailableActions()
-	World.playerPawn:BeginPulse(self)
+	
+	local dischargeTime = FloatRand(PlayerSkills.kPulseExplodeTime[1], PlayerSkills.kPulseExplodeTime[2])
+	World.playerPawn:BeginPulse(dischargeTime)
 	
 	local f = function()
 		self:DischargePulse()
 	end
 	
-	self.pulseTimer = World.gameTimers:Add(f, FloatRand(PlayerSkills.kPulseExplodeTime[1], PlayerSkills.kPulseExplodeTime[2]))
+	self.pulseTimer = World.gameTimers:Add(f, dischargeTime)
 	
 end
 

@@ -9,10 +9,12 @@ PlayerSkills.UnlimitedSkillPointsCheat = false
 PlayerSkills.RefundFraction = 0.75
 PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120
-PlayerSkills.kPulseExplodeTime = {8, 10}
+PlayerSkills.kPulseExplodeTime = {10, 12}
 PlayerSkills.kArmChatReward = 15
 PlayerSkills.kDiscoveryReward = 25
 PlayerSkills.kTerminalReward = 150
+PlayerSkills.kGlyphReward = 25
+PlayerSkills.kAchievementReward = 25
 
 PlayerSkills.Skills = {}
 
@@ -786,6 +788,24 @@ function PlayerSkills.GiveAllSkills(self)
 	
 	HUD:Print(nil, "All Skills Enabled", nil, false)
 	
+	-- calculate cost of all skills
+	local allSkillsCost = 0
+	
+	for k,v in pairs(PlayerSkills.Skills) do
+	
+		for i=1,9 do
+			local skill = v[i]
+			if (not skill) then
+				break
+			end
+			
+			allSkillsCost = allSkillsCost + skill.Cost
+		end
+	
+	end
+	
+	COutLine(kC_Debug, "Cost for all skill upgrades: %d skp", allSkillsCost)
+	
 end
 
 function PlayerSkills.Load(self, fromCheckpoint)
@@ -865,6 +885,7 @@ function PlayerSkills.AwardSkillPoints(self, num)
 		self.SkillPoints = self.SkillPoints + num
 	end
 	EventLog:AddEvent(GameDB:ArmDateString(), "!SKILLPOINTS", tostring(num))
+	GameNetwork.LogEvent("SkillPointsAwarded", {num=tostring(num)})
 end
 
 function PlayerSkills.ManipulateSkillLevel(self)

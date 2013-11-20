@@ -372,6 +372,7 @@ function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
 	
 	self.widgets.skills.SkillsTree:RecalcLayout()
 	
+	self:SelectSkill(PlayerSkills.Skills.ManipulateRegen)
 end
 
 function Arm.UpdateSkillsUI(self)
@@ -453,7 +454,7 @@ function Arm.OnSkillWidgetInputEvent(self, skill, e)
 end
 
 function Arm.OnStoreButtonPressed(self)
-
+	GameNetwork.LogEvent("BrowseInGameStore")
 end
 
 function Arm.OnRefundButtonPressed(self)
@@ -501,6 +502,8 @@ function Arm.HasTrainedAnySkills(self)
 end
 
 function Arm.RefundSkills(self, refund)
+
+	GameNetwork.LogEvent("RefundSkills")
 
 	for k,v in pairs(PlayerSkills.Skills) do
 		v:Untrain()
@@ -572,6 +575,13 @@ function Arm.UpgradeSkill(self, skill, cost)
 	
 	self.widgets.skills.Refund:SetVisible(true)
 	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
+	
+	for k,v in pairs(PlayerSkills.Skills) do
+		if (v == skill) then
+			GameNetwork.LogEvent("SkillUpgrade ("..k.." to level "..tostring(skill:CurrentLevel())..")", {map=World.worldspawn.keys.mappath})
+			break
+		end
+	end
 end
 
 function Arm.SelectSkill(self, skill)

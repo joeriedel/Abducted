@@ -181,9 +181,10 @@ function Metadata.Explode(self)
 	
 	World.globalTimers:Add(f, 0.1)
 	
-	HUD:Print(nil, "METADATA_MESSAGE")
+	HUD:Print(nil, StringTable.Get("METADATA_MESSAGE"):format(PlayerSkills.kGlyphReward), nil, false)
 	EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "EVENT_LOG_OPENED_METADATA_GLYPH")
-	PlayerSkills:AwardSkillPoints(25)
+	PlayerSkills:AwardSkillPoints(PlayerSkills.kGlyphReward)
+	Achievements:GlyphDiscovered()
 end
 
 function Metadata.SaveState(self)

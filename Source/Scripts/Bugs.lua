@@ -865,6 +865,7 @@ function Bug.CheckStomp(self)
 	end
 
 	local f = function()
+		Achievements:SquishedBugs(1)
 		self:Damage(Bug.Health, World.playerPawn)
 	end
 
@@ -1079,6 +1080,7 @@ function Bug.PulseDamage(self, damage)
 		end
 		
 		World.gameTimers:Add(f, 20) -- remove us in 20 seconds
+		Achievements:ShotWithPulse()
 	end
 end
 

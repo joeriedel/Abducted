@@ -211,6 +211,9 @@ function Arm.LoadLog(self)
 			end
 			
 			typeface = self.typefaces.LogEvent
+		elseif (v.style == "!ACHIEVEMENT") then
+			text = StringTable.Get("ACV_UNLOCKED")..": "..StringTable.Get(v.text)
+			typeface = self.typeface.LogEvent
 		else
 			text = StringTable.Get(v.text)
 			typeface = self.typefaces.LogEvent

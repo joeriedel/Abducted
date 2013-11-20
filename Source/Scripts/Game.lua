@@ -182,6 +182,11 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "load") then
 		self:LoadLevel(args)
 		return true
+	elseif (cmd == "achievement") then
+		if (args) then
+			Achievements:Award(args)
+			return true
+		end
 	end
 end
 

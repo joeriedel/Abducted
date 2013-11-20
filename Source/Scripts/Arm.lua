@@ -98,7 +98,7 @@ function Arm.SpawnShared(self)
 	self.sfx.HeartBeat = World.Load("Audio/heartbeat1")
 	self.sfx.HeartBeatFast = World.Load("Audio/heartbeatfast")
 	self.sfx.Reward = World.Load("Audio/armreward")
-	self.sfx.SelectSkill = World.Load("Audio/selectskill")
+	self.sfx.SelectSkill = World.LoadSound("Audio/selectskill", 2)
 	self.sfx.UpgradeSkill = World.Load("Audio/upgradeskill")
 	
 	self.sfx.HeartBeat:SetLoop(true)
@@ -466,7 +466,9 @@ function Arm.Start(self, mode, dbTopic)
 	self.introMode = mode
 	self.changeConversationCount = 0
 	
-	if (self.contextTopic) then
+	if (self.requestedTopic) then
+		self.topic = nil
+	elseif (self.contextTopic) then
 		if (not self.inContextTopic) then
 			self.topic = nil
 		end

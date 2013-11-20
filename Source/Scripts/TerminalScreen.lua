@@ -351,7 +351,7 @@ function TerminalScreen.CheckActivate(dt)
 end
 
 function TerminalScreen.CheckSignalDowngrade(self)
-	if ((self.failcount >= 2) and (not self.downgraded) and (self.hackDifficulty > 1)) then
+	if ((TerminalScreen.Signaled ~= self) and (self.failcount > 0) and (not self.downgraded) and (self.hackDifficulty > 1)) then
 		TerminalScreen.Signaled = self
 		Arm:SignalContext(
 			"TerminalDowngrade",
@@ -359,6 +359,7 @@ function TerminalScreen.CheckSignalDowngrade(self)
 				self:ClearContextChat()
 			end
 		)
+		GameNetwork.LogEvent("TerminalDowngradePrompt")
 	end
 end
 
@@ -368,11 +369,13 @@ function TerminalScreen.Downgrade()
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "TERMINAL_DOWNGRADED_LOG")
 		self.hackDifficulty = self.hackDifficulty - 1
 		self.downgraded = true
+		GameNetwork.LogEvent("TerminalDowngraded")
 	end
 end
 
 function TerminalScreen.ClearContextChat(self)
 	self.failcount = 0
+	self.downgraded = true -- don't prompt them again if they refuse the first time.
 end
 
 function TerminalScreen.GlyphPressed()

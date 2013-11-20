@@ -880,6 +880,8 @@ end
 
 function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 
+	Achievements:DiscussedTopic()
+	
 	self.changeConversationCount = 0
 	
 	-- add event

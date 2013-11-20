@@ -17,12 +17,8 @@ function MainMenuPanel.Create(self, options, parent)
 		options.background = MainMenu.gfx.MMPanel
 	end
 	
-	local OnInputEvent = function(widget, e)
-		return self:OnInputEvent(e)
-	end
-
 	self.widgets = {}
-	self.widgets.panel = UI:CreateWidget("MatWidget", {material=options.background, rect=options.rect, OnInputEvent=OnInputEvent})
+	self.widgets.panel = UI:CreateWidget("MatWidget", {material=options.background, rect=options.rect})
 	
 	if (parent) then
 		parent:AddChild(self.widgets.panel)
@@ -36,16 +32,6 @@ function MainMenuPanel.Show(self, show)
 	self.widgets.panel:SetVisible(show)
 end
 
-function MainMenuPanel.OnInputEvent(self, e)
-
-	if (self.eatInput) then
-		return true
-	end
-	
-	return false
-
-end
-
 function MainMenuPanel.Layout(self)
 
 end
@@ -56,7 +42,7 @@ end
 
 function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 
-	self.eatInput = true
+	MainMenu.eatInput = true
 	
 	self:PrepareContents()
 	self.widgets.panel:ScaleTo(scale, {0,0})
@@ -65,7 +51,7 @@ function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 	
 	local f = function()
 		local f = function()
-			self.eatInput = false
+			MainMenu.eatInput = false
 			if (onComplete) then
 				onComplete()
 			end
@@ -79,7 +65,7 @@ end
 
 function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 
-	self.eatInput = true
+	MainMenu.eatInput = true
 	
 	self:FadeOutContents(fade)
 	

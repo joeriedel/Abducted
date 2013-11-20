@@ -47,6 +47,7 @@ function GameDB.Load(self)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.bugKillCounter = Persistence.ReadNumber(SaveGame, "bugKillCounter", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
+	self.hackDetected = Persistence.ReadBool(Session, "hackDetected", false)
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
@@ -73,7 +74,7 @@ function GameDB.Load(self)
 end
 
 function GameDB.CheckBugKillCounter(self)
-	if (self.bugKillCounter > 0) then
+	if (self.bugKillCounter > 4) then
 		EventLog:AddEvent(GameDB:ArmDateString(), "!KILLEDBUGS", tostring(self.bugKillCounter))
 		self.bugKillCounter = 0
 	end
@@ -165,7 +166,10 @@ function GameDB.LoadPersistentObjects(self)
 		assert(type(k) == "string")
 		if (x ~= "vc") then
 			local x = db[k]
-			v:Load(x)
+			if (x) then
+			-- new objects won't have state.
+				v:Load(x)
+			end
 		end
 	end
 	
@@ -258,6 +262,8 @@ function GameDB.Discover(self, name, source, unlock, visible)
 				World.PostEvent(v)
 			end
 		end
+		
+		Achievements:Discovered(name)
 	else
 		logTitle = dbItem.mysteryTitle
 		logEntry = dbItem.mysteryLogText or "MISSING MYSTERY LOG TEXT!"
@@ -270,7 +276,7 @@ function GameDB.Discover(self, name, source, unlock, visible)
 	)
 	
 	if (visible) then
-		local text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(logTitle).."."
+		local text = StringTable.Get("ARM_REWARD_DISCOVERY")..": "..StringTable.Get(logTitle)
 		HUD:Print(nil, text, nil, false)
 	end
 

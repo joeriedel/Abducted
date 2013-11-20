@@ -51,8 +51,8 @@ function GameNetwork.OnLocalPlayerAuthenticated(authenticated)
 		Session:Save()
 	end
 	
-	if (World.game and World.game.OnLocalPlayerAuthenticated) then
-		World.game:OnLocalPlayerAuthenticated(authenticated, changed)
+	if (Game.entity and Game.entity.OnLocalPlayerAuthenticated) then
+		Game.entity:OnLocalPlayerAuthenticated(authenticated, changed)
 	end
 
 end
@@ -67,8 +67,8 @@ function GameNetwork.OnShowLeaderboard(show)
 
 	COutLine(kC_Debug, "GameNetwork.OnShowLeaderboard(%s)", tostring(show))
 	
-	if (World.game and World.game.OnShowLeaderboard) then
-		World.game:OnShowLeaderboard(show)
+	if (Game.entity and Game.entity.OnShowLeaderboard) then
+		Game.entity:OnShowLeaderboard(show)
 	end
 
 end
@@ -77,8 +77,8 @@ function GameNetwork.OnShowAchievements(show)
 
 	COutLine(kC_Debug, "GameNetwork.OnShowAchievements(%s)", tostring(show))
 	
-	if (World.game and World.game.OnShowAchievements) then
-		World.game:OnShowAchievements(show)
+	if (Game.entity and Game.entity.OnShowAchievements) then
+		Game.entity:OnShowAchievements(show)
 	end
 
 end

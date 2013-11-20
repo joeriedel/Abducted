@@ -25,6 +25,7 @@ end
 function HUD.CreatePrinter(self)
 
 	local typeface = World.Load("UI/HUD_TF")
+	local bkg = World.Load("UI/MMItemBackground_M")
 	
 	if (UI.mode == kGameUIMode_Mobile) then
 		local rect = self.widgets.Arm:Rect()
@@ -48,7 +49,7 @@ function HUD.CreatePrinter(self)
 		HUD.printerRect[1] = UI.screenWidth - HUD.printerRect[3]
 	end
 	
-	HUD.printer = TextPrinter:New(typeface, HUD.printerRect, 5, 50, nil, UI.widgets.hudprint.Root)
+	HUD.printer = TextPrinter:New(typeface, bkg, HUD.printerRect, 5, 50, nil, UI.widgets.hudprint.Root, {1,1}, World.gameTimers)
 
 end
 

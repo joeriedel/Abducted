@@ -726,6 +726,7 @@ end
 function PlayerPawn.EndPulse(self)
 	self.disableAnimTick = false
 	self.pulseSounds.Hum:FadeOutAndStop(0.1)
+	self:EndPulseOverload()
 end
 
 function PlayerPawn.PulseLight(self, pos)

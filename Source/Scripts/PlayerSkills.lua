@@ -786,6 +786,24 @@ function PlayerSkills.GiveAllSkills(self)
 	
 	HUD:Print(nil, "All Skills Enabled", nil, false)
 	
+	-- calculate cost of all skills
+	local allSkillsCost = 0
+	
+	for k,v in pairs(PlayerSkills.Skills) do
+	
+		for i=1,9 do
+			local skill = v[i]
+			if (not skill) then
+				break
+			end
+			
+			allSkillsCost = allSkillsCost + skill.Cost
+		end
+	
+	end
+	
+	COutLine(kC_Debug, "Cost for all skill upgrades: %d skp", allSkillsCost)
+	
 end
 
 function PlayerSkills.Load(self, fromCheckpoint)

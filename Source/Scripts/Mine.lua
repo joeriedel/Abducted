@@ -29,6 +29,12 @@ function Mine.Spawn(self)
 	self.model.dm = self:AttachDrawModel(self.model)
 	self.model.dm:ScaleTo({0.25, 0.25, 0.25}, 0)
 	
+	self.explode = World.Load("FX/mineexplode")
+	self.explode:SetMaxParticles(250)
+	self.explode.dm = self:AttachDrawModel(self.explode)
+	self.explode.dm:SetBounds(self:Mins(), self:Maxs())
+	self.explode.dm:SetLocalDir({0,0,1})
+	
 	self.sfx = {
 		Activate = World.LoadSound("Audio/mine_activate"),
 		Hum = World.LoadSound("Audio/mine_hum"),
@@ -41,6 +47,7 @@ function Mine.Spawn(self)
 		self:AttachSound(v)
 	end
 	
+	self.isMine = true
 	self.sfx.Hum:SetLoop(true)
 	
 	self:SetMins({-48, -48, 0})
@@ -108,7 +115,12 @@ function Mine.Scan(self)
 	)
 	
 	if (ents) then
-		self:Trip()
+		for k,v in pairs(ents) do
+			if (v.model and v.model.dm and (v.model.dm:Visible())) then	
+				self:Trip()
+				break
+			end
+		end
 	end
 
 end
@@ -126,6 +138,7 @@ function Mine.Explode(self)
 	self.sfx.Explode:Play(kSoundChannel_FX, 0)
 	self.sfx.Hum:Stop()
 	self.model.dm:SetVisible(false)
+	self.explode:Spawn(50)
 	
 	local ents = World.BBoxTouching(
 		self.blastMins,
@@ -135,14 +148,14 @@ function Mine.Explode(self)
 	
 	if (ents) then
 		for k,v in pairs(ents) do
-			if (v.Kill) then
-				v:Kill(self)
+			if (v.Damage) then
+				v:Damage(PlayerPawn.kMaxShieldDamage+1, self)
 			end
 		end
 	end
 	
 	self.think = Mine.Remove
-	self:SetNextThink(1)
+	self:SetNextThink(2)
 	
 	World.playerPawn:RemoveMine(self)
 end

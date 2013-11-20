@@ -1043,6 +1043,20 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 		return
 	end
 	
+	if (instigator and instigator.isMine) then
+		skill = PlayerSkills.Skills.Mines:CurrentLevel()
+		if (skill == 2) then
+			if (not self.shieldActive) then
+			-- only stuns us
+				self:PlayUninterruptable("damage_stun")
+				self:PlaySoundGroup(PlayerPawn.PainSounds, 1)
+				return
+			end
+		elseif (skill >= 3) then
+			return -- we don't take damage from mines
+		end
+	end
+	
 	if (self.shieldActive) then
 		if (damage <= PlayerPawn.kMaxShieldDamage) then
 			self.shieldSounds.ImpactLight:Play(kSoundChannel_FX, 0)

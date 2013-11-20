@@ -15,7 +15,7 @@ function ManipulatableObject.Spawn(self)
 	COutLine(kC_Debug, "Manipulatable:Spawn(%s)", StringForString(self.keys.model, "<NULL>"))
 	Entity.Spawn(self)
 	
-	self:SetClassBits(kEntityClass_Monster)
+--	self:SetClassBits(kEntityClass_Monster)
 	 if (BoolForString(self.keys.cast_shadows, false)) then
 		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	end

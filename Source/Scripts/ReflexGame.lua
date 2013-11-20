@@ -1410,10 +1410,11 @@ function ReflexGame.Think(self,dt)
 					self.skill,
 					function ()
 						self:EndGame("w")
-					end
+					end,
+					"hack"
 				)
 			end
-			World.globalTimers:Add(f, 1.5)
+			World.globalTimers:Add(f, 0.5)
 		else
 			self.sfx.Fail:Play(kSoundChannel_UI, 0)
 			PuzzleScoreScreen:DoRetryQuitScreen(
@@ -1968,7 +1969,7 @@ function PuzzleScoreScreen.CreateRewardWidget(self)
 	return w
 end
 	
-function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, skillLevel, callback, logevent)
+function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, skillLevel, callback, logevent, type)
 
 	ReflexGame.entity.sfx.Success:Play(kSoundChannel_UI, 0)
 	
@@ -2065,7 +2066,7 @@ function PuzzleScoreScreen.DoSuccessScreen(self, layer, actions, skillLevel, cal
 	end
 	
 	if (next(self.widgets.items) == nil) then
-		World.globalTimers:Add(callback, 3)
+		World.globalTimers:Add(callback, 2)
 	else
 		self.nextItem = 1
 		local f = function()

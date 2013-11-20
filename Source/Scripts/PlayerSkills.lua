@@ -13,6 +13,8 @@ PlayerSkills.kPulseExplodeTime = {10, 12}
 PlayerSkills.kArmChatReward = 15
 PlayerSkills.kDiscoveryReward = 25
 PlayerSkills.kTerminalReward = 150
+PlayerSkills.kGlyphReward = 25
+PlayerSkills.kAchievementReward = 25
 
 PlayerSkills.Skills = {}
 
@@ -883,6 +885,7 @@ function PlayerSkills.AwardSkillPoints(self, num)
 		self.SkillPoints = self.SkillPoints + num
 	end
 	EventLog:AddEvent(GameDB:ArmDateString(), "!SKILLPOINTS", tostring(num))
+	GameNetwork.LogEvent("SkillPointsAwarded", {num=tostring(num)})
 end
 
 function PlayerSkills.ManipulateSkillLevel(self)

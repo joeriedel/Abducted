@@ -47,6 +47,7 @@ function GameDB.Load(self)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.bugKillCounter = Persistence.ReadNumber(SaveGame, "bugKillCounter", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
+	self.hackDetected = Persistence.ReadBool(Session, "hackDetected", false)
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
@@ -73,7 +74,7 @@ function GameDB.Load(self)
 end
 
 function GameDB.CheckBugKillCounter(self)
-	if (self.bugKillCounter > 0) then
+	if (self.bugKillCounter > 4) then
 		EventLog:AddEvent(GameDB:ArmDateString(), "!KILLEDBUGS", tostring(self.bugKillCounter))
 		self.bugKillCounter = 0
 	end
@@ -261,6 +262,8 @@ function GameDB.Discover(self, name, source, unlock, visible)
 				World.PostEvent(v)
 			end
 		end
+		
+		Achievements:Discovered(name)
 	else
 		logTitle = dbItem.mysteryTitle
 		logEntry = dbItem.mysteryLogText or "MISSING MYSTERY LOG TEXT!"

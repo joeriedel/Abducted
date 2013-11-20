@@ -16,7 +16,7 @@ function ManipulatableObject.Spawn(self)
 	Entity.Spawn(self)
 	
 --	self:SetClassBits(kEntityClass_Monster)
-	 if (BoolForString(self.keys.cast_shadows, false)) then
+	if (BoolForString(self.keys.cast_shadows, false)) then
 		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	end
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
@@ -664,6 +664,7 @@ end
 
 function ManipulatableObject.ShotWithPulse(self)
 	self:Pain()
+	Achievements:ShotWithPulse()
 end
 
 function ManipulatableObject.CheckPulseTargets(e)
@@ -1083,6 +1084,8 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 	if (not self.model:HasState(state)) then
 		return false -- this model has no manipulate in that direction
 	end
+	
+	Achievements:Manipulated()
 	
 	local f = function()
 		if (self.shakeCamera == "EndOf") then

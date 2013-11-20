@@ -433,6 +433,8 @@ function MainMenu.MainPanel.News(self, item)
 		self.busy = false
 	end
 	
+	GameNetwork.LogEvent("ViewNews")
+	
 	MainMenu.newsPanel:LayoutNews()
 	MainMenu.newsPanel:TransitionIn({0,0}, 0.3, f)
 
@@ -454,6 +456,8 @@ function MainMenu.MainPanel.Continue(self, item)
 	
 	local f = function(result)
 		if (result == AlertPanel.YesButton) then
+		
+			GameNetwork.LogEvent("CheckpointLoad")
 		
 			local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
 			local saveInfo = MainMenu.saves[checkpoint]
@@ -497,6 +501,7 @@ function MainMenu.MainPanel.LoadGame(self, item)
 end
 
 function MainMenu.MainPanel.Store(self, item)
+	GameNetwork.LogEvent("BrowseMMStore")
 	self.busy = false
 end
 
@@ -505,18 +510,23 @@ function MainMenu.MainPanel.Leaderboards(self, item)
 end
 
 function MainMenu.MainPanel.Achievements(self, item)
+	GameNetwork.LogEvent("ViewAchievements")
+	GameNetwork.ShowAchievements()
 	self.busy = false
 end
 
 function MainMenu.MainPanel.Credits(self, item)
+	GameNetwork.LogEvent("ViewCredits")
 	self.busy = false
 end
 
 function MainMenu.MainPanel.Facebook(self)
+	GameNetwork.LogEvent("ClickedFacebook")
 	self.busy = false
 end
 
 function MainMenu.MainPanel.Twitter(self)
+	GameNetwork.LogEvent("ClickedTwitter")
 	self.busy = false
 end
 
@@ -556,7 +566,6 @@ function MainMenu.MainPanel.Create(self, options, parent)
 	self.widgets.selectionIndicator:SetHAlign(kHorizontalAlign_Left)
 		
 	for k,v in pairs(MainMenu.Items) do
-	
 		if ((v.Condition == nil) or (v.Condition(self))) then
 			local item = {i = (#self.items + 1)}
 			local w = v.Create(self, v.data, item)

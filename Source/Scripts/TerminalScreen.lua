@@ -359,6 +359,7 @@ function TerminalScreen.CheckSignalDowngrade(self)
 				self:ClearContextChat()
 			end
 		)
+		GameNetwork.LogEvent("TerminalDowngradePrompt")
 	end
 end
 
@@ -368,6 +369,7 @@ function TerminalScreen.Downgrade()
 		EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "TERMINAL_DOWNGRADED_LOG")
 		self.hackDifficulty = self.hackDifficulty - 1
 		self.downgraded = true
+		GameNetwork.LogEvent("TerminalDowngraded")
 	end
 end
 

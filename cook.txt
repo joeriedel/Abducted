@@ -193,6 +193,22 @@ pak0 {
 	UI/discovery_the_ship_M
 	UI/discovery_wild_growth_M
 	UI/discovery_window_light_M
+	UI/acv_telekinesis_M
+	UI/acv_disintegrate_M
+	UI/acv_guts_M
+	UI/acv_itbegins_M
+	UI/acv_einstein_M
+	UI/acv_fearless_M
+	UI/acv_interface_M
+	UI/acv_brawn_M
+	UI/acv_database_M
+	UI/acv_codex_M
+	UI/acv_vertical_M
+	UI/acv_symbolism_M
+	UI/acv_curious_M
+	UI/acv_revelation_M
+	UI/acv_thehunt_M
+	UI/acv_theship_M
 	UI/alphabet_scrollbar_M
 	UI/alphabet_scrollbar_pressed_M
 	UI/TerminalScreenButtons_TF
@@ -501,6 +517,7 @@ pak0 {
 	Audio/pulse_overload1
 	Audio/pulse_overload2
 	Audio/pulse_overload3
+	Audio/achievement
 
 	Audio/EFX_AlienSkinGrowsSlow
 	Audio/EFX_AlienSkinSwallow

@@ -1392,6 +1392,8 @@ function PlayerPawn.BugStun(self, callback)
 	self.bugStun = true
 	self.bugStunCallback = callback
 	
+	EventLog:AddEvent(GameDB:ArmDateString(), "!EVENT", "EVENT_LOG_BUG_CLIMB")
+	
 	local blend = self:PlayUninterruptable("bug_stun")
 	if (blend) then
 		blend.And(f)
@@ -1620,6 +1622,7 @@ function PlayerPawn.LeaveHackGame(self, terminal, result)
 			PlayerPawn.GodMode = self.oldGodMode
 			terminal:PostHackEvents(result)
 			if (result) then
+				Achievements:HackedPuzzle(terminal.hackDifficulty)
 				Abducted.entity:VisibleCheckpoint()
 			else
 				terminal:PopupUI()
@@ -1668,6 +1671,7 @@ function PlayerPawn.LeaveSolveGame(self, terminal, result)
 				terminal:PostSolveEvents(result == "w")
 			end
 			if (result == "w") then
+				Achievements:SolvedPuzzle(#terminal.solveGlyphs)
 				Abducted.entity:VisibleCheckpoint()
 			else
 				terminal:PopupUI()
@@ -1849,9 +1853,9 @@ function PlayerPawn.SaveState(self)
 	if (fp.floor == -1) then
 		error("PlayerPawn.SaveState: checkpoints not allowed when player is not on a floor!")
 	end
-	if (self.customMove) then
-		error("PlayerPawn.SaveState: executing custom move, cannot save!")
-	end
+--	if (self.customMove) then
+--		error("PlayerPawn.SaveState: executing custom move, cannot save!")
+--	end
 	assert(not self.dead)
 	
 	local vertex = self:Angles()

@@ -1314,7 +1314,8 @@ function MemoryGame.Think(self,dt)
 					#self.goals,
 					function()
 						self:EndGame("w")
-					end
+					end,
+					"solve"
 				)
 			end
 			World.globalTimers:Add(f, 1)

@@ -374,6 +374,7 @@ function Tormentor.Move(self, move)
 end
 
 function Tormentor.ShotWithPulse(self)
+	Achievements:Award("Fearless")
 	self:Stun()
 end
 

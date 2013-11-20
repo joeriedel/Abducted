@@ -49,7 +49,7 @@ function HUD.CreatePrinter(self)
 		HUD.printerRect[1] = UI.screenWidth - HUD.printerRect[3]
 	end
 	
-	HUD.printer = TextPrinter:New(typeface, bkg, HUD.printerRect, 5, 50, nil, UI.widgets.hudprint.Root)
+	HUD.printer = TextPrinter:New(typeface, bkg, HUD.printerRect, 5, 50, nil, UI.widgets.hudprint.Root, {1,1}, World.gameTimers)
 
 end
 

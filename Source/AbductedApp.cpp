@@ -333,9 +333,9 @@ void AbductedApp::Finalize() {
 
 const char *AbductedApp::RAD_IMPLEMENT_GET(flurryAPIKey) {
 #if defined(RAD_OPT_SHIP)
-	return "00000000000000000000";
+	return "WG76DKV4BWJS5VPXHH82";
 #else
-	return "00000000000000000000";
+	return "238NH7DY7GXSVMZ4977H";
 #endif
 }
 

@@ -73,9 +73,12 @@ function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 		self.widgets.panel:ScaleTo(scale, {time,time})
 		if (onComplete) then
 			local f = function()
+				MainMenu.eatInput = false
 				onComplete()
 			end
 			World.globalTimers:Add(f, time)
+		else
+			MainMenu.eatInput = false
 		end
 	end
 	

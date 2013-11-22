@@ -15,7 +15,7 @@ PlayerPawn.HandBone = "Girl_RArmPalm"
 PlayerPawn.PulseBeamScale = 1/120
 PlayerPawn.GodMode = false
 PlayerPawn.kMaxShieldDamage = 100
-PlayerPawn.PulseSmokePPS = 10
+PlayerPawn.PulseSmokePPS = 7
 
 PlayerPawn.DeathSounds = {
 	"Audio/VO_Eve_BigPain01",
@@ -66,7 +66,7 @@ PlayerPawn.AnimationStates = {
 			HUD:EnableAll()
 		end,
 		bbox = {mins = {-18, -18, 0}, maxs = {18, 18, 128}},
-		shadowBox = {mins = {-64, -64, 0}, maxs = {64, 64, 128}},
+		shadowBox = {mins = {-68, -68, 0}, maxs = {68, 68, 128}},
 		cameraShift = {0, 0, 32}
 	},
 	limp = {
@@ -85,7 +85,7 @@ PlayerPawn.AnimationStates = {
 		arm_pose_standing = "arm_pose_limp",
 		puzzle_default_choice = "puzzle_limp_choice",
 		smack_metadata = "limpmanup",
-		speedScale = 0.64,
+		speedScale = 0.05,
 		tapAdjust = 48, -- CheckTappedOn
 		bbox = {mins = {-40, -40, 0}, maxs = {40, 40, 90}},
 		canRun = false,
@@ -116,7 +116,7 @@ PlayerPawn.AnimationStates = {
 		OnSelect = function()
 			HUD:EnableAll()
 		end,
-		cameraShift = {0, 0, -64}
+		cameraShift = {0, 0, -48}
 	},
 	walkfast = {
 		walk = "walkfast",
@@ -144,9 +144,9 @@ PlayerPawn.AnimationStates = {
 		pulse_overload1 = "limpmanidle",
 		pulse_overload2 = "limpmanidle",
 		pulse_overload3 = "limpmanidle",
-		speedScale = 0.64,
+		speedScale = 0.75,
 		tapAdjust = 48, -- CheckTappedOn
-		bbox = {mins = {-48, -48, 0}, maxs = {48, 48, 104}},
+		bbox = {mins = {-40, -40, 0}, maxs = {40, 40, 90}},
 		canRun = false,
 		OnSelect = function()
 			HUD:EnableAll()

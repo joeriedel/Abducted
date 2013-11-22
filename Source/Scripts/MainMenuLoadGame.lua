@@ -34,7 +34,7 @@ function MainMenu.LoadGame.Create(self, options, parent)
         0,
         parentRect[3],
         parentRect[4]
-        }
+	}
     
 	self.widgets.vlist = UI:CreateWidget("VListWidget", {rect=parentArea})
 	self.widgets.vlist:SetBlendWithParent(true)
@@ -47,8 +47,8 @@ function MainMenu.LoadGame.Create(self, options, parent)
 	        24,
 	        24,
 	        8
-            )
-	        parentArea[3] = parentArea[3] - 24
+		)
+	    parentArea[3] = parentArea[3] - 24
     end
 	
 	self.widgets.vlist:SetClipRect(parentArea)

@@ -4,6 +4,9 @@
     <filename>Source\Scripts\Abducted.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\Achievements.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\Actor.lua</filename>
   </file>
   <file>
@@ -179,6 +182,9 @@
   </file>
   <file>
     <filename>Source\Scripts\Sprite.lua</filename>
+  </file>
+  <file>
+    <filename>Source\Scripts\Store.lua</filename>
   </file>
   <file>
     <filename>Source\Scripts\System.lua</filename>

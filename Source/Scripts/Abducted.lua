@@ -15,6 +15,8 @@ function Abducted.Initialize(self)
 	
 	Abducted.KeyBindings = LoadKeyBindings()
 	
+	StoreUI:InitForGame()
+	Store.Initialize()
 	UI:InitMap()
 	GameDB:Load()
 	Achievements:Init()
@@ -38,7 +40,7 @@ end
 function Abducted.PostSpawn(self)
 	Game.PostSpawn(self)
 	
-	if (GameDB.hackDetected) then
+	--[[if (Store.validApplication == false) then
 	-- punish people who steal
 		self.killTime = FloatRand(3,7)*60
 		local f = function()
@@ -60,7 +62,7 @@ function Abducted.PostSpawn(self)
 		end
 		
 		World.gameTimers:Add(f, 1, true)
-	end
+	end]]
 end
 
 function Abducted.OnLevelStart(self)

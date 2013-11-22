@@ -5,7 +5,7 @@
 
 PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
-PlayerSkills.UnlimitedSkillPointsCheat = false
+PlayerSkills.UnlimitedSkillPointsCheat = true
 PlayerSkills.RefundFraction = 0.75
 PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120
@@ -766,7 +766,7 @@ function _cv_allskills()
 	
 end
 
-function PlayerSkills.GiveAllSkills(self)
+function PlayerSkills.GiveAllSkills(self, silent)
 
 	self.ManipulateSkill = 2
 	self.ManipulateRegen = 4
@@ -786,25 +786,27 @@ function PlayerSkills.GiveAllSkills(self)
 	
 	Arm:UpdateSkillsUI()
 	
-	HUD:Print(nil, "All Skills Enabled", nil, false)
-	
-	-- calculate cost of all skills
-	local allSkillsCost = 0
-	
-	for k,v in pairs(PlayerSkills.Skills) do
-	
-		for i=1,9 do
-			local skill = v[i]
-			if (not skill) then
-				break
+	if (not silent) then
+		HUD:Print(nil, "All Skills Enabled", nil, false)
+		
+		-- calculate cost of all skills
+		local allSkillsCost = 0
+		
+		for k,v in pairs(PlayerSkills.Skills) do
+		
+			for i=1,9 do
+				local skill = v[i]
+				if (not skill) then
+					break
+				end
+				
+				allSkillsCost = allSkillsCost + skill.Cost
 			end
-			
-			allSkillsCost = allSkillsCost + skill.Cost
+		
 		end
-	
+		
+		COutLine(kC_Debug, "Cost for all skill upgrades: %d skp", allSkillsCost)
 	end
-	
-	COutLine(kC_Debug, "Cost for all skill upgrades: %d skp", allSkillsCost)
 	
 end
 

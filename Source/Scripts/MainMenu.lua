@@ -8,6 +8,7 @@ MainMenu = Game:New()
 function MainMenu.Initialize(self)
 
 	GameNetwork.Initialize()
+	Store.Initialize()
 	
 	MainMenu:PopulateSaveGames()
 	MainMenu:Load()

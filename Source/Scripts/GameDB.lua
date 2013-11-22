@@ -47,7 +47,6 @@ function GameDB.Load(self)
 	self.discoveryTime = Persistence.ReadNumber(SaveGame, "lastDiscoveryTime", 0)
 	self.bugKillCounter = Persistence.ReadNumber(SaveGame, "bugKillCounter", 0)
 	self.loadingCheckpoint = Persistence.ReadBool(Session, "loadCheckpoint", false)
-	self.hackDetected = Persistence.ReadBool(Session, "hackDetected", false)
 		
 	Persistence.WriteBool(Session, "loadCheckpoint", false)
 	Session:Save()
@@ -92,6 +91,7 @@ function GameDB.LoadingSaveGame(self)
 end
 
 function GameDB.SaveCheckpoint(self)
+	Store.SaveSkillPoints() -- save our balance
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
@@ -105,6 +105,7 @@ end
 
 function GameDB.SaveCheckpointTransition(self, level)
 
+	Store.SaveSkillPoints() -- save our balance
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
 	Persistence.WriteString(SaveGame, "lastPlayed", CurrentDateAndTimeString())
@@ -114,6 +115,7 @@ function GameDB.SaveCheckpointTransition(self, level)
 end
 
 function GameDB.LoadCheckpoint(self)
+	Store.LoadSkillPoints()
 	SaveGame:Load() -- load savegame data
 	GameDB:Load()
 	World.MarkTempEntsForGC()

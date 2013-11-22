@@ -268,9 +268,9 @@ function Arm.SpawnSkills(self)
 	self.widgets.skills.Root:AddChild(self.widgets.skills.SkillPointsLabel)
 	
 	self:SpawnSkillsTree(skillsTreeImageRect, scrollBar)
-	
-	self.selectedSkill = nil
-	
+	self:AddOmegaUpgradeButton()
+	self.widgets.skills.SkillsTree:RecalcLayout()
+	self:SelectSkill(PlayerSkills.Skills.ManipulateRegen)
 	Arm:UpdateSkillsUI()
 end
 
@@ -339,7 +339,47 @@ function Arm.CreateSkillInterace(self, skill)
 	
 end
 
+function Arm.AddOmegaUpgradeButton(self)
+
+	local omegaRect = {
+		16*UI.identityScale[1],
+		16*UI.identityScale[2],
+		92*UI.identityScale[1],
+		92*UI.identityScale[2]
+	}
+	
+	self.omegaLabelRect = {omegaRect[1]+omegaRect[3]+4, omegaRect[2], 64, omegaRect[4]}
+	
+	local omega = World.Load("UI/omega_button_M")
+	local omegaPressed = World.Load("UI/omega_button_pressed_M")
+	
+	self.widgets.skills.OmegaUpgradeButton = UIPushButton:Create(
+		omegaRect,
+		{
+			enabled = omega,
+			pressed = omegaPressed
+		},
+		{
+			pressed = UI.sfx.Command
+		},
+		{
+			pressed = function() Arm:OmegaUpgradePressed() end
+		},
+		nil,
+		nil
+	)
+	
+	self.widgets.skills.SkillsTree:AddItem(self.widgets.skills.OmegaUpgradeButton)
+	
+	self.widgets.skills.OmegaUpgradeButton:SetBlendWithParent(true)
+	self.widgets.skills.OmegaLabel = UI:CreateWidget("TextLabel", {rect=self.omegaLabelRect, typeface=self.typefaces.SkillPoints})
+	self.widgets.skills.SkillsTree:AddItem(self.widgets.skills.OmegaLabel)
+	self.widgets.skills.OmegaLabel:SetBlendWithParent(true)
+	
+end
+
 function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
+	
 	self.widgets.skills.SkillsTree = UI:CreateWidget("VListWidget", {rect=self.skillsTreeRect})
 	self.widgets.skills.Root:AddChild(self.widgets.skills.SkillsTree)
 	self.widgets.skills.SkillsTree:SetBlendWithParent(true)
@@ -369,14 +409,12 @@ function Arm.SpawnSkillsTree(self, imageRect, scrollBar)
 	self.widgets.skills.Highlight:SetBlendWithParent(true)
 	self.widgets.skills.Highlight:SetVisible(false)
 	self.widgets.skills.SkillsTree:AddItem(self.widgets.skills.Highlight)
-	
-	self.widgets.skills.SkillsTree:RecalcLayout()
-	
-	self:SelectSkill(PlayerSkills.Skills.ManipulateRegen)
+
 end
 
 function Arm.UpdateSkillsUI(self)
 	self:UpdateSkillPointsLabel()
+	self:UpdateOmegaPointsLabel()
 	for k,v in pairs(PlayerSkills.Skills) do
 		self:UpdateSkillUI(v)
 	end
@@ -422,9 +460,22 @@ end
 
 function Arm.UpdateSkillPointsLabel(self)
 
-	local text = StringTable.Get("SKILL_POINTS").." "..tostring(PlayerSkills.SkillPoints)
+	local skillPoints = PlayerSkills.SkillPoints
+	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
+		skillPoints = skillPoints + Store.skillPoints
+	end
+	
+	local text = StringTable.Get("SKILL_POINTS").." "..tostring(skillPoints)
 	UI:SetLabelText(self.widgets.skills.SkillPointsLabel, text, self.unityFontScale)
 	UI:CenterLabel(self.widgets.skills.SkillPointsLabel, self.skillPointsLabelRect)
+	
+end
+
+function Arm.UpdateOmegaPointsLabel(self)
+
+	local text = tostring(Store.omegaUpgrades)
+	UI:SetLabelText(self.widgets.skills.OmegaLabel, text, self.unityFontScale)
+	UI:VCenterLabel(self.widgets.skills.OmegaLabel, self.omegaLabelRect)
 	
 end
 
@@ -455,6 +506,13 @@ end
 
 function Arm.OnStoreButtonPressed(self)
 	GameNetwork.LogEvent("BrowseInGameStore")
+	
+	local f = function()
+		self:UpdateSkillPointsLabel()
+		self:UpdateOmegaPointsLabel()
+	end
+	
+	StoreUI:Do(f)
 end
 
 function Arm.OnRefundButtonPressed(self)
@@ -521,11 +579,41 @@ function Arm.RefundSkills(self, refund)
 	self.widgets.skills.Refund:SetVisible(false)
 end
 
+function Arm.OmegaUpgradePressed(self)
+	if (Store.omegaUpgrades > 0) then
+		AlertPanel:OKCancel(
+			"SKILL_CONFIRM_OMEGA_TITLE",
+			"SKILL_CONFIRM_OMEGA_TEXT",
+			function (result)
+				if (result == AlertPanel.YesButton) then
+					self:OmegaUpgrade()
+					AlertPanel:OK(
+						"SKILL_CONFIRM_OMEGA_APPLIED_TITLE",
+						"SKILL_CONFIRM_OMEGA_APPLIED_TEXT"
+					)
+				end
+			end
+		)
+	else
+		AlertPanel:YesNo(
+			"SKILL_NO_OMEGA_TITLE",
+			"SKILL_NO_OMEGA_TEXT",
+			function (result)
+				if (result == AlertPanel.YesButton) then
+					self:OnStoreButtonPressed()
+				end
+			end
+		)
+	end
+end
+
 function Arm.OnPurchaseButtonPressed(self)
 	local level = self.selectedSkill:CurrentLevel()
 	local cost = self.selectedSkill[level+1].Cost
 	
-	if (cost > PlayerSkills.SkillPoints) then
+	local skillPoints = PlayerSkills.SkillPoints + Store.skillPoints
+	
+	if (cost > skillPoints) then
 		local title = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TITLE")
 		local msg = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TEXT"):format(cost, PlayerSkills.SkillPoints)
 		
@@ -562,9 +650,31 @@ function Arm.OnPurchaseButtonPressed(self)
 	end
 end
 
+function Arm.OmegaUpgrade(self)
+	Store.omegaUpgrades = Store.omegaUpgrades - 1
+	PlayerSkills:GiveAllSkills(false)
+	self:UpdateSkillsUI()
+	local skill = self.selectedSkill
+	self.selectedSkill = nil -- force scroll to 0,0
+	if (skill) then
+		self:SelectSkill(skill)
+	end
+	
+	self.widgets.skills.Refund:SetVisible(true)
+	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
+	
+	GameNetwork.LogEvent("OmegaUpgradeUsed")
+	
+end
+
 function Arm.UpgradeSkill(self, skill, cost)
 	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
 		PlayerSkills.SkillPoints = PlayerSkills.SkillPoints - cost
+		if (PlayerSkills.SkillPoints < 0) then
+			-- pull from store balance
+			Store.skillPoints = Store.skillPoints + PlayerSkills.SkillPoints
+			PlayerSkills.SkillPoints = 0
+		end
 		self:UpdateSkillPointsLabel()
 	end
 	

@@ -39,7 +39,10 @@ Store.Products = {
 		Icon = "UI/store_ep2_icon_M",
 		Image = "UI/store_ep2_teaser_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 299
+		DebugPrice = 299,
+		PurchaseAction = function()
+			Store.PersistPurchase("761997278")
+		end
 	},
 	{
 		Id = "762002771",
@@ -50,7 +53,10 @@ Store.Products = {
 		Icon = "UI/store_s1_icon_M",
 		Image = "UI/store_s1_teaser_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 1999
+		DebugPrice = 1999,
+		PurchaseAction = function()
+			Store.PersistPurchase("762002771")
+		end
 	},
 	{
 		Id = "761996940",
@@ -425,6 +431,23 @@ function Store.OnApplicationValidateResult(code)
 	
 	Store.validationPending = false
 	Store.LoadProducts()
+end
+
+function Store.PersistPurchase(id)
+	local numPurchased = Persistence.ReadNumber(Globals, "purchased/numProducts", 0)
+	
+	for i=1,numPurchased do
+		local z = Persistence.ReadString(Globals, "purchased/productId", nil, i)
+		if (z and (z == id)) then
+			return
+		end
+	end
+	
+	numPurchased = numPurchased + 1
+	
+	Persistence.WriteNumber(Globals, "purchased/numProducts", numPurchased)
+	Persistence.WriteString(Globals, "purchased/productId", id, numPurchased)
+	Globals:Save()
 end
 
 function Store.AddPurchase(id)

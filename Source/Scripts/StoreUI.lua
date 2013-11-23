@@ -14,9 +14,6 @@ StoreUI.kOmegaIconSize = 32
 
 function StoreUI.InitForGame(self)
 
-	--local screenRect = {0, 0, 0.7*UI.fullscreenRect[3], 0.6*UI.fullscreenRect[4]*UI.fontScale[2]}
-	--screenRect = CenterRectInRect(screenRect, UI.fullscreenRect)
-
 	self.widgets = {}
 	self.widgets.root = UI:CreateRoot(UI.kLayer_Store, AlertPanel.EatInput)
 	self.widgets.panel = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
@@ -25,12 +22,33 @@ function StoreUI.InitForGame(self)
 	
 	StoreUI:InitUI(true)
 	
-	self.widgets.panel:SetRect(self.widgets.border:Rect())
 	UI:CenterWidget(self.widgets.panel, UI.fullscreenRect)
 end
 
-function StoreUI.InitForMainMenu(self, mmPanel)
+function StoreUI.InitForMainMenu(self)
 
+	local screenRect = {
+		0,
+		0,
+		UI.fullscreenRect[3] - 64*UI.identityScale[1],
+		UI.fullscreenRect[4] - 64*UI.identityScale[2]
+	}
+		
+	self.widgets = {}
+	self.widgets.root = UI:CreateRoot(UI.kLayer_Store, AlertPanel.EatInput)
+	
+	local background = World.Load("UI/storebackground1_M")
+	self.widgets.mmbackground = UI:CreateWidget("MatWidget", {rect=UI.fullscreenRect, material=background})
+	self.widgets.root:AddChild(self.widgets.mmbackground)
+	
+	self.widgets.panel = UI:CreateWidget("Widget", {rect=screenRect})
+	self.widgets.root:AddChild(self.widgets.panel)
+	self.widgets.root:SetVisible(false)
+	
+	StoreUI:InitUI(true)
+	
+	UI:CenterWidget(self.widgets.panel, UI.fullscreenRect)
+	
 end
 
 function StoreUI.InitUI(self, closeButton)
@@ -528,7 +546,7 @@ end
 
 function StoreUI.UpdateProductId(self, id)
 
-	if (not self.initialized) then
+	if ((not self.initialized) or (self.productWidgets == nil)) then
 		return
 	end
 
@@ -671,19 +689,31 @@ end
 
 function StoreUI.ClosePressed(self)
 	Game.entity.eatInput = true
+	
 	local f = function()
 		local f = function()
-			if (self.widgets.root) then
-				self.widgets.root:SetVisible(false)
+			local f = function()
+				if (self.widgets.root) then
+					self.widgets.root:SetVisible(false)
+				end
+				Game.entity.eatInput = false
+				if (self.callback) then
+					local callback = self.callback
+					self.callback = nil
+					callback()
+				end
 			end
-			Game.entity.eatInput = false
-			if (self.callback) then
-				local callback = self.callback
-				self.callback = nil
-				callback()
+			
+			if (self.widgets.mmbackground) then
+				World.SetDrawUIOnly(false)
+				self.widgets.mmbackground:BlendTo({1,1,1,0}, 0.5)
+				World.globalTimers:Add(f, 0.5)
+			else
+				f()
 			end
 		end
 		self.widgets.border:ScaleTo({0,0}, {0.3, 0.3})
+		
 		World.globalTimers:Add(f, 0.3)
 	end
 	
@@ -847,16 +877,31 @@ function StoreUI.Do(self, callback)
 	
 	self.widgets.contents:BlendTo({1,1,1,0}, 0)
 	self.widgets.border:ScaleTo({0,0}, {0,0})
-	self.widgets.border:ScaleTo({1,1}, {0.3, 0.3})
-	
+		
 	local f = function()
-		local f = function()
-			Game.entity.eatInput = false
+		if (self.widgets.mmbackground) then
+			World.SetDrawUIOnly(true)
 		end
-		self.widgets.contents:BlendTo({1,1,1,1}, 0.3)
+			
+		self.widgets.border:ScaleTo({1,1}, {0.3, 0.3})
+		
+		local f = function()
+			local f = function()
+				Game.entity.eatInput = false
+			end
+			self.widgets.contents:BlendTo({1,1,1,1}, 0.3)
+			World.globalTimers:Add(f, 0.3)
+		end
+		
 		World.globalTimers:Add(f, 0.3)
 	end
 	
-	World.globalTimers:Add(f, 0.3)
+	if (self.widgets.mmbackground) then
+		self.widgets.mmbackground:BlendTo({1,1,1,0}, 0)
+		self.widgets.mmbackground:BlendTo({1,1,1,1}, 0.5)
+		World.globalTimers:Add(f, 0.5)
+	else
+		f()
+	end
 	
 end

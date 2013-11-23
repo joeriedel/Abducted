@@ -8,6 +8,7 @@ MainMenu = Game:New()
 function MainMenu.Initialize(self)
 
 	GameNetwork.Initialize()
+	StoreUI:InitForMainMenu()
 	Store.Initialize()
 	
 	MainMenu:PopulateSaveGames()
@@ -504,6 +505,7 @@ end
 function MainMenu.MainPanel.Store(self, item)
 	GameNetwork.LogEvent("BrowseMMStore")
 	self.busy = false
+	StoreUI:Do()
 end
 
 function MainMenu.MainPanel.Leaderboards(self, item)

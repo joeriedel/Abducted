@@ -107,6 +107,7 @@ pak0 {
 	FX/screenflash3_M
 	Shared/terminal1
 	UI/Solid_M
+	UI/Spinner_M
 	UI/loading_icon_M
 	UI/finger_shadow_M
 	UI/Globals
@@ -209,6 +210,25 @@ pak0 {
 	UI/acv_revelation_M
 	UI/acv_thehunt_M
 	UI/acv_theship_M
+	UI/store_omega_icon_M
+	UI/sale1_M
+	UI/StoreItemTitle_TF
+	UI/StoreItemDescTitle_TF
+	UI/PriceLarge_TF
+	UI/StoreItemStatusRed_TF
+	UI/StoreItemStatusGreen_TF
+	UI/StoreItemStatusOrange_TF
+	UI/StoreItemStatusBlue_TF
+	UI/StoreProcessing_TF
+	UI/store_ep2_icon_M
+	UI/store_ep2_teaser_M
+	UI/store_s1_icon_M
+	UI/store_s1_teaser_M
+	UI/store_omega_icon_M
+	UI/store_skp25_icon_M
+	UI/store_skp10_icon_M
+	UI/store_skp5_icon_M
+	UI/store_skp1_icon_M
 	UI/alphabet_scrollbar_M
 	UI/alphabet_scrollbar_pressed_M
 	UI/TerminalScreenButtons_TF

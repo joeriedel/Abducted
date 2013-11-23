@@ -491,10 +491,9 @@ function StoreUI.CreateProductWidget(self, product, width, yOfs)
 	
 	local price = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.PriceLarge})
 	price:SetBlendWithParent(true)
-	UI:SetLabelText(price, product.Price)
-	UI:SizeLabelToContents(price)
-	UI:RAlignLabel(price, width-8, 8)
 	panel:AddChild(price)
+	panel.price = price
+	self:UpdateProductPrice(panel)
 	
 	local status = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.StatusGreen})
 	status:SetBlendWithParent(true)
@@ -511,6 +510,20 @@ function StoreUI.CreateProductWidget(self, product, width, yOfs)
 	self:UpdateProductState(panel)
 	
 	return panel,height
+end
+
+function StoreUI.UpdateProductPrice(self, panel)
+
+	if (panel.product.onSale) then
+		local text = StringTable.Get("STORE_SALE"):format(panel.product.Price, panel.product.onSale)
+		UI:SetLabelText(panel.price, text)
+	else
+		UI:SetLabelText(panel.price, panel.product.Price)
+	end
+	
+	UI:SizeLabelToContents(panel.price)
+	UI:RAlignLabel(panel.price, panel.width-8, 8)
+
 end
 
 function StoreUI.UpdateProductId(self, id)
@@ -577,7 +590,8 @@ function StoreUI.UpdateProductState(self, panel)
 		panel.busy = false
 	end
 	
-	panel.sale:SetVisible(panel.product.onSale == true)
+	panel.sale:SetVisible(panel.product.onSale ~= nil)
+	self:UpdateProductPrice(panel)
 	
 	if (self.selected == panel) then
 		local busy = panel.busy or (panel.product.State == Store.kProductState_Purchased)

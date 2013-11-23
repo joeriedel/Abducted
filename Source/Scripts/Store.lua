@@ -50,7 +50,7 @@ Store.Products = {
 		Icon = "UI/store_s1_icon_M",
 		Image = "UI/store_s1_teaser_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 1499
+		DebugPrice = 1999
 	},
 	{
 		Id = "761996940",
@@ -60,21 +60,35 @@ Store.Products = {
 		Thanks = "STORE_OMEGA_PURCHASE_THANKS",
 		Icon = "UI/store_omega_icon_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 1999,
+		DebugPrice = 1499,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(0, 1)
 		end
 	},
 	{
-		Id = "761842135",
+		Id = "764251225",
 		PublicId = "4",
+		Title = "STORE_SKP25_TITLE",
+		Description = "STORE_SKP25_DESCRIPTION",
+		Thanks = "STORE_SKP25_PURCHASE_THANKS",
+		Icon = "UI/store_skp25_icon_M",
+		State = Store.kProductState_Hidden,
+		DebugPrice = 999,
+		Consumable = true,
+		PurchaseAction = function()
+			Store.PurchasedConsumable(25000, 0)
+		end
+	},
+	{
+		Id = "761842135",
+		PublicId = "5",
 		Title = "STORE_SKP10_TITLE",
 		Description = "STORE_SKP10_DESCRIPTION",
 		Thanks = "STORE_SKP10_PURCHASE_THANKS",
 		Icon = "UI/store_skp10_icon_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 799,
+		DebugPrice = 499,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(10000, 0)
@@ -82,13 +96,13 @@ Store.Products = {
 	},
 	{
 		Id = "761828172",
-		PublicId = "5",
+		PublicId = "6",
 		Title = "STORE_SKP5_TITLE",
 		Description = "STORE_SKP5_DESCRIPTION",
 		Thanks = "STORE_SKP5_PURCHASE_THANKS",
 		Icon = "UI/store_skp5_icon_M",
 		State = Store.kProductState_Hidden,
-		DebugPrice = 399,
+		DebugPrice = 299,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(5000, 0)
@@ -96,7 +110,7 @@ Store.Products = {
 	},
 	{
 		Id = "761820735",
-		PublicId = "6",
+		PublicId = "7",
 		Title = "STORE_SKP1_TITLE",
 		Description = "STORE_SKP1_DESCRIPTION",
 		Thanks = "STORE_SKP1_PURCHASE_THANKS",
@@ -191,22 +205,25 @@ function Store.ParseSales()
 	
 	if (data) then
 	
-		local ids = Tokenize(data)
+		local idPairs = Tokenize(data)
 		
-		for k,id in pairs(ids) do
+		for k,id in pairs(idPairs) do
 		
-			for k,p in pairs(Store.Products) do
-			
-				if (p.PublicId == id) then
-					p.onSale = true
-					if (p.Idx) then
-						Persistence.WriteString(Session, "store/productOnSale", true, p.Idx)
+			item = Tokenize(id)
+			if (item and (#item == 2)) then
+				for k,p in pairs(Store.Products) do
+				
+					if (p.PublicId == item[1]) then
+						p.onSale = item[2]
+						if (p.Idx) then
+							Persistence.WriteString(Session, "store/productOnSale", item[2], p.Idx)
+						end
+						StoreUI:UpdateProductId(p.Id)
 					end
-					StoreUI:UpdateProductId(p.Id)
+				
 				end
-			
 			end
-		
+			
 		end
 	
 	end

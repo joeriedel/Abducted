@@ -51,6 +51,7 @@ function StoreUI.InitUI(self, closeButton)
 	self.gfx.MMItemBackground2 = World.Load("UI/MMItemBackground3_M")
 	self.gfx.Spinner = World.Load("UI/Spinner_M")
 	self.gfx.OmegaIcon = World.Load("UI/store_omega_icon_M")
+	self.gfx.Sale = World.Load("UI/sale1_M")
 	
 	self.typefaces = {}
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
@@ -347,6 +348,10 @@ end
 
 function StoreUI.ProductsListReady(self)
 
+	if (not self.initialized) then
+		return
+	end
+
 	self:CreateProductWidgets(self.productsWidth)
 	
 	if (self.productWidgets) then
@@ -453,6 +458,12 @@ function StoreUI.CreateProductWidget(self, product, width, yOfs)
 	local icon = UI:CreateWidget("MatWidget", {rect=iconRect, material=product.Icon})
 	icon:SetBlendWithParent(true)
 	panel:AddChild(icon)
+	
+	local sale = UI:CreateWidget("MatWidget", {rect=iconRect, material=self.gfx.Sale})
+	sale:SetBlendWithParent(true)
+	panel:AddChild(sale)
+	panel.sale = sale
+	sale:SetVisible(false)
 	
 	local titleRect = {iconRect[1]+iconRect[3]+padd*2, 0, width-iconRect[1]-padd, height}
 	local title = UI:CreateWidget("TextLabel", {rect=titleRect, typeface=self.typefaces.ItemTitle})
@@ -565,6 +576,8 @@ function StoreUI.UpdateProductState(self, panel)
 		panel.spinner:BlendTo({1,1,1,0}, 0.3)
 		panel.busy = false
 	end
+	
+	panel.sale:SetVisible(panel.product.onSale == true)
 	
 	if (self.selected == panel) then
 		local busy = panel.busy or (panel.product.State == Store.kProductState_Purchased)

@@ -32,32 +32,35 @@ Store.kTransactionState_Restored = 3
 Store.Products = {
 	{
 		Id = "761997278",
+		PublicId = "1",
 		Title = "STORE_EP2_TITLE",
 		Description = "STORE_EP2_DESCRIPTION",
 		Thanks = "STORE_EP2_PURCHASE_THANKS",
 		Icon = "UI/store_ep2_icon_M",
 		Image = "UI/store_ep2_teaser_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 499
+		DebugPrice = 299
 	},
 	{
 		Id = "762002771",
+		PublicId = "2",
 		Title = "STORE_S1_TITLE",
 		Description = "STORE_S1_DESCRIPTION",
 		Thanks = "STORE_S1_PURCHASE_THANKS",
 		Icon = "UI/store_s1_icon_M",
 		Image = "UI/store_s1_teaser_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 2499
+		DebugPrice = 1499
 	},
 	{
 		Id = "761996940",
+		PublicId = "3",
 		Title = "STORE_OMEGA_TITLE",
 		Description = "STORE_OMEGA_DESCRIPTION",
 		Thanks = "STORE_OMEGA_PURCHASE_THANKS",
 		Icon = "UI/store_omega_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 1999,
+		DebugPrice = 1999,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(0, 1)
@@ -65,12 +68,13 @@ Store.Products = {
 	},
 	{
 		Id = "761842135",
+		PublicId = "4",
 		Title = "STORE_SKP10_TITLE",
 		Description = "STORE_SKP10_DESCRIPTION",
 		Thanks = "STORE_SKP10_PURCHASE_THANKS",
 		Icon = "UI/store_skp10_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 799,
+		DebugPrice = 799,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(10000, 0)
@@ -78,12 +82,13 @@ Store.Products = {
 	},
 	{
 		Id = "761828172",
+		PublicId = "5",
 		Title = "STORE_SKP5_TITLE",
 		Description = "STORE_SKP5_DESCRIPTION",
 		Thanks = "STORE_SKP5_PURCHASE_THANKS",
 		Icon = "UI/store_skp5_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 399,
+		DebugPrice = 399,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(5000, 0)
@@ -91,12 +96,13 @@ Store.Products = {
 	},
 	{
 		Id = "761820735",
+		PublicId = "6",
 		Title = "STORE_SKP1_TITLE",
 		Description = "STORE_SKP1_DESCRIPTION",
 		Thanks = "STORE_SKP1_PURCHASE_THANKS",
 		Icon = "UI/store_skp1_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 99,
+		DebugPrice = 99,
 		Consumable = true,
 		PurchaseAction = function()
 			Store.PurchasedConsumable(1000, 0)
@@ -158,8 +164,54 @@ function Store.Load()
 	else
 		Persistence.WriteBool(Session, "appValidated", true)
 		Session:Save()
+		Store.DownloadSales()
 		Store.RequestValidateApplication()
 	end
+end
+
+function Store.DownloadSales()
+	Store.salesHttpGet = System.NewHTTPGet()
+	Store.salesHttpGet:SendRequest("www.sunsidegames.com", "/abducted_sales_ios.txt", "text/plain")
+	
+	local f = function()
+		local r = Store.salesHttpGet:Status()
+		if (r ~= kHTTP_OpStatus_Pending) then
+			Store.salesRefreshTimer:Clean()
+			Store.salesRefreshTimer = nil
+			Store.ParseSales()
+		end
+	end
+	
+	Store.salesRefreshTimer = World.globalTimers:Add(f, 1, true)
+end
+
+function Store.ParseSales()
+	local httpResponse = Store.salesHttpGet:Response()
+	local data = httpResponse:Body()
+	
+	if (data) then
+	
+		local ids = Tokenize(data)
+		
+		for k,id in pairs(ids) do
+		
+			for k,p in pairs(Store.Products) do
+			
+				if (p.PublicId == id) then
+					p.onSale = true
+					if (p.Idx) then
+						Persistence.WriteString(Session, "store/productOnSale", true, p.Idx)
+					end
+					StoreUI:UpdateProductId(p.Id)
+				end
+			
+			end
+		
+		end
+	
+	end
+	
+	Session:Save()
 end
 
 function Store.LoadSkillPoints()
@@ -225,12 +277,12 @@ function Store.LoadProducts()
 	
 		local id = Persistence.ReadString(Session, "store/productId", nil, i)
 		local price = Persistence.ReadString(Session, "store/productPrice", nil, i)
-		local usPrice = Persistence.ReadNumber(Session, "store/productusPrice", nil, i)
+		local onSale = Persistence.ReadBool(Session, "store/productOnSale", nil, i)
 		
 		local product = Store.ProductsById[id]
 		if (product) then
 			product.Price = price
-			product.usPrice = usPrice
+			product.onSale = onSale
 		end
 	
 		table.insert(Store.validProducts, id)
@@ -250,9 +302,8 @@ function Store.RequestTestProducts()
 		local product = {}
 		
 		product.id = v.Id
-		product.usPrice = v.BasePrice
-		
-		local cents = v.BasePrice
+				
+		local cents = v.DebugPrice
 		local dollars = math.floor(cents / 100)
 		cents = cents - dollars*100
 		
@@ -324,14 +375,13 @@ function Store.OnProductsResponse(products)
 		local product = Store.ProductsById[v.id]
 		if (product) then
 			product.Price = v.price
-			product.usPrice = v.usPrice
 			product.State = Store.kProductState_Available
 			
 			productIdx = productIdx + 1
-			Persistence.WriteString(Session, "store/productId", v.Id, productIdx)
+			product.Idx = productIdx
+			Persistence.WriteString(Session, "store/productId", v.id, productIdx)
 			Persistence.WriteString(Session, "store/productPrice", v.price, productIdx)
-			Persistence.WriteNumber(Session, "store/productusPrice", v.usPrice, productIdx)
-			
+						
 			table.insert(Store.validProducts, v.id)
 		end
 	

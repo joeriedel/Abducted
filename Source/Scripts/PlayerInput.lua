@@ -280,11 +280,14 @@ function PlayerInput.TapWaypoint(self, x, y, radius)
 	-- ZERO means no points are ever dropped.
 	local waypoint = World.PickWaypoint(x, y,  radius, 0) -- NOTE: does per-waypoint waypoint->camera line trace
 	if (waypoint) then
+		COutLine(kC_Debug, "Found a waypoint to move to...")
 		local targetFloorPos = World.WaypointFloorPosition(waypoint)
 		if (targetFloorPos) then
 			if (World.playerPawn:MoveToFloorPosition(targetFloorPos)) then
 				self.sfx.PlayerCommand:Play(kSoundChannel_UI, 0)
 				return true
+			else
+				COutLine(kC_Debug, "Player couldn't find a path to the waypoint!")
 			end
 		end
 	end

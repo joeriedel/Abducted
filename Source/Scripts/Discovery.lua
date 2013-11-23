@@ -523,7 +523,7 @@ function Discovery.UpdateUI(self)
 	BoundRect(panelRect, TerminalScreen.ScreenBounds)
 	Discovery.Widgets.Root:SetRect(panelRect)
 
-	if (left) then
+	if (self.left) then
 		closeRect[1] = panelRect[1] - (closeRect[3]/2)
 	else
 		closeRect[1] = panelRect[1] + panelRect[3] - (closeRect[3]/2)

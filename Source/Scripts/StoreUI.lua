@@ -10,15 +10,16 @@ StoreUI.kButtonBarHeight = 130
 StoreUI.kCloseButtonHeight = 75
 StoreUI.kProductHeight = 130
 StoreUI.kProductIconSize = 100
+StoreUI.kOmegaIconSize = 32
 
 function StoreUI.InitForGame(self)
 
-	local screenRect = {0, 0, 0.7*UI.fullscreenRect[3], 0.6*UI.fullscreenRect[4]*UI.fontScale[2]}
-	screenRect = CenterRectInRect(screenRect, UI.fullscreenRect)
+	--local screenRect = {0, 0, 0.7*UI.fullscreenRect[3], 0.6*UI.fullscreenRect[4]*UI.fontScale[2]}
+	--screenRect = CenterRectInRect(screenRect, UI.fullscreenRect)
 
 	self.widgets = {}
 	self.widgets.root = UI:CreateRoot(UI.kLayer_Store, AlertPanel.EatInput)
-	self.widgets.panel = UI:CreateWidget("Widget", {rect=screenRect})
+	self.widgets.panel = UI:CreateWidget("Widget", {rect=UI.fullscreenRect})
 	self.widgets.root:AddChild(self.widgets.panel)
 	self.widgets.root:SetVisible(false)
 	
@@ -49,6 +50,7 @@ function StoreUI.InitUI(self, closeButton)
 	self.gfx.MMItemBackground = World.Load("UI/MMItemBackground_M")
 	self.gfx.MMItemBackground2 = World.Load("UI/MMItemBackground3_M")
 	self.gfx.Spinner = World.Load("UI/Spinner_M")
+	self.gfx.OmegaIcon = World.Load("UI/store_omega_icon_M")
 	
 	self.typefaces = {}
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
@@ -60,6 +62,8 @@ function StoreUI.InitUI(self, closeButton)
 	self.typefaces.StatusRed = World.Load("UI/StoreItemStatusRed_TF")
 	self.typefaces.StatusGreen = World.Load("UI/StoreItemStatusGreen_TF")
 	self.typefaces.StatusOrange = World.Load("UI/StoreItemStatusOrange_TF")
+	self.typefaces.StatusBlue = World.Load("UI/StoreItemStatusBlue_TF")
+	self.typefaces.Processing = World.Load("UI/StoreProcessing_TF")
 	
 	self.contentWidgets = {}
 	
@@ -69,16 +73,17 @@ function StoreUI.InitUI(self, closeButton)
 	
 	local closeButtonHeight = 0
 	if (closeButton) then
-		closeButtonHeight = StoreUI.kCloseButtonHeight * UI.identityScale[2]
+		closeButtonHeight = StoreUI.kCloseButtonHeight * UI.identityScale[2] + (20*UI.identityScale[2])
 	end
 	
-	local borderRect = {contentRect[1], contentRect[2], contentRect[3], contentRect[4]+closeButtonHeight}
+	local borderRect = {contentRect[1], contentRect[2], contentRect[3], contentRect[4]}
 	self.widgets.border = UI:CreateWidget("MatWidget", {rect=borderRect, material=self.gfx.Border})
 	self.widgets.panel:AddChild(self.widgets.border)
 	
 	local outerContents = {0, 0, contentRect[3], contentRect[4]}
 	self.widgets.contents = UI:CreateWidget("Widget", {rect=contentRect})
 	self.widgets.border:AddChild(self.widgets.contents)
+	
 	
 	-- title
 	self.widgets.title = UI:CreateWidget("TextLabel", {rect={0,8,8,8}, typeface=self.typefaces.Gold})
@@ -99,9 +104,9 @@ function StoreUI.InitUI(self, closeButton)
 	contentRect[2] = contentRect[2] + panelBorder
 	contentRect[4] = contentRect[4] - panelBorder
 	
-	local buttonBarHeight = StoreUI.kButtonBarHeight * UI.identityScale[2]
-	local controlsRect = {0, contentRect[2], contentRect[3], contentRect[4] - buttonBarHeight}
-	local buttonBarRect = {0, contentRect[2]+contentRect[4] - buttonBarHeight, contentRect[3], buttonBarHeight}
+	local buttonBarHeight = StoreUI.kButtonBarHeight * UI.identityScale[2] + (20*UI.identityScale[2])
+	local controlsRect = {0, contentRect[2], contentRect[3], contentRect[4] - buttonBarHeight - closeButtonHeight}
+	local buttonBarRect = {0, controlsRect[2]+controlsRect[4], contentRect[3], buttonBarHeight}
 	local listRect = {8, controlsRect[2], controlsRect[3]*StoreUI.kItemsWidth-8, controlsRect[4]}
 	local descRect = {listRect[3]+panelBorder, controlsRect[2], controlsRect[3]*StoreUI.kDescriptionWidth-panelBorder, controlsRect[4]}
 	
@@ -141,7 +146,7 @@ function StoreUI.InitUI(self, closeButton)
 		
 		rect = ExpandRect(rect, 64*UI.identityScale[1], 16*UI.identityScale[2])
 		rect[1] = (borderRect[3]-rect[3])/2
-		rect[2] = borderRect[4]-rect[4]-8*UI.identityScale[2]+4
+		rect[2] = borderRect[4]-rect[4]-10*UI.identityScale[2]
 		
 		self.widgets.closeButton:SetRect(rect)
 		self.widgets.closeButton.highlight:SetRect({0,0,rect[3],rect[4]})
@@ -167,7 +172,7 @@ function StoreUI.InitUI(self, closeButton)
 	
 	rect = ExpandRect(rect, 32*UI.identityScale[1], 32*UI.identityScale[2])
 	rect[1] = buttonBarRect[1] + 10*UI.identityScale[1]
-	rect[2] = buttonBarRect[2] + 10*UI.identityScale[1]
+	rect[2] = (buttonBarRect[2]+buttonBarRect[4]) - rect[4] - 5*UI.identityScale[1]
 	self.widgets.restoreButton:SetRect(rect)
 	self.widgets.restoreButton.highlight:SetRect({0,0,rect[3],rect[4]})
 	UI:CenterLabel(self.widgets.restoreButton.label, {0,0,rect[3],rect[4]})
@@ -189,9 +194,9 @@ function StoreUI.InitUI(self, closeButton)
 		StringTable.Get("STORE_PURCHASE_BTN")
 	)
 	
-	rect = ExpandRect(rect, 32*UI.identityScale[1], 32*UI.identityScale[2])
+	rect = ExpandRect(rect, 72*UI.identityScale[1], 48*UI.identityScale[2])
 	rect[1] = descRect[1] + (descRect[3] - rect[3])/2
-	rect[2] = buttonBarRect[2] + buttonBarRect[4] - rect[4]
+	rect[2] = (buttonBarRect[2]+buttonBarRect[4]) - rect[4] - 5*UI.identityScale[1]
 	self.widgets.purchaseButton:SetRect(rect)
 	self.widgets.purchaseButton.highlight:SetRect({0,0,rect[3],rect[4]})
 	UI:CenterLabel(self.widgets.purchaseButton.label, {0,0,rect[3],rect[4]})
@@ -202,8 +207,35 @@ function StoreUI.InitUI(self, closeButton)
 	self.widgets.priceLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.PriceLarge})
 	self.widgets.priceLabel:SetBlendWithParent(true)
 	self.widgets.contents:AddChild(self.widgets.priceLabel)
-	self.priceRect = {descRect[1], buttonBarRect[2]+4, descRect[3], 32*UI.identityScale[2]}
+	self.priceRect = {descRect[1], buttonBarRect[2]+15*UI.identityScale[2], descRect[3], 32*UI.identityScale[2]}
 	table.insert(self.contentWidgets, self.widgets.priceLabel)
+	
+	self.widgets.skillPointsLabel = UI:CreateWidget("TextLabel", {rect={0,buttonBarRect[2]+32*UI.identityScale[2],8,8}, typeface=self.typefaces.StatusGreen})
+	self.widgets.skillPointsLabel:SetBlendWithParent(true)
+	self.widgets.contents:AddChild(self.widgets.skillPointsLabel)
+	table.insert(self.contentWidgets, self.widgets.skillPointsLabel)
+	
+	UI:SetLabelText(self.widgets.skillPointsLabel, StringTable.Get("SKILL_POINTS"))
+	UI:SizeLabelToContents(self.widgets.skillPointsLabel)
+	local skillPointsLabelRect = UI:HCenterLabel(self.widgets.skillPointsLabel, buttonBarRect)
+	
+	self.widgets.omegaUpgradesLabel = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.StatusOrange})
+	self.widgets.omegaUpgradesLabel:SetBlendWithParent(true)
+	self.widgets.contents:AddChild(self.widgets.omegaUpgradesLabel)
+	table.insert(self.contentWidgets, self.widgets.omegaUpgradesLabel)
+	
+	UI:SetLabelText(self.widgets.omegaUpgradesLabel, StringTable.Get("OMEGA_POINTS"))
+	UI:SizeLabelToContents(self.widgets.omegaUpgradesLabel)
+	local omegaUpgradesLabelRect = UI:RAlignLabel(self.widgets.omegaUpgradesLabel, skillPointsLabelRect[1]+skillPointsLabelRect[3], skillPointsLabelRect[2]+skillPointsLabelRect[4]+32*UI.identityScale[2])
+	
+	local omegaUpgradeIconRect = {0, 0, StoreUI.kOmegaIconSize*UI.identityScale[1], StoreUI.kOmegaIconSize*UI.identityScale[2]}
+	omegaUpgradeIconRect[1] = omegaUpgradesLabelRect[1] - omegaUpgradeIconRect[3] - 8
+	omegaUpgradeIconRect[2] = omegaUpgradesLabelRect[2] + (omegaUpgradesLabelRect[4]-omegaUpgradeIconRect[4])/2
+	
+	self.widgets.omegaUpgradeIcon = UI:CreateWidget("MatWidget", {rect=omegaUpgradeIconRect, material=self.gfx.OmegaIcon})
+	self.widgets.omegaUpgradeIcon:SetBlendWithParent(true)
+	self.widgets.contents:AddChild(self.widgets.omegaUpgradeIcon)
+	table.insert(self.contentWidgets, self.widgets.omegaUpgradeIcon)
 	
 	local descTitleAdv = UI:FontAdvanceSize(self.typefaces.DescTitle)*2
 	
@@ -285,6 +317,32 @@ function StoreUI.InitUI(self, closeButton)
 	for k,v in pairs(self.contentWidgets) do
 		v:BlendTo({1,1,1,0}, 0)
 	end
+	
+	self.buttonBarRect = buttonBarRect
+	
+	local processingFontAdv = UI:FontAdvanceSize(self.typefaces.Processing)
+	local processingRect = {0,0,contentRect[3]*0.7, processingFontAdv*4}
+	self.widgets.processingBar = UI:CreateWidget("MatWidget", {rect=processingRect, material=self.gfx.Border})
+	self.widgets.processingBar:SetBlendWithParent(true)
+	self.widgets.contents:AddChild(self.widgets.processingBar)
+	UI:CenterWidget(self.widgets.processingBar, contentRect)
+	
+	self.widgets.processingText = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.Processing})
+	self.widgets.processingBar:AddChild(self.widgets.processingText)
+	self.widgets.processingText:SetBlendWithParent(true)
+	
+	UI:LineWrapCenterText(
+		self.widgets.processingText,
+		processingRect[3] - 16*UI.identityScale[1],
+		true,
+		0,
+		StringTable.Get("STORE_PROCESSING_TRANSACTION")
+	)
+	
+	UI:CenterWidget(self.widgets.processingText, processingRect)
+	self.widgets.processingBar:SetVisible(false)
+	
+	self.initialized = true
 end
 
 function StoreUI.ProductsListReady(self)
@@ -301,7 +359,8 @@ function StoreUI.ProductsListReady(self)
 	
 	self.widgets.connectingText:BlendTo({1,1,1,0}, 0.3)
 	self.widgets.connectingSpinner:BlendTo({1,1,1,0}, 0.3)
-
+	
+	self:UpdateBalances()
 end
 
 function StoreUI.SelectProduct(self, panel)
@@ -314,6 +373,16 @@ function StoreUI.SelectProduct(self, panel)
 	panel:SetMaterial(self.gfx.MMItemBackground2)
 	self:UpdateProductState(panel)
 	
+end
+
+function StoreUI.UpdateBalances(self)
+
+	local text = StringTable.Get("SKILL_POINTS").." "..Store.AvailableSkillPoints()
+	UI:SetLabelText(self.widgets.skillPointsLabel, text)
+	
+	text = StringTable.Get("OMEGA_POINTS").." "..Store.AvailableOmegaUpgrades()
+	UI:SetLabelText(self.widgets.omegaUpgradesLabel, text)
+
 end
 
 function StoreUI.CreateProductWidgets(self, width)
@@ -409,7 +478,7 @@ function StoreUI.CreateProductWidget(self, product, width, yOfs)
 	
 	panel:AddChild(title)
 	
-	local price = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.PriceSmall})
+	local price = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=self.typefaces.PriceLarge})
 	price:SetBlendWithParent(true)
 	UI:SetLabelText(price, product.Price)
 	UI:SizeLabelToContents(price)
@@ -435,9 +504,19 @@ end
 
 function StoreUI.UpdateProductId(self, id)
 
+	if (not self.initialized) then
+		return
+	end
+
 	local w = self.productWidgets[id]
 	if (w) then
-		self:UpdateProductStatus(w)
+		self:UpdateProductState(w)
+		
+		if (self.purchasing and (self.purchasing.product.Id == id)) then
+			if (self.purchasing.product.State ~= Store.kProductState_Purchasing) then
+				self:PurchaseComplete()
+			end
+		end
 	end
 	
 end
@@ -451,16 +530,20 @@ function StoreUI.UpdateProductState(self, panel)
 		typeface = self.typefaces.StatusOrange
 		text = StringTable.Get("STORE_PROCESSING")
 		spinner = true
+		panel.busy = true
 	elseif (panel.product.State == Store.kProductState_Purchased) then
-		typeface = self.typefaces.StatusGreen
+		typeface = self.typefaces.StatusBlue
 		text = StringTable.Get("STORE_PURCHASED")
+		panel.busy = true
 	elseif (panel.product.State == Store.kProductState_Failed) then
 		typeface = self.typefaces.StatusRed
 		text = StringTable.Get("STORE_INVALID")
+		panel.busy = true
 	else
 		typeface = self.typefaces.StatusGreen
 		text = StringTable.Get("STORE_AVAILABLE")
 		buttonText = StringTable.Get("STORE_PURCHASE_BTN")
+		panel.busy = false
 	end
 	
 	panel.status:SetTypeface(typeface)
@@ -581,11 +664,144 @@ function StoreUI.ClosePressed(self)
 	World.globalTimers:Add(f, 0.3)
 end
 
+function StoreUI.ShowWaitStatus(self, show)
+
+	if (self.waitStatusTimer) then
+		self.waitStatusTimer:Clean()
+		self.waitStatusTimer = nil
+	end
+	
+	if (show) then
+		self.widgets.processingText:BlendTo({1,1,1,0}, 0)
+		self.widgets.processingBar:SetVisible(true)
+		self.widgets.processingBar:ScaleTo({0,0}, {0,0})
+		self.widgets.processingBar:ScaleTo({1,1}, {0.3, 0.3})
+		
+		local f = function()
+			self.widgets.processingText:BlendTo({1,1,1,1}, 0.3)
+		end
+		self.waitStatusTimer = World.globalTimers:Add(f, 0.3)
+	else
+		self.widgets.processingText:BlendTo({1,1,1,0}, 0.3)
+		
+		local f = function()
+			self.widgets.processingBar:ScaleTo({0,0}, {0.3,0.3})
+		end
+		
+		self.waitStatusTimer = World.globalTimers:Add(f, 0.3)
+	end
+
+end
+
+function StoreUI.RestorePurchases(self)
+	Game.entity.eatInput = true
+	self:ShowWaitStatus(true)	
+	Store.StartRestoreProducts()
+end
+
+function StoreUI.RestorePurchasesComplete(self, numRestored, errorMsg)
+	Game.entity.eatInput = false
+	if (errorMsg) then
+		local title = StringTable.Get("STORE_ERROR")
+		local text = StringTable.Get("STORE_PROCESSING_ERROR"):format(errorMsg)
+		AlertPanel:OK(
+			title,
+			text,
+			function ()
+				self:ShowWaitStatus(false)
+			end,
+			nil,
+			false
+		)
+	else
+		if (numRestored > 0) then
+			AlertPanel:OK(
+				"STORE_RESTORE_SUCCESS_TITLE",
+				"STORE_RESTORE_SUCCESS_TEXT",
+				function ()
+					self:ShowWaitStatus(false)
+				end
+			)
+		else
+			AlertPanel:OK(
+				"STORE_RESTORE_NOITEMS_TITLE",
+				"STORE_RESTORE_NOITEMS_TEXT",
+				function ()
+					self:ShowWaitStatus(false)
+				end
+			)
+		end
+	end
+end
+
 function StoreUI.RestoreItemsPressed(self)
+	AlertPanel:YesNo(
+		"STORE_CONFIRM_RESTORE_TITLE",
+		"STORE_CONFIRM_RESTORE_TEXT",
+		function(result)
+			if (result == AlertPanel.kYesButton) then
+				self:RestorePurchases()
+			end
+		end
+	)
+end
+
+function StoreUI.PurchaseProduct(self, panel)
+	Game.entity.eatInput = true
+	self:ShowWaitStatus(true)	
+	self.purchasing = panel
+	Store.Purchase(panel.product.Id, 1)
+end
+
+function StoreUI.PurchaseComplete(self)
+
+	local panel = self.purchasing
+	self.purchasing = nil
+	
+	Game.entity.eatInput = false
+	
+	self:UpdateBalances()
+	
+	local state = panel.product.State
+	if (((state == Store.kProductState_Available) and (panel.product.Consumable)) or 
+	    (state == Store.kProductState_Purchased)) then
+	    AlertPanel:OK(
+			"STORE_SUCCESS",
+			panel.product.Thanks,
+			function ()
+				self:ShowWaitStatus(false)
+			end
+		)
+	else
+		AlertPanel:OK(
+			"STORE_ERROR",
+			"STORE_PURCHASE_ERROR",
+			function ()
+				self:ShowWaitStatus(false)
+			end
+		)
+	end
+
 end
 
 function StoreUI.PurchasePressed(self)
-
+	local panel = self.selected
+		
+	local title = StringTable.Get("STORE_CONFIRM_PURCHASE_TITLE")
+	local text = StringTable.Get("STORE_CONFIRM_PURCHASE_TEXT")
+	text = text:format(StringTable.Get(panel.product.Title), panel.product.Price)
+	
+	AlertPanel:YesNo(
+		title,
+		text,
+		function (result)
+			if (result == AlertPanel.kYesButton) then
+				self:PurchaseProduct(panel)
+			end
+		end,
+		nil,
+		false
+	)
 end
 
 function StoreUI.Do(self, callback)
@@ -593,6 +809,10 @@ function StoreUI.Do(self, callback)
 	self.callback = callback
 	
 	Game.entity.eatInput = true
+	
+	if (self.initialized) then
+		self:UpdateBalances()
+	end
 	
 	if (self.widgets.root) then
 		self.widgets.root:SetVisible(true)

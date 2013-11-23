@@ -34,6 +34,7 @@ Store.Products = {
 		Id = "761997278",
 		Title = "STORE_EP2_TITLE",
 		Description = "STORE_EP2_DESCRIPTION",
+		Thanks = "STORE_EP2_PURCHASE_THANKS",
 		Icon = "UI/store_ep2_icon_M",
 		Image = "UI/store_ep2_teaser_M",
 		State = Store.kProductState_Hidden,
@@ -43,6 +44,7 @@ Store.Products = {
 		Id = "762002771",
 		Title = "STORE_S1_TITLE",
 		Description = "STORE_S1_DESCRIPTION",
+		Thanks = "STORE_S1_PURCHASE_THANKS",
 		Icon = "UI/store_s1_icon_M",
 		Image = "UI/store_s1_teaser_M",
 		State = Store.kProductState_Hidden,
@@ -52,33 +54,53 @@ Store.Products = {
 		Id = "761996940",
 		Title = "STORE_OMEGA_TITLE",
 		Description = "STORE_OMEGA_DESCRIPTION",
+		Thanks = "STORE_OMEGA_PURCHASE_THANKS",
 		Icon = "UI/store_omega_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 1999
+		BasePrice = 1999,
+		Consumable = true,
+		PurchaseAction = function()
+			Store.PurchasedConsumable(0, 1)
+		end
 	},
 	{
 		Id = "761842135",
 		Title = "STORE_SKP10_TITLE",
 		Description = "STORE_SKP10_DESCRIPTION",
+		Thanks = "STORE_SKP10_PURCHASE_THANKS",
 		Icon = "UI/store_skp10_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 799
+		BasePrice = 799,
+		Consumable = true,
+		PurchaseAction = function()
+			Store.PurchasedConsumable(10000, 0)
+		end
 	},
 	{
 		Id = "761828172",
 		Title = "STORE_SKP5_TITLE",
 		Description = "STORE_SKP5_DESCRIPTION",
+		Thanks = "STORE_SKP5_PURCHASE_THANKS",
 		Icon = "UI/store_skp5_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 399
+		BasePrice = 399,
+		Consumable = true,
+		PurchaseAction = function()
+			Store.PurchasedConsumable(5000, 0)
+		end
 	},
 	{
 		Id = "761820735",
 		Title = "STORE_SKP1_TITLE",
 		Description = "STORE_SKP1_DESCRIPTION",
+		Thanks = "STORE_SKP1_PURCHASE_THANKS",
 		Icon = "UI/store_skp1_icon_M",
 		State = Store.kProductState_Hidden,
-		BasePrice = 99
+		BasePrice = 99,
+		Consumable = true,
+		PurchaseAction = function()
+			Store.PurchasedConsumable(1000, 0)
+		end
 	}
 }
 
@@ -112,7 +134,7 @@ function Store.Load()
 	Store.validApplication = true
 	Store.validationPending = true
 	Store.validationError = false
-	
+		
 	Store.LoadSkillPoints()
 	
 	local guid = Persistence.ReadString(Globals, "guid")
@@ -141,6 +163,8 @@ function Store.Load()
 end
 
 function Store.LoadSkillPoints()
+	Store.encumberedSkillPoints = 0
+	Store.encumberedOmegaUpgrades = 0
 	Store.skillPoints = Persistence.ReadNumber(Globals, "storeSkillPoints", 0)
 	Store.omegaUpgrades = Persistence.ReadNumber(Globals, "omegaUpgrades", 0)
 end
@@ -149,6 +173,38 @@ function Store.SaveSkillPoints()
 	Persistence.WriteNumber(Globals, "storeSkillPoints", Store.skillPoints)
 	Persistence.WriteNumber(Globals, "omegaUpgrades", Store.omegaUpgrades)
 	Globals:Save()
+end
+
+function Store.PurchasedConsumable(numSkills, numOmegas)
+	Store.skillPoints = Store.skillPoints + numSkills
+	Store.omegaUpgrades = Store.omegaUpgrades + numOmegas
+	Store.SaveSkillPoints()
+end
+
+function Store.EncumberSkillPoints(num)
+	Store.encumberedSkillPoints = Store.encumberedSkillPoints + num
+end
+
+function Store.EncumberOmegaUpgrades(num)
+	Store.encumberedOmegaUpgrades = Store.encumberedOmegaUpgrades + num
+end
+
+function Store.ApplyEncumberedBalances()
+
+	Store.skillPoints = Store.skillPoints - Store.encumberedSkillPoints
+	Store.omegaUpgrades = Store.omegaUpgrades - Store.encumberedOmegaUpgrades
+	
+	Store.encumberedSkillPoints = 0
+	Store.encumberedOmegaUpgrades = 0
+	
+end
+
+function Store.AvailableSkillPoints()
+	return Store.skillPoints - Store.encumberedSkillPoints
+end
+
+function Store.AvailableOmegaUpgrades()
+	return Store.omegaUpgrades - Store.encumberedOmegaUpgrades
 end
 
 function Store.LoadProducts()
@@ -369,17 +425,35 @@ function Store.OnProductValidateResult(id, code)
 	if (product) then
 		if (code == Store.kResponseCode_InvalidReceipt) then
 			product.State = Store.kProductState_Failed
-			Store.RemovePurchase(product.Id)
-		elseif (code == Store.kResponseCode_Purchased) then
-			product.State = Store.kProductState_Purchased
-			Store.AddPurchase(product.Id)
+			if (not product.Consumable) then
+				Store.RemovePurchase(product.Id)
+			end
+		elseif (code == Store.kResponseCode_Success) then
+			if (product.Consumable) then
+				product.State = Store.kProductState_Available
+			else
+				product.State = Store.kProductState_Purchased
+				Store.AddPurchase(product.Id)
+			end
+			
+			if (Store.numRestored) then
+				if (product.Transaction) then
+					if (product.Transaction:State() == Store.kTransactionState_Restored) then
+						Store.numRestored = Store.numRestored + 1
+					end
+				end
+			end
+			
+			if (product.PurchaseAction) then
+				product.PurchaseAction()
+			end
 		end
 		
-		if (product.Callback) then
-			local callback = product.Callback
-			product.Callback = nil
-			callback()
+		if (product.Transaction) then
+			product.Transaction:Finish()
+			product.Transaction = nil
 		end
+		StoreUI:UpdateProductId(product.Id)
 	end
 	
 	if (Store.numProductsWaitingForValidation) then
@@ -396,22 +470,39 @@ function Store.OnUpdateTransaction(transaction)
 	local product = Store.ProductsById[transaction:ProductId()]
 	
 	if ((state == Store.kTransactionState_Purchased) or (state == Store.kTransactionState_Restored)) then
-		product.Transaction = transaction
-		Store.RequestValidateProducts({transaction:ProductId()})
+		if (product) then
+			product.Transaction = transaction
+			product.State = Store.kProductState_Validating
+			Store.RequestValidateProducts({transaction:ProductId()})
+		end
 	elseif (state == Store.kTransactionState_Purchasing) then
 		if (product) then
 			product.State = Store.kProductState_Purchasing
 		end
+		StoreUI.UpdateProductId(product.Id)
 	elseif (state == Store.kTransactionState_Failed) then
 		if (product) then
-			Store.RemoveProduct(product.Id)
+			if (not product.Consumable) then
+				Store.RemoveProduct(product.Id)
+			end
 			product.State = Store.kProductState_Failed
 		end
 		transaction:Finish()
-		if (product and product.Callback) then
-			local callback = product.Callback
-			product.Callback = nil
-			callback()
-		end
+		StoreUI.UpdateProductId(product.Id)
 	end
 end
+
+function Store.StartRestoreProducts()
+	Store.numRestored = 0
+	Store.RestoreProducts()
+end
+
+function Store.OnRestoreProductsComplete(error, msg)
+	if (error) then
+		StoreUI:RestorePurchasesComplete(Store.numRestored, msg)
+	else
+		StoreUI:RestorePurchasesComplete(Store.numRestored)
+	end
+	Store.numRestored = nil
+end
+

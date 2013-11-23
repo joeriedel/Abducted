@@ -410,7 +410,7 @@ function Arm.QuitPressed(widget)
 	Arm:ClearButtonHighlights(widget)
 	
 	local f = function (result)
-		if (result == AlertPanel.YesButton) then
+		if (result == AlertPanel.kYesButton) then
 			Abducted.entity.eatInput = true
 			UI:BlendTo({0,0,0,0}, 0)
 			UI:BlendTo({0,0,0,1}, 1)

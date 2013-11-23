@@ -91,6 +91,7 @@ function GameDB.LoadingSaveGame(self)
 end
 
 function GameDB.SaveCheckpoint(self)
+	Store.ApplyEncumberedBalances()
 	Store.SaveSkillPoints() -- save our balance
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)
@@ -105,6 +106,7 @@ end
 
 function GameDB.SaveCheckpointTransition(self, level)
 
+	Store.ApplyEncumberedBalances()
 	Store.SaveSkillPoints() -- save our balance
 	Persistence.WriteNumber(SaveGame, "secondsPlayed", self.realTime)
 	Persistence.WriteNumber(SaveGame, "bugKillCounter", self.bugKillCounter)

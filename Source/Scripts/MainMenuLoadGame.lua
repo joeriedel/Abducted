@@ -194,7 +194,7 @@ function MainMenu.LoadGame.OnSaveGameInputEvent(self, panel, saveInfo, e)
 		if (e.type ~= kI_TouchCancelled) then
 			UI.sfx.Command:Play(kSoundChannel_UI, 0)
 			local f = function(r)
-				if (r == AlertPanel.YesButton) then
+				if (r == AlertPanel.kYesButton) then
 					self:LoadGame(saveInfo)
 				end
 			end
@@ -209,7 +209,7 @@ end
 function MainMenu.LoadGame.DeleteGame(self, saveInfo)
 
 	local f = function(result)
-		if (result == AlertPanel.YesButton) then
+		if (result == AlertPanel.kYesButton) then
 			local checkpoint = Persistence.ReadNumber(Globals, "checkpoint")
 			if (saveInfo.index == checkpoint) then
 				Persistence.DeleteKey(Globals, "checkpoint")

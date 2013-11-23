@@ -589,7 +589,7 @@ function Abducted.RapidPulse(self)
 end
 
 function Abducted.PlayerDiedAlertPanelDone(self, result)
-	if (result == AlertPanel.YesButton) then
+	if (result == AlertPanel.kYesButton) then
 		self:DoLoadCheckpoint()
 	else
 		Abducted.entity.eatInput = true

@@ -203,19 +203,19 @@ function MainMenu.ShowSignInMessage(self, show)
 	end
 
 	if (show) then
-		MainMenu.eatInput = true
+		Game.entity.eatInput = true
 		self.widgets.signInBkg:BlendTo({1,1,1,1}, 0.5)
 		self.widgets.signInText:BlendTo({1,1,1,1}, 0.5)
 		
 		local f = function() -- don't keep blocking after 5 seconds
-			MainMenu.eatInput = false
+			Game.entity.eatInput = false
 			self.widgets.signInBkg:BlendTo({1,1,1,0}, 0.5)
 			self.widgets.signInText:BlendTo({1,1,1,0}, 0.5)
 		end
 		
 		self.signInTimer = World.gameTimers:Add(f, 5)
 	else
-		MainMenu.eatInput = false
+		Game.entity.eatInput = false
 		self.widgets.signInBkg:BlendTo({1,1,1,0}, 0.5)
 		self.widgets.signInText:BlendTo({1,1,1,0}, 0.5)
 	end
@@ -306,7 +306,7 @@ function MainMenu.InputEventFilter(self, e)
 	if (MainMenu.mainPanel and MainMenu.mainPanel.busy) then
 		return true
 	end
-	if (MainMenu.eatInput) then
+	if (Game.entity.eatInput) then
 		return true
 	end
 	return false
@@ -456,7 +456,7 @@ function MainMenu.MainPanel.Continue(self, item)
 	end
 	
 	local f = function(result)
-		if (result == AlertPanel.YesButton) then
+		if (result == AlertPanel.kYesButton) then
 		
 			GameNetwork.LogEvent("CheckpointLoad")
 		
@@ -714,7 +714,7 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 end
 
 function MainMenu.MainPanel.Exit(self)
-	MainMenu.eatInput = true
+	Game.entity.eatInput = true
 	
 	local f = function()
 		UI:BlendTo({1,1,1,1}, 0.3)

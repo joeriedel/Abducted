@@ -5,7 +5,7 @@
 
 PlayerSkills = Class:New()
 PlayerSkills.DebugAllAbilitiesEnabled = false
-PlayerSkills.UnlimitedSkillPointsCheat = true
+PlayerSkills.UnlimitedSkillPointsCheat = false
 PlayerSkills.RefundFraction = 0.75
 PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120

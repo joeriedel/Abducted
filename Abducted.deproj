@@ -187,6 +187,9 @@
     <filename>Source\Scripts\Store.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\StoreUI.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\System.lua</filename>
   </file>
   <file>

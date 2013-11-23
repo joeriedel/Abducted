@@ -462,7 +462,7 @@ function Arm.UpdateSkillPointsLabel(self)
 
 	local skillPoints = PlayerSkills.SkillPoints
 	if (not PlayerSkills.UnlimitedSkillPointsCheat) then
-		skillPoints = skillPoints + Store.skillPoints
+		skillPoints = skillPoints + Store.AvailableSkillPoints()
 	end
 	
 	local text = StringTable.Get("SKILL_POINTS").." "..tostring(skillPoints)
@@ -473,7 +473,7 @@ end
 
 function Arm.UpdateOmegaPointsLabel(self)
 
-	local text = tostring(Store.omegaUpgrades)
+	local text = tostring(Store.AvailableOmegaUpgrades())
 	UI:SetLabelText(self.widgets.skills.OmegaLabel, text, self.unityFontScale)
 	UI:VCenterLabel(self.widgets.skills.OmegaLabel, self.omegaLabelRect)
 	
@@ -525,7 +525,7 @@ function Arm.OnRefundButtonPressed(self)
 		title,
 		msg,
 		function (result)
-			if (result == AlertPanel.YesButton) then
+			if (result == AlertPanel.kYesButton) then
 				self:RefundSkills(refund)
 			end
 		end,
@@ -580,12 +580,12 @@ function Arm.RefundSkills(self, refund)
 end
 
 function Arm.OmegaUpgradePressed(self)
-	if (Store.omegaUpgrades > 0) then
+	if (Store.AvailableOmegaUpgrades() > 0) then
 		AlertPanel:OKCancel(
 			"SKILL_CONFIRM_OMEGA_TITLE",
 			"SKILL_CONFIRM_OMEGA_TEXT",
 			function (result)
-				if (result == AlertPanel.YesButton) then
+				if (result == AlertPanel.kYesButton) then
 					self:OmegaUpgrade()
 					AlertPanel:OK(
 						"SKILL_CONFIRM_OMEGA_APPLIED_TITLE",
@@ -599,7 +599,7 @@ function Arm.OmegaUpgradePressed(self)
 			"SKILL_NO_OMEGA_TITLE",
 			"SKILL_NO_OMEGA_TEXT",
 			function (result)
-				if (result == AlertPanel.YesButton) then
+				if (result == AlertPanel.kYesButton) then
 					self:OnStoreButtonPressed()
 				end
 			end
@@ -611,7 +611,7 @@ function Arm.OnPurchaseButtonPressed(self)
 	local level = self.selectedSkill:CurrentLevel()
 	local cost = self.selectedSkill[level+1].Cost
 	
-	local skillPoints = PlayerSkills.SkillPoints + Store.skillPoints
+	local skillPoints = PlayerSkills.SkillPoints + Store.AvailableSkillPoints()
 	
 	if (cost > skillPoints) then
 		local title = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TITLE")
@@ -621,7 +621,7 @@ function Arm.OnPurchaseButtonPressed(self)
 			title,
 			msg,
 			function (result)
-				if (result == AlertPanel.YesButton) then
+				if (result == AlertPanel.kYesButton) then
 					self:OnStoreButtonPressed()
 				end
 			end,
@@ -640,7 +640,7 @@ function Arm.OnPurchaseButtonPressed(self)
 			title,
 			msg,
 			function (result)
-				if (result == AlertPanel.YesButton) then
+				if (result == AlertPanel.kYesButton) then
 					self:UpgradeSkill(self.selectedSkill, cost)
 				end
 			end,
@@ -651,7 +651,7 @@ function Arm.OnPurchaseButtonPressed(self)
 end
 
 function Arm.OmegaUpgrade(self)
-	Store.omegaUpgrades = Store.omegaUpgrades - 1
+	Store.EncumberOmegaUpgrades(1)
 	PlayerSkills:GiveAllSkills(false)
 	self:UpdateSkillsUI()
 	local skill = self.selectedSkill
@@ -672,7 +672,7 @@ function Arm.UpgradeSkill(self, skill, cost)
 		PlayerSkills.SkillPoints = PlayerSkills.SkillPoints - cost
 		if (PlayerSkills.SkillPoints < 0) then
 			-- pull from store balance
-			Store.skillPoints = Store.skillPoints + PlayerSkills.SkillPoints
+			Store.EncumberSkillPoints(-PlayerSkills.SkillPoints)
 			PlayerSkills.SkillPoints = 0
 		end
 		self:UpdateSkillPointsLabel()

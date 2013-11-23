@@ -4,10 +4,10 @@
 -- See Abducted/LICENSE for licensing terms
 
 AlertPanel = {}
-AlertPanel.OKButton = 1
-AlertPanel.YesButton = 1
-AlertPanel.CancelButton = 2
-AlertPanel.NoButton = 2
+AlertPanel.kOKButton = 1
+AlertPanel.kYesButton = 1
+AlertPanel.kCancelButton = 2
+AlertPanel.kNoButton = 2
 
 function AlertPanel.Create(self)
 	self.gfx = {}
@@ -223,7 +223,7 @@ function AlertPanel.Run(self, title, msg, buttons, callback, screenRect, useStri
 end
 
 function AlertPanel.OK(self, title, msg, callback, screenRect, useStringTable)
-	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.OKButton}}, callback, screenRect, useStringTable)
+	AlertPanel:Run(title, msg, {{"ALERT_PANEL_OK", r=AlertPanel.kOKButton}}, callback, screenRect, useStringTable)
 end
 
 function AlertPanel.OKCancel(self, title, msg, callback, screenRect, useStringTable)
@@ -231,8 +231,8 @@ function AlertPanel.OKCancel(self, title, msg, callback, screenRect, useStringTa
 		title,
 		msg, 
 		{
-			{"ALERT_PANEL_OK", r=AlertPanel.OKButton}, 
-			{"ALERT_PANEL_CANCEL", r=AlertPanel.CancelButton}
+			{"ALERT_PANEL_OK", r=AlertPanel.kOKButton}, 
+			{"ALERT_PANEL_CANCEL", r=AlertPanel.kCancelButton}
 		}, 
 		callback,
 		screenRect,
@@ -245,8 +245,8 @@ function AlertPanel.YesNo(self, title, msg, callback, screenRect, useStringTable
 		title,
 		msg, 
 		{
-			{"ALERT_PANEL_YES", r=AlertPanel.YesButton}, 
-			{"ALERT_PANEL_NO", r=AlertPanel.NoButton}
+			{"ALERT_PANEL_YES", r=AlertPanel.kYesButton}, 
+			{"ALERT_PANEL_NO", r=AlertPanel.kNoButton}
 		}, 
 		callback,
 		screenRect,

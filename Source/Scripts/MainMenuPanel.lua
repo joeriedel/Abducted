@@ -42,7 +42,7 @@ end
 
 function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 
-	MainMenu.eatInput = true
+	Game.entity.eatInput = true
 	
 	self:PrepareContents()
 	self.widgets.panel:ScaleTo(scale, {0,0})
@@ -51,7 +51,7 @@ function MainMenuPanel.TransitionIn(self, scale, time, onComplete)
 	
 	local f = function()
 		local f = function()
-			MainMenu.eatInput = false
+			Game.entity.eatInput = false
 			if (onComplete) then
 				onComplete()
 			end
@@ -65,7 +65,7 @@ end
 
 function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 
-	MainMenu.eatInput = true
+	Game.entity.eatInput = true
 	
 	self:FadeOutContents(fade)
 	
@@ -73,12 +73,12 @@ function MainMenuPanel.TransitionOut(self, scale, time, fade, onComplete)
 		self.widgets.panel:ScaleTo(scale, {time,time})
 		if (onComplete) then
 			local f = function()
-				MainMenu.eatInput = false
+				Game.entity.eatInput = false
 				onComplete()
 			end
 			World.globalTimers:Add(f, time)
 		else
-			MainMenu.eatInput = false
+			Game.entity.eatInput = false
 		end
 	end
 	

@@ -29,7 +29,7 @@ function Arm.SpawnDB(self)
 	self.widgets.db.Root:SetVisible(false)
 	self.widgets.WorkspaceLeft:AddChild(self.widgets.db.Root)
 	
-	rect = UI:MaterialSize(self.gfx.CharTab)
+	rect = {0,39,198,576}--UI:MaterialSize(self.gfx.CharTab)
 	local scale = self.dbRootWorkspaceSize[4] / rect[4]
 	rect[4] = self.dbRootWorkspaceSize[4]
 	rect[3] = rect[3] * scale

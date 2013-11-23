@@ -503,6 +503,7 @@ function Discovery.UpdateUI(self)
 
 	local panelRect = Discovery.Widgets.Root:Rect()
 	local arrowRect = Discovery.Widgets.Arrow:Rect()
+	local closeRect = Discovery.Widgets.Close:Rect()
 	
 	local p,r = World.Project(self.pos)
 	p = UI:MapToUI(p)
@@ -522,6 +523,15 @@ function Discovery.UpdateUI(self)
 	BoundRect(panelRect, TerminalScreen.ScreenBounds)
 	Discovery.Widgets.Root:SetRect(panelRect)
 
+	if (left) then
+		closeRect[1] = panelRect[1] - (closeRect[3]/2)
+	else
+		closeRect[1] = panelRect[1] + panelRect[3] - (closeRect[3]/2)
+	end
+	
+	closeRect[2] = panelRect[2] - (closeRect[4]/2)
+	
+	Discovery.Widgets.Close:SetRect(closeRect)
 end
 
 function Discovery.CheckTouched(self, e)
@@ -627,8 +637,9 @@ function Discovery.StaticInit()
 			pressed = Discovery.ClosePressed
 		},
 		nil,
-		Discovery.Widgets.Root
+		UI.widgets.discoveries.Root
 	)
+	Discovery.Widgets.Close:BlendTo({1,1,1,0}, 0)
 	
 	local titleTF = World.Load("UI/DiscoveryTitle_TF")
 	Discovery.Widgets.Title = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=titleTF})

@@ -1526,19 +1526,19 @@ function ReflexGame.Think(self,dt)
         self.state.lineTimer = self.state.lineTimer + dt
         if (self.state.lineTimer >= self.LINE_SPAWN_TIME) then
             self.state.lineTimer = 0
-
             local v = self.state.path[self.state.lineIndex]
             local index = self:ConvertCoordToIndex(v.x,v.y)
-            local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]})
-            b.state = self:CreateState("blocker_green")
-            self.widgets.root:AddChild(b)
-            assert(self.widgets.grid[index] == nil)
-            self.widgets.grid[index] = b
-            self:SetPositionByGrid(b,v.x,v.y)
-            b:ScaleTo({0,0}, {0,0})
-            b:ScaleTo({1,1}, {self.state.level.blockGrowTime,self.state.level.blockGrowTime})
-            self.state.lineIndex = self.state.lineIndex + 1
-            COutLine(kC_Debug, "Spawned block")
+            if (self.widgets.grid[index] == nil) then
+				local b = UI:CreateWidget("MatWidget", {rect={0,0,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]})
+				b.state = self:CreateState("blocker_green")
+				self.widgets.root:AddChild(b)
+				self.widgets.grid[index] = b
+				self:SetPositionByGrid(b,v.x,v.y)
+				b:ScaleTo({0,0}, {0,0})
+				b:ScaleTo({1,1}, {self.state.level.blockGrowTime,self.state.level.blockGrowTime})
+				COutLine(kC_Debug, "Spawned block")
+			end
+			self.state.lineIndex = self.state.lineIndex + 1
         end
     end
 

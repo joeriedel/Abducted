@@ -5,7 +5,7 @@
 
 -- Native:
 -- Store.Create()
--- Store.RequestProducts()
+-- Store.RequestProductInfo()
 -- Store.CreatePaymentRequest()
 -- Store.RequestValidateApplication()
 -- Store.RequestValidateProducts()
@@ -289,7 +289,13 @@ function Store.LoadProducts()
 		if (System.Platform() == kPlatPC) then
 			Store.RequestTestProducts()
 		else
-			Store.RequestProducts()
+			local ids = {}
+			for k,v in pairs(Store.Products) do
+				table.insert(ids, v.Id)
+			end
+			if (next(ids)) then
+				Store.RequestProductInfo(ids)
+			end
 		end
 		return
 	end

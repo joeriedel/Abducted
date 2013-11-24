@@ -71,6 +71,9 @@
 		3380F7EE183CD0F60073F0D8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7DB183CCFFD0073F0D8 /* QuartzCore.framework */; };
 		3380F7EF183CD0FE0073F0D8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7D9183CCFE90073F0D8 /* UIKit.framework */; };
 		3380F7F0183CD1060073F0D8 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7D7183CCFDB0073F0D8 /* AudioToolbox.framework */; };
+		3380F813184196F00073F0D8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F812184196F00073F0D8 /* StoreKit.framework */; };
+		3380F814184196FD0073F0D8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F812184196F00073F0D8 /* StoreKit.framework */; };
+		3380F815184197060073F0D8 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F812184196F00073F0D8 /* StoreKit.framework */; };
 		33956A7A16FBD677008314CD /* AbductedApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06191626684B00F8C9FF /* AbductedApp.cpp */; };
 		33956A7B16FBD677008314CD /* AbductedGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06201626689800F8C9FF /* AbductedGame.cpp */; };
 		33956A7C16FBD677008314CD /* G_SkModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC062A1626689800F8C9FF /* G_SkModel.cpp */; };
@@ -470,6 +473,7 @@
 		3380F7E3183CD02E0073F0D8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		3380F7E5183CD0500073F0D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		3380F7E7183CD0BA0073F0D8 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		3380F812184196F00073F0D8 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		338BD5081638DD4200468A4D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		33956A7616FBC9AD008314CD /* 3rdParty.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = 3rdParty.entitlements; path = OSX/3rdParty.entitlements; sourceTree = "<group>"; };
 		33956AA616FBD677008314CD /* Abducted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Abducted.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -599,6 +603,7 @@
 				3321A98F16FBB5C600E2102F /* OpenGL.framework in Frameworks */,
 				3321A99016FBB5C600E2102F /* Cocoa.framework in Frameworks */,
 				3321A99116FBB5C600E2102F /* GameKit.framework in Frameworks */,
+				3380F815184197060073F0D8 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,10 +624,10 @@
 				3380F7E9183CD0CB0073F0D8 /* CoreGraphics.framework in Frameworks */,
 				3380F7EA183CD0D40073F0D8 /* Foundation.framework in Frameworks */,
 				3380F7EB183CD0DC0073F0D8 /* GameKit.framework in Frameworks */,
+				33986C7218395CCD00142AA5 /* StoreKit.framework in Frameworks */,
 				3380F7EC183CD0E40073F0D8 /* OpenAL.framework in Frameworks */,
 				3380F7ED183CD0ED0073F0D8 /* OpenGLES.framework in Frameworks */,
 				3380F7EE183CD0F60073F0D8 /* QuartzCore.framework in Frameworks */,
-				33986C7218395CCD00142AA5 /* StoreKit.framework in Frameworks */,
 				3380F7EF183CD0FE0073F0D8 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -674,6 +679,7 @@
 				33BF6CEB16FA89B50021C144 /* OpenGL.framework in Frameworks */,
 				33BF6CED16FA89B50021C144 /* Cocoa.framework in Frameworks */,
 				33BF6CEE16FA89B50021C144 /* GameKit.framework in Frameworks */,
+				3380F814184196FD0073F0D8 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +708,7 @@
 				33DB15251627D97A00963A33 /* Cg.framework in Frameworks */,
 				33EC05661626653900F8C9FF /* Cocoa.framework in Frameworks */,
 				33BF6C9D16FA83EA0021C144 /* GameKit.framework in Frameworks */,
+				3380F813184196F00073F0D8 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -783,6 +790,7 @@
 		33EC04EF162663FC00F8C9FF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3380F812184196F00073F0D8 /* StoreKit.framework */,
 				3380F7E7183CD0BA0073F0D8 /* CoreFoundation.framework */,
 				3380F7E5183CD0500073F0D8 /* CoreGraphics.framework */,
 				3380F7E3183CD02E0073F0D8 /* Foundation.framework */,

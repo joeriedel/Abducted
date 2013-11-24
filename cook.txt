@@ -126,6 +126,8 @@ pak0 {
 	UI/StandardButtonDark_TF
 	Shared/spellcasting_edgelines_M
 	Shared/painblend_M
+	UI/omega_button_M
+	UI/omega_button_pressed_M
 	UI/lineborder1_M
 	UI/lineborder2_M
 	UI/lineborder3_M

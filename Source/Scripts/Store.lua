@@ -341,7 +341,7 @@ function Store.RequestTestProducts()
 		table.insert(products, product)
 	end
 	
-	Store.OnProductsResponse(products)
+	Store.OnProductInfoResponse(products)
 
 end
 
@@ -391,9 +391,9 @@ function Store.ValidateProducts()
 	
 end
 
-function Store.OnProductsResponse(products)
+function Store.OnProductInfoResponse(products)
 
-	COutLine(kC_Debug, "Store.OnProductsResponse")
+	COutLine(kC_Debug, "Store.OnProductInfoResponse")
 
 	Store.validProducts = {}
 	

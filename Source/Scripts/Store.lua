@@ -535,11 +535,7 @@ function Store.OnProductValidateResult(id, code)
 			end
 			
 			if (Store.numRestored) then
-				if (product.Transaction) then
-					if (product.Transaction:State() == Store.kTransactionState_Restored) then
-						Store.numRestored = Store.numRestored + 1
-					end
-				end
+				Store.numRestored = Store.numRestored + 1
 			end
 			
 			if (product.PurchaseAction) then

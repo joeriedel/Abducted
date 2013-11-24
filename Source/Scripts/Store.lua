@@ -41,7 +41,7 @@ Store.Products = {
 		State = Store.kProductState_Hidden,
 		DebugPrice = 299,
 		PurchaseAction = function()
-			Store.PersistPurchase("761997278")
+			Store.PersistPurchase("ABEP2")
 		end
 	},
 	{
@@ -55,7 +55,7 @@ Store.Products = {
 		State = Store.kProductState_Hidden,
 		DebugPrice = 1999,
 		PurchaseAction = function()
-			Store.PersistPurchase("762002771")
+			Store.PersistPurchase("ABDSPS1")
 		end
 	},
 	{

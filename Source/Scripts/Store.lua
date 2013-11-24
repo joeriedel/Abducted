@@ -31,7 +31,7 @@ Store.kTransactionState_Restored = 3
 
 Store.Products = {
 	{
-		Id = "761997278",
+		Id = "ABEP2",
 		PublicId = "1",
 		Title = "STORE_EP2_TITLE",
 		Description = "STORE_EP2_DESCRIPTION",
@@ -45,7 +45,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "762002771",
+		Id = "ABDSPS1",
 		PublicId = "2",
 		Title = "STORE_S1_TITLE",
 		Description = "STORE_S1_DESCRIPTION",
@@ -59,7 +59,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "761996940",
+		Id = "Omega1",
 		PublicId = "3",
 		Title = "STORE_OMEGA_TITLE",
 		Description = "STORE_OMEGA_DESCRIPTION",
@@ -73,7 +73,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "764251225",
+		Id = "SKP1",
 		PublicId = "4",
 		Title = "STORE_SKP25_TITLE",
 		Description = "STORE_SKP25_DESCRIPTION",
@@ -87,7 +87,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "761842135",
+		Id = "SKP10",
 		PublicId = "5",
 		Title = "STORE_SKP10_TITLE",
 		Description = "STORE_SKP10_DESCRIPTION",
@@ -101,7 +101,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "761828172",
+		Id = "SKP25",
 		PublicId = "6",
 		Title = "STORE_SKP5_TITLE",
 		Description = "STORE_SKP5_DESCRIPTION",
@@ -115,7 +115,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "761820735",
+		Id = "SKP5",
 		PublicId = "7",
 		Title = "STORE_SKP1_TITLE",
 		Description = "STORE_SKP1_DESCRIPTION",
@@ -580,7 +580,7 @@ function Store.OnUpdateTransaction(transaction)
 	elseif (state == Store.kTransactionState_Failed) then
 		if (product) then
 			if (not product.Consumable) then
-				Store.RemoveProduct(product.Id)
+				Store.RemovePurchase(product.Id)
 			end
 			product.State = Store.kProductState_Failed
 		end

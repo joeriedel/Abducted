@@ -229,6 +229,7 @@ pak0 {
 	UI/store_skp10_icon_M
 	UI/store_skp5_icon_M
 	UI/store_skp1_icon_M
+	UI/storebackground1_M
 	UI/alphabet_scrollbar_M
 	UI/alphabet_scrollbar_pressed_M
 	UI/TerminalScreenButtons_TF
@@ -335,8 +336,9 @@ pak0 {
 	UI/MMLarge_TF
 	UI/MMNormal_TF
 	UI/charselectarrow_M
-	UI/MMItemBackground2_M
 	UI/MMItemBackground_M
+	UI/MMItemBackground2_M
+	UI/MMItemBackground3_M
 	UI/MMPanel_M
 	UI/MMSelPanel_M
 	UI/MMSelectedItem_M

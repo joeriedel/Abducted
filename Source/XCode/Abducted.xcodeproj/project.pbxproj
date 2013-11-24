@@ -1747,21 +1747,21 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05881626678A00F8C9FF /* AppShipDebugiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/Golden-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 					"\"$(SRCROOT)/../../Extern/Flurry-iOS-4.3.0/Flurry\"",
 				);
 				PRODUCT_NAME = Abducted;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "E354EFA9-E733-4A5E-995D-78294443897A";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1770,21 +1770,21 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC058A1626678A00F8C9FF /* AppShipReleaseiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/Golden-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 					"\"$(SRCROOT)/../../Extern/Flurry-iOS-4.3.0/Flurry\"",
 				);
 				PRODUCT_NAME = Abducted;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "E354EFA9-E733-4A5E-995D-78294443897A";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1793,21 +1793,21 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05821626678A00F8C9FF /* AppGoldenDebugiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/Golden-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 					"\"$(SRCROOT)/../../Extern/Flurry-iOS-4.3.0/Flurry\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "E354EFA9-E733-4A5E-995D-78294443897A";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1816,21 +1816,21 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33EC05841626678A00F8C9FF /* AppGoldenReleaseiOS.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
 				);
 				INFOPLIST_FILE = "iOS/Golden-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../Extern/luaJIT-2.0.1\"",
 					"\"$(SRCROOT)/../../Extern/Flurry-iOS-4.3.0/Flurry\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "E354EFA9-E733-4A5E-995D-78294443897A";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

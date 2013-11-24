@@ -399,22 +399,23 @@ function Store.OnProductInfoResponse(products)
 	Store.validProducts = {}
 	
 	local productIdx = 0
+	for k,product in pairs(Store.Products) do
 	
-	for k,v in pairs(products) do
-	
-		local product = Store.ProductsById[v.id]
-		if (product) then
-			product.Price = v.price
-			product.State = Store.kProductState_Available
-			
-			productIdx = productIdx + 1
-			product.Idx = productIdx
-			Persistence.WriteString(Session, "store/productId", v.id, productIdx)
-			Persistence.WriteString(Session, "store/productPrice", v.price, productIdx)
-						
-			table.insert(Store.validProducts, v.id)
+		for k,v in pairs(products) do
+		
+			if (v.id == product.Id) then
+				product.Price = v.price
+				product.State = Store.kProductState_Available
+					
+				productIdx = productIdx + 1
+				product.Idx = productIdx
+				Persistence.WriteString(Session, "store/productId", v.id, productIdx)
+				Persistence.WriteString(Session, "store/productPrice", v.price, productIdx)
+							
+				table.insert(Store.validProducts, v.id)
+				break
+			end
 		end
-	
 	end
 	
 	Persistence.WriteNumber(Session, "store/numProducts", productIdx)
@@ -583,9 +584,10 @@ function Store.OnUpdateTransaction(transaction)
 				Store.RemovePurchase(product.Id)
 			end
 			product.State = Store.kProductState_Failed
+			product.ErrorMsg = transaction:GetErrorMessage() or "Unkown Error"
 		end
 		transaction:Finish()
-		StoreUI.UpdateProductId(product.Id)
+		StoreUI:UpdateProductId(product.Id)
 	end
 end
 

@@ -371,8 +371,16 @@ function StoreUI.ProductsListReady(self)
 
 	self:CreateProductWidgets(self.productsWidth)
 	
-	if (self.productWidgets and next(self.productWidgets)) then
-		self:SelectProduct(self.productWidgets[next(self.productWidgets)])
+	if (self.productWidgets) then
+	-- select first item
+		for k,v in pairs(Store.Products) do
+			local panel = self.productWidgets[v.Id]
+			if (panel) then
+				self:SelectProduct(panel)
+				self.widgets.productList:ScrollTo({0,panel.yOfs}, 0)
+				break
+			end
+		end
 	end
 	
 	for k,v in pairs(self.contentWidgets) do
@@ -462,6 +470,7 @@ function StoreUI.CreateProductWidget(self, product, width, yOfs)
 	panel.width = width
 	panel.height = height
 	panel.product = product
+	panel.yOfs = yOfs
 	
 	local OnInputEvent = function(widget, e)
 		return self:OnProductInputEvent(panel, e)
@@ -578,7 +587,7 @@ function StoreUI.UpdateProductState(self, panel)
 		panel.busy = true
 	elseif (panel.product.State == Store.kProductState_Failed) then
 		typeface = self.typefaces.StatusRed
-		text = StringTable.Get("STORE_INVALID")
+		text = StringTable.Get("STORE_ERROR")
 		panel.busy = true
 	else
 		typeface = self.typefaces.StatusGreen
@@ -829,12 +838,18 @@ function StoreUI.PurchaseComplete(self)
 			end
 		)
 	else
+		local title = StringTable.Get("STORE_ERROR")
+		local text = StringTable.Get("STORE_PURCHASE_ERROR")
+		text = text:format(panel.product.ErrorMsg)
+		
 		AlertPanel:OK(
-			"STORE_ERROR",
-			"STORE_PURCHASE_ERROR",
+			title,
+			text,
 			function ()
 				self:ShowWaitStatus(false)
-			end
+			end,
+			nil,
+			false
 		)
 	end
 

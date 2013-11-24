@@ -73,7 +73,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "SKP1",
+		Id = "SKP25",
 		PublicId = "4",
 		Title = "STORE_SKP25_TITLE",
 		Description = "STORE_SKP25_DESCRIPTION",
@@ -101,7 +101,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "SKP25",
+		Id = "SKP5",
 		PublicId = "6",
 		Title = "STORE_SKP5_TITLE",
 		Description = "STORE_SKP5_DESCRIPTION",
@@ -115,7 +115,7 @@ Store.Products = {
 		end
 	},
 	{
-		Id = "SKP5",
+		Id = "SKP1",
 		PublicId = "7",
 		Title = "STORE_SKP1_TITLE",
 		Description = "STORE_SKP1_DESCRIPTION",
@@ -527,6 +527,8 @@ function Store.OnProductValidateResult(id, code)
 				Store.RemovePurchase(product.Id)
 			end
 		elseif (code == Store.kResponseCode_Success) then
+			COutLine(kC_Debug, "Product '%s' validated.", product.Id)
+
 			if (product.Consumable) then
 				product.State = Store.kProductState_Available
 			else
@@ -595,9 +597,20 @@ end
 function Store.OnRestoreProductsComplete(error, msg)
 	if (error) then
 		StoreUI:RestorePurchasesComplete(Store.numRestored, msg)
+		Store.numRestored = nil
 	else
-		StoreUI:RestorePurchasesComplete(Store.numRestored)
+		-- Interesting issue here
+		-- Store.RestoreProducts() dumps transactions into the SKPaymentQueue but that won't get
+		-- serviced until next frame, however as soon as the transactions are queued OnRestoreProductsComplete()
+		-- is called.
+		-- Delay this until next frame so we service the remaining transactions
+
+		local f = function()
+			COutLine(kC_Debug, "Store.OnRestoreProductsComplete (%d)", Store.numRestored)
+			StoreUI:RestorePurchasesComplete(Store.numRestored)
+			Store.numRestored = nil
+		end
+		World.globalTimers:Add(f, 1)
 	end
-	Store.numRestored = nil
 end
 

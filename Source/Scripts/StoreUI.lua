@@ -862,6 +862,15 @@ end
 
 function StoreUI.Do(self, callback)
 
+	if (not Store.enabled) then
+		AlertPanel:OK(
+			"STORE_ERROR",
+			"STORE_DISABLED",
+			callback
+		)
+		return
+	end
+
 	self.callback = callback
 	
 	Game.entity.eatInput = true

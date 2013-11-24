@@ -371,7 +371,7 @@ function StoreUI.ProductsListReady(self)
 
 	self:CreateProductWidgets(self.productsWidth)
 	
-	if (self.productWidgets) then
+	if (self.productWidgets and next(self.productWidgets)) then
 		self:SelectProduct(self.productWidgets[next(self.productWidgets)])
 	end
 	

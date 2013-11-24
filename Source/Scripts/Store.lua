@@ -342,6 +342,7 @@ function Store.RequestTestProducts()
 	end
 	
 	Store.OnProductInfoResponse(products)
+	--Store.OnProductInfoResponse({})
 
 end
 

@@ -759,24 +759,29 @@ end
 
 function TerminalScreen.CreateReturnArrow(handler)
 
-	local w = UIPushButton:Create(
-		{0, 0, 125*UI.identityScale[1], 62.5*UI.identityScale[2]},
-		{
-			enabled = World.Load("UI/return_arrow_M"),
-			pressed = World.Load("UI/return_arrow_pressed_M")
-		},
-		{
-			pressed = UI.sfx.Command
-		},
-		{
-			pressed=handler
-		},
-		{
-			highlight = {on={0,0,0,0}, off = {0,0,0,0}, overbright = {1,1,1,1}, time = 0.1, overbrightTime = 0.1},
-		},
+	local w = UI:CreateStylePushButton(
+		{0, 0, 8, 8},
+		handler,
+		{ highlight={on={0,0,0,0}}, solidBackground = true },
 		UI.widgets.interactive.Root
 	)
 	w:BlendTo({1,1,1,0}, 0)
+	
+	local text = StringTable.Get("TERMINAL_EXIT_BTN")
+	local r = UI:LineWrapCenterText(
+		w.label,
+		nil,
+		true,
+		0,
+		text
+	)
+	
+	r = ExpandRect(r, 96*UI.identityScale[1], 32*UI.identityScale[2])
+	r[1] = 0
+	r[2] = 0
+	w:SetRect(r)
+	w.highlight:SetRect(r)
+	UI:CenterLabel(w.label, {0,0,r[3],r[4]})
 	
 	return w
 

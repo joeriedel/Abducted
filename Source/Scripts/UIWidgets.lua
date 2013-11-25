@@ -183,6 +183,10 @@ function UIPushButton.DoPressed(self, widget, e)
 	
 	widget:SetCapture(true)
 	
+	if (widget.events.stateNotify) then
+		widget.events.stateNotify(widget)
+	end
+	
 	return true, true
 	
 end
@@ -199,6 +203,10 @@ function UIPushButton.DoUnpressed(self, widget, event)
 	
 	if (widget.sfx.unpressed and event) then
 		widget.sfx.unpressed:Play(kSoundChannel_UI, 0)
+	end
+	
+	if (widget.events.stateNotify) then
+		widget.events.stateNotify(widget)
 	end
 	
 	if (widget.events.unpressed and event) then

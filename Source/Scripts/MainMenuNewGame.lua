@@ -49,14 +49,32 @@ function MainMenu.NewGame.Create(self, options, parent)
 	)
 	
 	self.widgets.portrait:SetBlendWithParent(true)
-	
-	local widget = UI:CreateWidget("MatWidget", {rect={x+self.xInset+w, y, 64*UI.identityScale[1], h}, material=MainMenu.gfx.PortraitSelectArrow})
-	widget:SetBlendWithParent(true)
-	self.widgets.group:AddChild(widget)
 		
+	self.widgets.portraitArrow = UI:CreateStylePushButton(
+		{x+self.xInset+w, y, 64*UI.identityScale[1], h},
+		function() self:NextPortrait() end,
+		{ nolabel = true, highlight={on={0,0,0,0}} },
+		self.widgets.group
+	)
+	
+	local gfx = {
+		enabled = MainMenu.gfx.PortraitSelectArrow,
+		highlight = UI.gfx.ButtonOverbright
+	}
+	
+	self.widgets.portraitArrow.class:ChangeGfx(self.widgets.portraitArrow, gfx)
+	self.widgets.portraitArrow:SetBlendWithParent(true)
+	
+	local notifyStates = function(widget)
+		self:NotifyPortraitState(widget)
+	end
+	
+	self.widgets.portrait.events.stateNotify = notifyStates
+	self.widgets.portraitArrow.events.stateNotify = notifyStates
+	
 	y = y + h + (16 * UI.identityScale[2])
 
-	widget = UI:CreateWidget("TextLabel", {rect = {self.xInset, y, 8, 8}, typeface = MainMenu.typefaces.Normal})
+	local widget = UI:CreateWidget("TextLabel", {rect = {self.xInset, y, 8, 8}, typeface = MainMenu.typefaces.Normal})
 	self.widgets.group:AddChild(widget)
 	widget:SetBlendWithParent(true)
 	UI:SetLabelText(widget, StringTable.Get("ARM_CHARDB_NAME"))
@@ -130,6 +148,20 @@ function MainMenu.NewGame.Create(self, options, parent)
 		UI.invIdentityScale
 	)
 	
+end
+
+function MainMenu.NewGame.NotifyPortraitState(self, widget)
+
+	-- slave button states
+	
+	local otherWidget = self.widgets.portrait
+	if (widget == otherWidget) then
+		otherWidget = self.widgets.portraitArrow
+	end
+	
+	otherWidget.state.pressed = widget.state.pressed
+	otherWidget.class:SetGfxState(otherWidget)
+
 end
 
 function MainMenu.NewGame.PrepareContents(self)

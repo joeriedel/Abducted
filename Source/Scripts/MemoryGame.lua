@@ -1327,18 +1327,25 @@ function MemoryGame.Think(self,dt)
 			World.globalTimers:Add(f, 1)
 		else
 			ReflexGame.entity.sfx.Fail:Play(kSoundChannel_UI, 0)
-			local f = function()
-				PuzzleScoreScreen:DoRetryQuitScreen(
-					self.widgets.root2,
-					function ()
-						self:DoRetry()
-					end,
-					function ()
-						self:DoQuit()
-					end
-				)
+			if (self.state.timeLeft > 0) then
+				local f = function()
+					PuzzleScoreScreen:DoRetryQuitScreen(
+						self.widgets.root2,
+						function ()
+							self:DoRetry()
+						end,
+						function ()
+							self:DoQuit()
+						end
+					)
+				end
+				World.globalTimers:Add(f, 1)
+			else
+				local f = function()
+					self:DoQuit()
+				end
+				World.globalTimers:Add(f, 1)
 			end
-			World.globalTimers:Add(f, 1)
 		end
 		return
     end

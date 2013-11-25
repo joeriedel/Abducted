@@ -520,7 +520,7 @@ function Discovery.UpdateUI(self)
 	panelRect[2] = p[2] - panelRect[4]/2
 	
 	Discovery.Widgets.Arrow:SetRect(arrowRect)
-	BoundRect(panelRect, TerminalScreen.ScreenBounds)
+	BoundRect(panelRect, Discovery.ScreenBounds)
 	Discovery.Widgets.Root:SetRect(panelRect)
 
 	if (self.left) then
@@ -606,6 +606,26 @@ function Discovery.StaticInit()
 	
 	Discovery.kUISize[1] = Discovery.kUISize[1] * UI.fontScale[1]
 	Discovery.kUISize[2] = Discovery.kUISize[2] * UI.fontScale[1]
+	local closeButtonSize = 64*UI.identityScale[1]
+	
+	local bounds = 0.025
+	
+	Discovery.ScreenBounds = {
+		bounds * UI.screenWidth,
+		bounds * UI.screenHeight,
+		UI.screenWidth - (bounds * UI.screenWidth * 2),
+		UI.screenHeight - (bounds * UI.screenHeight * 2)
+	}
+	
+	if (UI.mode == kGameUIMode_Mobile) then
+		local armButtonRect = HUD.widgets.Arm:Rect()
+		Discovery.kUISize[2] = Min(Discovery.kUISize[2], UI.screenHeight - armButtonRect[2] - armButtonRect[4])
+		
+		local actionButtonSize = UI:MaterialSize(HUD.gfx.ShieldEnabled)
+		local leftEdge = UI.screenWidth - HUD.mobileInset - actionButtonSize[3] - (closeButtonSize/2) - 8
+		
+		Discovery.ScreenBounds[3] = leftEdge - Discovery.ScreenBounds[1]
+	end
 	
 	Discovery.kUIBorder = Discovery.kUIBorder * UI.identityScale[1]
 	
@@ -623,7 +643,6 @@ function Discovery.StaticInit()
 	Discovery.Widgets.Root:SetHAlign(kHorizontalAlign_Center)
 	Discovery.Widgets.Root:SetVAlign(kVerticalAlign_Center)
 	
-	local closeButtonSize = 64*UI.identityScale[1]
 	Discovery.Widgets.Close = UIPushButton:Create(
 		{Discovery.kUISize[1]-(closeButtonSize/2),-(closeButtonSize/2),closeButtonSize,closeButtonSize}, 
 		{

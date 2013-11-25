@@ -218,7 +218,7 @@ function HUD.Load(self)
 	self.widgets.Manipulate.flashing = false
 	
 	self.widgets.Shield = UIPushButton:Create(
-		UI:MaterialSize(self.gfx.ShieldEnabled, {0, 0}),
+		UI:MaterialSize(self.gfx.ShieldEnabled),
 		{ -- we go to disabled state when shield gets activated
 			enabled = self.gfx.ShieldEnabled,
 			disabled = self.gfx.ShieldDisabled,

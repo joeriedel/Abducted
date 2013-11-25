@@ -45,8 +45,7 @@ pak0 {
 	Objects/crushed_up_pylon1
 	Objects/podshield1
 	Objects/bugslime1
-	Objects/terminalglow1_M
-	Objects/terminalglow2_M
+	Objects/terminalflash_M
 	Objects/alien_metadata1
 	Objects/crushed_down_pylon2
 	Characters/Eve

@@ -706,8 +706,12 @@ function ReflexGame.CreateBoard(self)
 			table.insert(self.widgets.lines,current)
 			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
 			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)
-        end
-        if (v.img == "mark_end") then
+       elseif (v.img == "mark_end") then
+			local rect = b:Rect()
+			rect[3] = rect[3] * 1.75
+			rect[4] = rect[4] * 1.75
+			b:SetRect(rect)
+			self:SetPositionByGrid(b,v.x,v.y,false)
 			self.widgets.portal = b
         end
         if (string.find(b.state.archetype,"cell_") ~= nil) then

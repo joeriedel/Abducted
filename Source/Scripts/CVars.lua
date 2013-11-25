@@ -71,6 +71,8 @@ cv_r_fly = CVarBool("r_fly", false)
 cv_godmode = CVarFunc("godmode", "_cv_godmode_func")
 cv_drg = CVarFunc("drg", "_cv_debug_reflex_game")
 cv_dmg = CVarFunc("dmg", "_cv_debug_memory_game")
+cv_giveskillpoints = CVarFunc("giveskillpoints", "_cv_giveskillpoints")
+
 -------------------------------------------------------------------------------
 
 function tabstr(tabs)
@@ -195,4 +197,10 @@ end
 
 function _cv_debug_memory_game()
 	MemoryGame:DebugStart()
+end
+
+function _cv_giveskillpoints(num)
+
+	PlayerSkills:AwardSkillPoints(tonumber(num))
+
 end

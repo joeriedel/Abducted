@@ -196,6 +196,14 @@ function MainMenu.OnLocalPlayerAuthenticated(self, authenticated, changed)
 	end
 end
 
+function MainMenu.OnShowAchievements(self, show)
+
+	if (not show) then
+		MainMenu.mainPanel:SelectNone()
+	end
+
+end
+
 function MainMenu.ShowSignInMessage(self, show)
 
 	if (self.signInTimer) then
@@ -448,15 +456,16 @@ end
 
 function MainMenu.MainPanel.Continue(self, item)
 	self.busy = false
+	MainMenu.mainPanel:SelectNone()
 	
 	if (Persistence.ReadNumber(Globals, "checkpoint") == nil) then
-	
 		AlertPanel:OK("MM_CANNOT_CONTINUE_TITLE", "MM_CANNOT_CONTINUE_PROMPT", nil, MainMenu.contentRect)
 		return
 	
 	end
 	
 	local f = function(result)
+		
 		if (result == AlertPanel.kYesButton) then
 		
 			GameNetwork.LogEvent("CheckpointLoad")
@@ -505,6 +514,7 @@ end
 function MainMenu.MainPanel.Store(self, item)
 	GameNetwork.LogEvent("BrowseMMStore")
 	self.busy = false
+	self:SelectNone()
 	StoreUI:Do()
 end
 
@@ -525,11 +535,13 @@ end
 
 function MainMenu.MainPanel.Facebook(self)
 	GameNetwork.LogEvent("ClickedFacebook")
+	System.LaunchURL("http://www.facebook.com/sunsidegames")
 	self.busy = false
 end
 
 function MainMenu.MainPanel.Twitter(self)
 	GameNetwork.LogEvent("ClickedTwitter")
+	System.LaunchURL("https://twitter.com/sunsidegames")
 	self.busy = false
 end
 
@@ -713,6 +725,11 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 	end
 	
 	UI.sfx.Command:Play(kSoundChannel_UI, 0)
+end
+
+function MainMenu.MainPanel.SelectNone(self)
+	self.item = nil
+	self.widgets.selectionIndicator:ScaleTo({0,1}, {0.3, 0})
 end
 
 function MainMenu.MainPanel.Exit(self)

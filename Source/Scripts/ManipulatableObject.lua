@@ -314,10 +314,14 @@ function ManipulatableObject.OnEvent(self, cmd, args)
 		self:Attack()
 		return true
 	elseif (cmd == "idle") then
+		self.attackArgs = nil
+		self.nextAttackTime = nil
 		self:Idle()
 		return true
 	elseif (cmd == "idle_if_active") then
 		if (self.enabled) then
+			self.attackArgs = nil
+			self.nextAttackTime = nil
 			self:Idle()
 		end
 		return true
@@ -455,6 +459,8 @@ function ManipulatableObject.Sleep(self)
 	self.awake = false
 	self.enabled = false
 	self.canAttack = false
+	self.attackArgs = nil
+	self.nextAttackTime = nil
 	
 	self:RemoveFromManipulateList()
 	self:RemoveFromShootableList()
@@ -493,6 +499,8 @@ function ManipulatableObject.Awaken(self)
 	self.think = nil
 	self.awake = true
 	self.canAttack = true
+	self.attackArgs = nil
+	self.nextAttackTime = nil
 	
 	if (self.autoFace) then
 		self:SetAutoFace(World.playerPawn)
@@ -601,6 +609,15 @@ function ManipulatableObject.Attack(self)
 			World.PostEvent(self.keys.on_attack_begin)
 		end
 		
+		self:QueueNextAttack(args)
+		
+	end
+end
+
+function ManipulatableObject.QueueNextAttack(self, args)
+
+	if (self.attackArgs) then
+	
 		local min = nil
 		local max = nil
 		
@@ -619,8 +636,8 @@ function ManipulatableObject.Attack(self)
 				self.nextAttackTime = {min, min}
 			end
 		end
-		
 	end
+	
 end
 
 function ManipulatableObject.AttackFinish(self)
@@ -641,7 +658,19 @@ function ManipulatableObject.AttackFinish(self)
 		local t = FloatRand(self.nextAttackTime[1], self.nextAttackTime[2])
 		COutLine(kC_Debug, "ManipulatableObject: attacking again in %f seconds", t)
 		self:SetNextThink(t)
+	end
+end
+
+function ManipulatableObject.ContinueAttack(self)
+	if (self.nextAttackTime) then
+		COutLine(kC_Debug, "ManipulatableObject.ContinueAttack(continuing)")
+		self.think = ManipulatableObject.Attack
+		local t = FloatRand(self.nextAttackTime[1], self.nextAttackTime[2])
+		COutLine(kC_Debug, "ManipulatableObject: attacking again in %f seconds", t)
+		self:SetNextThink(t)
 		self.nextAttackTime = nil
+	else
+		COutLine(kC_Debug, "ManipulatableObject.ContinueAttack(ignored, not attacking right now)")
 	end
 end
 
@@ -652,6 +681,7 @@ function ManipulatableObject.Pain(self)
 	
 	local f = function()
 		self:Idle()
+		self:ContinueAttack()
 		if (self.keys.on_shot) then
 			World.PostEvent(self.keys.on_shot)
 		end
@@ -1116,6 +1146,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 	self.manipulate = objDir
 	self.canAttack = false
 	self.enabled = false
+	self.think = nil
 	self:PlayAnim(state, self.model).Seq(f).Seq(idle)
 	self:SetAutoFace(nil)
 	
@@ -1169,6 +1200,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 					end
 					if (not self.disabledFromReset) then
 						self:Idle()
+						self:ContinueAttack()
 					end
 				end
 				blend.Seq(f)
@@ -1178,6 +1210,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 					World.PostEvent(self.keys.post_reset)
 				end
 				self:Idle()
+				self:ContinueAttack()
 			end
 			
 			-- manipulatable again

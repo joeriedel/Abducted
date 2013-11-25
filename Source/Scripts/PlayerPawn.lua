@@ -1078,7 +1078,7 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 			self:PlaySoundGroup(PlayerPawn.PainSounds, 1)
 			return
 		end
-	elseif (PlayerSkills.Defender > 0) then
+	elseif ((PlayerSkills.Defender > 0) and (PlayerSkills:ShieldUnlocked())) then
 		-- Auto activate shield defense
 		local cd = PlayerSkills:ShieldAutoActivateCooldown()
 		local elapsed = GameDB.realTime - self.shieldAutoActivateTime

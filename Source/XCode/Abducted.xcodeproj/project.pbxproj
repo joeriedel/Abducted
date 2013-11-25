@@ -118,6 +118,11 @@
 		339BA57B163656D50017FD79 /* G_Exports.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06231626689800F8C9FF /* G_Exports.cpp */; };
 		339BA57C163656D50017FD79 /* G_PlayerPawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06251626689800F8C9FF /* G_PlayerPawn.cpp */; };
 		339BA57D163656D50017FD79 /* G_ViewController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06271626689800F8C9FF /* G_ViewController.cpp */; };
+		33A42EF818437563006A65F5 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33A42EF718437563006A65F5 /* MediaPlayer.framework */; };
+		33A42F1418437575006A65F5 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33A42EF718437563006A65F5 /* MediaPlayer.framework */; };
+		33A42F16184379D1006A65F5 /* ep2teasertest.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
+		33A42F171843A01C006A65F5 /* ep2teasertest.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
+		33A42F1F1843A8F0006A65F5 /* ep2teasertest.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
 		33B55A541710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
 		33B55A551710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
 		33B55A561710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
@@ -420,6 +425,7 @@
 			dstPath = Base;
 			dstSubfolderSpec = 6;
 			files = (
+				33A42F16184379D1006A65F5 /* ep2teasertest.mp4 in CopyFiles */,
 				33956AA116FBD677008314CD /* manifest.pak in CopyFiles */,
 				33956AA216FBD677008314CD /* pak0.pak in CopyFiles */,
 			);
@@ -445,6 +451,7 @@
 			dstPath = Base;
 			dstSubfolderSpec = 6;
 			files = (
+				33A42F1F1843A8F0006A65F5 /* ep2teasertest.mp4 in CopyFiles */,
 				3397729116E9D61F0046535B /* manifest.pak in CopyFiles */,
 				3397729216E9D61F0046535B /* pak0.pak in CopyFiles */,
 			);
@@ -484,6 +491,8 @@
 		33982E8A16B2554F00C2ED49 /* G_TouchTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_TouchTrigger.cpp; sourceTree = "<group>"; };
 		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
 		33986C7118395CCD00142AA5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
+		33A42EF718437563006A65F5 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/MediaPlayer.framework; sourceTree = DEVELOPER_DIR; };
+		33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = ep2teasertest.mp4; path = ../../Base/ep2teasertest.mp4; sourceTree = "<group>"; };
 		33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_ManipulatableObject.cpp; sourceTree = "<group>"; };
 		33B55A531710CB2300F8C70B /* G_ManipulatableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_ManipulatableObject.h; sourceTree = "<group>"; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -629,6 +638,7 @@
 				3380F7ED183CD0ED0073F0D8 /* OpenGLES.framework in Frameworks */,
 				3380F7EE183CD0F60073F0D8 /* QuartzCore.framework in Frameworks */,
 				3380F7EF183CD0FE0073F0D8 /* UIKit.framework in Frameworks */,
+				33A42F1418437575006A65F5 /* MediaPlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,6 +667,7 @@
 				3380F7D6183CCF020073F0D8 /* SystemConfiguration.framework in Frameworks */,
 				3380F7D8183CCFDB0073F0D8 /* AudioToolbox.framework in Frameworks */,
 				3380F7DA183CCFE90073F0D8 /* UIKit.framework in Frameworks */,
+				33A42EF818437563006A65F5 /* MediaPlayer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -790,6 +801,7 @@
 		33EC04EF162663FC00F8C9FF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				33A42EF718437563006A65F5 /* MediaPlayer.framework */,
 				3380F812184196F00073F0D8 /* StoreKit.framework */,
 				3380F7E7183CD0BA0073F0D8 /* CoreFoundation.framework */,
 				3380F7E5183CD0500073F0D8 /* CoreGraphics.framework */,
@@ -1020,6 +1032,7 @@
 		33FA822416353382002603A5 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */,
 				3397728F16E9D61F0046535B /* manifest.pak */,
 				3397729016E9D61F0046535B /* pak0.pak */,
 				33FED209183AE5F700E2943B /* Default-Landscape-568h@2x.png */,
@@ -1479,6 +1492,7 @@
 				33FED20E183AE5F700E2943B /* Default-Landscape.png in Resources */,
 				33FA817E1635193A002603A5 /* ViewController_iPhone.xib in Resources */,
 				33FED20C183AE5F700E2943B /* Default-Landscape-568h@2x.png in Resources */,
+				33A42F171843A01C006A65F5 /* ep2teasertest.mp4 in Resources */,
 				33FA8223163532A4002603A5 /* Icon.png in Resources */,
 				33FA8226163533C5002603A5 /* Icon-114.png in Resources */,
 				33FA822E1635344D002603A5 /* Icon-72.png in Resources */,

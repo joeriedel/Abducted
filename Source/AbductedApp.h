@@ -36,7 +36,7 @@ private:
 	virtual RAD_DECLARE_GET(website, const char*);
 	virtual RAD_DECLARE_GET(flurryAPIKey, const char*);
 
-#if defined(RAD_TARGET_GOLDEN) || defined(RAD_OPT_IOS)
+#if !defined(RAD_OPT_PC_TOOLS)
 	virtual RAD_DECLARE_GET(game, Game*) { return m_game.get(); }
 	bool RunAutoExec();
 	Game::Ref m_game;

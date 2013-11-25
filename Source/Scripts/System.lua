@@ -425,3 +425,9 @@ function World.SaveGameState()
 		Game.entity:SaveCheckpoint()
 	end
 end
+
+function World.MovieFinished()
+	if (Game.entity and Game.entity.OnMovieFinished) then
+		Game.entity:OnMovieFinished()
+	end
+end

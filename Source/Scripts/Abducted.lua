@@ -652,6 +652,38 @@ function Abducted.UnlockTopic(self, name, silent)
 	Arm:UnlockTopic(name, nil, silent)
 end
 
+function Abducted.EndEpisode(self, num)
+
+	-- we never come back from this
+
+	Persistence.WriteNumber(Session, "endOfEpisode", num)
+	Persistence.WriteBool(Session, "loadCheckpoint", false)
+	Session:Save()
+	
+	self.eatInput = true
+	self.showCheckpointNotification = false
+	self:SaveCheckpoint()
+	
+	UI:BlendTo({1,1,1,1}, 1)
+	World.SoundFadeMasterVolume(0, 1)
+	
+	local f = function()
+		System.PlayFullscreenMovie("ep2teasertest.mp4")
+	end
+
+	World.globalTimers:Add(f, 1)
+end
+
+function Abducted.OnMovieFinished()
+
+	UI:BlendTo({0,0,0,1}, 1)
+	
+	local f = function()
+		World.RequestLoad("UI/mainmenu", kUnloadDisposition_Slot)
+	end
+	World.globalTimers:Add(f, 1)
+end
+
 function Abducted.Think(self, dt)
 	Game.Think(self, dt)
 	

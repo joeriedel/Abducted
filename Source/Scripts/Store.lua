@@ -306,12 +306,13 @@ function Store.LoadProducts()
 	
 		local id = Persistence.ReadString(Session, "store/productId", nil, i)
 		local price = Persistence.ReadString(Session, "store/productPrice", nil, i)
-		local onSale = Persistence.ReadBool(Session, "store/productOnSale", nil, i)
+		local onSale = Persistence.ReadString(Session, "store/productOnSale", nil, i)
 		
 		local product = Store.ProductsById[id]
 		if (product) then
 			product.Price = price
 			product.onSale = onSale
+			product.State = Store.kProductState_Available
 		end
 	
 		table.insert(Store.validProducts, id)

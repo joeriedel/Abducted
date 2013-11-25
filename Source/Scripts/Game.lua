@@ -187,6 +187,9 @@ function Game.OnEvent(self, cmd, args)
 			Achievements:Award(args)
 			return true
 		end
+	elseif (cmd == "endep1") then
+		Abducted.entity:EndEpisode(1)
+		return true
 	end
 end
 

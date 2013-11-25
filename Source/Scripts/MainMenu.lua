@@ -56,6 +56,10 @@ function MainMenu.Load(self)
 	self.typefaces.Gold = World.Load("UI/MMGold_TF")
 	self.typefaces.Copyright = World.Load("UI/Copyright_TF")
 	
+	self.endOfEpisode = Persistence.ReadNumber(Session, "endOfEpisode")
+	Persistence.DeleteKey(Session, "endOfEpisode")
+	Session:Save()
+	
 end
 
 function MainMenu.InitUI(self)
@@ -151,9 +155,12 @@ function MainMenu.InitUI(self)
 	local f = function()
 		self.widgets.logo:BlendTo({1,1,1,1}, 3)
 		local f = function()
-			local f = function()	
+			local f = function()
+				self.episodePrompt = self.endOfEpisode
 				if (self.signInPending) then
 					self:ShowSignInMessage(true)
+				else
+					self:CheckBuyEpisodePrompt()
 				end
 				local f = function()
 					self.widgets.copyright:BlendTo({1,1,1,1}, 0.3)
@@ -187,6 +194,43 @@ function MainMenu.SignIn(self)
 	
 	end
 
+end
+
+function MainMenu.CheckBuyEpisodePrompt(self)
+	if (not (StoreUI.initialized and StoreUI.productWidgets)) then
+		return
+	end
+	
+	if (self.episodePrompt) then
+		local nextEpisode = self.episodePrompt+1
+		local productId = "ABEP"..nextEpisode
+		local product = Store.ProductsById[productId]
+		if (product) then
+			if (product.State ~= Store.kProductState_Hidden) then
+				if (Store.purchases[product.Id] == nil) then
+					local title = StringTable.Get("STORE_EP"..tostring(nextEpisode).."_PREORDER_PROMPT_TITLE")
+					local text = nil
+					if (product.onSale) then
+						text = StringTable.Get("STORE_EP"..tostring(nextEpisode).."_PREORDER_PROMPT_TEXT2"):format(product.onSale)
+					else
+						text = StringTable.Get("STORE_EP"..tostring(nextEpisode).."_PREORDER_PROMPT_TEXT")
+					end
+					AlertPanel:YesNo(
+						title,
+						text,
+						function (result)
+							if (result == AlertPanel.kYesButton) then
+								GameNetwork.LogEvent("BrowseMMStorePreorderEP"..tostring(nextEpisode))
+								StoreUI:Do()
+							end
+						end,
+						nil,
+						false
+					)
+				end
+			end
+		end
+	end
 end
 
 function MainMenu.OnLocalPlayerAuthenticated(self, authenticated, changed)
@@ -227,6 +271,7 @@ function MainMenu.ShowSignInMessage(self, show)
 		Game.entity.eatInput = false
 		self.widgets.signInBkg:BlendTo({1,1,1,0}, 0.5)
 		self.widgets.signInText:BlendTo({1,1,1,0}, 0.5)
+		self:CheckBuyEpisodePrompt()
 	end
 
 end

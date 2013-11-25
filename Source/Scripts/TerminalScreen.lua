@@ -803,7 +803,8 @@ function TerminalScreen.SaveState(self)
 		downgraded = tostring(self.downgraded),
 		failcount = tostring(self.failcount),
 		success = tostring(self.success),
-		enabled = tostring(self.enabled)
+		enabled = tostring(self.enabled),
+		visible = tostring(self.visible)
 	}
 		
 	return state
@@ -818,7 +819,10 @@ function TerminalScreen.LoadState(self, state)
 	self.failcount = tonumber(self.failcount)
 	self.success = state.success == "true"
 	self.enabled = state.enabled == "true"
+	self.visible = state.visible == "true"
 	self.state = "none"
+	
+	self.model.dm:SetVisible(self.visible)
 	
 	if (self.size == "big") then
 		self.model:BlendImmediate("grown")

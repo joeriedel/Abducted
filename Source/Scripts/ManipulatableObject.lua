@@ -1220,6 +1220,7 @@ function ManipulatableObject.Manipulate(self, objDir, playerDir, canReset)
 		World.gameTimers:Add(f, self.manipulateWindow)
 	else
 		-- object is not going to reset
+		self.nextAttackTime = nil
 		self.saveManipulateDir = objDir
 		World.viewController:RemoveLookTarget(self.manipulateTarget)
 		
@@ -1333,6 +1334,14 @@ function ManipulatableObject.SaveState(self)
 	if (self.saveManipulateDir) then
 		state.manipulate = self.saveManipulateDir
 	end
+	
+	if (self.nextAttackTime) then
+		state.nextAttackTime = tostring(self.nextAttackTime)
+	end
+	
+	if (self.attackArgs) then
+		state.attackArgs = self.attackArgs
+	end
 
 	return state
 end
@@ -1350,6 +1359,7 @@ function ManipulatableObject.LoadState(self, state)
 	
 	self.enableManipulateShimmer = state.enableManipulateShimmer == "true"
 	self.didManipulateShimmer = state.didManipulateShimmer == "true"
+	self.nextAttackTime = nil
 	
 	if (state.awake == "true") then
 		self.awake = true
@@ -1389,9 +1399,12 @@ function ManipulatableObject.LoadState(self, state)
 			self.enabled = true
 			self.canAttack = true
 			self.disabledFromReset = false
+			self.nextAttackTime = state.nextAttackTime
+			self.attackArgs = state.attackArgs
 			self:PlayAnim("idle", self.model)
 			self:AddToManipulateList()
 			self:AddToShootableList()
+			self:ContinueAttack()
 			if (self.cameraFocus) then
 				local fov = NumberForString(self.keys.camera_focus_fov, 10)
 				if (fov <= 0) then

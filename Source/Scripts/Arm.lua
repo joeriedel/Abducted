@@ -388,7 +388,12 @@ end
 
 function Arm.DatabasePressed(widget)
 	Arm:ClearButtonHighlights(widget)
-	Arm:SwitchMode("db")
+	if (Arm.mode ~= "db") then
+		Arm:SwitchMode("db")
+	else
+		-- cycle tabs
+		Arm:DBTabPressed()
+	end
 end
 
 function Arm.TalkPressed(widget)

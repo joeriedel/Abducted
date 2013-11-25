@@ -31,7 +31,7 @@ function Arm.SpawnDB(self)
 	
 	rect = {0,39,198,576}--UI:MaterialSize(self.gfx.CharTab)
 	local scale = self.dbRootWorkspaceSize[4] / rect[4]
-	rect[4] = self.dbRootWorkspaceSize[4]
+	rect[4] = self.dbRootWorkspaceSize[4]-39
 	rect[3] = rect[3] * scale
 	
 	self.widgets.db.Tab = UIPushButton:Create(

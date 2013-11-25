@@ -128,11 +128,16 @@ function MemoryGame.RestartGameState(self)
 	end
 		
 	-- define structure: self.state
+	local timeLeft = MemoryGame.kLevelTime -- don't reset time
+	if (self.state) then
+		timeLeft = self.state.timeLeft
+	end
+	
     self.state = {}    
     self.state.gameOver = false
     self.state.gameOverTimer = 2
     self.state.victory = false
-    self.state.timeLeft = MemoryGame.kLevelTime
+    self.state.timeLeft = timeLeft
     self.state.phase = kMGPhase_AnimateOpening
     self.state.phaseTimer = 2
     self.state.phaseShuffles = self.PHASE1_BOARD_SHUFFLE_MAX
@@ -175,6 +180,7 @@ end
 function MemoryGame.EndGame(self, result)
 	self = MemoryGame.entity
 	self.think = nil
+	self.state = nil
 	self.exiting = true
 	
 	self.sfx.Calculating:FadeOutAndStop(1)

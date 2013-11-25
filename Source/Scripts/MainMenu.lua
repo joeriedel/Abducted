@@ -391,6 +391,7 @@ function MainMenu.MainPanel.CreateMMText(self, data, item)
 	end
 	
 	local w = UI:CreateWidget("TextLabel", {rect={0, 0, 8, 8}, typeface=MainMenu.typefaces.Normal, OnInputEvent=OnInputEvent})
+	w.text = text
 	UI:SetLabelText(w, text)
 	UI:SizeLabelToContents(w)
 	
@@ -699,6 +700,8 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 	
 	if (self.item) then
 		-- move selection bar to the selected item
+		self.item.w:SetTypeface(MainMenu.typefaces.Normal)
+		UI:SetLabelText(self.item.w, self.item.w.text)
 		
 		local itemRect = item.w:Rect()
 		local time = 0.12
@@ -710,9 +713,12 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 		end
 		
 		self.item = item
-		
+		self.item.w:SetTypeface(MainMenu.typefaces.Gold)
+		UI:SetLabelText(self.item.w, self.item.w.text)
 	else
 		self.item = item
+		self.item.w:SetTypeface(MainMenu.typefaces.Gold)
+		UI:SetLabelText(self.item.w, self.item.w.text)
 		
 		self.widgets.selectionIndicator:SetVisible(true)
 		self.widgets.selectionIndicator:SetRect(rect)
@@ -728,6 +734,11 @@ function MainMenu.MainPanel.SelectItem(self, item, onComplete)
 end
 
 function MainMenu.MainPanel.SelectNone(self)
+	if (self.item) then
+		self.item.w:SetTypeface(MainMenu.typefaces.Normal)
+		UI:SetLabelText(self.item.w, self.item.w.text)
+	end
+	
 	self.item = nil
 	self.widgets.selectionIndicator:ScaleTo({0,1}, {0.3, 0})
 end

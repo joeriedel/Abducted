@@ -80,6 +80,9 @@ PlayerPawn.AnimationStates = {
 		manipulate_down = "limpmandown",
 		pulse_idle = "limpmanidle",
 		pulse_fire = "limpmanup",
+		pulse_overload1 = "limp_pulse_overload1",
+		pulse_overload2 = "limp_pulse_overload2",
+		pulse_overload3 = "limp_pulse_overload3",
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
@@ -104,6 +107,9 @@ PlayerPawn.AnimationStates = {
 		manipulate_down = "limpmandown",
 		pulse_idle = "limpmanidle",
 		pulse_fire = "limpmanup",
+		pulse_overload1 = "limp_pulse_overload1",
+		pulse_overload2 = "limp_pulse_overload2",
+		pulse_overload3 = "limp_pulse_overload3",
 		arm_default_flyin = "arm_limp_flyin",
 		arm_default_flyout = "arm_limp_flyout",
 		arm_pose_standing = "arm_pose_limp",
@@ -1243,6 +1249,10 @@ function PlayerPawn.PlayAnimSounds(self, anim)
 	elseif (anim == "limp_dropdown_med") then
 		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
 	elseif (anim == "limp_dropdown_low") then
+		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	elseif (anim == "limp_ship_crawldown2") then
+		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	elseif (anim == "limp_ship_crawldown3") then
 		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
 	end
 end

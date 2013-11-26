@@ -463,7 +463,7 @@ Arm.Discoveries = {
 		chat = "Skin"
 	},
 	
-	SleepingTentacle = {
+	--[[SleepingTentacle = {
 		picture = "UI/discovery_sleeping_tentacle_M",
 		title = "ARM_DISCOVERY_SLEEPING_TENTACLE_TITLE",
 		text = "ARM_DISCOVERY_SLEEPING_TENTACLE",
@@ -471,7 +471,7 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_SLEEPING_TENTACLE"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_SLEEPING_TENTACLE_POPUP"
-	},
+	},]]
 	
 	Tentacles = {
 		picture = "UI/discovery_tentacles_M",
@@ -482,6 +482,17 @@ Arm.Discoveries = {
 		},
 		discoveryPopupText = "ARM_DISCOVERY_TENTACLES_POPUP",
 		chat = "Tentacles"
+	},
+	
+	RogueTentacles = {
+		picture = "UI/discovery_rogue_tentacles_M",
+		title = "ARM_DISCOVERY_ROGUE_TENTACLES_TITLE",
+		text = "ARM_DISCOVERY_ROGUE_TENTACLES",
+		logText = {
+			all = "ARM_DISCOVERY_ROGUE_TENTACLES_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_ROGUE_TENTACLES_POPUP",
+		chat = "RogueTentacles"
 	},
 	
 	Terminals = {

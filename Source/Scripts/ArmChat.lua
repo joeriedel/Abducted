@@ -276,7 +276,7 @@ function Arm.ProcessActionTokens(self, tokens)
 			self.rewardDiscover = self.rewardDiscover or {}
 			table.insert(self.rewardDiscover, tokens[2])
 			self.rewardSkillPoints = self.rewardSkillPoints or 0
-			self.rewardSkillPoints = self.rewardSkillPoints + Arm:GetSkillAwardAmount("x1", "arm")
+			self.rewardSkillPoints = self.rewardSkillPoints + PlayerSkills.kDiscoveryReward
 		end
 	elseif (tokens[1] == "clear_topic") then
 		self.requiredTopic = nil
@@ -389,7 +389,7 @@ end
 
 function Arm.CreateRewardText(self)
 
-	if (not (self.rewardTopic or self.rewardMessage or self.rewardSkillpoints or self.rewardSkill or self.rewardDiscover)) then
+	if (not (self.rewardTopic or self.rewardMessage or self.rewardSkillPoints or self.rewardSkill or self.rewardDiscover)) then
 		return nil
 	end
 	

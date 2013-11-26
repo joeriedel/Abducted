@@ -237,11 +237,11 @@ function Arm.SetTopicFlags(self, name, topic)
 end
 
 function Arm.CheckTopicReward(self, topic, type)
-	return Persistence.ReadBool(SaveGame, "armTopicRewards", false, name, type)
+	return Persistence.ReadBool(SaveGame, "armTopicRewards", false, topic.name, type)
 end
 
 function Arm.SaveTopicReward(self, topic, type)
-	Persistence.WriteBool(SaveGame, "armTopicRewards", true, name, type)
+	Persistence.WriteBool(SaveGame, "armTopicRewards", true, topic.name, type)
 end
 
 function Arm.AddAvailableChats(self, db, flags)

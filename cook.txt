@@ -153,6 +153,7 @@ pak0 {
 	UI/discovery_pod_M
 	UI/discovery_terminals_M
 	UI/discovery_tentacles_M
+	UI/discovery_rogue_tentacles_M
 	UI/discovery_acheron_M
 	UI/discovery_block_creature_M
 	UI/discovery_bug_holes_M

@@ -1324,7 +1324,7 @@ function MemoryGame.Think(self,dt)
 					"solve"
 				)
 			end
-			World.globalTimers:Add(f, 1)
+			World.globalTimers:Add(f, 0.5)
 		else
 			ReflexGame.entity.sfx.Fail:Play(kSoundChannel_UI, 0)
 			if (self.state.timeLeft > 0) then
@@ -1339,12 +1339,12 @@ function MemoryGame.Think(self,dt)
 						end
 					)
 				end
-				World.globalTimers:Add(f, 1)
+				World.globalTimers:Add(f, 0.5)
 			else
 				local f = function()
 					self:DoQuit()
 				end
-				World.globalTimers:Add(f, 1)
+				World.globalTimers:Add(f, 0.5)
 			end
 		end
 		return

@@ -11,10 +11,10 @@ PlayerSkills.kPulseBaseDamageRadius = 80
 PlayerSkills.kPulseBaseDamage = 120
 PlayerSkills.kPulseExplodeTime = {10, 12}
 PlayerSkills.kArmChatReward = 15
-PlayerSkills.kDiscoveryReward = 25
+PlayerSkills.kDiscoveryReward = 50
 PlayerSkills.kTerminalReward = 150
 PlayerSkills.kGlyphReward = 25
-PlayerSkills.kAchievementReward = 25
+PlayerSkills.kAchievementReward = 50
 
 PlayerSkills.Skills = {}
 

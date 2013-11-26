@@ -130,11 +130,11 @@ function ReflexGame.LoadLevels(self)
 	self.db.levels = { }    
 	
 	self.db.levels = {  
-		{ self:CreateLevel1x1(), self:CreateLevel1x2(), self:CreateLevel1x3(), self:CreateLevel1x4() },
-		{ self:CreateLevel2x1(), self:CreateLevel2x2(), self:CreateLevel2x3(), self:CreateLevel2x4() },
-		{ self:CreateLevel3x1(), self:CreateLevel3x2(), self:CreateLevel3x3(), self:CreateLevel3x4() },
+		{ self:CreateLevel1x1() },
+		{ self:CreateLevel2x1(), self:CreateLevel2x2(), self:CreateLevel2x3() },
+		{ self:CreateLevel3x1(), self:CreateLevel3x2(), self:CreateLevel3x3() },
 		{ self:CreateLevel4x1(), self:CreateLevel4x2(), self:CreateLevel4x3(), self:CreateLevel4x4() }
-		}
+	}
 end
 
 function ReflexGame.OnInputEvent(self,e)

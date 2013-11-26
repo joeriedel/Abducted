@@ -278,7 +278,7 @@ function PlayerInput.TapWaypoint(self, x, y, radius)
 	-- closest candidate waypoint are removed from consideration.
 	--
 	-- ZERO means no points are ever dropped.
-	local waypoint = World.PickWaypoint(x, y,  radius, 0) -- NOTE: does per-waypoint waypoint->camera line trace
+	local waypoint = World.PickWaypoint(x, y,  radius*UI.invScreenUIScale[1], 0) -- NOTE: does per-waypoint waypoint->camera line trace
 	if (waypoint) then
 		COutLine(kC_Debug, "Found a waypoint to move to...")
 		local targetFloorPos = World.WaypointFloorPosition(waypoint)

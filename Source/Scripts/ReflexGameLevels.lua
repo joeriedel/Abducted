@@ -52,18 +52,6 @@ function ReflexGame.CreateLevel1x1(self)
 	return level
 end
 
-function ReflexGame.CreateLevel1x2(self)
-	return self:CreateLevel1x1()
-end
-
-function ReflexGame.CreateLevel1x3(self)
-	return self:CreateLevel1x1()
-end
-
-function ReflexGame.CreateLevel1x4(self)
-	return self:CreateLevel1x1()
-end
-
 ------- level 2's
 
 function ReflexGame.CreateLevel2x1(self)
@@ -253,10 +241,6 @@ function ReflexGame.CreateLevel2x3(self)
 		, { x=13, y=8, img="blocker_green" }
 		}
 	return level
-end
-
-function ReflexGame.CreateLevel2x4(self)
-	return self:CreateLevel2x1()
 end
 
 ------- level 3's
@@ -475,10 +459,6 @@ function ReflexGame.CreateLevel3x3(self)
 		, { x=9, y=8, img="blocker_green" }
 		}
 	return level
-end
-
-function ReflexGame.CreateLevel3x4(self)
-	return self:CreateLevel3x1()
 end
 
 ------- level 4's

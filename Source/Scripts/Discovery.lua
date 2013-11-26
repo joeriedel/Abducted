@@ -611,20 +611,22 @@ function Discovery.StaticInit()
 	local bounds = 0.025
 	
 	Discovery.ScreenBounds = {
-		bounds * UI.screenWidth,
-		bounds * UI.screenHeight,
-		UI.screenWidth - (bounds * UI.screenWidth * 2),
-		UI.screenHeight - (bounds * UI.screenHeight * 2)
+		bounds * UI.screenWidth + (closeButtonSize/2),
+		bounds * UI.screenHeight + (closeButtonSize/2),
+		UI.screenWidth - (bounds * UI.screenWidth * 2) - (closeButtonSize/2),
+		UI.screenHeight - (bounds * UI.screenHeight * 2) - (closeButtonSize/2)
 	}
 	
 	if (UI.mode == kGameUIMode_Mobile) then
 		local armButtonRect = HUD.widgets.Arm:Rect()
-		Discovery.kUISize[2] = Min(Discovery.kUISize[2], UI.screenHeight - armButtonRect[2] - armButtonRect[4])
+		Discovery.kUISize[2] = Min(Discovery.kUISize[2], UI.screenHeight - armButtonRect[2] - armButtonRect[4] - (closeButtonSize/2))
 		
 		local actionButtonSize = UI:MaterialSize(HUD.gfx.ShieldEnabled)
-		local leftEdge = UI.screenWidth - HUD.mobileInset - actionButtonSize[3] - (closeButtonSize/2) - 8
+		local rightEdge = UI.screenWidth - HUD.mobileInset - actionButtonSize[3] - (closeButtonSize/2) - 8
 		
-		Discovery.ScreenBounds[3] = leftEdge - Discovery.ScreenBounds[1]
+		Discovery.ScreenBounds[1] = armButtonRect[1] + armButtonRect[3] + (closeButtonSize/2)
+		Discovery.ScreenBounds[3] = rightEdge - Discovery.ScreenBounds[1]
+		Discovery.ScreenBounds[4] = UI.screenHeight - (bounds * UI.screenHeight) - Discovery.ScreenBounds[2]
 	end
 	
 	Discovery.kUIBorder = Discovery.kUIBorder * UI.identityScale[1]

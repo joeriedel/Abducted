@@ -257,6 +257,8 @@ pak0 {
 	UI/terminal_screen1_M
 	UI/distortion_pattern1_M
 	UI/blue_blank1_M
+	UI/DownloadingBar_M
+	UI/data_download1_M
 
 	UI/power_bubble_M
 	UI/power_bubble_disabled_M
@@ -565,6 +567,9 @@ pak0 {
 	Audio/PFX_TentacleStrikeDeath2
 	Audio/PFX_TentacleStrikeDeath3
 	Audio/EFX_TenticleHit1-BodyHit
+	Audio/EFX_TenticleHit1-HardSurface2_rev1
+	Audio/TentacleEnter
+
 	Audio/EnviroFX_PylonEnd
 	Audio/EnviroFX_PylonMoving
 

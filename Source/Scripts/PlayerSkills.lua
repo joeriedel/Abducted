@@ -995,6 +995,14 @@ function PlayerSkills.ArmUnlocked(self)
 	return self.armUnlocked
 end
 
+function PlayerSkills.LockArm(self)
+	if (self.armUnlocked or PlayerSkills.DebugAllAbilitiesEnabled) then
+		self.armUnlocked = false
+		Persistence.WriteBool(SaveGame, "armUnlocked", false)
+		HUD:AnimateLock({arm=true})
+	end
+end
+
 function PlayerSkills.UnlockArm(self)
 	if (not (self.armUnlocked or PlayerSkills.DebugAllAbilitiesEnabled)) then
 		self.armUnlocked = true

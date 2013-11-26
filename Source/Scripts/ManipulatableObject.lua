@@ -258,7 +258,7 @@ function ManipulatableObject.LoadSounds(self)
 	
 	if (self.keys.manipulate_sound) then
 		self.sounds.Manipulate = World.LoadSound(self.keys.manipulate_sound)
-		if (self.keys.loop_manipulate_sound) then
+		if (BoolForString(self.keys.loop_manipulate_sound, false)) then
 			self.sounds.Manipulate:SetLoop(true)
 		end
 	end
@@ -273,7 +273,7 @@ function ManipulatableObject.LoadSounds(self)
 			self.sounds.Reset = self.sounds.Manipulate
 		else
 			self.sounds.Reset = World.LoadSound(self.keys.reset_sound)
-			if (self.keys.loop_manipulate_sound) then
+			if (BoolForString(self.keys.loop_manipulate_sound, false)) then
 				self.sounds.Reset:SetLoop(true)
 			end
 		end
@@ -461,6 +461,14 @@ function ManipulatableObject.Sleep(self)
 	self.canAttack = false
 	self.attackArgs = nil
 	self.nextAttackTime = nil
+	self:EnableTouch(false)
+	
+	if (self.sounds.Manipulate) then 
+		self.sounds.Manipulate:FadeOutAndStop(1)
+	end
+	if (self.sounds.ManipulateEnd) then
+		self.sounds.ManipulateEnd:FadeOutAndStop(1)
+	end
 	
 	self:RemoveFromManipulateList()
 	self:RemoveFromShootableList()
@@ -552,6 +560,13 @@ function ManipulatableObject.Idle(self)
 	end
 	if (self.sounds.Dormant) then
 		self.sounds.Dormant:FadeOutAndStop(1)
+	end
+	
+	if (self.sounds.Manipulate) then
+		self.sounds.Manipulate:FadeOutAndStop(1)
+	end
+	if (self.sounds.ManipulateEnd) then
+		self.sounds.ManipulateEnd:FadeOutAndStop(1)
 	end
 	
 	if (self.autoFace) then
@@ -687,7 +702,12 @@ function ManipulatableObject.Pain(self)
 		end
 	end
 	
-	self:PlayAnim("pain", self.model).Seq(f)
+	local blend = self:PlayAnim("pain", self.model)
+	if (blend) then
+		blend.Seq(f)
+	else
+		f()
+	end
 	self:EnableTouch(false)
 
 end

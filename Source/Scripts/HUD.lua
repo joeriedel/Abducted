@@ -86,6 +86,11 @@ function HUD.SetVisible(self, visible)
 	self.widgets.Root:SetVisible(visible)
 	UI.widgets.discoveries.Root:SetVisible(visible)
 	UI.widgets.hudprint.Root:SetVisible(visible)
+	
+	local showDownloadBar = visible and self.downloadBarVisible
+	self.widgets.Downloading.label:SetVisible(showDownloadBar)
+	self.widgets.Downloading.icon:SetVisible(showDownloadBar)
+	self.widgets.Downloading.bar:SetVisible(showDownloadBar)
 end
 
 function HUD.Load(self)
@@ -149,6 +154,8 @@ function HUD.Load(self)
 	
 	self.gfx.ArmActivity = "UI/arm_activity_M"
 	self.gfx.ArmSignaled = "UI/arm_signaled_M"
+	self.gfx.DownloadingBar = "UI/DownloadingBar_M"
+	self.gfx.DownloadingIcon = "UI/data_download1_M"
 	
 	map(self.gfx, World.Load)
 	
@@ -298,21 +305,6 @@ function HUD.Load(self)
 		self.widgets.Root
 	)
 
---[[
-    self.widgets.MemoryGame = UIPushButton:Create(
-        UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
-        { -- we go to disabled state when pulse is fired
-            enabled = self.gfx.PulseEnabled,
-            disabled = self.gfx.PulseDisabled,
-            pressed = self.gfx.PulseDisabled
-        },
-        nil,
-        {pressed=function (widget) HUD:MemoryGamePressed(widget) end},
-        nil,
-        self.widgets.Root
-    )
-]]--
-
 	self.widgets.PulseCharging = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.PulseEnabled})
 	self.widgets.Root:AddChild(self.widgets.PulseCharging)
 	self.widgets.PulseCharging:SetDrawMode(kMaterialWidgetDrawMode_Circle)
@@ -385,6 +377,22 @@ function HUD.Load(self)
 	self.widgets.Root:AddChild(self.widgets.ManipulateShimmer)
 	self.widgets.Root:AddChild(self.widgets.ShieldShimmer)
 	self.widgets.Root:AddChild(self.widgets.PulseShimmer)
+	
+	self.downloadBarVisible = false
+	local downloadingTF = World.Load("UI/Downloading_TF")
+	self.widgets.Downloading = {}
+	self.widgets.Downloading.label = UI:CreateWidget("TextLabel", {rect={0,0,8,8}, typeface=downloadingTF})
+	self.widgets.Root:AddChild(self.widgets.Downloading.label)
+	self.widgets.Downloading.icon = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=World.Load("UI/data_download1_M")})
+	self.widgets.Root:AddChild(self.widgets.Downloading.icon)
+	self.widgets.Downloading.bar = UI:CreateWidget("MatWidget", {rect={0,0,8,8}, material=World.Load("UI/DownloadingBar_M")})
+	self.widgets.Root:AddChild(self.widgets.Downloading.bar)
+	
+	self.widgets.Downloading.label:SetVisible(false)
+	self.widgets.Downloading.icon:SetVisible(false)
+	self.widgets.Downloading.bar:SetVisible(false)
+	self.widgets.Downloading.bar:SetHAlign(kHorizontalAlign_Left)
+	
 end
 
 function HUD.FlushInput(self)
@@ -449,6 +457,91 @@ end
 function HUD.RapidPulsePressed(self)
 	COutLine(kC_Debug, "Rapid Pulse Pressed!")
 	Game.entity:RapidPulse()
+end
+
+function HUD.DoDownloadBar(self, time)
+
+	-- lay out the bar
+	local width = UI.screenWidth * 0.5
+	
+	UI:SetLabelText(self.widgets.Downloading.label, StringTable.Get("HUD_DOWNLOADING"), UI.identityScale)
+	UI:SizeLabelToContents(self.widgets.Downloading.label)
+	UI:VAlignLabelTop(self.widgets.Downloading.label, 0, 24*UI.identityScale[2])
+	local textRect = UI:HCenterLabel(self.widgets.Downloading.label, UI.fullscreenRect)
+	
+	-- downloading bar goes next
+	local barHeight = 21*UI.identityScale[2]
+	local barRect = { textRect[1], textRect[2], textRect[3], textRect[4] }
+	--barRect[1] = (UI.screenWidth - width)/2
+	barRect[3] = width
+	barRect[2] = textRect[2]+textRect[4] + 8*UI.identityScale[2]
+	barRect[4] = barHeight
+	
+	self.widgets.Downloading.bar:SetRect(barRect)
+	self.widgets.Downloading.bar:ScaleTo({1,1}, {0,0})
+	
+	local iconSize = 72*UI.identityScale[1]
+	local iconRect = {}
+	iconRect[1] = barRect[1] - iconSize - 8*UI.identityScale[1]
+	iconRect[2] = barRect[2]-(iconSize/ 2)
+	iconRect[3] = iconSize
+	iconRect[4] = iconSize
+	
+	self.widgets.Downloading.icon:SetRect(iconRect)
+	
+	-- scroll everything onto the screen from the top
+	local totalHeight = barRect[2] + barRect[4]
+	local totalHeight2 = iconRect[2] + iconRect[4]
+	
+	totalHeight = Max(totalHeight, totalHeight2)
+	
+	self.widgets.Downloading.label:MoveTo({textRect[1],textRect[2]-totalHeight}, {0,0})
+	self.widgets.Downloading.bar:MoveTo({barRect[1],barRect[2]-totalHeight}, {0,0})
+	self.widgets.Downloading.icon:MoveTo({iconRect[1],iconRect[2]-totalHeight}, {0,0})
+	
+	self.widgets.Downloading.bar:BlendTo({1,1,1,1}, 0)
+	self.widgets.Downloading.icon:BlendTo({1,1,1,1}, 0)
+	self.widgets.Downloading.label:SetVisible(true)
+	self.widgets.Downloading.bar:SetVisible(true)
+	self.widgets.Downloading.icon:SetVisible(true)
+	
+	self.downloadBarVisible = true
+	
+	self.widgets.Downloading.label:MoveTo({textRect[1],textRect[2]}, {0,0.3})
+	self.widgets.Downloading.bar:MoveTo({barRect[1],barRect[2]}, {0,0.3})
+	self.widgets.Downloading.icon:MoveTo({iconRect[1],iconRect[2]}, {0,0.3})
+	
+	self.widgets.Downloading.bar:ScaleTo({1,1}, {0,0})
+	self.widgets.Downloading.bar:ScaleTo({0,1}, {time,0})
+	
+	local f = function()
+		UI:SetLabelText(self.widgets.Downloading.label, StringTable.Get("HUD_DOWNLOAD_COMPLETE"), UI.identityScale)
+		UI:SizeLabelToContents(self.widgets.Downloading.label)
+		UI:VAlignLabelTop(self.widgets.Downloading.label, 0, 24*UI.identityScale[2])
+		UI:HCenterLabel(self.widgets.Downloading.label, UI.fullscreenRect)
+		self.widgets.Downloading.bar:BlendTo({1,1,1,0}, 0.5)
+		self.widgets.Downloading.icon:BlendTo({1,1,1,0}, 0.5)
+	end
+	
+	self.downloadBarTimer = World.gameTimers:Add(f, time-1)
+	
+	UI.widgets.hudprint.Root:SetVisible(false)
+end
+
+function HUD.DownloadFailed(self, time)
+	if (self.downloadBarVisible) then
+		UI:SetLabelText(self.widgets.Downloading.label, StringTable.Get("HUD_DOWNLOAD_FAILED"), UI.identityScale)
+		UI:SizeLabelToContents(self.widgets.Downloading.label)
+		UI:VAlignLabelTop(self.widgets.Downloading.label, 0, 24*UI.identityScale[2])
+		UI:HCenterLabel(self.widgets.Downloading.label, UI.fullscreenRect)
+		self.widgets.Downloading.bar:BlendTo({1,1,1,0}, 0.5)
+		self.widgets.Downloading.icon:BlendTo({1,1,1,0}, 0.5)
+		
+		if (self.downloadBarTimer) then	
+			self.downloadBarTimer:Clean()
+			self.downloadBarTimer = nil
+		end
+	end
 end
 
 function HUD.BeginShield(self, gameTime)
@@ -1149,6 +1242,25 @@ function HUD.AnimatePCActionBarItems(self, widgets)
 	
 end
 
+function HUD.AnimateLock(self, items)
+
+	if (UI.mode == kGameUIMode_Mobile) then
+		HUD:AnimateLockMobile(items)
+	else
+--		HUD:AnimateLockPC(items)
+	end
+
+end
+
+function HUD.AnimateLockMobile(self, items)
+	if (items.arm) then
+		local r = self.widgets.Arm:Rect()
+		self.widgets.Arm:MoveTo({-r[3], r[2]}, {0.3, 0})
+		self.armEnabled = false
+		self.widgets.Arm.class:SetEnabled(self.widgets.Arm, false)
+	end
+end
+
 function HUD.Think(self)
 	if (HUD.enabled) then
 		self:UpdateManipulateButton()
@@ -1758,14 +1870,22 @@ end
 
 function HUD.LoadState(self)
 	self.enabled = true
+	self.downloadBarVisible = false
 	self.armActivityTimer = nil
 	self.armSignaled = false
 	self.printer:Clear()
 	self.printer.timers = World.globalTimers
+	if (self.downloadBarTimer) then
+		self.downloadBarTimer:Clean()
+		self.downloadBarTimer = nil
+	end
 	self.widgets.PowerBubble:SetVisible(false)
 	self.widgets.DropMine:SetVisible(false)
 	self.widgets.RapidPulse:SetVisible(false)
 	self.widgets.ArmActivity:SetVisible(false)
+	self.widgets.Downloading.label:SetVisible(false)
+	self.widgets.Downloading.icon:SetVisible(false)
+	self.widgets.Downloading.bar:SetVisible(false)
 	self.widgets.PowerBubble.class:SetEnabled(self.widgets.PowerBubble, true)
 	self.widgets.DropMine.class:SetEnabled(self.widgets.DropMine, true)
 	self.widgets.RapidPulse.class:SetEnabled(self.widgets.RapidPulse, true)

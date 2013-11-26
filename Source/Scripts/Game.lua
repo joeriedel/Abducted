@@ -133,6 +133,9 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "signal_arm") then
 		Arm:Signal(args)
 		return true
+	elseif (cmd == "disable_arm") then
+		PlayerSkills:LockArm()
+		return true
 	elseif (cmd == "enable_arm") then
 		PlayerSkills:UnlockArm()
 		return true
@@ -185,6 +188,11 @@ function Game.OnEvent(self, cmd, args)
 	elseif (cmd == "achievement") then
 		if (args) then
 			Achievements:Award(args)
+			return true
+		end
+	elseif (cmd == "downloadbar") then
+		if (args) then
+			HUD:DoDownloadBar(tonumber(args))
 			return true
 		end
 	elseif (cmd == "endep1") then

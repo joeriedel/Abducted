@@ -1142,6 +1142,9 @@ function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
 	
 	Game.entity:PlayerDied(killMessage, specialCommand)
 	PlayerInput:Flush()
+	
+	HUD:DownloadFailed()
+	World.PostEvent("hook_playerdeath trigger") -- notification can be hooked by a world script
 end
 
 function PlayerPawn.CheckTappedOn(self, e)
@@ -1183,6 +1186,9 @@ function PlayerPawn.OnEvent(self, cmd, args)
 	elseif (cmd == "set_health_status") then
 		assert((args == "good") or (args == "bad") or (args == "stable"))
 		self.charDBStatus = args
+		return true
+	elseif (cmd == "godmode") then
+		PlayerPawn.GodMode = true
 		return true
 	end
 	
@@ -1254,6 +1260,8 @@ function PlayerPawn.PlayAnimSounds(self, anim)
 		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
 	elseif (anim == "limp_ship_crawldown3") then
 		self:PlaySoundGroup(PlayerPawn.DeathSounds, 1, 1)
+	elseif (anim == "ship_stumble") then
+		self:PlaySoundGroup(PlayerPawn.SurpriseSounds, 1, 1)
 	end
 end
 

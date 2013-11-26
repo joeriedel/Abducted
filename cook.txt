@@ -619,6 +619,7 @@ pak0 {
 	Audio/EnviroFX_Creak07
 	Audio/EnviroFX_TenticalsSnapping2
 	Audio/EnviroFX_Crash
+	Audio/EnviroFX_Crash2
 	Audio/EnviroFX_HumanShip
 
 	// System (for DebugUI)

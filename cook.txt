@@ -123,6 +123,7 @@ pak0 {
 	UI/StandardButtonSmall_TF
 	UI/StandardButton_TF
 	UI/StandardButtonDark_TF
+	UI/Downloading_TF
 	Shared/spellcasting_edgelines_M
 	Shared/painblend_M
 	UI/omega_button_M

@@ -749,7 +749,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 		return false
 	end
 	
-	if (World.playerPawn.stomping or World.playerPawn.bugStun or (not World.playerPawn.visible)) then
+	if (World.playerPawn.stomping or World.playerPawn.customMove or World.playerPawn.bugStun or (not World.playerPawn.visible)) then
 		return false
 	end
 	
@@ -801,7 +801,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 end
 
 function Bug.CheckGroupAttack(self)
-	if (World.playerPawn.dead or World.playerPawn.shieldActive or (not World.playerPawn.visible) or PlayerPawn.GodMode) then
+	if (World.playerPawn.dead or World.playerPawn.customMove or World.playerPawn.shieldActive or (not World.playerPawn.visible) or PlayerPawn.GodMode) then
 		return false
 	end
 	
@@ -838,7 +838,7 @@ end
 
 function Bug.CheckStomp(self)
 
-	if (World.playerPawn.dead) then
+	if (World.playerPawn.dead or World.playerPawn.customMove) then
 		return false
 	end
 	

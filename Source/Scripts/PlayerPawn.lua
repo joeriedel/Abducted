@@ -334,7 +334,7 @@ function PlayerPawn.Spawn(self)
 	self.pulseSounds = {
 		Hum = World.LoadSound("Audio/AFX_PulseCycleLoop"),
 		Explode = World.LoadSound("Audio/AFX_ShieldImpactAggressive"),
-		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact", 3),
+		Fire = World.LoadSound("Audio/AFX_PulseEnergyImpact", 6),
 		Overload1 = World.LoadSound("Audio/pulse_overload1"),
 		Overload2 = World.LoadSound("Audio/pulse_overload2"),
 		Overload3 = World.LoadSound("Audio/pulse_overload3"),

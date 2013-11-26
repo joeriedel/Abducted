@@ -89,6 +89,7 @@ function TerminalScreen.Spawn(self)
 	self.success = false
 	
 	self.model.dm:SetVisible(self.visible)
+	self.model.white:SetVisible(self.visible)
 	
 	if (self.keys.success_actions) then
 		if (self.hackActions) then
@@ -281,9 +282,13 @@ function TerminalScreen.OnEvent(self, cmd, args)
 	elseif (cmd == "show") then
 		self.visible = true
 		self.model.dm:SetVisible(true)
+		if (self.size ~= "big") then
+			self.model.white:SetVisible(true)
+		end
 	elseif (cmd == "hide") then
 		self.visible = false
 		self.model.dm:SetVisible(false)
+		self.model.white:SetVisible(false)
 	elseif (cmd == "reset") then
 		self:Reset()
 	end
@@ -838,6 +843,7 @@ function TerminalScreen.LoadState(self, state)
 		self.model.white:BlendTo({1,1,1,1}, 0)
 		self.flashSprite.dm:BlendTo({1,1,1,0.08}, 0)
 		self.flashSprite.dm:ScaleTo({0.25,0.25,0.25}, 0)
+		self.model.white:SetVisible(self.visible)
 	end
 
 end

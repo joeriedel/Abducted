@@ -12,7 +12,7 @@ GameDB.MinutesPerHour = 60
 GameDB.HoursPerDay = 24
 GameDB.SecondsPerHour = 60*60
 GameDB.SecondsPerDay = 60*60*24
-GameDB.AllDiscoveriesCheat = true
+GameDB.AllDiscoveriesCheat = false
 GameDB.PersistentObjects = {}
 GameDB.Portraits = {
 	"UI/portrait1_M",

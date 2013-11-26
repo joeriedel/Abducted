@@ -41,8 +41,8 @@ function Entity.SaveFloorPos(self, state)
 	
 	local pos = Vec3ForString(state.floorpos)
 	fp  = World.ClipToFloor(
-		{pos[1], pos[2], pos[3] + 16},
-		{pos[1], pos[2], pos[3] - 16}
+		{pos[1], pos[2], pos[3] + 32},
+		{pos[1], pos[2], pos[3] - 32}
 	)
 	
 	World.SetFloorState(floorNum, floorState)

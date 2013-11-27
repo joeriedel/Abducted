@@ -83,6 +83,9 @@ function StoreUI.InitUI(self, closeButton)
 	self.typefaces.StatusBlue = World.Load("UI/StoreItemStatusBlue_TF")
 	self.typefaces.Processing = World.Load("UI/StoreProcessing_TF")
 	
+	self.sfx = {}
+	self.sfx.Purchase = World.Load("Audio/upgradeskill")
+	
 	self.contentWidgets = {}
 	
 	local screenRect = self.widgets.panel:Rect()
@@ -829,6 +832,7 @@ function StoreUI.PurchaseComplete(self)
 	local state = panel.product.State
 	if (((state == Store.kProductState_Available) and (panel.product.Consumable)) or 
 	    (state == Store.kProductState_Purchased)) then
+	    StoreUI.sfx.Purchase:Play(kSoundChannel_UI, 0)
 	    AlertPanel:OK(
 			"STORE_SUCCESS",
 			panel.product.Thanks,

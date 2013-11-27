@@ -101,6 +101,7 @@ function Arm.SpawnShared(self)
 	self.sfx.Reward = World.Load("Audio/armreward")
 	self.sfx.SelectSkill = World.LoadSound("Audio/selectskill", 2)
 	self.sfx.UpgradeSkill = World.Load("Audio/upgradeskill")
+	self.sfx.OmegaUpgrade = World.Load("Audio/omegaupgrade")
 	
 	self.sfx.HeartBeat:SetLoop(true)
 	self.sfx.HeartBeatFast:SetLoop(true)

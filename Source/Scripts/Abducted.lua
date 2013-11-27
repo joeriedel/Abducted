@@ -689,7 +689,9 @@ function Abducted.Think(self, dt)
 	
 	if (Abducted.CheckpointError) then
 		Abducted.CheckpointError = false
-		AlertPanel:OK("Checkpoint Failed", "There was a checkpoint failure, please check the output log. This indicates a critical bug.", nil, nil, false)
+		if (System.BuildConfig() ~= "ship") then
+			AlertPanel:OK("Checkpoint Failed", "There was a checkpoint failure, please check the output log. This indicates a critical bug.", nil, nil, false)
+		end
 	end
 	
 	if (self.lastSysTime == nil) then

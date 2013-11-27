@@ -661,7 +661,7 @@ function Arm.OmegaUpgrade(self)
 	end
 	
 	self.widgets.skills.Refund:SetVisible(true)
-	self.sfx.UpgradeSkill:Play(kSoundChannel_UI, 0)
+	self.sfx.OmegaUpgrade:Play(kSoundChannel_UI, 0)
 	
 	GameNetwork.LogEvent("OmegaUpgradeUsed")
 	

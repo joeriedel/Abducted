@@ -533,6 +533,7 @@ pak0 {
 	Audio/shiphum1
 	Audio/selectskill
 	Audio/upgradeskill
+	Audio/omegaupgrade
 	Audio/heartbeat1
 	Audio/heartbeatfast
 	Audio/ability_unlocked

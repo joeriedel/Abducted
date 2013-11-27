@@ -695,10 +695,9 @@ function ManipulatableObject.Pain(self)
 	self:RemoveFromShootableList()
 	
 	local f = function()
-		self:Idle()
-		self:ContinueAttack()
-		if (self.keys.on_shot) then
-			World.PostEvent(self.keys.on_shot)
+		if (self.awake) then
+			self:Idle()
+			self:ContinueAttack()
 		end
 	end
 	
@@ -710,6 +709,9 @@ function ManipulatableObject.Pain(self)
 	end
 	self:EnableTouch(false)
 
+	if (self.keys.on_shot) then
+		World.PostEvent(self.keys.on_shot)
+	end
 end
 
 function ManipulatableObject.ShotWithPulse(self)

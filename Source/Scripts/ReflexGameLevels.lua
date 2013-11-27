@@ -464,17 +464,84 @@ end
 ------- level 4's
 
 function ReflexGame.CreateLevel4x1(self)
-	return self:CreateLevel1x1()
+	local level = {}
+	
+	level.name = "4x1"
+	
+	level.antivirusSpiderSpawnRate = {3, 6}
+	level.antivirusSpiderSpeed = {60, 90}
+	level.antivirusSpiderLifetime = {15, 18}
+	level.antivirusSpiderHeadingTime = {3, 5}
+	level.antivirusSpiderSeekPlayerRange = 7 -- grid squares
+    level.blackholeSpeed = {90, 100}
+    level.blackholeMoveTime = {20, 20}
+    level.blockChaseTime = 1.1 -- delay before blocks start eating player line
+    level.blockGrowTime = 1.05
+    level.time = 40
+	
+	level.board = {
+		-- row 0
+		{ x=3, y=0, img="blackhole", heading={ 0,1 } }
+		, { x=15, y=0, img="blackhole", heading={ 1,0 } }
+		-- row 1
+		, { x=14, y=1, img="blocker_green" }
+		, { x=15, y=1, img="blocker_green" }
+		-- row 2
+		, { x=3, y=2, img="blocker_green" }
+		, { x=4, y=2, img="blocker_green" }
+		, { x=5, y=2, img="blocker_green" }
+		, { x=6, y=2, img="blocker_green" }
+		, { x=7, y=2, img="blocker_green" }
+		, { x=8, y=2, img="blocker_green" }
+		, { x=10, y=2, img="blocker_green" }
+		, { x=11, y=2, img="blocker_green" }
+		, { x=14, y=2, img="cell_10" }
+		, { x=15, y=2, img="blocker_green" }
+		-- row 3
+		, { x=6, y=3, img="blocker_green" }
+		, { x=7, y=3, img="cell_11" }
+		, { x=11, y=3, img="blocker_green" }
+		, { x=12, y=3, img="blocker_green" }
+		-- row 4
+		, { x=0, y=4, img="mark_start" }
+		, { x=11, y=4, img="blocker_green" }
+		, { x=16, y=4, img="mark_end" }	
+		-- row 5
+		, { x=6, y=5, img="blocker_green" }
+		-- row 6
+		, { x=1, y=6, img="blocker_green" }
+		, { x=2, y=6, img="cell_12" }
+		, { x=6, y=6, img="blocker_green" }
+		, { x=10, y=6, img="cell_13" }
+		, { x=11, y=6, img="blocker_green" }
+		, { x=15, y=6, img="blocker_green" }
+		-- row 7
+		, { x=1, y=7, img="blocker_green" }
+		, { x=2, y=7, img="blocker_green" }
+		, { x=3, y=7, img="blocker_green" }
+		, { x=5, y=7, img="blocker_green" }
+		, { x=6, y=7, img="blocker_green" }
+		, { x=7, y=7, img="blocker_green" }
+		, { x=9, y=7, img="blocker_green" }
+		, { x=10, y=7, img="blocker_green" }
+		, { x=11, y=7, img="blocker_green" }
+		, { x=14, y=7, img="blocker_green" }
+		, { x=15, y=7, img="blocker_green" }
+		-- row 8
+		, { x=8, y=8, img="blackhole", heading={ 0,1 } }
+		, { x=12, y=8, img="blackhole", heading={ 0,1 } }
+		}
+	return level
 end
 
 function ReflexGame.CreateLevel4x2(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel4x1()
 end
 
 function ReflexGame.CreateLevel4x3(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel4x1()
 end
 
 function ReflexGame.CreateLevel4x4(self)
-	return self:CreateLevel1x1()
+	return self:CreateLevel4x1()
 end

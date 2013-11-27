@@ -663,65 +663,97 @@ function ReflexGame.CreateBoard(self)
 		local archetype = v.img
 		local gfx = nil
 		
-		if (v.img == "blocker_green") then
-			gfx = self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]
-		else
-			if (self.gfx[v.img] == self.gfx.blackhole) then
-				objectTable = self.widgets.blackholes
-				objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
-				layer = self.widgets.root2
-			elseif (v.img == "mark_start") then
-				layer = nil
-				archetype = "player"
+		if (string.find(archetype,"cell_") == nil) then
+		
+			if (v.img == "blocker_green") then
+				gfx = self.gfx.blocker_green[IntRand(1, #self.gfx.blocker_green)]
+			else
+				if (self.gfx[v.img] == self.gfx.blackhole) then
+					objectTable = self.widgets.blackholes
+					objectSize = { self.BLACKHOLE_WIDGET_SIZE[1], self.BLACKHOLE_WIDGET_SIZE[2] }
+					layer = self.widgets.root2
+				elseif (v.img == "mark_start") then
+					layer = nil
+					archetype = "player"
+				end
+				
+				gfx = self.gfx[v.img]
 			end
 			
-			gfx = self.gfx[v.img]
-		end
-		
-		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=gfx})
-		local index = self:ConvertCoordToIndex(v.x,v.y)
-		b.state = self:CreateState(archetype,v)
-        if (layer) then
-			layer:AddChild(b)
-		end
-        if ((objectTable == self.widgets.cells) and (v.img ~= "mark_start")) then
-		    self.widgets.grid[index] = b
-        end
-        table.insert(objectTable,b)
-		self:SetPositionByGrid(b,v.x,v.y,objectTable==self.widgets.blackholes)
-		if (v.img == "mark_start") then
-            local player = b
-            player:SetMaterial(self.gfx.mark_current)
-            self.widgets.player = player           
-            self:SetPositionByGrid(player,v.x,v.y)
+			local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=gfx})
+			local index = self:ConvertCoordToIndex(v.x,v.y)
+			b.state = self:CreateState(archetype,v)
+			if (layer) then
+				layer:AddChild(b)
+			end
+			if ((objectTable == self.widgets.cells) and (v.img ~= "mark_start")) then
+				self.widgets.grid[index] = b
+			end
+			table.insert(objectTable,b)
+			self:SetPositionByGrid(b,v.x,v.y,objectTable==self.widgets.blackholes)
+			if (v.img == "mark_start") then
+				local player = b
+				player:SetMaterial(self.gfx.mark_current)
+				self.widgets.player = player           
+				self:SetPositionByGrid(player,v.x,v.y)
 
-			local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
-			current.state = self:CreateState("mark_current",v)
-			self.widgets.current = current
-			self.widgets.root:AddChild(current)
-			self:SetPositionByGrid(current,v.x,v.y)
-            current.state.lastCell = v
-			current.state.startPos = self:GetPosition(current) 
-			current.state.endPos = current.state.startPos
-			table.insert(self.widgets.lines,current)
-			self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
-			COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)
-       elseif (v.img == "mark_end") then
-			local rect = b:Rect()
-			rect[3] = rect[3] * 1.75
-			rect[4] = rect[4] * 1.75
-			b:SetRect(rect)
-			self:SetPositionByGrid(b,v.x,v.y,false)
-			self.widgets.portal = b
-        end
-        if (string.find(b.state.archetype,"cell_") ~= nil) then
-			local img = self.gfx[string.format("cell_%02i", goalimages[goalnum])]
-			goalnum = goalnum + 1
-			b:SetMaterial(img)
-            table.insert(self.widgets.goals,b)
+				local current = UI:CreateWidget("MatWidget", {rect={200,200,self.REFLEX_CELL_SIZE[1],self.REFLEX_CELL_SIZE[2]}, material=self.gfx.mark_line_v})
+				current.state = self:CreateState("mark_current",v)
+				self.widgets.current = current
+				self.widgets.root:AddChild(current)
+				self:SetPositionByGrid(current,v.x,v.y)
+				current.state.lastCell = v
+				current.state.startPos = self:GetPosition(current) 
+				current.state.endPos = current.state.startPos
+				table.insert(self.widgets.lines,current)
+				self:SetLineSegmentPosition(current,current.state.startPos,current.state.endPos)			
+				COutLine(kC_Debug,"current widget: x=%i, y=%i",v.x,v.y)
+		   elseif (v.img == "mark_end") then
+				local rect = b:Rect()
+				rect[3] = rect[3] * 1.75
+				rect[4] = rect[4] * 1.75
+				b:SetRect(rect)
+				self:SetPositionByGrid(b,v.x,v.y,false)
+				self.widgets.portal = b
+			end
 		end
     end
     
+    -- add goal pieces, first gather and sort them
+    local goals = {}
+    for i,v in ipairs(self.state.level.board) do
+
+        if (string.find(v.img,"cell_") ~= nil) then
+			table.insert(goals, v)
+		end
+		
+	end
+	
+	goals = ShuffleArray(goals)
+	
+	for k,v in pairs(goals) do
+		local objectTable = self.widgets.cells
+        local objectSize = { self.REFLEX_CELL_SIZE[1], self.REFLEX_CELL_SIZE[2] }
+		local layer = self.widgets.root
+		local gfx = self.gfx[v.img]
+	
+		local b = UI:CreateWidget("MatWidget", {rect={0,0,objectSize[1],objectSize[2]}, material=gfx})
+		local index = self:ConvertCoordToIndex(v.x,v.y)
+		b.state = self:CreateState(v.img,v)
+		layer:AddChild(b)
+	    self.widgets.grid[index] = b
+		table.insert(objectTable,b)
+		self:SetPositionByGrid(b,v.x,v.y,false)
+		local img = self.gfx[string.format("cell_%02i", goalimages[goalnum])]
+		goalnum = goalnum + 1
+		b:SetMaterial(img)
+		table.insert(self.widgets.goals,b)
+		
+		if (#self.widgets.goals == self.skill) then
+			break
+		end
+	end
+	
     if (self.widgets.player) then
 		-- on top of blackholes
 		self.widgets.root2:AddChild(self.widgets.player)
@@ -1337,6 +1369,9 @@ function ReflexGame.DoRetry(self)
 				v:BlendTo({1,1,1,0}, 0)
 			end
 		end
+	
+		local levelBank = self.db.levels[self.skill]
+		self.level = levelBank[IntRand(1, #levelBank)]
 	
 		self:CreateBoard()
 				

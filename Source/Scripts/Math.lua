@@ -24,14 +24,7 @@ function FloatRand(a, b)
 end
 
 function IntRand(a, b)
-
-	if (a ~= nil) and (b ~= nil) then
-		local x = Lerp(a, b, math.random())
-		return math.floor(x + 0.5)
-	end
-	
-	return 0
-	
+	return math.random(a,b)
 end
 
 function DegToRad(degs)

@@ -501,7 +501,7 @@ function Arm.ChatPrompt(self)
 	self.prompt = Arm:ChooseChatPrompt(self.topic.reply)
 	assert(self.topic.stringTable)
 		
-	local promptText = StringTable.Get(self.prompt[1], self.topic.stringTable)
+	local promptText = StringTable.Get(self.prompt[1], self.topic.stringTable):gsub("%$name%$", GameDB.playerName)
 	self.promptText = "> "..promptText
 	
 	local lock = false
@@ -765,6 +765,9 @@ function Arm.DisplayChoices(self)
 		prompts[k] = prompt
 		
 		local text = StringTable.Get(prompt[1], v.stringTable)
+		if (text) then
+			text = text:gsub("%$name%$", GameDB.playerName)
+		end
 		promptText[k] = text
 		
 		local w,h = UI:StringDimensions(self.typefaces.ChatChoice, text)

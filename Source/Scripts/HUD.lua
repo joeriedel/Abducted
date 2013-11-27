@@ -103,7 +103,10 @@ function HUD.Load(self)
 	
 	HUD.pulseMode = "Normal"
 	
+	local iconSize = nil
+	
 	if (UI.mode == kGameUIMode_Mobile) then
+		iconSize = {121, 125}
 		self.gfx = {
 			Arm = "UI/arm_button_M",
 			ArmPressed = "UI/arm_button_pressed_M",
@@ -127,6 +130,7 @@ function HUD.Load(self)
 			TNTBoxDisabled = "UI/tntbox_disabled_M"
 		}
 	else
+		iconSize = {48, 48}
 		self.gfx = {
 			Arm = "UI/arm_button_pc_M",
 			ArmPressed = "UI/arm_button_pressed_pc_M",
@@ -202,7 +206,7 @@ function HUD.Load(self)
 	self.widgets.Arm:AddChild(self.widgets.ArmActivity)
 	
 	self.widgets.Manipulate = UIPushButton:Create(
-		UI:MaterialSize(self.gfx.ManipulateEnabled, {0, 0}),
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when manipulate gets activated
 			enabled = self.gfx.ManipulateEnabled,
 			disabled = self.gfx.ManipulateDisabled,
@@ -225,7 +229,7 @@ function HUD.Load(self)
 	self.widgets.Manipulate.flashing = false
 	
 	self.widgets.Shield = UIPushButton:Create(
-		UI:MaterialSize(self.gfx.ShieldEnabled),
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when shield gets activated
 			enabled = self.gfx.ShieldEnabled,
 			disabled = self.gfx.ShieldDisabled,
@@ -245,10 +249,8 @@ function HUD.Load(self)
 	self.widgets.ShieldShimmer = UI:CreateWidget("MatWidget", {rect={0, 0, 8, 8}, material=self.gfx.RechargeShimmer})
 	self.widgets.ShieldShimmer:SetVisible(false)
 	
-	local size = UI:MaterialSize(self.gfx.PowerBubble)
-	
 	self.widgets.PowerBubble = UIPushButton:Create(
-		{0, 0, size[3], size[4]},
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.PowerBubble,
 			disabled = self.gfx.PowerBubbleDisabled,
@@ -263,7 +265,7 @@ function HUD.Load(self)
 	self.widgets.PowerBubble:SetVisible(false)
 	
 	self.widgets.DropMine = UIPushButton:Create(
-		{0, 0, size[3], size[4]},
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.DropMine,
 			disabled = self.gfx.DropMineDisabled,
@@ -278,7 +280,7 @@ function HUD.Load(self)
 	self.widgets.DropMine:SetVisible(false)
 	
 	self.widgets.RapidPulse = UIPushButton:Create(
-		{0, 0, size[3], size[4]},
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.RapidPulse,
 			disabled = self.gfx.RapidPulseDisabled,
@@ -293,7 +295,7 @@ function HUD.Load(self)
 	self.widgets.RapidPulse:SetVisible(false)
 	
 	self.widgets.Pulse = UIPushButton:Create(
-		UI:MaterialSize(self.gfx.PulseEnabled, {0, 0}),
+		{0, 0, iconSize[1], iconSize[2]},
 		{ -- we go to disabled state when pulse is fired
 			enabled = self.gfx.PulseEnabled,
 			disabled = self.gfx.PulseDisabled,

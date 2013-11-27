@@ -328,6 +328,7 @@ pak0 {
 	UI/curve2_M
 	UI/vertlines2_M
 	UI/backgroundplate1_M
+	UI/credits_M
 
 	UI/Title_TF
 	UI/Subtitle_TF

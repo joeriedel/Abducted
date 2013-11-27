@@ -177,6 +177,7 @@ function MainMenu.InitUI(self)
 	self:InitNews()
 	self:InitNewGame()
 	self:InitLoadGame()
+	self:InitCredits()
 	
 end
 
@@ -576,7 +577,15 @@ end
 
 function MainMenu.MainPanel.Credits(self, item)
 	GameNetwork.LogEvent("ViewCredits")
-	self.busy = false
+	local f = function()
+		self.busy = false
+	end
+	
+	MainMenu.creditsPanel:TransitionIn({0,0}, 0.3, f)
+
+	self.unselectItem = function(callback)
+		MainMenu.creditsPanel:TransitionOut({0,0}, 0.2, 0.3, callback)
+	end
 end
 
 function MainMenu.MainPanel.Facebook(self)

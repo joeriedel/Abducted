@@ -658,7 +658,7 @@ function StoreUI.UpdateProductState(self, panel)
 			self.widgets.descImage:SetMaterial(panel.product.Image)
 						
 			local imageRect = {0,0,0,0}
-			imageRect[3] = self.descRect[3] * 0.5
+			imageRect[3] = self.descRect[3] - 8 * UI.identityScale[1]
 			imageRect[4] = imageRect[3] * (9/16)
 			imageRect[1] = (self.descRect[3]-imageRect[3])/2
 			imageRect[2] = 16*UI.identityScale[2]

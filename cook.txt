@@ -305,6 +305,7 @@ pak0 {
 	UI/level3_M
 	UI/level4_M
 	UI/straight2_M
+	UI/straight3_M
 	UI/curve2L_M
 	UI/curve3J_M
 	UI/SkillDescription_TF
@@ -314,8 +315,12 @@ pak0 {
 	UI/SkillTitle_TF
 	UI/manipulate_default1_M
 	UI/pulse_default1_M
+	UI/upgrade_multipulse1_M
+	UI/upgrade_mine1_M
 	UI/shield_default1_M
+	UI/upgrade_shieldpulse1_M
 	UI/selection_highlighter1_M
+	UI/upgrade_omega1_M
 	UI/straight1_M
 	UI/squiggle1_M
 	UI/squiggle2_M

@@ -333,7 +333,7 @@ PlayerSkills.Skills.MultiShield = {
 	Graphics = {
 			Icon = { 
 				Pos={4,626},
-				Material="UI/shield_default1_M"
+				Material="UI/upgrade_shieldpulse1_M"
 			},
 			Lines = {
 				{
@@ -396,7 +396,7 @@ PlayerSkills.Skills.Mines = {
 	Graphics = {
 			Icon = { 
 				Pos={822,631},
-				Material="UI/pulse_default1_M"
+				Material="UI/upgrade_mine1_M"
 			},
 			Lines = {
 				{
@@ -540,7 +540,7 @@ PlayerSkills.Skills.TriggerHappy = {
 	Graphics = {
 			Icon = { 
 				Pos={823, 901},
-				Material="UI/pulse_default1_M"
+				Material="UI/upgrade_multipulse1_M"
 			},
 			Lines = {
 				{
@@ -605,8 +605,8 @@ PlayerSkills.Skills.TheHand = {
 			},
 			Lines = {
 				{
-					Material="SkillsVertLines2",
-					Pos={460, 1023}
+					Material="SkillsVertLines3",
+					Pos={458, 1022}
 				}
 			}
 	},
@@ -734,7 +734,7 @@ PlayerSkills.Skills.Omega = {
 	Graphics = {
 			Icon = { 
 				Pos={415, 1291},
-				Material="UI/manipulate_default1_M"
+				Material="UI/upgrade_omega1_M"
 			}
 	},
 	Stats = function(skill, level)

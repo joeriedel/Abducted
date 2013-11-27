@@ -170,6 +170,7 @@ function Tormentor.PlayCinematicAnim(self, args)
 	args = Tokenize(args)
 	
 	local f = function()
+		self.customMove = false
 		self:SetMoveType(kMoveType_Floor)
 		
 		if (args[2]) then
@@ -186,6 +187,7 @@ function Tormentor.PlayCinematicAnim(self, args)
 		self:SwitchModes()
 	end
 	
+	self.customMove = true
 	self:SetMoveType(kMoveType_Ska)
 	self.think = nil
 	self:Move(false)
@@ -250,6 +252,9 @@ function Tormentor.SwitchModes(self)
 end
 
 function Tormentor.Stun(self)
+	if (self.customMove) then
+		return
+	end
 
 	if (self.attackDamageTimer) then
 		self.attackDamageTimer:Clean()

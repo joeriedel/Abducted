@@ -138,10 +138,10 @@ end
 function MainMenu.News.PrepareContents(self)
 	MainMenuPanel.PrepareContents(self)
 	self.widgets.vlist:BlendTo({1,1,1,0}, 0)
-	MainMenu.widgets.logo:BlendTo({0,0,0,1}, 0.5)
 end
 
 function MainMenu.News.AnimateContents(self, onComplete)
+	self.widgets.vlist:BlendTo({1,1,1,1}, 0.2)
 	if (onComplete) then
 		local f = function()
 			onComplete()

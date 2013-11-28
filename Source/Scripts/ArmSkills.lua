@@ -615,7 +615,7 @@ function Arm.OnPurchaseButtonPressed(self)
 	
 	if (cost > skillPoints) then
 		local title = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TITLE")
-		local msg = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TEXT"):format(cost, PlayerSkills.SkillPoints)
+		local msg = StringTable.Get("SKILL_NOT_ENOUGH_SKILLPOINTS_TEXT"):format(cost, skillPoints)
 		
 		AlertPanel:YesNo(
 			title,

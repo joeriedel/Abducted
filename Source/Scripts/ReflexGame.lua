@@ -1173,8 +1173,11 @@ function ReflexGame.UpdateTimer(self, dt)
 		self.state.timeLeft = self.state.timeLeft - dt
 		if (self.state.timeLeft <= 0) then
 			self.state.timeLeft = 0
-			self.timerTask:Clean()
-			self.timerTask = nil
+			-- don't expire this until we can do a HandleTimeUp() call!
+			if (not self.animatingRetry) then
+				self.timerTask:Clean()
+				self.timerTask = nil
+			end
 		end
 		
 		if ((oldTime >= 30) and (self.state.timeLeft < 30)) then
@@ -1369,9 +1372,6 @@ function ReflexGame.DoRetry(self)
 				v:BlendTo({1,1,1,0}, 0)
 			end
 		end
-	
-		local levelBank = self.db.levels[self.skill]
-		self.level = levelBank[IntRand(1, #levelBank)]
 	
 		self:CreateBoard()
 				

@@ -292,7 +292,7 @@ Arm.Discoveries = {
 		discoveryPopupText = "ARM_DISCOVERY_GLYPHS_POPUP"
 	},
 	
-	HumanShipDoor = {
+	--[[HumanShipDoor = {
 		picture = "UI/discovery_human_ship_door_M",
 		title = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_TITLE",
 		text = "ARM_DISCOVERY_HUMAN_SHIP_DOOR",
@@ -300,7 +300,7 @@ Arm.Discoveries = {
 			all = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_LOG"
 		},
 		discoveryPopupText = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_POPUP"
-	},
+	},]]
 	
 	HumanShipTop1 = {
 		picture = "UI/discovery_human_ship_top1_M",

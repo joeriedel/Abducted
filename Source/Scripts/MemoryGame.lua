@@ -119,10 +119,15 @@ function MemoryGame.RestartGameState(self)
 	end
 	
 	local invalidGlyph = self.goals[IntRand(1, #self.goals)]
+	local invalidGlyph2 = invalidGlyph + 1
+	if (invalidGlyph2 > #self.goals) then
+		invalidGlyph2 = 1
+	end
+	invalidGlyph2 = self.goals[invalidGlyph2]
 	self.validGlyphs2 = {}
 	
 	for i=1,#self.glyphNums do
-		if (self.glyphNums[i] ~= invalidGlyph) then
+		if ((self.glyphNums[i] ~= invalidGlyph) and (self.glyphNums[i] ~= invalidGlyph2)) then
 			table.insert(self.validGlyphs2, self.glyphNums[i])
 		end
 	end

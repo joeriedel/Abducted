@@ -122,12 +122,14 @@ function Arm.LoadLog(self)
 		
 		if (v.style == "!ARM_REPLY") then
 			text = kEventLogArm.." "..Arm:FindChatString(v.text)
+			text = text:gsub("%$name%$", GameDB.playerName)
 			typeface = self.typefaces.Chat
 		elseif (v.style == "!ARM_LOCKED_REPLY") then
 			text = kEventLogArm.." "..Arm:FindChatString(v.text)
 			typeface = self.typefaces.ChatLocked
 		elseif (v.style == "!ARM_ASK") then
 			text = kEventLogYou.." "..Arm:FindChatString(v.text)
+			text = text:gsub("%$name%$", GameDB.playerName)
 			typeface = self.typefaces.LogArmAsk
 		elseif (v.style == "!ARM_LOCKED") then
 			text = kEventLogArmLocked

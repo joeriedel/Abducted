@@ -668,7 +668,7 @@ function Abducted.EndEpisode(self, num)
 	World.SoundFadeMasterVolume(0, 1)
 	
 	local f = function()
-		System.PlayFullscreenMovie("ep2teasertest.mp4")
+		System.PlayFullscreenMovie("ep2teaser1.mp4")
 	end
 
 	World.globalTimers:Add(f, 1)

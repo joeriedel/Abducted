@@ -293,6 +293,7 @@ function Bug.Spawn(self)
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 
 	self.guts.dm = self:AttachDrawModel(self.guts)
+	self.guts.dm:ScaleTo({1.3,1.3,1}, 0) -- bigger guts
 	self.guts.dm:SetBounds(VecAdd(self:Mins(), {0,0,2}), self:Maxs()) -- avoid clipping problems
 	self.guts.dm:SetVisible(false)
 	
@@ -745,6 +746,8 @@ end
 
 function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
+	return false
+	--[[
 	if (World.playerPawn.dead) then
 		return false
 	end
@@ -796,7 +799,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	self.model:BlendToState("bug_stun", nil, true)
 	
 	World.playerPawn:BugStun(callback)
-	return true
+	return true]]
 	
 end
 

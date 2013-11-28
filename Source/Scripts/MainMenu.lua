@@ -380,9 +380,10 @@ function MainMenu.OnInputGesture(self, g)
 end
 
 function MainMenu.PromptUserRename()
-	local text = StringTable.Get("RENAME_TITLE")
+	local title = StringTable.Get("RENAME_TITLE")
+	local text = StringTable.Get("RENAME_TEXT")
 	Game.entity.eatInput = true
-	System.EnterPlainTextDialog(text, text)
+	System.EnterPlainTextDialog(title, text)
 end
 
 function MainMenu.OnTextDialogResult(canceled, text)

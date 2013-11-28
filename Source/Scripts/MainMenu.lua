@@ -379,6 +379,19 @@ function MainMenu.OnInputGesture(self, g)
 	return false
 end
 
+function MainMenu.PromptUserRename()
+	local text = StringTable.Get("RENAME_TITLE")
+	Game.entity.eatInput = true
+	System.EnterPlainTextDialog(text, text)
+end
+
+function MainMenu.OnTextDialogResult(canceled, text)
+	Game.entity.eatInput = false
+	if ((not canceled) and (text and (text ~= ""))) then
+		MainMenu.newGame:UpdatePlayerName(text)
+	end
+end
+
 --[[---------------------------------------------------------------------------
 	Main Menu Panel
 -----------------------------------------------------------------------------]]

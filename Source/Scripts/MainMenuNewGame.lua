@@ -164,13 +164,17 @@ function MainMenu.NewGame.NotifyPortraitState(self, widget)
 
 end
 
-function MainMenu.NewGame.PrepareContents(self)
-	self.playerName = "Eve"
+function MainMenu.NewGame.UpdatePlayerName(self, name)
+	self.playerName = name
 	UI:SetLabelText(self.widgets.name, self.playerName)
 	UI:SizeLabelToContents(self.widgets.name)
 	local r = self.widgets.panel:Rect()
 	UI:HCenterWidget(self.widgets.name, {self.xInset,0,r[3]-(self.xInset*2),r[4]})
-	
+end
+
+function MainMenu.NewGame.PrepareContents(self)
+	self:UpdatePlayerName("Eve")
+		
 	-- start with portrait 1
 	self.portrait = 1
 	
@@ -214,7 +218,7 @@ function MainMenu.NewGame.NextPortrait(self)
 end
 
 function MainMenu.NewGame.RenameCharacter(self)
-
+	MainMenu.PromptUserRename()
 end
 
 function MainMenu.NewGame.StartGame(self)

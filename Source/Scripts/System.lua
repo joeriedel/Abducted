@@ -431,3 +431,11 @@ function World.MovieFinished()
 		Game.entity:OnMovieFinished()
 	end
 end
+
+function World.PlainTextDialogResult(canceled, text)
+
+	if (Game.entity and Game.entity.OnTextDialogResult) then
+		Game.entity:OnTextDialogResult(canceled, text)
+	end
+
+end

@@ -112,6 +112,9 @@
     <filename>Source\Scripts\MainMenu.lua</filename>
   </file>
   <file>
+    <filename>Source\Scripts\MainMenuCredits.lua</filename>
+  </file>
+  <file>
     <filename>Source\Scripts\MainMenuLoadGame.lua</filename>
   </file>
   <file>

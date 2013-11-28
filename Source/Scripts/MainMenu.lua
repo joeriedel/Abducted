@@ -386,10 +386,15 @@ function MainMenu.PromptUserRename()
 	System.EnterPlainTextDialog(title, text)
 end
 
-function MainMenu.OnTextDialogResult(canceled, text)
+function MainMenu.OnTextDialogResult(self, canceled, text)
 	Game.entity.eatInput = false
+	if (not canceled) then
+		if (text) then
+			COutLine(kC_Debug, "MainMenu.OnTextDialogResult(%s)", text)
+		end
+	end
 	if ((not canceled) and (text and (text ~= ""))) then
-		MainMenu.newGame:UpdatePlayerName(text)
+		MainMenu.newGamePanel:UpdatePlayerName(text)
 	end
 end
 

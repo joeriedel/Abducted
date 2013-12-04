@@ -30,7 +30,7 @@ Store.kTransactionState_Failed = 2
 Store.kTransactionState_Restored = 3
 
 Store.Products = {
-	{
+	--[[{
 		Id = "ABEP2",
 		PublicId = "1",
 		Title = "STORE_EP2_TITLE",
@@ -57,7 +57,7 @@ Store.Products = {
 		PurchaseAction = function()
 			Store.PersistPurchase("ABDSPS1")
 		end
-	},
+	},]]
 	{
 		Id = "Omega1",
 		PublicId = "3",

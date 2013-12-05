@@ -292,6 +292,16 @@ Arm.Discoveries = {
 		discoveryPopupText = "ARM_DISCOVERY_GLYPHS_POPUP"
 	},
 	
+	Glyphs2 = {
+		picture = "UI/discovery_glyphs_M",
+		title = "ARM_DISCOVERY_GLYPHS2_TITLE",
+		text = "ARM_DISCOVERY_GLYPHS2",
+		logText = {
+			all = "ARM_DISCOVERY_GLYPHS2_LOG"
+		},
+		discoveryPopupText = "ARM_DISCOVERY_GLYPHS2_POPUP"
+	},
+	
 	--[[HumanShipDoor = {
 		picture = "UI/discovery_human_ship_door_M",
 		title = "ARM_DISCOVERY_HUMAN_SHIP_DOOR_TITLE",

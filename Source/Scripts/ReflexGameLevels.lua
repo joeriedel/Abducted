@@ -528,8 +528,8 @@ function ReflexGame.CreateLevel4x1(self)
 		, { x=14, y=7, img="blocker_green" }
 		, { x=15, y=7, img="blocker_green" }
 		-- row 8
-		, { x=8, y=8, img="blackhole", heading={ 0,1 } }
-		, { x=12, y=8, img="blackhole", heading={ 0,1 } }
+		, { x=8, y=7, img="blackhole", heading={ 0,1 } }
+		, { x=12, y=7, img="blackhole", heading={ 0,1 } }
 		}
 	return level
 end

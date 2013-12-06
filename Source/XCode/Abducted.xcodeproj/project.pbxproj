@@ -120,9 +120,6 @@
 		339BA57D163656D50017FD79 /* G_ViewController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33EC06271626689800F8C9FF /* G_ViewController.cpp */; };
 		33A42EF818437563006A65F5 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33A42EF718437563006A65F5 /* MediaPlayer.framework */; };
 		33A42F1418437575006A65F5 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33A42EF718437563006A65F5 /* MediaPlayer.framework */; };
-		33A42F16184379D1006A65F5 /* ep2teasertest.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
-		33A42F171843A01C006A65F5 /* ep2teasertest.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
-		33A42F1F1843A8F0006A65F5 /* ep2teasertest.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */; };
 		33A42F3718475AD5006A65F5 /* Icon-29.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F2E18475AD5006A65F5 /* Icon-29.png */; };
 		33A42F3818475AD5006A65F5 /* Icon-29.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F2E18475AD5006A65F5 /* Icon-29.png */; };
 		33A42F3918475AD5006A65F5 /* Icon-40.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F2F18475AD5006A65F5 /* Icon-40.png */; };
@@ -141,6 +138,12 @@
 		33A42F4618475AD5006A65F5 /* Icon-120.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F3518475AD5006A65F5 /* Icon-120.png */; };
 		33A42F4718475AD5006A65F5 /* Icon-152.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F3618475AD5006A65F5 /* Icon-152.png */; };
 		33A42F4818475AD5006A65F5 /* Icon-152.png in Resources */ = {isa = PBXBuildFile; fileRef = 33A42F3618475AD5006A65F5 /* Icon-152.png */; };
+		33A42F4C1847765B006A65F5 /* ep2teaser1.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F491847764C006A65F5 /* ep2teaser1.mp4 */; };
+		33A42F4D18477669006A65F5 /* ep2teaser1.mp4 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33A42F491847764C006A65F5 /* ep2teaser1.mp4 */; };
+		33A42F4E184778D8006A65F5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7D1183CCE6A0073F0D8 /* Security.framework */; };
+		33A42F4F184778EA006A65F5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7D5183CCF020073F0D8 /* SystemConfiguration.framework */; };
+		33A42F5018477901006A65F5 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7D3183CCE9D0073F0D8 /* AdSupport.framework */; };
+		33A42F5118477913006A65F5 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3380F7E7183CD0BA0073F0D8 /* CoreFoundation.framework */; };
 		33B55A541710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
 		33B55A551710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
 		33B55A561710CB2300F8C70B /* G_ManipulatableObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */; };
@@ -443,7 +446,7 @@
 			dstPath = Base;
 			dstSubfolderSpec = 6;
 			files = (
-				33A42F16184379D1006A65F5 /* ep2teasertest.mp4 in CopyFiles */,
+				33A42F4D18477669006A65F5 /* ep2teaser1.mp4 in CopyFiles */,
 				33956AA116FBD677008314CD /* manifest.pak in CopyFiles */,
 				33956AA216FBD677008314CD /* pak0.pak in CopyFiles */,
 			);
@@ -469,7 +472,7 @@
 			dstPath = Base;
 			dstSubfolderSpec = 6;
 			files = (
-				33A42F1F1843A8F0006A65F5 /* ep2teasertest.mp4 in CopyFiles */,
+				33A42F4C1847765B006A65F5 /* ep2teaser1.mp4 in CopyFiles */,
 				3397729116E9D61F0046535B /* manifest.pak in CopyFiles */,
 				3397729216E9D61F0046535B /* pak0.pak in CopyFiles */,
 			);
@@ -510,7 +513,6 @@
 		33982E8B16B2554F00C2ED49 /* G_TouchTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_TouchTrigger.h; sourceTree = "<group>"; };
 		33986C7118395CCD00142AA5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
 		33A42EF718437563006A65F5 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/MediaPlayer.framework; sourceTree = DEVELOPER_DIR; };
-		33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = ep2teasertest.mp4; path = ../../Base/ep2teasertest.mp4; sourceTree = "<group>"; };
 		33A42F2E18475AD5006A65F5 /* Icon-29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-29.png"; path = "iOS/Icon-29.png"; sourceTree = "<group>"; };
 		33A42F2F18475AD5006A65F5 /* Icon-40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-40.png"; path = "iOS/Icon-40.png"; sourceTree = "<group>"; };
 		33A42F3018475AD5006A65F5 /* Icon-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-50.png"; path = "iOS/Icon-50.png"; sourceTree = "<group>"; };
@@ -520,6 +522,7 @@
 		33A42F3418475AD5006A65F5 /* Icon-100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-100.png"; path = "iOS/Icon-100.png"; sourceTree = "<group>"; };
 		33A42F3518475AD5006A65F5 /* Icon-120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-120.png"; path = "iOS/Icon-120.png"; sourceTree = "<group>"; };
 		33A42F3618475AD5006A65F5 /* Icon-152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-152.png"; path = "iOS/Icon-152.png"; sourceTree = "<group>"; };
+		33A42F491847764C006A65F5 /* ep2teaser1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = ep2teaser1.mp4; path = ../../Base/ep2teaser1.mp4; sourceTree = "<group>"; };
 		33B55A521710CB2300F8C70B /* G_ManipulatableObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = G_ManipulatableObject.cpp; sourceTree = "<group>"; };
 		33B55A531710CB2300F8C70B /* G_ManipulatableObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = G_ManipulatableObject.h; sourceTree = "<group>"; };
 		33BF3EEA1633263C006DEAAE /* AbductedGoldeniOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AbductedGoldeniOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -656,7 +659,9 @@
 				33956A8A16FBD677008314CD /* libzlibiOS.a in Frameworks */,
 				33956AA916FBD695008314CD /* libMainShipiOS.a in Frameworks */,
 				33956AAA16FBD695008314CD /* libRadianceShipiOS.a in Frameworks */,
+				33A42F5018477901006A65F5 /* AdSupport.framework in Frameworks */,
 				3380F7F0183CD1060073F0D8 /* AudioToolbox.framework in Frameworks */,
+				33A42F5118477913006A65F5 /* CoreFoundation.framework in Frameworks */,
 				3380F7E9183CD0CB0073F0D8 /* CoreGraphics.framework in Frameworks */,
 				3380F7EA183CD0D40073F0D8 /* Foundation.framework in Frameworks */,
 				3380F7EB183CD0DC0073F0D8 /* GameKit.framework in Frameworks */,
@@ -666,6 +671,8 @@
 				3380F7EE183CD0F60073F0D8 /* QuartzCore.framework in Frameworks */,
 				3380F7EF183CD0FE0073F0D8 /* UIKit.framework in Frameworks */,
 				33A42F1418437575006A65F5 /* MediaPlayer.framework in Frameworks */,
+				33A42F4E184778D8006A65F5 /* Security.framework in Frameworks */,
+				33A42F4F184778EA006A65F5 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1059,7 +1066,7 @@
 		33FA822416353382002603A5 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				33A42F15184379D1006A65F5 /* ep2teasertest.mp4 */,
+				33A42F491847764C006A65F5 /* ep2teaser1.mp4 */,
 				3397728F16E9D61F0046535B /* manifest.pak */,
 				3397729016E9D61F0046535B /* pak0.pak */,
 				33FED209183AE5F700E2943B /* Default-Landscape-568h@2x.png */,
@@ -1540,7 +1547,6 @@
 				33FA817E1635193A002603A5 /* ViewController_iPhone.xib in Resources */,
 				33A42F3718475AD5006A65F5 /* Icon-29.png in Resources */,
 				33FED20C183AE5F700E2943B /* Default-Landscape-568h@2x.png in Resources */,
-				33A42F171843A01C006A65F5 /* ep2teasertest.mp4 in Resources */,
 				33A42F3D18475AD5006A65F5 /* Icon-58.png in Resources */,
 				33A42F4118475AD5006A65F5 /* Icon-80.png in Resources */,
 				33FA8223163532A4002603A5 /* Icon.png in Resources */,

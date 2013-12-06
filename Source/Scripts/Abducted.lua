@@ -71,6 +71,7 @@ function Abducted.OnLevelStart(self)
 	
 	if (GameDB:LoadingSaveGame() and (Game.type == "Map")) then
 		COutLine(kC_Debug, "Loading checkpoint!")
+		Cinematics:PlayLevelCinematics()
 		self:LoadCheckpoint()
 		UI:FadeIn(1)
 		TitleCrawl:Clear()

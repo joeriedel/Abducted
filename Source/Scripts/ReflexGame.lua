@@ -21,7 +21,7 @@ function ReflexGame.DebugStart(self)
 			end
 			World.globalTimers:Add(f, 0.3)
 		end
-		ReflexGame:InitGame(3)
+		ReflexGame:InitGame(4)
 		UI:BlendTo({0,0,0,0}, 0.3)
 		ReflexGame:ShowBoard(true)
 		ReflexGame:StartGame("discover Bugs;award 6;message ARM_REWARD_MSG_POWER_RESTORED;unlock_topic LockedTest ARM_REWARD_LOCKEDTEST", f)

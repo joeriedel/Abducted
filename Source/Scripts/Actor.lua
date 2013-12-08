@@ -86,7 +86,9 @@ end
 function Actor.PostSpawn(self)
 
 	if (self.model and (self.keys.model == "Characters/Eve")) then
+		self:Unlink() -- break lighting interactions
 		PlayerPawn.SwapModelTextures(self.model)
+		self:Link()
 	end
 
 end

@@ -452,7 +452,9 @@ function PlayerPawn.PostSpawn(self)
 	self:SelectAnimState(state)	
 
 	-- player styles / portraits
+	self:Unlink() -- break lighting interactions
 	PlayerPawn.SwapModelTextures(self.model)
+	self:Link()
 end
 
 function PlayerPawn.PlaySoundGroup(self, group, probability, delay)
@@ -1266,6 +1268,10 @@ function PlayerPawn.PlayAnimSounds(self, anim)
 end
 
 function PlayerPawn.PlayCinematicAnim(self, args)
+	if (self.bugStun or self.dead or self.customMove) then
+		return
+	end
+	
 	args = Tokenize(args)
 	local anim = self:LookupAnimation(args[1])
 	if (anim) then
@@ -1359,7 +1365,7 @@ function PlayerPawn.RemoveMine(self, mine)
 end
 
 function PlayerPawn.SmackMetadata(self, callback)
-	if (self.bugStun) then
+	if (self.bugStun or self.dead) then
 		return false
 	end
 	if (Abducted.entity.manipulate) then
@@ -1381,7 +1387,7 @@ end
 
 function PlayerPawn.BugStun(self, callback)
 
-	if (self.bugStun) then
+	if (self.bugStun or self.dead) then
 		return
 	end
 	

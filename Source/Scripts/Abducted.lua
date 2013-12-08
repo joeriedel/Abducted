@@ -279,6 +279,9 @@ function Abducted.OnInputGesture(self, g)
 	if (TerminalScreen.Active) then
 		return false
 	end
+	if (World.playerPawn.dead) then
+		return false
+	end
 	
 	if (self.manipulate) then
 		if (g.id == kIG_Line) then

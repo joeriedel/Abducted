@@ -281,6 +281,11 @@ function Arm.ProcessActionTokens(self, tokens)
 	elseif (tokens[1] == "clear_topic") then
 		self.requiredTopic = nil
 		self:ClearSignal()
+	elseif (tokens[1] == "push_topic") then
+		-- insert a topic into the convo tree so it doesn't show up again.
+		if (self.topicTree) then
+			self.topicTree[tokens[2]] = true
+		end
 	elseif (tokens[1] == "downgrade_yes") then
 		TerminalScreen.Downgrade()
 	elseif (tokens[1] == "clear_context") then

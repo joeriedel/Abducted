@@ -131,7 +131,7 @@ function Discovery.Activate(self, activate)
 			Discovery.Popup:CloseUI()
 		end
 	end
-
+	
 end
 
 function Discovery.CheckPlayerProximity(self)
@@ -596,7 +596,9 @@ function Discovery.OpenDBPressed()
 end
 
 function Discovery.ClosePressed()
-	Discovery.Popup:CloseUI()
+	if (Discovery.Popup and (Discovery.Popup.active)) then
+		Discovery.Popup:CloseUI()
+	end
 end
 
 function Discovery.StaticInit()

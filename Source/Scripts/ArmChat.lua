@@ -27,7 +27,7 @@ function Arm.SpawnChat(self)
 		self.workspaceLeft[4] - (20*UI.identityScale[2])
 	}
 	
-	self.widgets.chat.ChatList = UI:CreateWidget("VListWidget", {rect=self.chatRect})
+	self.widgets.chat.ChatList = UI:CreateWidget("VListWidget", {rect=self.chatRect,OnInputEvent=Arm.SkipText})
 	
 	if (UI.mode == kGameUIMode_PC) then
 		UI:CreateVListWidgetScrollBar(
@@ -51,6 +51,18 @@ function Arm.SpawnChat(self)
 	self.widgets.chat.ChatList:SetEndStops({0, self.chatRect[4]*0.1})
 	self.widgets.chat.ChatList:SetBlendWithParent(true)
 	
+end
+
+function Arm.SkipText(widget, e)
+	if (Input.IsTouchBegin(e)) then
+		if (Arm.skipFun) then
+			Arm:skipFun()
+			Arm.skipFun = nil
+			return true
+		end
+	end
+	
+	return false
 end
 
 function Arm.ResetChat(self)
@@ -486,7 +498,7 @@ function Arm.CreateRewardText(self)
 	self.currentRewardWidgetsHeight = self.chatPos[2] - startY
 end
 
-function Arm.ChatPrompt(self)
+function Arm.ChatPrompt(self, extraDelay)
 
 	-- create the necessary chat controls and append them to the VList
 	self.choiceWidgets = nil
@@ -615,7 +627,10 @@ function Arm.ChatPrompt(self)
 		thinkTime = FloatRand(self.prompt.time[1], self.prompt.time[2])
 	end
 	
-	self.promptState.flashDuration = Game.sysTime + thinkTime
+	extraDelay = extraDelay or 0
+	
+	self.promptState.flashDelay = Game.sysTime + extraDelay
+	self.promptState.flashDuration = Game.sysTime + thinkTime + extraDelay
 	
 	local f = function()
 		Arm:FlashCursor()
@@ -625,21 +640,33 @@ function Arm.ChatPrompt(self)
 	self.promptState.labels[1]:SetVisible(false)
 	self.chatTimer = World.globalTimers:Add(f, 0.2, true)
 	
+	self.skipFun = function () Arm:SkipPrompt() end
 end
 
 function Arm.FlashCursor(self)
 	local time = Game.sysTime
 	
+	if (self.promptState.flashDelay and (time < self.promptState.flashDelay)) then
+		return
+	end
+	
 	if (time >= self.promptState.flashDuration) then
 		self.chatTimer:Clean()
 		self.chatTimer = nil
 		self.promptState.labels[1]:SetVisible(true)
+		self.widgets.chat.ChatList:RecalcLayout()
 		self:AnimatePrompt()
-		return;
+		return
 	end
 	
 	local visible = not self.promptState.labels[1]:Visible()
 	self.promptState.labels[1]:SetVisible(visible)
+	
+	if (self.promptState.flashDelay) then
+		self.promptState.flashDelay = nil
+		self.widgets.chat.ChatList:RecalcLayout()
+	end
+	
 end
 
 function Arm.AnimatePrompt(self)
@@ -649,6 +676,21 @@ function Arm.AnimatePrompt(self)
 	
 	local charactersPerSecond = 33
 	self.chatTimer = World.globalTimers:Add(f, 1/charactersPerSecond, true)
+end
+
+function Arm.SkipRewards(self)
+	if (self.currentRewardWidgets) then
+		if (Arm.active and (Arm.mode == "chat")) then
+			Arm.sfx.Reward:Play(kSoundChannel_UI, 0)
+		end
+		for k,v in pairs(self.currentRewardWidgets) do
+			v:MoveTo({v.x, v.y}, {0,0})
+			v:BlendTo({1,1,1,1}, 0.1)
+		end
+	end
+	
+	Arm:SkipChoices()
+	collectgarbage()
 end
 
 function Arm.DisplayRewards(self)
@@ -673,6 +715,51 @@ function Arm.DisplayRewards(self)
 	end
 end
 
+function Arm.SkipPrompt(self)
+
+	if (self.chatTimer) then
+		self.chatTimer:Clean()
+		self.chatTimer = nil
+	end
+	
+	if (self.chatTimer2) then
+		self.chatTimer2:Clean()
+		self.chatTimer2 = nil
+	end
+	
+	self.skipFun = nil
+	if (self.promptState.labels[1]) then
+		self.promptState.labels[1]:SetVisible(true)
+	end
+	
+	for i=self.promptState.line,#self.promptState.lines do
+	
+		local utf32 = self.promptState.lines[i]
+		local w = self.promptState.labels[i]
+		self.promptState.labels[i] = nil
+		
+		local utf8 = System.UTF32To8(utf32)
+		UI:SetLabelText(w, utf8)
+		
+		w:Unmap()
+	end
+	
+	if (Arm.active and (Arm.mode == "chat")) then
+		if (GameDB.chatLockout) then
+			local f = function()
+				Arm:DisplayChatLockout()
+			end
+			self.chatTimer2 = World.globalTimers:Add(f, 3)
+		else
+			Arm:EnableChangeTopic(true)
+		end
+	end
+			
+	Arm:SkipRewards()
+	self.widgets.chat.ChatList:RecalcLayout()
+	
+end
+
 function Arm.TickPrompt(self)
 	local utf32 = self.promptState.lines[self.promptState.line]
 	local w = self.promptState.labels[self.promptState.line]
@@ -690,6 +777,7 @@ function Arm.TickPrompt(self)
 		if (self.promptState.line > #self.promptState.lines) then
 			self.chatTimer:Clean()
 			self.chatTimer = nil
+			self.skipFun = nil
 			if (Arm.active and (Arm.mode == "chat")) then
 				if (GameDB.chatLockout) then
 					local f = function()
@@ -743,7 +831,11 @@ function Arm.ClearLockout(self)
 	GameDB:ClearChatLockout()
 end
 
-function Arm.DisplayChoices(self)
+function Arm.SkipChoices(self)
+	Arm:DisplayChoices(true)
+end
+
+function Arm.DisplayChoices(self, skip)
 
 	if (self.clearTopicPending) then
 		Arm:EndHorrorTopic()
@@ -875,15 +967,21 @@ function Arm.DisplayChoices(self)
 	
 	self.chatPos[2] = self.chatPos[2] + lineHeight + (Arm.ChatLineSpace*UI.identityScale[2])
 	
-	local f = function()
-	
+	if (skip) then
 		for k,v in pairs(self.choiceWidgets) do
-			v:BlendTo({1,1,1,1}, 0.75)
+			v:BlendTo({1,1,1,1}, 0)
 		end
-	
+	else
+		local f = function()
+		
+			for k,v in pairs(self.choiceWidgets) do
+				v:BlendTo({1,1,1,1}, 0.75)
+			end
+		
+		end
+		
+		self.chatTimer = World.globalTimers:Add(f, 1)
 	end
-	
-	self.chatTimer = World.globalTimers:Add(f, 1)
 end
 
 function Arm.ChoiceSelected(self, widget, choice, prompt, text)
@@ -917,12 +1015,7 @@ function Arm.ChoiceSelected(self, widget, choice, prompt, text)
 		Persistence.WriteBool(SaveGame, "armGeneratedTopicChosen", true, choice.generated)
 	end
 	
-	local f = function()
-		Arm:ChatPrompt()
-	end
-	
-	self.chatTimer = World.globalTimers:Add(f, 1.5)
-
+	Arm:ChatPrompt(1.5)
 end
 
 function Arm.SelectChatRoot(self)

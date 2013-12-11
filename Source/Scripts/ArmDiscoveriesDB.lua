@@ -132,7 +132,8 @@ Arm.Discoveries = {
 		text = "ARM_DISCOVERY_ACHERON",
 		logText = {
 			all = "ARM_DISCOVERY_ACHERON_LOG"
-		}
+		},
+		chat = "Acheron"
 	},
 	
 	Exodus = {
@@ -141,7 +142,8 @@ Arm.Discoveries = {
 		text = "ARM_DISCOVERY_EXODUS",
 		logText = {
 			all = "ARM_DISCOVERY_EXODUS_LOG"
-		}
+		},
+		chat = "Exodus"
 	},
 	
 	Morta = {
@@ -150,7 +152,8 @@ Arm.Discoveries = {
 		text = "ARM_DISCOVERY_MORTA",
 		logText = {
 			all = "ARM_DISCOVERY_MORTA_LOG"
-		}
+		},
+		chat = "Morta"
 	},
 	
 	TheGhost = {
@@ -159,7 +162,8 @@ Arm.Discoveries = {
 		text = "ARM_DISCOVERY_GHOST",
 		logText = {
 			all = "ARM_DISCOVERY_GHOST_LOG"
-		}
+		},
+		chat = "TheGhost"
 	},
 		
 	BlockCreature = {
@@ -179,7 +183,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_BUG_HOLES_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_BUG_HOLES_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_BUG_HOLES_POPUP",
+		chat = "Infestation"
 	},
 	
 	Bugs = {
@@ -209,7 +214,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_CRYSTALINE_STRUCTURE_POPUP",
+		chat = "CrystallineStructure"
 	},
 	
 	DarkCorner = {
@@ -229,7 +235,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_DEEPSPACE_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_DEEPSPACE_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_DEEPSPACE_POPUP",
+		chat = "DeepSpace"
 	},
 	
 	Dreamscape = {
@@ -239,7 +246,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_DREAMSCAPE_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_DREAMSCAPE_POPUP",
+		chat = "TheDreamscape"
 	},
 	
 	DreamscapeMatrix = {
@@ -269,7 +277,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_FLOWING_SKIN_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_FLOWING_SKIN_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_FLOWING_SKIN_POPUP",
+		chat = "FlowingSkin"
 	},
 	
 	GlowingPolyps = {
@@ -279,7 +288,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_GLOWING_POLYPS_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_GLOWING_POLYPS_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_GLOWING_POLYPS_POPUP",
+		chat = "GlowingPolyps"
 	},
 	
 	Glyphs = {
@@ -289,7 +299,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_GLYPHS_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_GLYPHS_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_GLYPHS_POPUP",
+		chat = "Glyphs"
 	},
 	
 	Glyphs2 = {
@@ -359,7 +370,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_JUMP_DOWN_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_JUMP_DOWN_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_JUMP_DOWN_POPUP",
+		chat = "JumpingDown"
 	},
 	
 	ManipulateTentacle = {
@@ -369,7 +381,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_MANIPULATE_TENTACLE_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_TENTACLE_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_TENTACLE_POPUP",
+		chat = "MTentacle"
 	},
 	
 	ManipulatePylon = {
@@ -379,7 +392,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_MANIPULATE_PYLON_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_PYLON_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_MANIPULATE_PYLON_POPUP",
+		chat = "MPylon"
 	},
 	
 	MedicalDiscovery = {
@@ -389,7 +403,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_MEDICAL_DISCOVERY_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_MEDICAL_DISCOVERY_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_MEDICAL_DISCOVERY_POPUP",
+		chat = "MedicalSupplies"
 	},
 	
 	Overgrowth = {
@@ -399,7 +414,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_OVERGROWTH_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_OVERGROWTH_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_OVERGROWTH_POPUP",
+		chat = "Overgrowth"
 	},
 	
 	PlacesToClimb = {
@@ -419,7 +435,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_POD_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_POD_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_POD_POPUP",
+		chat = "AlienPod"
 	},
 	
 	Polyps = {
@@ -429,7 +446,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_POLYPS_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_POLYPS_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_POLYPS_POPUP",
+		chat = "Polyps"
 	},
 	
 	PylonElevator = {
@@ -449,7 +467,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_PYLONS_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_PYLONS"
+		discoveryPopupText = "ARM_DISCOVERY_PYLONS",
+		chat = "Pylons"
 	},
 	
 	Rain = {
@@ -459,7 +478,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_RAIN"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_RAIN_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_RAIN_POPUP",
+		chat = "IndoorRain"
 	},
 	
 	Skin = {
@@ -530,7 +550,7 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_THE_MASTERS_LOG"
 		},
-		chat = "Masters"
+		chat = "TheWatchers"
 	},
 	
 	TheMaw = {
@@ -569,7 +589,8 @@ Arm.Discoveries = {
 		logText = {
 			all = "ARM_DISCOVERY_WILD_GROWTH_LOG"
 		},
-		discoveryPopupText = "ARM_DISCOVERY_WILD_GROWTH_POPUP"
+		discoveryPopupText = "ARM_DISCOVERY_WILD_GROWTH_POPUP",
+		chat = "WildGrowth"
 	},
 	
 	WindowLight = {

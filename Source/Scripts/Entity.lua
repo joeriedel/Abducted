@@ -63,12 +63,39 @@ function Entity.LoadFloorPos(self, state)
 	World.SetFloorState(floorNum, kFloorState_Enabled)
 	
 	local pos = Vec3ForString(state.floorpos)
+
 	local fp  = World.ClipToFloor(
 		{pos[1], pos[2], pos[3] + 16},
 		{pos[1], pos[2], pos[3] - 16}
 	)
 	
-	assert(fp)
+	if (fp == nil) then
+	
+		local shift = {-8, 0, 8}
+		for x=1,#shift do
+		
+			for y=1,#shift do
+		
+				fp = World.ClipToFloor(
+					{pos[1]+shift[x], pos[2]+shift[y], pos[3] + 16},
+					{pos[1]+shift[x], pos[2]+shift[y], pos[3] - 16}
+				)
+				
+				if (fp) then
+					break
+				end
+
+			end
+		
+			if (fp) then
+				break
+			end
+
+		end
+
+		assert(fp)
+	end
+
 	self:SetFloorPosition(fp)
 	self:Link()
 	

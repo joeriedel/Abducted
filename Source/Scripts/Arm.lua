@@ -6,7 +6,7 @@
 Arm = Class:New()
 Arm.active = false
 Arm.Chats = {}
-Arm.IntroAnimationSpeedScale = 0.85
+Arm.IntroAnimationSpeedScale = 0.50
 
 function Arm.Spawn(self)
 

@@ -735,7 +735,7 @@ function Arm.SwapToChange(self)
 end
 
 function Arm.EnableChangeTopic(self, enable)
-	if (enable and (self.horrorTopic or self.requiredTopic or self.contextTopic)) then
+	if (enable and (self.horrorTopic or self.requiredTopic or self.contextTopic) and (self.inReqTopic or self.inContextTopic)) then
 		return
 	end
 	

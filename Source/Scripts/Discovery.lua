@@ -19,6 +19,7 @@ function Discovery.Spawn(self)
 
 	self.databaseId = self.keys.database_id
 	self.left = StringForString(self.keys.fold_out, "left") == "left"
+	self.dbButton = BoolForString(self.keys.has_db_button, true)
 		
 	local spriteSize = {80, 80}--Vec2ForString(self.keys.sprite_size, {64, 64})
 	local absSize = math.max(spriteSize[1], spriteSize[2])
@@ -317,6 +318,7 @@ function Discovery.AnimateOpenUI(self, awardSkillPoints)
 
 	Discovery.Widgets.Arrow:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Close:BlendTo({1,1,1,0}, 0)
+	Discovery.Widgets.Close.class:Reset(Discovery.Widgets.Close)
 	Discovery.Widgets.Title:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Text:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Scroll:BlendTo({1,1,1,0}, 0)
@@ -325,6 +327,8 @@ function Discovery.AnimateOpenUI(self, awardSkillPoints)
 	Discovery.Widgets.Button:BlendTo({1,1,1,0}, 0)
 	Discovery.Widgets.Root:ScaleTo({0,0}, {0,0})
 	Discovery.Widgets.Root:SetVisible(true)
+	
+	Discovery.Widgets.Button:SetVisible(self.dbButton)
 	
 	local arrowRect = Discovery.Widgets.Arrow:Rect()
 	if (self.left) then

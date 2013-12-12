@@ -58,10 +58,8 @@ function Arm.SkipText(widget, e)
 		if (Arm.skipFun) then
 			Arm:skipFun()
 			Arm.skipFun = nil
-			return true
 		end
 	end
-	
 	return false
 end
 
@@ -757,6 +755,7 @@ function Arm.SkipPrompt(self)
 			
 	Arm:SkipRewards()
 	self.widgets.chat.ChatList:RecalcLayout()
+	self.widgets.chat.ChatList:SetCapture(false)
 	
 end
 

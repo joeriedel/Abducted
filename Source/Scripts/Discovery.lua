@@ -460,6 +460,16 @@ end
 
 function Discovery.CloseUI(self, callback)
 	local f = function()
+		if (callback) then
+			callback()
+		end
+	end
+	self:AnimateCloseUI(f)
+	self:RemoveLookTarget()
+end
+
+function Discovery.ActiveCloseUI(self, callback)
+	local f = function()
 		if (self.disableOnClose) then
 			self:Enable(false)
 		end
@@ -470,8 +480,7 @@ function Discovery.CloseUI(self, callback)
 			callback()
 		end
 	end
-	self:AnimateCloseUI(f)
-	self:RemoveLookTarget()
+	self:CloseUI(f)
 end
 
 function Discovery.AddLookTarget(self)
@@ -587,17 +596,17 @@ function Discovery.OpenDBPressed()
 		local discovered = GameDB:CheckDiscovery(self.databaseId)
 		if (discovered ~= "unlocked") then
 			Arm.requestedTopic = dbItem.mysteryChat
-			self:CloseUI(function () World.playerPawn:EnterArm() end)
+			self:ActiveCloseUI(function () World.playerPawn:EnterArm() end)
 			return
 		end
 	end
 		
-	self:CloseUI(function () World.playerPawn:EnterArm("db", self.databaseId) end)
+	self:ActiveCloseUI(function () World.playerPawn:EnterArm("db", self.databaseId) end)
 end
 
 function Discovery.ClosePressed()
 	if (Discovery.Popup and (Discovery.Popup.active)) then
-		Discovery.Popup:CloseUI()
+		Discovery.Popup:ActiveCloseUI()
 	end
 end
 

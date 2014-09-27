@@ -5,9 +5,9 @@
 
 PlayerPawn = Entity:New()
 PlayerPawn.kWalkSpeed = 80
-PlayerPawn.kAutoDecelDistance = 5
-PlayerPawn.kFriction = 1000
-PlayerPawn.kRunSpeed = 160
+PlayerPawn.kAutoDecelDistance = 50
+PlayerPawn.kFriction = 500
+PlayerPawn.kRunSpeed = 185
 PlayerPawn.kShieldSpeed = 1
 PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 400

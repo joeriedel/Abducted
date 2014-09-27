@@ -205,7 +205,7 @@ function BugSpawner.OnEvent(self, cmd, args)
 	elseif (cmd == "disable") then
 		self.enabled = false
 		self.think = nil
-	end
+		end
 end
 
 function BugSpawner.SaveState(self)
@@ -234,7 +234,7 @@ info_bug_spawner = BugSpawner
 Bug = Entity:New()
 Bug.KillMessages = { "BUG_KILLED_MESSAGE1" }
 Bug.DebugMessages = false
-Bug.Health = 25
+Bug.Health = 10
 
 function Bug.Spawn(self)
 
@@ -242,6 +242,7 @@ function Bug.Spawn(self)
 	Entity.Spawn(self)
 	
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 		
 	self.aggression = NumberForString(self.keys.aggression, 1)
 	
@@ -249,7 +250,7 @@ function Bug.Spawn(self)
 		self.model = LoadModel("Characters/Buggroup10")
 		self.guts = LoadModel("FX/bug_guts_group01")
 		self.group = true
-		self.moveSpeed = 90
+		self.moveSpeed = 110
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
@@ -260,7 +261,7 @@ function Bug.Spawn(self)
 		self.playerSeekAttackDistance = 210 * self.aggression
 		self.playerAttackDistance = 75
 		self.zigZagSize = {10, 15}
-		self.zigZagDist = {100, 150}
+		self.zigZagDist = {30, 150}
 	else
 		self.model = LoadModel("Characters/Bug1")
 		self.guts = LoadModel("FX/bug_guts_lone01")
@@ -286,14 +287,14 @@ function Bug.Spawn(self)
 	self:AttachSound(self.sounds.Squish)
 	
 	self.model.dm = self:AttachDrawModel(self.model)
-	self:SetMins({-24, -24, 0})
-	self:SetMaxs({ 24,  24, 32})
+	self:SetMins({-35, -35, 0})
+	self:SetMaxs({ 35,  35, 360})
 	self:SetShadowMins(self:Mins())
 	self:SetShadowMaxs(self:Maxs())
 	self.model.dm:SetBounds(self:Mins(), self:Maxs())
 
 	self.guts.dm = self:AttachDrawModel(self.guts)
-	self.guts.dm:ScaleTo({1.3,1.3,1}, 0) -- bigger guts
+	self.guts.dm:ScaleTo({2,2,1}, 0) -- bigger guts
 	self.guts.dm:SetBounds(VecAdd(self:Mins(), {0,0,2}), self:Maxs()) -- avoid clipping problems
 	self.guts.dm:SetVisible(false)
 	
@@ -311,7 +312,7 @@ function Bug.Spawn(self)
 	self.angle = angle
 	
 	local spring = self:AngleSpring()
-	spring.elasticity = 300 -- <-- larger numbers means she turns faster
+	spring.elasticity = 100 -- <-- larger numbers means she turns faster
 	self:SetAngleSpring(spring)
 	
 	self:SetClassBits(kEntityClass_Monster)
@@ -640,15 +641,15 @@ function Bug.RunAwayFromPlayerAction(self)
 end
 
 function Bug.SeekPlayerAttack(self)
-	if (World.playerPawn.dead) then
-		if (self.action == nil) then	
-			self.eating = false
-		end
-		if (self.eating) then
-			return true
-		end
-		return false
-	end
+	-- if (World.playerPawn.dead) then
+	-- 	if (self.action == nil) then	
+	-- 		self.eating = false
+	-- 	end
+	-- 	if (self.eating) then
+	-- 		return true
+	-- 	end
+	-- 	return false
+	-- end
 	
 	if (self.attackCooldown and (self.attackCooldown > Game.time)) then
 		return false
@@ -748,9 +749,9 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
 	return false
 	--[[
-	if (World.playerPawn.dead) then
-		return false
-	end
+	-- if (World.playerPawn.dead) then
+	-- 	return false
+	-- end
 	
 	if (World.playerPawn.stomping or World.playerPawn.customMove or World.playerPawn.bugStun or (not World.playerPawn.visible)) then
 		return false
@@ -824,17 +825,18 @@ function Bug.CheckGroupAttack(self)
 	World.playerPawn.bugSounds.Eaten:Play(kSoundChannel_FX, 0)
 	
 	-- crawl over her body
-	local callbacks = {
-		OnEndFrame = function()
-			self.model:BlendToState("crawling")
-		end
-	}
+	-- local callbacks = {
+	-- 	OnEndFrame = function()
+	-- 		self.model:BlendToState("crawling")
+	-- 	end
+	-- }
 	
 	self.model:BlendToState("eat_eve", nil, true, self, callbacks)
 	self.busy = true
 	self.eating = true
-	self.action = Bug.SeekPlayerAttackAction
-	self:RunToDistance(self.moveSpeed * 4, self.angle) -- keep going well past player
+
+	self:Stop()
+	self:SetMoveType(kMoveType_None)
 		
 	return true
 end
@@ -1065,8 +1067,10 @@ function Bug.PulseDamage(self, damage)
 		self.sounds.Squish:Play(kSoundChannel_FX, 0)
 		
 		if (self.group) then
+			-- self.model.dm:SetVisible(false)
+			-- GameDB:KilledBugs(1)
 			self.model:BlendToState("pulsedeath")
-			GameDB:KilledBugs(IntRand(8, 12))
+			GameDB:KilledBugs(IntRand(20, 20))
 		else
 			self.model.dm:SetVisible(false)
 			GameDB:KilledBugs(1)

@@ -250,7 +250,7 @@ function Bug.Spawn(self)
 		self.model = LoadModel("Characters/Buggroup10")
 		self.guts = LoadModel("FX/bug_guts_group01")
 		self.group = true
-		self.moveSpeed = 110
+		self.moveSpeed = 130
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
@@ -265,7 +265,7 @@ function Bug.Spawn(self)
 	else
 		self.model = LoadModel("Characters/Bug1")
 		self.guts = LoadModel("FX/bug_guts_lone01")
-		self.moveSpeed = 75
+		self.moveSpeed = 83
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10

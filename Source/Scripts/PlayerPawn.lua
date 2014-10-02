@@ -4,10 +4,10 @@
 -- See Abducted/LICENSE for licensing terms
 
 PlayerPawn = Entity:New()
-PlayerPawn.kWalkSpeed = 80
-PlayerPawn.kAutoDecelDistance = 50
-PlayerPawn.kFriction = 500
-PlayerPawn.kRunSpeed = 185
+PlayerPawn.kWalkSpeed = 93
+PlayerPawn.kAutoDecelDistance = 20
+PlayerPawn.kFriction = 1000
+PlayerPawn.kRunSpeed = 186
 PlayerPawn.kShieldSpeed = 1
 PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 400

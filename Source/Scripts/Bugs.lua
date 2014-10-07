@@ -27,6 +27,7 @@ function BugSpawner.Spawn(self)
 	self.continuous = StringForString(self.keys.mode, "singleshot") == "continuous"
 	self.radiusTarget = self
 	self.aggression = NumberForString(self.keys.aggression, 1)
+	self.enableKillCmd = BoolForString(self.keys.enable_kill_cmd, true)
 	if (self.aggression <= 0) then
 		self.aggression = 1
 	end
@@ -241,9 +242,6 @@ function Bug.Spawn(self)
 	COutLine(kC_Debug, "Bug:Spawn")
 	Entity.Spawn(self)
 	
-	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
-	self:SetLightingFlags(kObjectLightingFlag_CastShadows)
-		
 	self.aggression = NumberForString(self.keys.aggression, 1)
 	
 	if (BoolForString(self.keys.group, false)) then
@@ -262,6 +260,8 @@ function Bug.Spawn(self)
 		self.playerAttackDistance = 75
 		self.zigZagSize = {10, 15}
 		self.zigZagDist = {30, 150}
+		self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
+		self:SetLightingFlags(kObjectLightingFlag_CastShadows)
 	else
 		self.model = LoadModel("Characters/Bug1")
 		self.guts = LoadModel("FX/bug_guts_lone01")
@@ -747,11 +747,9 @@ end
 
 function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	
-	return false
-	--[[
-	-- if (World.playerPawn.dead) then
-	-- 	return false
-	-- end
+	if (World.playerPawn.dead) then
+	 	return false
+	end
 	
 	if (World.playerPawn.stomping or World.playerPawn.customMove or World.playerPawn.bugStun or (not World.playerPawn.visible)) then
 		return false
@@ -800,7 +798,7 @@ function Bug.CheckAttack(self, d, dd, playerPos, playerAngle)
 	self.model:BlendToState("bug_stun", nil, true)
 	
 	World.playerPawn:BugStun(callback)
-	return true]]
+	return true
 	
 end
 
@@ -820,16 +818,21 @@ function Bug.CheckGroupAttack(self)
 		return false
 	end
 	
+	local cmd = nil
+	if (self.enableKillCmd) then
+		cmd = self.keys.killed_player_command
+	end
+			
 	local killMessage = Bug.KillMessages[IntRand(1, #Bug.KillMessages)]
-	World.playerPawn:Damage(50, self, killMessage)
+	World.playerPawn:Damage(50, self, killMessage, cmd)
 	World.playerPawn.bugSounds.Eaten:Play(kSoundChannel_FX, 0)
 	
 	-- crawl over her body
-	-- local callbacks = {
-	-- 	OnEndFrame = function()
-	-- 		self.model:BlendToState("crawling")
-	-- 	end
-	-- }
+	local callbacks = {
+		OnEndFrame = function()
+			self.model:BlendToState("crawling")
+		end
+	}
 	
 	self.model:BlendToState("eat_eve", nil, true, self, callbacks)
 	self.busy = true

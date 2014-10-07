@@ -636,9 +636,9 @@ MainMenu.Items = {
 	{data={string="MM_CONTINUE", Action=MainMenu.MainPanel.Continue}, Condition=MainMenu.MainPanel.ValidCheckpoint, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_NEW_GAME", Action=MainMenu.MainPanel.NewGame}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_LOAD_GAME", Action=MainMenu.MainPanel.LoadGame}, Condition=MainMenu.MainPanel.SaveGamesExist, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
+--	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
 --	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
-	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Condition=GameNetwork.Available, Create=MainMenu.MainPanel.CreateMMText},
+--	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Condition=GameNetwork.Available, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_CREDITS", Action=MainMenu.MainPanel.Credits}, Create=MainMenu.MainPanel.CreateMMText},
 	{Create=MainMenu.MainPanel.CreateMMIcons}
 }

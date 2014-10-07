@@ -23,16 +23,16 @@ DefaultActionKeys = {
 	[kAction_ManipulateDown] = kKeyCode_S,
 	[kAction_ManipulateLeft] = kKeyCode_A,
 	[kAction_ManipulateRight] = kKeyCode_D,
-	[kAction_Manipulate] = kKeyCode_Z,
+	[kAction_Manipulate] = kKeyCode_3,
 	[kAction_Arm] = kKeyCode_Tab,
-	[kAction_Shield] = kKeyCode_X,
-	[kAction_Pulse] = kKeyCode_C,
+	[kAction_Shield] = kKeyCode_2,
+	[kAction_Pulse] = kKeyCode_1,
 	[kAction_Stop] = kKeyCode_Space,
-	[kAction_Select1] = kKeyCode_1,
-	[kAction_Select2] = kKeyCode_2,
-	[kAction_Select3] = kKeyCode_3,
-	[kAction_Select4] = kKeyCode_4,
-	[kAction_Select5] = kKeyCode_5
+	--[kAction_Select1] = kKeyCode_1,
+	--[kAction_Select2] = kKeyCode_2,
+	--[kAction_Select3] = kKeyCode_3,
+	--[kAction_Select4] = kKeyCode_4,
+	--[kAction_Select5] = kKeyCode_5
 }
 
 function LoadKeyBindings()
@@ -41,7 +41,7 @@ function LoadKeyBindings()
 		KeyToAction = {}
 	}
 	for k,v in pairs(DefaultActionKeys) do
-		local key = Persistence.ReadNumber(Globals, "KeyBindings", v, k)
+		local key = v--Persistence.ReadNumber(Globals, "KeyBindings", v, k)
 		bindings.ActionToKey[k] = key
 		bindings.KeyToAction[key] = k
 	end

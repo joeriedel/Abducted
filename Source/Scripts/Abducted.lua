@@ -294,9 +294,9 @@ function Abducted.OnInputGesture(self, g)
 end
 
 function Abducted.InputKeyAction(self, e)
-	if (UI.mode == kGameUIMode_Mobile) then
-		return false
-	end
+	--if (UI.mode == kGameUIMode_Mobile) then
+	--	return false
+	--end
 	
 	if (e.type == kI_KeyUp) then
 		return true
@@ -310,14 +310,14 @@ function Abducted.InputKeyAction(self, e)
 		return false
 	end
 	
-	if (action == kAction_Stop) then
-		World.playerPawn:Stop()
-		return true
-	end
+	--if (action == kAction_Stop) then
+	--	World.playerPawn:Stop()
+	--	return true
+	--end
 	
-	if (ManipulatableObjectUI:HandleAction(action)) then
-		return true
-	end
+	--if (ManipulatableObjectUI:HandleAction(action)) then
+	--	return true
+	--end
 	
 	if (HUD:HandleAction(action)) then
 		return true

@@ -21,6 +21,8 @@ function ManipulatableObject.Spawn(self)
 	end
 	self:SetLightInteractionFlags(kLightInteractionFlag_Objects)
 	
+	self.enableKillCmd = BoolForString(self.keys.enable_kill_cmd, true)
+	
 	-- setup auto-face smoothing
 	local angleVertex = self:Angles()
 	angleVertex.mass = 5
@@ -358,12 +360,21 @@ function ManipulatableObject.OnDamage(self, targets)
 
 	local blocked = false
 	
+	local cmd = nil
+	if (self.enableKillCmd) then
+		cmd = self.keys.killed_player_command
+	end
+			
 	for k,v in pairs(targets) do
 		if ((not v.dead) and v.Damage) then
 			local shieldOn = v.shieldActive == true
 			
-			v:Damage(self.attackDamage, self, killMsg)
-		
+			if (v == World.playerPawn) then
+				v:Damage(self.attackDamage, self, killMsg, cmd)
+			else
+				v:Damage(self.attackDamage, self, killMsg)
+			end
+			
 			shieldOn = shieldOn or (v.shieldActive == true)
 			
 			if (shieldOn and (not v.dead)) then

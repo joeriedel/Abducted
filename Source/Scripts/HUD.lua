@@ -1564,13 +1564,13 @@ function HUD.RefreshAvailableActions(self)
 	else
 		HUD:EnableArm(self.itemState.arm)
 		if (self.shieldStartTime == nil) then
-			HUD:EnableShield(self.itemState.shield)
+			HUD:EnableShield(self.itemState.shield and PlayerSkills:ShieldUnlocked())
 		end
 		if (self.manipulateStartTime == nil) then
-			HUD:EnableManipulate(self.itemState.manipulate)
+			HUD:EnableManipulate(self.itemState.manipulate and PlayerSkills:ManipulateUnlocked())
 		end
 		if (self.pulseStartTime == nil) then
-			HUD:EnablePulse(self.itemState.pulse)
+			HUD:EnablePulse(self.itemState.pulse and PlayerSkills:PulseUnlocked())
 		end
 	end
 	

@@ -177,6 +177,7 @@ function MainMenu.InitUI(self)
 	self:InitNews()
 	self:InitNewGame()
 	self:InitLoadGame()
+	self:InitInstructions()
 	self:InitCredits()
 	
 end
@@ -607,6 +608,20 @@ function MainMenu.MainPanel.Credits(self, item)
 	end
 end
 
+function MainMenu.MainPanel.Instructions(self, item)
+	GameNetwork.LogEvent("ViewInstructions")
+	local f = function()
+		self.busy = false
+	end
+	
+	MainMenu.instructionsPanel:TransitionIn({0,0}, 0.3, f)
+
+	self.unselectItem = function(callback)
+		MainMenu.instructionsPanel:TransitionOut({0,0}, 0.2, 0.3, callback)
+	end
+end
+
+
 function MainMenu.MainPanel.Facebook(self)
 	GameNetwork.LogEvent("ClickedFacebook")
 	System.LaunchURL("http://www.facebook.com/sunsidegames")
@@ -639,6 +654,7 @@ MainMenu.Items = {
 --	{data={string="MM_STORE", Action=MainMenu.MainPanel.Store}, Create=MainMenu.MainPanel.CreateMMText},
 --	{data={string="MM_LEADERBOARDS", Action=MainMenu.MainPanel.Leaderboards}, Create=MainMenu.MainPanel.CreateMMText},
 --	{data={string="MM_ACHIEVEMENTS", Action=MainMenu.MainPanel.Achievements}, Condition=GameNetwork.Available, Create=MainMenu.MainPanel.CreateMMText},
+	{data={string="MM_INSTRUCTIONS", Action=MainMenu.MainPanel.Instructions}, Create=MainMenu.MainPanel.CreateMMText},
 	{data={string="MM_CREDITS", Action=MainMenu.MainPanel.Credits}, Create=MainMenu.MainPanel.CreateMMText},
 	{Create=MainMenu.MainPanel.CreateMMIcons}
 }

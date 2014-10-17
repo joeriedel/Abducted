@@ -31,7 +31,7 @@ function PostFX.Init()
 	
 	local scale = 0.25
 	
-	if (UI.mode == kGameUIMode_PC) then
+	if (UI.mode == kGameUIMode_Mobile) then
 		PostFX.kNumBlurPasses = 9
 		scale = 0.5
 	end

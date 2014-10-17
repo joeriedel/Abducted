@@ -10,8 +10,8 @@
 #define IDD_ABOUTBOX			103
 #define IDM_ABOUT				104
 #define IDM_EXIT				105
-#define IDI_ABDUCTED			107
-#define IDI_SMALL				108
+#define IDI_APPICON 			107
+#define IDI_SMALLICON			108
 #define IDC_ABDUCTED			109
 #define IDC_MYICON				2
 #ifndef IDC_STATIC

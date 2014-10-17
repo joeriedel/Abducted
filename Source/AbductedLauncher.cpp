@@ -1,7 +1,7 @@
 // AbductedLauncher.cpp
 // Copyright (c) 2010 Sunside Inc., All Rights Reserved
 // Author: Joe Riedel
-// See Crow/LICENSE for licensing terms.
+// See Abducted/LICENSE for licensing terms.
 
 #include "AbductedApp.h"
 #include "AbductedLauncher.h"

@@ -167,7 +167,7 @@ bool AbductedApp::RunAutoExec() {
 	String token;
 	if (script.GetToken(token, Tokenizer::kTokenMode_SameLine)) {
 #if defined(RAD_OPT_PC)
-		const GameUIMode kUIMode = kGameUIMode_PC;
+		const GameUIMode kUIMode = kGameUIMode_Mobile; // HACK!
 #elif defined(RAD_OPT_IOS)
 		const GameUIMode kUIMode = kGameUIMode_Mobile;
 #else

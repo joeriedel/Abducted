@@ -83,7 +83,7 @@ void G_ManipulatableObject::CheckDamage() {
 		lua_State *L = world->lua->L;
 		if (PushEntityCall(L, "OnDamage")) {
 			
-			lua_createtable(L, touching.size(), 0);
+			lua_createtable(L, (int)touching.size(), 0);
 			for (Entity::Vec::const_iterator it = touching.begin(); it != touching.end(); ++it) {
 				const Entity::Ref &entity = *it;
 				lua_pushinteger(L, (it-touching.begin())+1);

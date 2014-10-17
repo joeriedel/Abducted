@@ -357,6 +357,7 @@ pak0 {
 	UI/twitter_icon_M
 	UI/abducted_logo1_M
 	UI/Copyright_TF
+	UI/instructions_M
 
 	Audio/Amb01-Cine
 	Audio/Amb02-Cine1

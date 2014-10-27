@@ -262,18 +262,18 @@ PlayerSkills.Skills.ShieldDuration = {
 		PlayerSkills.ShieldDuration = 0
 	end,
 	[0] = {
-		MaxDuration = 20
+		MaxDuration = 4
 	},
 	{
-		MaxDuration = 30,
+		MaxDuration = 10,
 		Cost = 600
 	},
 	{
-		MaxDuration = 45,
+		MaxDuration = 17,
 		Cost = 900
 	},
 	{
-		MaxDuration = 60,
+		MaxDuration = 24,
 		Cost = 1200
 	}
 }

@@ -4,11 +4,11 @@
 -- See Abducted/LICENSE for licensing terms
 
 PlayerPawn = Entity:New()
-PlayerPawn.kWalkSpeed = 93
+PlayerPawn.kWalkSpeed = 100
 PlayerPawn.kAutoDecelDistance = 20
 PlayerPawn.kFriction = 1000
-PlayerPawn.kRunSpeed = 195
-PlayerPawn.kShieldSpeed = 0.5
+PlayerPawn.kRunSpeed = 225
+PlayerPawn.kShieldSpeed = 0.66
 PlayerPawn.kShieldAccel = 1
 PlayerPawn.kAccel = 400
 PlayerPawn.HandBone = "Girl_RArmPalm"
@@ -126,7 +126,7 @@ PlayerPawn.AnimationStates = {
 	},
 	walkfast = {
 		walk = "walkfast",
-		speedScale = 2.2,
+		speedScale = 2.33,
 		OnSelect = function()
 			HUD:EnableAll()
 		end

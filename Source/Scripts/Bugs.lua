@@ -248,13 +248,13 @@ function Bug.Spawn(self)
 		self.model = LoadModel("Characters/Buggroup10")
 		self.guts = LoadModel("FX/bug_guts_group01")
 		self.group = true
-		self.moveSpeed = 130
+		self.moveSpeed = 150
 		self.accel = 1000
 		self.friction = 1000
 		self.traceMoveStep = 10
 		self.moveRange = {600, 1000}
 		self.turnRange = {-15, 15}
-		self.wanderHangOutTime = {0.2, 0.8}
+		self.wanderHangOutTime = {0.1, 0.2}
 		self.playerDistance = {150, 250, 600}
 		self.playerSeekAttackDistance = 210 * self.aggression
 		self.playerAttackDistance = 75
@@ -515,7 +515,7 @@ function Bug.SeekSpawner(self)
 	
 	self.busy = false
 	
-	local runDistance = d - (self.spawner.radius * math.random(0.5, 0.7))
+	local runDistance = d - (self.spawner.radius * math.random(0.1, 0.2))
 		
 	if (self:RunToDistance(runDistance, v)) then
 		self.angle = LookAngles(v)[3]

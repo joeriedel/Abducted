@@ -23,11 +23,9 @@ function BugSpawner.Spawn(self)
 	self.spawn_radius = NumberForString(self.keys.spawn_radius, 25)
 	self.delay = NumberForString(self.keys.delay, 0)
 	self.probability = NumberForString(self.keys.probability, 0)
-	self.enabled = self.enabled
 	self.continuous = StringForString(self.keys.mode, "singleshot") == "continuous"
 	self.radiusTarget = self
 	self.aggression = NumberForString(self.keys.aggression, 1)
-	self.enableKillCmd = BoolForString(self.keys.enable_kill_cmd, true)
 	if (self.aggression <= 0) then
 		self.aggression = 1
 	end
@@ -106,6 +104,8 @@ function BugSpawner.Think(self)
 	keys.bug_waypoint = self.keys.bug_waypoint
 	keys.group = tostring(math.random() < self.probability)
 	keys.aggression = tostring(self.aggression)
+	keys.enable_kill_command = self.keys.enable_kill_command
+	keys.killed_player_command = self.keys.killed_player_command
 	
 	if (self.keys.intro_anim) then
 		keys.intro_anim = self.keys.intro_anim
@@ -243,6 +243,7 @@ function Bug.Spawn(self)
 	Entity.Spawn(self)
 	
 	self.aggression = NumberForString(self.keys.aggression, 1)
+	self.enableKillCmd = BoolForString(self.keys.enable_kill_cmd, true)
 	
 	if (BoolForString(self.keys.group, false)) then
 		self.model = LoadModel("Characters/Buggroup10")

@@ -607,7 +607,7 @@ function Abducted.PlayerDiedAlertPanelDone(self, result)
 	end
 end
 
-function Abducted.PlayerDied(self, killMessage, specialCommand)
+function Abducted.PlayerDied(self, killMessage, specialCommand, specialCommandDelay)
 	HUD:PlayerDied()
 	if (self.manipulate) then
 		self:EndManipulate()
@@ -620,8 +620,14 @@ function Abducted.PlayerDied(self, killMessage, specialCommand)
 		local f = function()
 			World.PostEvent(specialCommand)
 		end
-		World.globalTimers:Add(f, 2.5)
-	else
+		if (specialCommandDelay ~= nil) then
+			World.globalTimers:Add(f, specialCommandDelay)
+		else
+			f()
+		end
+	end
+	
+	if (specialCommandDelay == nil) then -- normal death
 		if (killMessage == nil) then
 			killMessage = Abducted.KillMessages[IntRand(1, #Abducted.KillMessages)]
 		end

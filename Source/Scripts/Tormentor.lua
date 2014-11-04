@@ -359,7 +359,7 @@ function Tormentor.AttackPlayer(self)
 				cmd = self.keys.killed_player_command
 			end
 			self.sfx.Contact:Play(kSoundChannel_FX, 0)
-			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, cmd)
+			World.playerPawn:Damage(PlayerPawn.kMaxShieldDamage*1.5, self, nil, cmd, 2.5)
 			if (World.playerPawn.dead) then
 				local f = function()
 					World.viewController:AddLookTarget(self, {0,0,160})

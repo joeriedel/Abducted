@@ -1046,7 +1046,7 @@ function PlayerPawn.EndPowerBubble(self)
 	self.powerBubble = false
 end
 
-function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand)
+function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand, specialCommandDelay)
 	if (self.dead) then
 		return
 	end
@@ -1117,11 +1117,11 @@ function PlayerPawn.Damage(self, damage, instigator, killMessage, specialCommand
 	end
 	
 	if (not PlayerPawn.GodMode) then
-		self:Kill(instigator, killMessage, specialCommand)
+		self:Kill(instigator, killMessage, specialCommand, specialCommandDelay)
 	end
 end
 
-function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
+function PlayerPawn.Kill(self, instigator, killMessage, specialCommand, specialCommandDelay)
 
 	if (self.dead) then
 		return
@@ -1142,7 +1142,7 @@ function PlayerPawn.Kill(self, instigator, killMessage, specialCommand)
 		self:EndShield()
 	end
 	
-	Game.entity:PlayerDied(killMessage, specialCommand)
+	Game.entity:PlayerDied(killMessage, specialCommand, specialCommandDelay)
 	PlayerInput:Flush()
 	
 	HUD:DownloadFailed()

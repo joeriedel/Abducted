@@ -76,10 +76,20 @@ function KillVolume.KillThink(self)
 			local entity = touching[i]
 			if (entity.Damage and (not entity.dead)) then
 				local msg = nil
+				local cmd = nil
+				local immune = false
 				if (entity:ClassBits() == kEntityClass_Player) then
 					msg = self.keys.killed_player_msg
+					cmd = self.keys.killed_player_script
+					if (entity.shieldActive and BoolForString(self.keys.blocked_by_shield, false)) then
+						immune = true
+					end
+				else
+					cmd = self.keys.killed_script
 				end
-				entity:Damage(999, self, msg)
+				if (not immune) then
+					entity:Damage(999, self, msg, cmd)
+				end
 			end
 		end
 	end

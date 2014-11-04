@@ -482,7 +482,7 @@ function Bug.SeekPlayer(self)
 		return
 	end
 	
-	if (World.playerPawn.dead or (not self.group)) then	
+	if (World.playerPawn.dead) then	
 		if (self:RunAwayFromPlayer()) then
 			return
 		end
@@ -515,7 +515,7 @@ function Bug.SeekSpawner(self)
 	
 	self.busy = false
 	
-	local runDistance = d - (self.spawner.radius * math.random(0.1, 0.2))
+	local runDistance = d - (self.spawner.radius * math.random(0.5, 0.7))
 		
 	if (self:RunToDistance(runDistance, v)) then
 		self.angle = LookAngles(v)[3]
